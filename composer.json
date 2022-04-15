@@ -1,0 +1,75 @@
+{
+    "name": "blitz-php/framework",
+    "description": "The Blitz framework core",
+    "keywords": ["framework", "blitz", "flash"],
+    "license": "MIT",
+    "type": "project",
+    "support": {
+        "issues": "https://github.com/blitz-php/framework/issues",
+        "source": "https://github.com/blitz-php/framework"
+    },
+    "authors": [
+        {
+            "name": "Dimitri Sitchet Tomkeu",
+            "email": "devcode.dst@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "adhocore/cli": "0.9.1",
+        "php-di/php-di": "^6.3",
+        "laminas/laminas-diactoros": "^2.9"
+    },
+    "require-dev": {
+        "blitz-php/coding-standard": "@dev",
+        "kahlan/kahlan": "5.2.0",
+        "fakerphp/faker": "^1.9.2",
+        "phpstan/phpstan": "^1.4.7"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../blitz/coding-standard",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BlitzPHP\\": "src/"
+        }
+    },
+    "scripts": {
+        "analyze": "phpstan analyse",
+        "test": "phpunit",
+        "cs": [
+            "php-cs-fixer fix --ansi --verbose --dry-run --diff"
+        ],
+        "cs-fix": [
+            "php-cs-fixer fix --ansi --verbose --diff"
+        ]
+    },
+    "scripts-descriptions": {
+        "analyze": "Lance l'analyse statique du code du framework",
+        "test": "Execute les tests unitaires",
+        "cs": "Vérifie les normes de codage",
+        "cs-fix": "Fix the coding style"
+    },
+    "replace": {
+        "blitz-php/database": "self.version"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "suggest": {
+        "ext-ftp": "Required to use the Flysystem FTP driver.",
+        "fakerphp/faker": "Required to make seed of database (^1.9.1).",
+        "filp/whoops": "Required for friendly error pages in development (^2.14.3)."
+    },
+    "prefer-stable": true
+}
