@@ -1,7 +1,7 @@
 {
     "name": "blitz-php/framework",
     "description": "The Blitz framework core",
-    "keywords": ["framework", "blitz", "flash"],
+    "keywords": ["framework", "blitz php", "flash", "rapid"],
     "license": "MIT",
     "type": "project",
     "support": {
@@ -16,6 +16,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
+        "php": "^8.0",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "adhocore/cli": "0.9.1",

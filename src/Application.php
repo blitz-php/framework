@@ -11,7 +11,7 @@
 
 namespace BlitzPHP;
 
-use Laminas\Diactoros\Response;
+use BlitzPHP\Http\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

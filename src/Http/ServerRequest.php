@@ -33,4 +33,9 @@ class ServerRequest extends \Laminas\Diactoros\ServerRequest
 
         return ServerRequestFactory::fromGlobals(...$args);
     }
+
+    public function getLocale(): string
+    {
+        return 'fr';
+    }
 }
