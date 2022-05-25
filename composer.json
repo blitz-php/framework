@@ -13,17 +13,8 @@
         "php": ">=7.4 | ^8.0"
     },
     "require-dev": {
-        "blitz-php/coding-standard": "@dev"
+        "blitz-php/coding-standard": "dev-main"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../blitz/coding-standard",
-            "options": {
-                "symlink": false
-            }
-        }
-    ],
     "autoload": {
         "psr-4": {
             "BlitzPHP\\Contracts\\": "src/"
