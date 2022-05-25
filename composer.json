@@ -1,0 +1,64 @@
+{
+    "name": "blitz-php/contracts",
+    "type": "library",
+    "description": "Contrats (interfaces) utilisés pour Blitz PHP",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dimitri Sitchet Tomkeu",
+            "email": "devcode.dst@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4 | ^8.0"
+    },
+    "require-dev": {
+        "blitz-php/coding-standard": "@dev"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../blitz/coding-standard",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BlitzPHP\\Contracts\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "scripts": {
+        "analyze": "phpstan analyse",
+        "test": "phpunit",
+        "cs": [
+            "php-cs-fixer fix --ansi --verbose --dry-run --diff"
+        ],
+        "cs-fix": [
+            "php-cs-fixer fix --ansi --verbose --diff"
+        ]
+    },
+    "scripts-descriptions": {
+        "analyze": "Lance l'analyse statique du code du framework",
+        "test": "Execute les tests unitaires",
+        "cs": "Vérifie les normes de codage",
+        "cs-fix": "Fix the coding style"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/blitz-php/utilities/issues",
+        "source": "https://github.com/blitz-php/utilities"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
