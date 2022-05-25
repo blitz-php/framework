@@ -11,27 +11,12 @@
     ],
     "require": {
         "php": ">=7.4 | ^8.0",
-		"blitz-php/contracts": "@dev"
+		"blitz-php/contracts": "dev-main"
     },
-    "require-dev": {
-        "blitz-php/coding-standard": "@dev"
+	"require-dev": {
+        "blitz-php/coding-standard": "dev-main",
+		"phpstan/phpstan": "^1.0"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../blitz/coding-standard",
-            "options": {
-                "symlink": false
-            }
-        },
-		{
-            "type": "path",
-            "url": "../../blitz/contracts",
-            "options": {
-                "symlink": false
-            }
-        }
-    ],
     "autoload": {
         "psr-4": {
             "BlitzPHP\\Utilities\\": "src/"
