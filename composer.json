@@ -13,40 +13,15 @@
         "php": ">=7.4 | ^8.0",
 		"blitz-php/contracts": "dev-main"
     },
-	"require-dev": {
-        "blitz-php/coding-standard": "dev-main",
-		"phpstan/phpstan": "^1.0"
-    },
     "autoload": {
         "psr-4": {
-            "BlitzPHP\\Utilities\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "BlitzPHP\\Utilities\\Tests\\": "tests/"
+            "BlitzPHP\\Utilities\\": ""
         }
     },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
-    },
-    "scripts": {
-        "analyze": "phpstan analyse",
-        "test": "phpunit",
-        "cs": [
-            "php-cs-fixer fix --ansi --verbose --dry-run --diff"
-        ],
-        "cs-fix": [
-            "php-cs-fixer fix --ansi --verbose --diff"
-        ]
-    },
-    "scripts-descriptions": {
-        "analyze": "Lance l'analyse statique du code du framework",
-        "test": "Execute les tests unitaires",
-        "cs": "Vérifie les normes de codage",
-        "cs-fix": "Fix the coding style"
     },
     "extra": {
         "branch-alias": {

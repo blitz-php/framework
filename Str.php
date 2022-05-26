@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of Blitz PHP framework - Utilities.
+ * This file is part of Blitz PHP framework.
  *
  * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
  *
