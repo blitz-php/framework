@@ -1,0 +1,45 @@
+{
+    "name": "blitz-php/cache",
+    "type": "library",
+    "description": "Bibliothèque de mise en cache facile avec prise en charge de plusieurs systèmes de mise en cache",
+    "license": "MIT",
+    "keywords": [
+        "blitz-php",
+        "caching",
+        "cache"
+    ],
+    "authors": [
+        {
+            "name": "Dimitri Sitchet Tomkeu",
+            "email": "devcode.dst@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.3",
+        "psr/simple-cache": "^1.0 || ^2.0"
+    },
+	"provide": {
+        "psr/simple-cache-implementation": "^1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BlitzPHP\\Cache\\": ""
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/blitz-php/cache/issues",
+        "source": "https://github.com/blitz-php/cache"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
