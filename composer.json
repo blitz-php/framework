@@ -1,0 +1,37 @@
+{
+    "name": "blitz-php/traits",
+    "type": "library",
+    "description": "Traits utilisés pour Blitz PHP",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dimitri Sitchet Tomkeu",
+            "email": "devcode.dst@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4 | ^8.0",
+		"blitz-php/utilities": "dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "BlitzPHP\\Traits\\": ""
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/blitz-php/traits/issues",
+        "source": "https://github.com/blitz-php/traits"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
