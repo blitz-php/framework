@@ -1,7 +1,7 @@
 <?php
 namespace BlitzPHP\Traits;
 
-use BlitzPHP\Utility\Arr;
+use BlitzPHP\Utilities\Arr;
 use Exception;
 use InvalidArgumentException;
 
