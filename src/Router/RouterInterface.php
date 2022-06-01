@@ -14,20 +14,20 @@ namespace BlitzPHP\Router;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Expected behavior of a Router.
+ * Comportement attendu d'un routeur.
  */
 interface RouterInterface
 {
     /**
-     * Stores a reference to the RouteCollection object.
+     * Stocke une référence à l'objet RouteCollection.
      *
      * @param Request $request
      */
-    public function __construct(RouteCollectionInterface $routes, ?ServerRequestInterface $request = null);
+    public function init(RouteCollectionInterface $routes, ServerRequestInterface $request);
 
     /**
-     * Scans the URI and attempts to match the current URI to the
-     * one of the defined routes in the RouteCollection.
+     * Analyse l'URI et tente de faire correspondre l'URI actuel au
+     * l'une des routes définies dans la RouteCollection.
      *
      * @param string $uri
      *
@@ -36,24 +36,24 @@ interface RouterInterface
     public function handle(?string $uri = null);
 
     /**
-     * Returns the name of the matched controller.
+     * Renvoie le nom du contrôleur correspondant.
      *
      * @return mixed
      */
     public function controllerName();
 
     /**
-     * Returns the name of the method to run in the
-     * chosen container.
+     * Renvoie le nom de la méthode à exécuter dans le
+     * conteneur choisi.
      *
      * @return mixed
      */
     public function methodName();
 
     /**
-     * Returns the binds that have been matched and collected
-     * during the parsing process as an array, ready to send to
-     * instance->method(...$params).
+     * Renvoie les liaisons qui ont été mises en correspondance et collectées
+     * pendant le processus d'analyse sous forme de tableau, prêt à être envoyé à
+     * instance->méthode(...$params).
      *
      * @return mixed
      */

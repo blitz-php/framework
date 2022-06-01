@@ -9,8 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Http;
-
-class Response extends \GuzzleHttp\Psr7\Response
-{
-}
+// Files language settings
+return [
+    'fileDoesNotExist'      => 'Unable to loader the "{0} "configuration, the {1} file does not exist',
+];

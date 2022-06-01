@@ -9,8 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Http;
-
-class Response extends \GuzzleHttp\Psr7\Response
-{
-}
+// Files language settings
+return [
+    'providersDefinitionDontExist'      => 'Unable to load system services definition file. The `{0}` file does not exist or cannot be read.',
+];

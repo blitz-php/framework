@@ -9,16 +9,12 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP;
+namespace BlitzPHP\Exceptions;
 
-use BlitzPHP\Http\Response;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
-class Application
+class HttpException extends FrameworkException
 {
-    public function run(ServerRequestInterface $request): ResponseInterface
+    public static function methodNotAllowed(string $method): self
     {
-        return new Response();
+        return new static(self::lang('Http.methodNotAllowed', [$method]));
     }
 }

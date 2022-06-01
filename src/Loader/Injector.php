@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Traits\SingletonTrait;
 use DI\Container;
 use DI\ContainerBuilder;
 
@@ -21,44 +22,50 @@ use DI\ContainerBuilder;
  */
 class Injector
 {
+    use SingletonTrait;
+    
     /**
      * @var \DI\Container
      */
     private $container;
 
     /**
-     * @var self
+     * @var ContainerBuilder
      */
-    private static $instance;
+    private $builder;
 
     /**
      * Constructor
      */
     private function __construct()
     {
-        $builder = new ContainerBuilder();
-        $builder->useAutowiring(true);
+        $this->builder = new ContainerBuilder();
+        $this->builder->useAutowiring(true);
 
-        // $builder->addDefinitions(Load::providers());
+        if (on_prod()) {
+            $this->builder->enableCompilation(SYST_PATH.'Constants'.DS);
+        }
 
-        /*  if (Config::get('general.environment') === 'prod')
-         {
-             $builder->enableCompilation(SYST_DIR.'constants'.DS);
-         } */
-
-        $this->container = $builder->build();
+        $this->container = new Container();
     }
 
     /**
-     * Renvoie l'instance unique de la classe courante
+     * Charge les definitions pour le container
      */
-    public static function instance(): self
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
+    private function loadProviders() {
+        $providers = Load::providers();
+        
+        $this->builder->addDefinitions($providers);
 
-        return self::$instance;
+        $this->container = $this->builder->build();
+    }
+
+    /**
+     * Initialise le container d'injection de dependences
+     */
+    public static function init()
+    {
+        self::instance()->loadProviders();
     }
 
     /**

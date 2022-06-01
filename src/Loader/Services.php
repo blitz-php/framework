@@ -11,7 +11,16 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Cache\Cache;
+use BlitzPHP\Core\Config;
+use BlitzPHP\Debug\Timer;
+use BlitzPHP\Event\EventManager;
+use BlitzPHP\Http\Negotiator;
+use BlitzPHP\Http\Response;
+use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
+use BlitzPHP\Http\Uri;
+use BlitzPHP\Output\Language;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
 use DI\NotFoundException;
@@ -49,7 +58,74 @@ class Services
     }
 
     /**
-     * The Request class models an HTTP request.
+     * La classe de cache fournit un moyen simple de stocker et de récupérer
+     * données complexes pour plus tard
+     */
+    public static function cache(bool $shared = true): Cache
+    {
+        $config = Config::get('cache');
+
+        if (true === $shared) {
+            return self::singleton(Cache::class)->setConfig($config);
+        }
+
+        return self::factory(Cache::class, [$config]);
+    }
+
+    /**
+     * Émetteur de réponse au client
+     */
+    public static function emitter(bool $shared = true): ResponseEmitter
+    {
+        if (true === $shared) {
+            return self::singleton(ResponseEmitter::class);
+        }
+
+        return self::factory(ResponseEmitter::class);
+    }
+    
+    /**
+     * Gestionnaire d'evenement
+     */
+    public static function event(bool $shared = true): EventManager
+    {
+        if (true === $shared) {
+            return self::singleton(EventManager::class);
+        }
+
+        return self::factory(EventManager::class);
+    }
+
+    /**
+     * Responsable du chargement des traductions des chaînes de langue.
+     */
+    public static function language(?string $locale = null, bool $shared = true): Language
+    {
+        if (true === $shared) {
+            return self::singleton(Language::class)->setLocale($locale);
+        }
+
+        return self::factory(Language::class)->setLocale($locale);
+    }
+
+    /**
+     * La classe Input générale modélise une requête HTTP.
+     */
+    public static function negotiator(?ServerRequest $request = null, bool $shared = true): Negotiator
+    {
+        if (empty($request)) {
+            $request = static::request(true);
+        }
+
+        if (true === $shared) {
+            return self::singleton(Negotiator::class)->setRequest($request);
+        }
+
+        return self::factory(Negotiator::class, [$request]);
+    }
+
+    /**
+     * La classe Resquest modélise une reqûete HTTP.
      */
     public static function request(bool $shared = true): ServerRequest
     {
@@ -58,6 +134,18 @@ class Services
         }
 
         return self::factory(ServerRequest::class);
+    }
+
+    /**
+     * La classe Response modélise une réponse HTTP.
+     */
+    public static function response(bool $shared = true): Response
+    {
+        if (true === $shared) {
+            return self::singleton(Response::class);
+        }
+
+        return self::factory(Response::class);
     }
 
     /**
@@ -82,7 +170,6 @@ class Services
         if (true === $shared) {
             return self::singleton(Router::class);
         }
-
         if (empty($routes)) {
             $routes = static::routes(true);
         }
@@ -90,7 +177,31 @@ class Services
             $request = static::request(true);
         }
 
-        return self::factory(Router::class, [$routes, $request]);
+        return self::factory(Router::class)->init($routes, $request);
+    }
+
+    /**
+     * La classe Timer fournit un moyen simple d'évaluer des parties de votre application.
+     */
+    public static function timer(bool $shared = true): Timer
+    {
+        if (true === $shared) {
+            return self::singleton(Timer::class);
+        }
+
+        return self::factory(Timer::class);
+    }
+
+    /**
+     * La classe URI fournit un moyen de modéliser et de manipuler les URI.
+     */
+    public static function uri(?string $uri = null, bool $shared = true): Uri
+    {
+        if (true === $shared) {
+            return self::singleton(Uri::class)->setURI($uri);
+        }
+
+        return self::factory(Uri::class, [$uri]);
     }
 
     /**
@@ -163,7 +274,7 @@ class Services
      *
      * @return mixed
      */
-    private static function singleton(string $name)
+    public static function singleton(string $name)
     {
         return self::injector()->get($name);
     }

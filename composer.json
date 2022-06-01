@@ -16,28 +16,29 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": "^8.0",
+        "php": ">=7.4 | ^8.0",
+        "blitz-php/cache": "dev-main",
+        "blitz-php/contracts": "dev-main",
+        "blitz-php/traits": "dev-main",
+        "blitz-php/utilities": "dev-main",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "adhocore/cli": "0.9.1",
         "php-di/php-di": "^6.3",
-        "laminas/laminas-diactoros": "^2.9"
+        "mirazmac/php-requirements-checker": "^0.2.0",
+        "kint-php/kint": "^4.1",
+        "guzzlehttp/psr7": "^2.2",
+        "psr/http-server-middleware": "^1.0",
+        "psr/simple-cache": "^1.0 || ^2.0",
+        "league/config": "^1.1",
+        "cweagans/composer-patches": "^1.7"
     },
     "require-dev": {
-        "blitz-php/coding-standard": "@dev",
+        "blitz-php/coding-standard": "dev-main",
         "kahlan/kahlan": "5.2.0",
         "fakerphp/faker": "^1.9.2",
         "phpstan/phpstan": "^1.4.7"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../blitz/coding-standard",
-            "options": {
-                "symlink": false
-            }
-        }
-    ],
     "autoload": {
         "psr-4": {
             "BlitzPHP\\": "src/"
@@ -60,12 +61,21 @@
         "cs-fix": "Fix the coding style"
     },
     "replace": {
-        "blitz-php/database": "self.version"
+        "blitz-php/cache": "self.version",
+        "blitz-php/contracts": "self.version",
+        "blitz-php/traits": "self.version",
+        "blitz-php/utilities": "self.version"
     },
     "extra": {
         "branch-alias": {
             "dev-master": "1.x-dev"
-        }
+        },
+        "patches": {
+            "league/config": {
+                "PR7 - https://github.com/thephpleague/config/pull/7": "./patches/league-config.patch"
+            }
+        },
+        "composer-exit-on-patch-failure": true
     },
     "suggest": {
         "ext-ftp": "Required to use the Flysystem FTP driver.",

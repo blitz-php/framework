@@ -99,8 +99,9 @@ class Router implements RouterInterface
 
     /**
      * @param Request $request
+     * @return self
      */
-    public function __construct(RouteCollection $routes, ?ServerRequestInterface $request = null)
+    public function init(RouteCollectionInterface $routes, ServerRequestInterface $request)
     {
         $this->collection = $routes;
 
@@ -108,6 +109,8 @@ class Router implements RouterInterface
         $this->setMethod($this->collection->getDefaultMethod());
 
         $this->collection->setHTTPVerb($request->getMethod() ?? strtolower($_SERVER['REQUEST_METHOD']));
+
+        return $this;
     }
 
     /**
@@ -118,8 +121,8 @@ class Router implements RouterInterface
      */
     public function handle(?string $uri = null)
     {
-        // If we cannot find a URI to match against, then
-        // everything runs off of it's default settings.
+        // Si nous ne trouvons pas d'URI à comparer, alors
+        // tout fonctionne à partir de ses paramètres par défaut.
         if ($uri === null || $uri === '') {
             return strpos($this->controller, '\\') === false
                 ? $this->collection->getDefaultNamespace() . $this->controller
@@ -136,9 +139,9 @@ class Router implements RouterInterface
             return $this->controller;
         }
 
-        // Still here? Then we can try to match the URI against
-        // Controllers/directories, but the application may not
-        // want this, like in the case of API's.
+        // Toujours là ? Ensuite, nous pouvons essayer de faire correspondre l'URI avec
+        // Contrôleurs/répertoires, mais l'application peut ne pas
+        // vouloir ceci, comme dans le cas des API.
         if (! $this->collection->shouldAutoRoute()) {
             throw new PageNotFoundException("Can't find a route for '{$uri}'.");
         }
@@ -628,8 +631,7 @@ class Router implements RouterInterface
     private function makeController(string $name): string
     {
         return preg_replace(
-            ['#Controller$#'],
-            // ['#Controller$#', '#'.config('general.url_suffix').'$#i'],
+            ['#Controller$#', '#'.config('app.url_suffix').'$#i'],
             '',
             ucfirst($name)
         ) . 'Controller';
@@ -640,7 +642,6 @@ class Router implements RouterInterface
      */
     private function setMethod(string $name): void
     {
-        // $this->method = preg_replace('#'.config('general.url_suffix').'$#i', '', strtolower($name));
-        $this->method = strtolower($name);
+        $this->method = preg_replace('#'.config('app.url_suffix').'$#i', '', strtolower($name));
     }
 }

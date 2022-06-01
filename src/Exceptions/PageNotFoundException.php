@@ -44,20 +44,4 @@ class PageNotFoundException extends OutOfBoundsException implements ExceptionInt
     {
         return new static(self::lang('HTTP.methodNotFound', [$method]));
     }
-
-    /**
-     * Obtenir le message système traduit
-     *
-     * Utilisez une instance de langue non partagée dans les services.
-     * Si une instance partagée est créée, la langue
-     * ont les paramètres régionaux actuels, donc même si les utilisateurs appellent
-     * `$this->request->setLocale()` dans le contrôleur ensuite,
-     * les paramètres régionaux de la langue ne seront pas modifiés.
-     */
-    private static function lang(string $line, array $args = []): string
-    {
-        $lang = Services::language(null, false);
-
-        return $lang->getLine($line, $args);
-    }
 }

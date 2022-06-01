@@ -9,53 +9,43 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace dFramework\core\loader;
+namespace BlitzPHP\Loader;
 
-use dFramework\core\exception\LoadException;
+use BlitzPHP\Exceptions\LoadException;
 
-/**
- * FileLocator
- *
- * @category    Loader
- *
- * @see		https://dimtrov.hebfree.org/docs/dframework
- * @since       3.2.1
- * @file		/system/core/loader/FileLocator.php
- */
 class FileLocator
 {
+    /**
+     * Charge un fichier de traduction
+     */
     public static function lang(string $lang, string $locale): array
     {
-        $file  = self::ensureExt($lang, 'json');
+        $file  = self::ensureExt($lang, 'php');
         $paths = [
             // Path to system languages
-            SYST_DIR . 'constants' . DS . 'lang' . DS . config('general.language') . DS . $file,
+            SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
 
             // Path to app languages
-            LANG_DIR . config('general.language') . DS . $file,
+            LANG_PATH . config('app.language') . DS . $file,
 
             // Path to system languages
-            SYST_DIR . 'constants' . DS . 'lang' . DS . $locale . DS . $file,
+            SYST_PATH . 'Constants' . DS . 'language' . DS . $locale . DS . $file,
 
             // Path to app languages
-            LANG_DIR . $locale . DS . $file,
+            LANG_PATH . $locale . DS . $file,
         ];
         $file_exist = false;
         $languages  = [];
 
         foreach ($paths as $path) {
-            if (file_exists($path) && false !== ($lang = file_get_contents($path))) {
-                $languages  = array_merge($languages, json_decode($lang, true));
+            if (file_exists($path) && ! in_array($path, get_included_files(), true)) {
+                $languages  = array_merge($languages, (array) require($path));
                 $file_exist = true;
             }
         }
 
         if (true !== $file_exist) {
-            LoadException::except('
-                Impossible de charger les langues  <b>' . $lang . '</b>.
-                <br>
-                Aucun fichier accessible en lecture et correspondant à cette langue n\'a été trouvé.
-            ');
+            throw LoadException::langNotFound($lang);
         }
 
         return $languages;
@@ -70,11 +60,11 @@ class FileLocator
     {
         $file  = self::ensureExt($helper, 'php');
         $paths = [
-            // Path to system helpers
-            SYST_DIR . 'helpers' . DS . $file,
+            // Helpers système
+            SYST_PATH . 'Helpers' . DS . $file,
 
-            // Path to app helpers
-            APP_DIR . 'helpers' . DS . $file,
+            // Helpers de l'application
+            APP_PATH . 'Helpers' . DS . $file,
         ];
         $file_exist = false;
 
@@ -86,11 +76,7 @@ class FileLocator
         }
 
         if (true !== $file_exist) {
-            LoadException::except('
-                Impossible de charger les fonctions d\'aide <b>' . $helper . '</b>.
-                <br>
-                Aucun fichier accessible en lecture et correspondant à ce helper n\'a été trouvé.
-            ');
+            throw LoadException::helperNotFound($helper);
         }
     }
 
@@ -109,16 +95,14 @@ class FileLocator
 
         $file  = self::ensureExt(implode(DS, $library), 'php');
         $paths = [
-            // Path to system helpers
-            SYST_DIR . 'libraries' . DS . $file,
+            SYST_PATH . 'Libraries' . DS . $file,
 
-            // Path to app helpers
-            APP_DIR . 'libraries' . DS . $file,
+            APP_PATH . 'Libraries' . DS . $file,
         ];
         $file_syst = $file_exist = false;
 
         if (file_exists($paths[0])) {
-            $lib       = "dFramework\\libraries\\{$lib}";
+            $lib       = "BlitzPhp\\Libraries\\{$lib}";
             $file_syst = $file_exist = true;
         } elseif (file_exists($paths[1])) {
             require_once $paths[1];
@@ -126,21 +110,11 @@ class FileLocator
         }
 
         if (true !== $file_exist) {
-            LoadException::except(
-                'Library file not found',
-                'Impossible de charger la librairie <b>' . $lib . '</b>.
-                <br/>
-                Aucun fichier accessible en lecture n\'a été trouvé pour cette librairie'
-            );
+            throw LoadException::libraryNotFound($lib);
         }
 
         if (true !== $file_syst && ! class_exists($lib)) {
-            LoadException::except(
-                'Library class do not exist',
-                'Impossible de charger la librarie <b>' . $lib . '</b>.
-                <br>
-                Le fichier correspondant à cette librairie ne contient pas de classe <b>' . $lib . '</b>'
-            );
+            throw LoadException::libraryDontExist($lib);
         }
 
         return Injector::make($lib);
@@ -166,15 +140,10 @@ class FileLocator
             }
         }
 
-        $path = MODEL_DIR . self::ensureExt(implode(DS, $model), 'php');
+        $path = MODEL_PATH . self::ensureExt(implode(DS, $model), 'php');
 
         if (! file_exists($path)) {
-            LoadException::except(
-                'Model file not found',
-                'Impossible de charger le modele <b>' . str_replace('Model', '', $mod) . '</b> souhaité.
-                <br/>
-                Le fichier &laquo; ' . $path . ' &raquo; n\'existe pas'
-            );
+            throw LoadException::modelNotFound($mod, $path);
         }
 
         require_once $path;
@@ -185,13 +154,7 @@ class FileLocator
             return Injector::make($class_namespaced);
         }
         if (! class_exists($mod, false)) {
-            LoadException::except(
-                'Model class do not exist',
-                'Impossible de charger le model <b>' . str_replace('Model', '', $mod) . '</b> souhaité.
-                <br/>
-                Le fichier &laquo; ' . $path . ' &raquo; ne contient pas de classe <b>' . $mod . '</br>
-            '
-            );
+            throw LoadException::modelDontExist($mod, $path);
         }
 
         return Injector::make($mod);
@@ -217,15 +180,10 @@ class FileLocator
             }
         }
 
-        $path = CONTROLLER_DIR . self::ensureExt(implode(DS, $controller), 'php');
+        $path = CONTROLLER_PATH . self::ensureExt(implode(DS, $controller), 'php');
 
         if (! file_exists($path)) {
-            LoadException::except(
-                'Controller file not found',
-                'Impossible de charger le controleur <b>' . str_replace('Controller', '', $con) . '</b> souhaité.
-                <br/>
-                Le fichier &laquo; ' . $path . ' &raquo; n\'existe pas'
-            );
+            throw LoadException::controllerNotFound(str_replace('Controller', '', $con), $path);
         }
 
         require_once $path;
@@ -236,12 +194,7 @@ class FileLocator
             return Injector::make($class_namespaced);
         }
         if (! class_exists($con, false)) {
-            LoadException::except(
-                'Controller class do not exist',
-                'Impossible de charger le controleur <b>' . str_replace('Controller', '', $con) . '</br> souhaité.
-                <br>
-                Le fichier &laquo; ' . $path . ' &raquo; ne contient pas de classe <b>' . $con . '</b>'
-            );
+            throw LoadException::controllerDontExist(str_replace('Controller', '', $con), $path);
         }
 
         return Injector::make($con);

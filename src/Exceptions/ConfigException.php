@@ -29,4 +29,9 @@ class ConfigException extends CriticalError
     {
         return new static(lang('Migrations.disabled'));
     }
+
+    public static function configDontExist(string $config, string $file)
+    {
+        return new static(lang('Config.fileDoesNotExist', [$config, $file]));
+    }
 }

@@ -170,7 +170,7 @@ class DotEnv
             return $value;
         }
 
-        // Commence-t-il par une citation ?
+        // Commence-t-il par une citation ?
         if (strpbrk($value[0], '"\'') !== false) {
             // la valeur commence par un guillemet
             $quote        = $value[0];
