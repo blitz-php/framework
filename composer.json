@@ -30,7 +30,6 @@
         "guzzlehttp/psr7": "^2.2",
         "psr/http-server-middleware": "^1.0",
         "psr/simple-cache": "^1.0 || ^2.0",
-        "league/config": "^1.1",
         "monolog/monolog": "^2.6",
         "dflydev/dot-access-data": "^3.0.1",
         "nette/schema": "^1.2"

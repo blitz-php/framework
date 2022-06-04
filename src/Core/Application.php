@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Core;
 
+use BlitzPHP\Config\Config;
 use BlitzPHP\Loader\DotEnv;
 use BlitzPHP\Loader\FileLocator;
 use BlitzPHP\Loader\Injector;
