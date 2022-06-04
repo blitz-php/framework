@@ -1,4 +1,14 @@
-<?php 
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Debug;
 
 use InvalidArgumentException;
@@ -26,6 +36,7 @@ use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use stdClass;
+use Stringable;
 
 class Logger implements LoggerInterface
 {
@@ -43,7 +54,7 @@ class Logger implements LoggerInterface
      */
     private $monolog;
 
-    public function __construct() 
+    public function __construct()
     {
         $this->config = (object) config('log');
 
@@ -52,79 +63,80 @@ class Logger implements LoggerInterface
         foreach (($this->config->handlers ?? []) as $handler => $options) {
             $this->pushHandler($handler, (object) $options);
         }
+
         foreach (($this->config->processors ?? []) as $processor) {
             $this->pushProcessor($processor);
         }
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function emergency(string|\Stringable $message, array $context = []): void
+    public function emergency(string|Stringable $message, array $context = []): void
     {
         $this->monolog->emergency($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function alert(string|\Stringable $message, array $context = []): void
+    public function alert(string|Stringable $message, array $context = []): void
     {
         $this->monolog->alert($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function critical(string|\Stringable $message, array $context = []): void
+    public function critical(string|Stringable $message, array $context = []): void
     {
         $this->monolog->critical($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function error(string|\Stringable $message, array $context = []): void
+    public function error(string|Stringable $message, array $context = []): void
     {
         $this->monolog->error($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function warning(string|\Stringable $message, array $context = []): void
+    public function warning(string|Stringable $message, array $context = []): void
     {
         $this->monolog->warning($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function notice(string|\Stringable $message, array $context = []): void
+    public function notice(string|Stringable $message, array $context = []): void
     {
         $this->monolog->notice($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function info(string|\Stringable $message, array $context = []): void
+    public function info(string|Stringable $message, array $context = []): void
     {
         $this->monolog->info($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function debug(string|\Stringable $message, array $context = []): void
+    public function debug(string|Stringable $message, array $context = []): void
     {
         $this->monolog->debug($message, $context);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function log($level, string|\Stringable $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         $this->monolog->log($level, $message, $context);
     }
@@ -138,28 +150,33 @@ class Logger implements LoggerInterface
             case 'error':
                 $this->pushErrorHandler($options);
                 break;
+
             case 'email':
                 $this->pushEmailHandler($options);
                 break;
+
             case 'telegram':
                 $this->pushTelegramHandler($options);
                 break;
+
             case 'chrome':
                 $this->pushChromeHandler($options);
                 break;
+
             case 'firebug':
                 $this->pushFirebugHandler($options);
                 break;
+
             case 'browser':
                 $this->pushBrowserHandler($options);
                 break;
+
             default:
                 // File handler
                 $this->pushFileHandler($options);
                 break;
         }
     }
-
 
     /**
      * Ajoute un gestionnaire de log de type Fichier
@@ -169,18 +186,17 @@ class Logger implements LoggerInterface
     private function pushFileHandler(stdClass $options): void
     {
         $directory = rtrim($options->path ?: LOG_PATH, DS) . DS;
-        $filename = strtolower($this->config->name ?: 'application');
+        $filename  = strtolower($this->config->name ?: 'application');
         $extension = $options->extension ?: '.log';
 
         if ($options->dayly_rotation ?: true === true) {
-            $handler = new RotatingFileHandler($directory.$filename.$extension, $options->max_files ?: 0, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);
-        }
-        else {
-            $handler = new StreamHandler($directory.$filename.$extension, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);
+            $handler = new RotatingFileHandler($directory . $filename . $extension, $options->max_files ?: 0, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);
+        } else {
+            $handler = new StreamHandler($directory . $filename . $extension, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);
         }
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, ['json', 'line','scalar','normalizer'], $options->format)    
+            $this->setFormatter($handler, ['json', 'line', 'scalar', 'normalizer'], $options->format)
         );
     }
 
@@ -194,13 +210,13 @@ class Logger implements LoggerInterface
         $handler = new ErrorLogHandler($options->type ?: ErrorLogHandler::OPERATING_SYSTEM, $options->level ?: LogLevel::DEBUG);
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, ['json', 'line'], $options->format)    
+            $this->setFormatter($handler, ['json', 'line'], $options->format)
         );
     }
 
     /**
      * Ajoute un gestionnaire de log de type Email
-     * 
+     *
      * Envoi un email à l'administrateur en cas de problème
      */
     private function pushEmailHandler(stdClass $options): void
@@ -208,7 +224,7 @@ class Logger implements LoggerInterface
         $handler = new NativeMailerHandler($options->to, $options->subject, $options->from, $options->level ?: LogLevel::ERROR);
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, ['html','json', 'line'], $options->format)
+            $this->setFormatter($handler, ['html', 'json', 'line'], $options->format)
         );
     }
 
@@ -223,7 +239,7 @@ class Logger implements LoggerInterface
 
     /**
      * Ajoute un gestionnaire de log pour chrome
-     * 
+     *
      * Affichera les log dans la console de chrome
      */
     private function pushChromeHandler(stdClass $options): void
@@ -237,7 +253,7 @@ class Logger implements LoggerInterface
 
     /**
      * Ajoute un gestionnaire de log pour firebug
-     * 
+     *
      * Affichera les log dans la console firebug
      */
     private function pushFirebugHandler(stdClass $options): void
@@ -251,7 +267,7 @@ class Logger implements LoggerInterface
 
     /**
      * Ajoute un gestionnaire de log pour les navigateurs
-     * 
+     *
      * Affichera les log dans la console des navigateurs
      */
     private function pushBrowserHandler(stdClass $options): void
@@ -263,41 +279,46 @@ class Logger implements LoggerInterface
         );
     }
 
-
     /**
      * Ajoute les processeur au gestionnaire de log
-     * 
+     *
      * Un processor permet d'ajouter des méta données aux log générés
      */
     private function pushProcessor(string $processor)
     {
-        switch($processor) {
+        switch ($processor) {
             case 'web':
                 $this->monolog->pushProcessor(new WebProcessor());
                 break;
+
             case 'introspection':
                 $this->monolog->pushProcessor(new IntrospectionProcessor());
                 break;
+
             case 'hostname':
                 $this->monolog->pushProcessor(new HostnameProcessor());
                 break;
+
             case 'process_id':
                 $this->monolog->pushProcessor(new ProcessIdProcessor());
                 break;
+
             case 'uid':
                 $this->monolog->pushProcessor(new UidProcessor());
                 break;
+
             case 'memory_usage':
                 $this->monolog->pushProcessor(new MemoryUsageProcessor());
                 break;
+
             case 'psr':
                 $this->monolog->pushProcessor(new PsrLogMessageProcessor());
                 break;
+
             default:
                 throw new InvalidArgumentException('Invalid formatter for log processor. Accepts values: web/introspection/hostname/process_id/uid/memory_usage/psr');
         }
     }
-
 
     /**
      * Definit le formateur des gestionnaire
@@ -306,33 +327,38 @@ class Logger implements LoggerInterface
      */
     private function setFormatter(object $handler, array $allowed, ?string $format = 'json'): object
     {
-        if (!method_exists($handler, 'setFormatter')) {
+        if (! method_exists($handler, 'setFormatter')) {
             return $handler;
         }
 
         if (empty($format)) {
             $format = 'json';
         }
-        if (!empty($allowed) && !in_array($format, $allowed)) {
-            throw new InvalidArgumentException('Invalid formatter for log file handler. Accepts values: '. implode('/', $allowed));
+        if (! empty($allowed) && ! in_array($format, $allowed, true)) {
+            throw new InvalidArgumentException('Invalid formatter for log file handler. Accepts values: ' . implode('/', $allowed));
         }
 
-        switch($format) {
+        switch ($format) {
             case 'json':
                 $handler->setFormatter(new JsonFormatter());
                 break;
+
             case 'line':
                 $handler->setFormatter(new LineFormatter(null, $this->config->date_format ?? 'Y-m-d H:i:s'));
                 break;
+
             case 'normalizer':
                 $handler->setFormatter(new NormalizerFormatter($this->config->date_format ?? 'Y-m-d H:i:s'));
                 break;
+
             case 'scalar':
                 $handler->setFormatter(new ScalarFormatter($this->config->date_format ?? 'Y-m-d H:i:s'));
                 break;
+
             case 'html':
                 $handler->setFormatter(new HtmlFormatter($this->config->date_format ?? 'Y-m-d H:i:s'));
                 break;
+
             default:
                 break;
         }
