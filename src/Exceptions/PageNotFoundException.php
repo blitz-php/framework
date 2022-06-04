@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Exceptions;
 
-use BlitzPHP\Loader\Services;
 use OutOfBoundsException;
 
 class PageNotFoundException extends OutOfBoundsException implements ExceptionInterface

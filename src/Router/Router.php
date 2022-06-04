@@ -99,6 +99,7 @@ class Router implements RouterInterface
 
     /**
      * @param Request $request
+     *
      * @return self
      */
     public function init(RouteCollectionInterface $routes, ServerRequestInterface $request)
@@ -139,7 +140,7 @@ class Router implements RouterInterface
             return $this->controller;
         }
 
-        // Toujours là ? Ensuite, nous pouvons essayer de faire correspondre l'URI avec
+        // Toujours là ? Ensuite, nous pouvons essayer de faire correspondre l'URI avec
         // Contrôleurs/répertoires, mais l'application peut ne pas
         // vouloir ceci, comme dans le cas des API.
         if (! $this->collection->shouldAutoRoute()) {
@@ -631,7 +632,7 @@ class Router implements RouterInterface
     private function makeController(string $name): string
     {
         return preg_replace(
-            ['#Controller$#', '#'.config('app.url_suffix').'$#i'],
+            ['#Controller$#', '#' . config('app.url_suffix') . '$#i'],
             '',
             ucfirst($name)
         ) . 'Controller';
@@ -642,6 +643,6 @@ class Router implements RouterInterface
      */
     private function setMethod(string $name): void
     {
-        $this->method = preg_replace('#'.config('app.url_suffix').'$#i', '', strtolower($name));
+        $this->method = preg_replace('#' . config('app.url_suffix') . '$#i', '', strtolower($name));
     }
 }

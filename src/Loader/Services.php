@@ -12,7 +12,7 @@
 namespace BlitzPHP\Loader;
 
 use BlitzPHP\Cache\Cache;
-use BlitzPHP\Core\Config;
+use BlitzPHP\Config\Config;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Event\EventManager;
@@ -84,7 +84,7 @@ class Services
 
         return self::factory(ResponseEmitter::class);
     }
-    
+
     /**
      * Gestionnaire d'evenement
      */
@@ -110,17 +110,17 @@ class Services
     }
 
     /**
-	 * La classe Logger est une classe Logging compatible PSR-3 qui prend en charge
+     * La classe Logger est une classe Logging compatible PSR-3 qui prend en charge
      * plusieurs gestionnaires qui traitent la journalisation réelle.
-	 */
-	public static function logger(bool $shared = true): Logger
-	{
-		if ($shared) {
+     */
+    public static function logger(bool $shared = true): Logger
+    {
+        if ($shared) {
             return self::singleton(Logger::class);
-		}
+        }
 
-		return self::factory(Logger::class);
-	}
+        return self::factory(Logger::class);
+    }
 
     /**
      * La classe Input générale modélise une requête HTTP.

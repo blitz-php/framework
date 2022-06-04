@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Http;
 
 use GuzzleHttp\Psr7\LimitStream;
@@ -20,20 +30,16 @@ use GuzzleHttp\Psr7\LimitStream;
  */
 class ResponseEmitter
 {
-    /**
-     * {@inheritDoc}
-     */
     public function emit(Response $response, int $maxBufferLength = 8192)
     {
         $file = $line = null;
         if (headers_sent($file, $line)) {
-            $message = "Unable to emit headers. Headers sent in file=$file line=$line";
+            $message = "Unable to emit headers. Headers sent in file={$file} line={$line}";
             if (on_dev()) {
                 trigger_error($message, E_USER_WARNING);
             }
-            else {
-                // Logger::warning($message, __FILE__, __LINE__);
-            }
+
+            // Logger::warning($message, __FILE__, __LINE__);
         }
 
         $this->emitStatusLine($response);
@@ -43,8 +49,7 @@ class ResponseEmitter
         $range = $this->parseContentRange($response->getHeaderLine('Content-Range'));
         if (is_array($range)) {
             $this->emitBodyRange($range, $response, $maxBufferLength);
-        }
-        else {
+        } else {
             $this->emitBody($response, $maxBufferLength);
         }
 
@@ -58,23 +63,25 @@ class ResponseEmitter
      * Emet le corps de la requête
      *
      * @param int $maxBufferLength La taille du bloc à émettre
+     *
      * @return void
      */
     protected function emitBody(Response $response, int $maxBufferLength)
     {
-        if (in_array($response->getStatusCode(), [204, 304])) {
+        if (in_array($response->getStatusCode(), [204, 304], true)) {
             return;
         }
         $body = $response->getBody();
 
-        if (!$body->isSeekable()) {
+        if (! $body->isSeekable()) {
             echo $body;
 
             return;
         }
 
         $body->rewind();
-        while (!$body->eof()) {
+
+        while (! $body->eof()) {
             echo $body->read($maxBufferLength);
         }
     }
@@ -82,17 +89,18 @@ class ResponseEmitter
     /**
      * Émettre une plage du corps du message.
      *
-     * @param array $range La plage de données à émettre
-     * @param int $maxBufferLength La taille du bloc à émettre
+     * @param array $range           La plage de données à émettre
+     * @param int   $maxBufferLength La taille du bloc à émettre
+     *
      * @return void
      */
     protected function emitBodyRange(array $range, Response $response, int $maxBufferLength)
     {
-        list($unit, $first, $last, $length) = $range;
+        [$unit, $first, $last, $length] = $range;
 
         $body = $response->getBody();
 
-        if (!$body->isSeekable()) {
+        if (! $body->isSeekable()) {
             $contents = $body->getContents();
             echo substr($contents, $first, $last - $first + 1);
 
@@ -101,9 +109,10 @@ class ResponseEmitter
 
         $body = new LimitStream($body, -1, $first);
         $body->rewind();
-        $pos = 0;
+        $pos    = 0;
         $length = $last - $first + 1;
-        while (!$body->eof() AND $pos < $length) {
+
+        while (! $body->eof() && $pos < $length) {
             if (($pos + $maxBufferLength) > $length) {
                 echo $body->read($length - $pos);
                 break;
@@ -136,7 +145,7 @@ class ResponseEmitter
     /**
      * Émettre des en-têtes de réponse.
      *
-     * Boucle à travers chaque en-tête, émettant chacun ; si la valeur d'en-tête
+     * Boucle à travers chaque en-tête, émettant chacun ; si la valeur d'en-tête
      * est un tableau avec plusieurs valeurs, garantit que chacune est envoyée
      * de manière à créer des en-têtes agrégés (au lieu de remplacer
      * la précédente).
@@ -147,19 +156,18 @@ class ResponseEmitter
     {
         $cookies = [];
         if (method_exists($response, 'getCookies')) {
-			$cookies = $response->getCookies();
+            $cookies = $response->getCookies();
         }
 
-        foreach ($response->getHeaders() As $name => $values)
-        {
-            if (strtolower($name) === 'set-cookie')
-            {
+        foreach ($response->getHeaders() as $name => $values) {
+            if (strtolower($name) === 'set-cookie') {
                 $cookies = array_merge($cookies, $values);
+
                 continue;
             }
             $first = true;
-            foreach ($values As $value)
-            {
+
+            foreach ($values as $value) {
                 header(sprintf(
                     '%s: %s',
                     $name,
@@ -176,14 +184,13 @@ class ResponseEmitter
      * émettre des cookies en utilisant setcookie()
      *
      * @param array $cookies Un tableau d'en-têtes Set-Cookie.
+     *
      * @return void
      */
     protected function emitCookies(array $cookies)
     {
-        foreach ($cookies As $cookie)
-        {
-            if (is_array($cookie))
-			{
+        foreach ($cookies as $cookie) {
+            if (is_array($cookie)) {
                 setcookie(
                     $cookie['name'],
                     $cookie['value'],
@@ -193,21 +200,19 @@ class ResponseEmitter
                     $cookie['secure'],
                     $cookie['httpOnly']
                 );
+
                 continue;
             }
 
-            if (strpos($cookie, '";"') !== false)
-            {
+            if (strpos($cookie, '";"') !== false) {
                 $cookie = str_replace('";"', '{__cookie_replace__}', $cookie);
-                $parts = str_replace('{__cookie_replace__}', '";"', explode(';', $cookie));
-            }
-            else
-            {
+                $parts  = str_replace('{__cookie_replace__}', '";"', explode(';', $cookie));
+            } else {
                 $parts = preg_split('/\;[ \t]*/', $cookie);
             }
 
-            list($name, $value) = explode('=', array_shift($parts), 2);
-            $data = [
+            [$name, $value] = explode('=', array_shift($parts), 2);
+            $data           = [
                 'name'     => urldecode($name),
                 'value'    => urldecode($value),
                 'expires'  => 0,
@@ -217,23 +222,18 @@ class ResponseEmitter
                 'httponly' => false,
             ];
 
-            foreach ($parts As $part)
-            {
-                if (strpos($part, '=') !== false)
-                {
-                    list($key, $value) = explode('=', $part);
-                }
-                else
-                {
-                    $key = $part;
+            foreach ($parts as $part) {
+                if (strpos($part, '=') !== false) {
+                    [$key, $value] = explode('=', $part);
+                } else {
+                    $key   = $part;
                     $value = true;
                 }
 
-                $key = strtolower($key);
+                $key        = strtolower($key);
                 $data[$key] = $value;
             }
-            if (!empty($data['expires']))
-            {
+            if (! empty($data['expires'])) {
                 $data['expires'] = strtotime($data['expires']);
             }
             setcookie(
@@ -253,17 +253,16 @@ class ResponseEmitter
      * la réponse.
      *
      * @param int|null $maxBufferLevel Vide jusqu'à ce niveau de tampon.
+     *
      * @return void
      */
     protected function flush(?int $maxBufferLevel = null)
     {
-        if (null === $maxBufferLevel)
-        {
+        if (null === $maxBufferLevel) {
             $maxBufferLevel = ob_get_level();
         }
 
-        while (ob_get_level() > $maxBufferLevel)
-        {
+        while (ob_get_level() > $maxBufferLevel) {
             ob_end_flush();
         }
     }
@@ -273,18 +272,18 @@ class ResponseEmitter
      * https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16
      *
      * @param string $header L'en-tête Content-Range à analyser.
-     * @return array|false [unité, premier, dernier, longueur] ; renvoie faux si non
-     * une plage de contenu ou une plage de contenu non valide est fournie
+     *
+     * @return array|false [unité, premier, dernier, longueur] ; renvoie faux si non
+     *                     une plage de contenu ou une plage de contenu non valide est fournie
      */
     protected function parseContentRange(string $header)
     {
-        if (preg_match('/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/', $header, $matches))
-        {
+        if (preg_match('/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/', $header, $matches)) {
             return [
                 $matches['unit'],
-                (int)$matches['first'],
-                (int)$matches['last'],
-                $matches['length'] === '*' ? '*' : (int)$matches['length'],
+                (int) $matches['first'],
+                (int) $matches['last'],
+                $matches['length'] === '*' ? '*' : (int) $matches['length'],
             ];
         }
 

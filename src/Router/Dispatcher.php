@@ -188,7 +188,7 @@ class Dispatcher
         if (file_exists($events_file)) {
             require_once $events_file;
         }
-        
+
         Services::event()->trigger('pre_system');
 
         // Recherche une page en cache. L'exécution s'arrêtera
@@ -527,13 +527,13 @@ class Dispatcher
         ob_start();
         $this->controller = $this->router->handle($path);
         $this->method     = $this->router->methodName();
-        
+
         // Si un segment {locale} correspondait dans la route finale,
-         // alors nous devons définir les paramètres régionaux corrects sur notre requête.
+        // alors nous devons définir les paramètres régionaux corrects sur notre requête.
         if ($this->router->hasLocale()) {
             $this->request = $this->request->withLocale($this->router->getLocale());
         }
-        
+
         $this->timer->stop('routing');
 
         return $this->router->getMiddlewares();

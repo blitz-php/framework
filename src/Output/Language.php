@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Output;
 
-use BlitzPHP\Core\Config;
+use BlitzPHP\Config\Config;
 use BlitzPHP\Loader\FileLocator;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Arr;
@@ -99,7 +99,7 @@ class Language
         if (empty($args)) {
             $args = [];
         }
-        
+
         // Parse out the file name and the actual alias.
         // Will load the language file and strings.
         [
@@ -145,7 +145,7 @@ class Language
     {
         $file = substr($line, 0, strpos($line, '.'));
         $line = substr($line, strlen($file) + 1);
-        
+
         /*
         $line = explode('.', $line);
         $file = array_shift($line);
@@ -229,7 +229,7 @@ class Language
     public static function searchLocale(?string $locale = null): string
     {
         $config = Config::get('app');
-        
+
         if (empty($locale)) {
             $locale = Services::negotiator()->language($config['supported_locales']);
         }
@@ -243,7 +243,7 @@ class Language
     private function findLocale(?string $locale = null): string
     {
         $this->locale = self::searchLocale($locale);
-        
+
         return $this->locale;
     }
 

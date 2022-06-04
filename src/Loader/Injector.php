@@ -23,7 +23,7 @@ use DI\ContainerBuilder;
 class Injector
 {
     use SingletonTrait;
-    
+
     /**
      * @var \DI\Container
      */
@@ -43,7 +43,7 @@ class Injector
         $this->builder->useAutowiring(true);
 
         if (on_prod()) {
-            $this->builder->enableCompilation(SYST_PATH.'Constants'.DS);
+            $this->builder->enableCompilation(SYST_PATH . 'Constants' . DS);
         }
 
         $this->container = new Container();
@@ -52,9 +52,10 @@ class Injector
     /**
      * Charge les definitions pour le container
      */
-    private function loadProviders() {
+    private function loadProviders()
+    {
         $providers = Load::providers();
-        
+
         $this->builder->addDefinitions($providers);
 
         $this->container = $this->builder->build();
