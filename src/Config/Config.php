@@ -9,12 +9,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Core;
+namespace BlitzPHP\Config;
 
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Traits\SingletonTrait;
 use InvalidArgumentException;
-use League\Config\Configuration;
 use Nette\Schema\Expect;
 
 class Config
@@ -22,7 +21,7 @@ class Config
     use SingletonTrait;
 
     /**
-     * @var Configuration
+     * @var Configurator
      */
     private $configurator;
 
@@ -33,18 +32,17 @@ class Config
      */
     private static $loaded = [];
 
-
-    protected function __construct() 
+    protected function __construct()
     {
-        $this->configurator = new Configuration([
+        $this->configurator = new Configurator([
             'app' => Expect::structure([
-                'base_url' => Expect::string()->default('auto'),
-                'charset' => Expect::string()->default('UTF-8'),
+                'base_url'    => Expect::string()->default('auto'),
+                'charset'     => Expect::string()->default('UTF-8'),
                 'environment' => Expect::string()->default('auto'),
-                'language' => Expect::string()->default('en')
-            ])->otherItems()
+                'language'    => Expect::string()->default('en'),
+            ])->otherItems(),
         ]);
-    } 
+    }
 
     /**
      * Renvoyer une configuration de l'application
@@ -82,7 +80,7 @@ class Config
     {
         self::load(['autoload', 'data', 'app']);
 
-        self::instance()->initialize();
+        self::instance()->initialize(); // @phpstan-ignore-line
     }
 
     /**
@@ -106,7 +104,7 @@ class Config
                 }
                 self::load($conf, $file);
             }
-        } elseif (is_string($config) && !isset(self::$loaded[$config])) {
+        } elseif (is_string($config) && ! isset(self::$loaded[$config])) {
             if (empty($file)) {
                 $file = self::path($config);
             }
@@ -196,7 +194,6 @@ class Config
         return CONFIG_PATH . $path . '.php';
     }
 
-
     /**
      * Initialiser la configuration du système avec les données des fichier de configuration
      */
@@ -214,12 +211,11 @@ class Config
     /**
      * Initialise l'URL
      */
-    private function initializeURL() 
+    private function initializeURL()
     {
-        if (!$this->configurator->exists('app.base_url')) {
+        if (! $this->configurator->exists('app.base_url')) {
             $config = 'auto';
-        }
-        else {
+        } else {
             $config = $this->configurator->get('app.base_url');
         }
 
@@ -233,24 +229,22 @@ class Config
     /**
      * Initialise l'environnement d'execution de l'application
      */
-    private function initializeEnvironment() 
+    private function initializeEnvironment()
     {
         $environment = $config = $this->configurator->get('app.environment');
 
         if ($config === 'auto') {
             $config = is_online() ? 'production' : 'development';
-        }
-        else if ($config === 'dev') {
+        } elseif ($config === 'dev') {
             $config = 'development';
-        }
-        else if ($config === 'prod') {
+        } elseif ($config === 'prod') {
             $config = 'production';
         }
 
-        if ($config != $environment) {
+        if ($config !== $environment) {
             $this->configurator->set('app.environment', $config);
         }
-        
+
         switch ($config) {
             case 'development':
                 error_reporting(-1);
@@ -271,12 +265,11 @@ class Config
     /**
      * Initialise les paramètres de compression de la vue
      */
-    private function initializeView() 
+    private function initializeView()
     {
-        if (!$this->configurator->exists('app.compress_output')) {
+        if (! $this->configurator->exists('app.compress_output')) {
             $config = 'auto';
-        }
-        else {
+        } else {
             $config = $this->configurator->get('app.compress_output');
         }
 
@@ -293,10 +286,9 @@ class Config
      */
     private function initializeDebugbar()
     {
-        if (!$this->configurator->exists('app.show_debugbar')) {
+        if (! $this->configurator->exists('app.show_debugbar')) {
             $config = 'auto';
-        }
-        else {
+        } else {
             $config = $this->configurator->get('app.show_debugbar');
         }
 

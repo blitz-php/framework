@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Core\Config;
+use BlitzPHP\Config\Config;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Services;
@@ -418,12 +418,12 @@ if (! function_exists('logger')) {
      *
      * @return \BlitzPHP\Exceptions\Logger|mixed
      */
-    function logger($level = null, ?string $message = null, ?string $file = null, ?int $line = null)
+    function logger($level = null, ?string $message = null, array $context = [])
     {
         $logger = Services::logger();
 
         if (! empty($level) && ! empty($message)) {
-            return $logger->write($level, $message, $file, $line);
+            return $logger->log($level, $message, $context);
         }
 
         return $logger;
