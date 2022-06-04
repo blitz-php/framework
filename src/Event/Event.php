@@ -1,4 +1,14 @@
-<?php 
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Event;
 
 use BlitzPHP\Contracts\Event\EventInterface;
@@ -40,16 +50,18 @@ class Event implements EventInterface
 
     /**
      * Creation de l'evenement
+     *
+     * @param mixed|null $target
      */
     public function __construct(?string $name = '', $target = null, array $params = [])
     {
-        $this->name = $name;
+        $this->name   = $name;
         $this->target = $target;
         $this->params = $params;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getName(): string
     {
@@ -57,7 +69,7 @@ class Event implements EventInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setName(string $name): void
     {
@@ -65,7 +77,7 @@ class Event implements EventInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getParams(): array
     {
@@ -73,7 +85,7 @@ class Event implements EventInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getParam(string $name)
     {
@@ -81,22 +93,23 @@ class Event implements EventInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setParams(array $params): void
     {
         $this->params = $params;
     }
-    
+
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getTarget()
     {
         return $this->target;
     }
+
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setTarget($target): void
     {
@@ -104,15 +117,15 @@ class Event implements EventInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function isPropagationStopped() : bool
+    public function isPropagationStopped(): bool
     {
         return $this->isPropagationStopped;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function stopPropagation(bool $flag): void
     {

@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Event;
 
 use BlitzPHP\Contracts\Event\EventManagerInterface;
@@ -11,7 +21,6 @@ use Closure;
  */
 trait EventListenerManagerTrait
 {
-
     /**
      * L'actuel gestionnaire d'evenement
      *
@@ -46,7 +55,7 @@ trait EventListenerManagerTrait
     public function addEventListener(string $event, Closure $callback, int $priority = 0, bool $bindContext = false): bool
     {
         if ($bindContext) {
-            $callback = Closure::bind($callback, $this, get_class($this));
+            $callback = Closure::bind($callback, $this, static::class);
         }
 
         return $this->eventManager->attach($event, $callback, $priority);
@@ -56,8 +65,9 @@ trait EventListenerManagerTrait
      * Déclenche un événement
      *
      * @param array|EventInterface $event
-     * @param mixed $target
-     * @param array|object $params
+     * @param mixed                $target
+     * @param array|object         $params
+     *
      * @return mixed
      */
     public function fireEvent($event, $target = null, $params = [])
