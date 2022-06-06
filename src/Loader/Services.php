@@ -24,6 +24,7 @@ use BlitzPHP\Http\Uri;
 use BlitzPHP\Output\Language;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
+use BlitzPHP\View\View;
 use DI\NotFoundException;
 
 /**
@@ -216,6 +217,20 @@ class Services
         }
 
         return self::factory(Uri::class, [$uri]);
+    }
+
+    /**
+     * La classe Renderer est la classe qui affiche réellement un fichier à l'utilisateur.
+     * La classe View par défaut dans BlitzPHP est intentionnellement simple, mais
+     * le service peut facilement être remplacé par un moteur de modèle si l'utilisateur en a besoin.
+     */
+    public static function viewer(bool $shared = true): View
+    {
+        if (true === $shared) {
+            return self::singleton(View::class);
+        }
+
+        return self::factory(View::class);
     }
 
     /**

@@ -9,8 +9,10 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-// Files language settings
-return [
-    'fileDoesNotExist'          => 'Unable to loader the "{0} "configuration, the {1} file does not exist',
-    'viewAdapterConfigNotFound' => 'No configuration found for adapter {0}',
-];
+namespace BlitzPHP\View\Adapters;
+
+use BlitzPHP\View\RendererInterface;
+
+abstract class AbstractAdapter implements RendererInterface
+{
+}

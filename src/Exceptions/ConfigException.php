@@ -34,4 +34,9 @@ class ConfigException extends CriticalError
     {
         return new static(lang('Config.fileDoesNotExist', [$config, $file]));
     }
+
+    public static function viewAdapterConfigNotFound(string $adapter)
+    {
+        return new static(lang('Config.viewAdapterConfigNotFound', [$adapter]));
+    }
 }

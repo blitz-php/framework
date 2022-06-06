@@ -362,6 +362,36 @@ if (! function_exists('clean_url')) {
     }
 }
 
+if (! function_exists('clean_path')) {
+    /**
+     * Une méthode pratique pour nettoyer les chemins pour
+     * une sortie plus belle. Utile pour les exceptions
+     * gestion, journalisation des erreurs, etc.
+     */
+    function clean_path(string $path): string
+    {
+        // Resolve relative paths
+        $path = realpath($path) ?: $path;
+
+        switch (true) {
+            case strpos($path, APP_PATH) === 0:
+                return 'APP_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(APP_PATH));
+
+            case strpos($path, SYST_PATH) === 0:
+                return 'SYST_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(SYST_PATH));
+
+            case defined('COMPOSER_PATH') && strpos($path, COMPOSER_PATH) === 0:
+                return 'COMPOSER_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(COMPOSER_PATH));
+
+            case strpos($path, ROOTPATH) === 0:
+                return 'ROOTPATH' . DIRECTORY_SEPARATOR . substr($path, strlen(ROOTPATH));
+
+            default:
+                return $path;
+        }
+    }
+}
+
 // ================================= FONCTIONS DE DEBOGAGE ================================= //
 
 if (! function_exists('dd')) {
@@ -416,7 +446,7 @@ if (! function_exists('logger')) {
      * @param string     $message
      * @param array|null $context
      *
-     * @return \BlitzPHP\Exceptions\Logger|mixed
+     * @return \BlitzPHP\Debug\Logger|mixed
      */
     function logger($level = null, ?string $message = null, array $context = [])
     {
@@ -427,6 +457,36 @@ if (! function_exists('logger')) {
         }
 
         return $logger;
+    }
+}
+
+if (! function_exists('cache')) {
+    /**
+     * Une méthode pratique qui donne accès au cache
+     * objet. Si aucun paramètre n'est fourni, renverra l'objet,
+     * sinon, tentera de renvoyer la valeur mise en cache.
+     *
+     * Examples:
+     *    cache()->set('foo', 'bar'); or cache('foo', 'bar');
+     *    $foo = cache('bar');
+     *
+     * @param mixed|null $value
+     *
+     * @return \BlitzPHP\Cache\Cache|bool|mixed
+     */
+    function cache(?string $key = null, $value = null)
+    {
+        $cache = Services::cache();
+
+        if (empty($key)) {
+            return $cache;
+        }
+
+        if (empty($value)) {
+            return $cache->get($key);
+        }
+
+        return $cache->set($key, $value);
     }
 }
 
@@ -663,12 +723,13 @@ if (! function_exists('view')) {
     /**
      * Charge une vue
      *
-     * @return \dFramework\core\output\View
+     * @return \BlitzPHP\View\View
      */
-    function view(string $view, ?array $data = [], ?array $options = [], ?array $config = [])
+    function view(string $view, ?array $data = [], ?array $options = [])
     {
         $object = Services::viewer(false);
-        $object->addData($data)->addConfig($config)->setOptions($options);
+
+        $object->addData($data)->setOptions($options);
 
         return $object->display($view);
     }

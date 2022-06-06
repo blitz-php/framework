@@ -20,6 +20,7 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\View\View;
 use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -669,6 +670,10 @@ class Dispatcher
         $output = Services::injector()->call([$class, $method], (array) $params);
 
         $this->timer->stop('controller');
+
+        if ($output instanceof View) {
+            $output = $this->response->withBody(to_stream($output->get()));
+        }
 
         return $output;
     }
