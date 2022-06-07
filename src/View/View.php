@@ -14,6 +14,7 @@ namespace BlitzPHP\View;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\View\Adapters\LatteAdapter;
 use BlitzPHP\View\Adapters\NativeAdapter;
+use BlitzPHP\View\Adapters\SmartyAdapter;
 
 class View
 {
@@ -34,7 +35,7 @@ class View
         'blade',
         'latte' => LatteAdapter::class,
         'plate',
-        'smarty',
+        'smarty' => SmartyAdapter::class,
         'twig',
     ];
 
