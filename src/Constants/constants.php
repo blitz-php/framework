@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-define('BASEPATH', dirname(SYST_PATH) . DS);
+define('BASEPATH', dirname(COMPOSER_PATH) . DS);
 
 define('ROOTPATH', dirname(WEBROOT) . DS);
 
@@ -31,23 +31,35 @@ defined('CONTROLLER_PATH') || define('CONTROLLER_PATH', APP_PATH . 'Controllers'
 defined('ENTITY_PATH') || define('ENTITY_PATH', APP_PATH . 'Entities' . DS);
 
 /**
+ * Chemin vers le dossier des helpers de l'application
+ */
+defined('HELPER_PATH') || define('HELPER_PATH', APP_PATH . 'Helpers' . DS);
+
+/**
+ * Chemin vers le dossier des helpers de l'application
+ */
+defined('LIBRARY_PATH') || define('LIBRARY_PATH', APP_PATH . 'Libraries' . DS);
+
+/**
  * Chemin vers le dossier de stockage des fichiers temporaires
  */
 defined('TEMP_PATH') || define('TEMP_PATH', STORAGE_PATH . 'temp' . DS);
 
-if (! defined('HELPER_PATH')) {
-    /**
-     * Helpers directory path
-     */
-    define('HELPER_PATH', APP_PATH . 'helpers' . DS);
-}
+/**
+ * Chemin vers le dossier de cache des vues
+ */
+defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', STORAGE_PATH . 'cache' . DS);
 
-if (! defined('LIBRARY_PATH')) {
-    /**
-     * Libraries directory path
-     */
-    define('LIBRARY_PATH', APP_PATH . 'libraries' . DS);
-}
+/**
+ * Chemin vers le dossier des vues
+ */
+defined('VIEW_PATH') || define('VIEW_PATH', APP_PATH . 'Views' . DS);
+
+/**
+ * Chemin vers le dossier des layouts
+ */
+defined('LAYOUT_PATH') || define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
+
 
 if (! defined('MIDDLEWARE_PATH')) {
     /**
@@ -126,26 +138,8 @@ if (! defined('DB_CACHE_PATH')) {
     define('DB_CACHE_PATH', DATABASE_PATH . 'cache' . DS);
 }
 
-if (! defined('VIEW_PATH')) {
-    /**
-     * Views directory path
-     */
-    define('VIEW_PATH', APP_PATH . 'views' . DS);
-}
 
-if (! defined('LAYOUT_PATH')) {
-    /**
-     * Layouts directory path
-     */
-    define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
-}
 
-if (! defined('VIEW_CACHE_PATH')) {
-    /**
-     * Views cache directory path
-     */
-    define('VIEW_CACHE_PATH', STORAGE_PATH . 'cache' . DS);
-}
 
 if (! defined('SMARTY_CACHE_PATH')) {
     /**
