@@ -24,13 +24,6 @@ class LatteAdapter extends AbstractAdapter
     private $latte;
 
     /**
-     * Configuration de l'adapter
-     *
-     * @var array
-     */
-    private $config;
-
-    /**
      * {@inheritDoc}
      */
     public function __construct(array $config, string $viewPath = VIEW_PATH)
@@ -69,6 +62,10 @@ class LatteAdapter extends AbstractAdapter
         return $this->render($view, $options, $saveData);
     }
 
+    
+    /**
+     * Configure le moteur de template
+     */
     private function configure()
     {
         if (isset($this->config['configure']) && is_callable($this->config['configure'])) {

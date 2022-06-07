@@ -39,13 +39,6 @@ class NativeAdapter extends AbstractAdapter
     protected $performanceData = [];
 
     /**
-     * Configuration de l'adapter actuel
-     *
-     * @var array
-     */
-    protected $config;
-
-    /**
      * Indique si les données doivent être enregistrées entre les rendus.
      *
      * @var bool
@@ -58,14 +51,6 @@ class NativeAdapter extends AbstractAdapter
      * @var int
      */
     protected $viewsCount = 0;
-
-    /**
-     * Le nom de la mise en page utilisée, le cas échéant.
-     * Défini par la méthode "extend" utilisée dans les vues.
-     *
-     * @var string|null
-     */
-    protected $layout;
 
     /**
      * Contient les sections et leurs données.
