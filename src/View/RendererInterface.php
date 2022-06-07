@@ -18,7 +18,10 @@ namespace BlitzPHP\View;
  */
 interface RendererInterface
 {
-    public function __construct(array $config);
+    /**
+     * Constructeur
+     */
+    public function __construct(array $config, string $viewPath = VIEW_PATH);
 
     /**
      * Définit plusieurs éléments de données de vue à la fois.

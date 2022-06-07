@@ -15,4 +15,85 @@ use BlitzPHP\View\RendererInterface;
 
 abstract class AbstractAdapter implements RendererInterface
 {
+    /**
+     * Données mises à la disposition des vues.
+     *
+     * @var array
+     */
+    protected $data = [];
+
+    /**
+     * Les variables de rendu
+     *
+     * @var array
+     */
+    protected $renderVars = [];
+
+    /**
+     * Le répertoire de base dans lequel rechercher nos vues.
+     *
+     * @var string
+     */
+    protected $viewPath;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    {
+        $this->config   = $config;
+        $this->viewPath = rtrim($viewPath, '\\/ ') . DS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setData(array $data = [], ?string $context = null): self
+    {
+        if ($context) {
+            // $data = \esc($data, $context);
+        }
+
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addData(array $data = [], ?string $context = null): self
+    {
+        if ($context) {
+            // $data = \esc($data, $context);
+        }
+
+        $this->data = array_merge($this->data, $data);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setVar(string $name, $value = null, ?string $context = null): self
+    {
+        if ($context) {
+            // $value = esc($value, $context);
+        }
+
+        $this->data[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resetData(): self
+    {
+        $this->data = [];
+
+        return $this;
+    }
 }

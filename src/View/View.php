@@ -12,6 +12,7 @@
 namespace BlitzPHP\View;
 
 use BlitzPHP\Exceptions\ConfigException;
+use BlitzPHP\View\Adapters\LatteAdapter;
 use BlitzPHP\View\Adapters\NativeAdapter;
 
 class View
@@ -31,7 +32,7 @@ class View
     public static $validAdapters = [
         'native' => NativeAdapter::class,
         'blade',
-        'latte',
+        'latte' => LatteAdapter::class,
         'plate',
         'smarty',
         'twig',
@@ -90,7 +91,7 @@ class View
      */
     public function render(): void
     {
-        $compress = $this->adapterConfig['compress_output'] ?? 'auto';
+        $compress = $this->config['compress_output'] ?? 'auto';
 
         echo $this->get($compress);
     }
@@ -175,7 +176,7 @@ class View
         }
 
         $this->adapterConfig = $config;
-        $this->adapter       = new self::$validAdapters[$adapter]($config);
+        $this->adapter       = new self::$validAdapters[$adapter]($config, $this->config['view_base'] ?? VIEW_PATH);
 
         return $this;
     }

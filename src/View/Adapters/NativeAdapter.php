@@ -20,30 +20,9 @@ use RuntimeException;
 class NativeAdapter extends AbstractAdapter
 {
     /**
-     * Données mises à la disposition des vues.
-     *
-     * @var array
-     */
-    protected $data = [];
-
-    /**
      * Fusionner les données enregistrées et les données utilisateur
      */
     protected $tempData;
-
-    /**
-     * Le répertoire de base dans lequel rechercher nos vues.
-     *
-     * @var string
-     */
-    protected $viewPath;
-
-    /**
-     * Les variables de rendu
-     *
-     * @var array
-     */
-    protected $renderVars = [];
 
     /**
      * Devrions-nous stocker des informations sur les performances ?
@@ -107,8 +86,8 @@ class NativeAdapter extends AbstractAdapter
      */
     public function __construct(array $config, string $viewPath = VIEW_PATH)
     {
-        $this->config   = $config;
-        $this->viewPath = rtrim($viewPath, '\\/ ') . DS;
+        parent::__construct($config, $viewPath);
+
         $this->saveData = (bool) ($config['save_data'] ?? true);
     }
 
@@ -278,16 +257,6 @@ class NativeAdapter extends AbstractAdapter
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function resetData(): self
-    {
-        $this->data = [];
-
-        return $this;
-    }
-
-    /**
      * Renvoie les données actuelles qui seront affichées dans la vue.
      */
     public function getData(): array
@@ -442,6 +411,18 @@ class NativeAdapter extends AbstractAdapter
         }
 
         return $this->addData($data)->render($view, $options, $saveData);
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires.
+     *
+     * @alias self::insert()
+     *
+     * @param mixed $saveData
+     */
+    public function include(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    {
+        return $this->insert($view, $data, $options, $saveData);
     }
 
     /**
