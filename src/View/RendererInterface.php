@@ -78,4 +78,9 @@ interface RendererInterface
      * Supprime toutes les données de vue du système.
      */
     public function resetData(): self;
+
+    /**
+	 * Definit le layout a utiliser par les vues
+	 */
+	public function setLayout(?string $layout): self;
 }

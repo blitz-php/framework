@@ -37,6 +37,21 @@ abstract class AbstractAdapter implements RendererInterface
     protected $viewPath;
 
     /**
+     * Configuration actuelle de l'adapter
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * Le nom de la mise en page utilisée, le cas échéant.
+     * Défini par la méthode "extend" utilisée dans les vues.
+     *
+     * @var string|null
+     */
+    protected $layout = null;
+
+    /**
      * {@inheritDoc}
      */
     public function __construct(array $config, string $viewPath = VIEW_PATH)
@@ -96,4 +111,14 @@ abstract class AbstractAdapter implements RendererInterface
 
         return $this;
     }
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public function setLayout(?string $layout): self
+	{
+		$this->layout = $layout;
+
+		return $this;
+	}
 }
