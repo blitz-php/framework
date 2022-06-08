@@ -118,9 +118,15 @@ if (! function_exists('config')) {
 if (! function_exists('on_dev')) {
     /**
      * Testez pour voir si nous sommes dans un environnement de développement.
+     * 
+     * @param bool checkOnline 
      */
-    function on_dev(): bool
+    function on_dev(bool $checkOnline = false): bool
     {
+        if ($checkOnline && is_online()) {
+            return false;
+        }
+        
         $env = config('app.environment');
 
         return in_array($env, ['dev', 'development'], true);
@@ -131,8 +137,12 @@ if (! function_exists('on_prod')) {
     /**
      * Testez pour voir si nous sommes dans un environnement de production.
      */
-    function on_prod(): bool
+    function on_prod(bool $checkOnline = false): bool
     {
+        if ($checkOnline && is_online()) {
+            return true;
+        }
+
         $env = config('app.environment');
 
         return in_array($env, ['prod', 'production'], true);
