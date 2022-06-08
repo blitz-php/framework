@@ -77,14 +77,6 @@ class SmartyAdapter extends AbstractAdapter
         );
 	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function renderString(string $view, ?array $options = null, bool $saveData = false): string
-    {
-        return $this->render($view, $options, $saveData);
-    }
-
 
     /**
      * Configure le moteur de template

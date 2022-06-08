@@ -121,4 +121,12 @@ abstract class AbstractAdapter implements RendererInterface
 
 		return $this;
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    public function renderString(string $view, ?array $options = null, bool $saveData = false): string
+    {
+        return $this->render($view, $options, $saveData);
+    }
 }
