@@ -1,7 +1,17 @@
 <?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Traits;
 
-use BlitzPHP\Utility\Arr;
+use BlitzPHP\Utilities\Arr;
 use Exception;
 use InvalidArgumentException;
 
@@ -31,32 +41,34 @@ trait InstanceConfigTrait
      *
      * ### Utilisation
      *
-     * Définition d'une valeur spécifique :
+     * Définition d'une valeur spécifique :
      *
      * ```
      * $this->setConfig('key', $value);
      * ```
      *
-     * Définition d'une valeur imbriquée :
+     * Définition d'une valeur imbriquée :
      *
      * ```
      * $this->setConfig('some.nested.key', $value);
      * ```
      *
-     * Mise à jour de plusieurs paramètres de configuration en même temps :
+     * Mise à jour de plusieurs paramètres de configuration en même temps :
      *
      * ```
      * $this->setConfig(['one' => 'value', 'other' => 'value']);
      * ```
      *
-     * @param string|array<string, mixed> $key La clé à définir, ou un tableau complet de configurations.
-     * @param bool $merge Que ce soit pour fusionner ou écraser de manière récursive la configuration existante, la valeur par défaut est true.
+     * @param array<string, mixed>|string $key   La clé à définir, ou un tableau complet de configurations.
+     * @param bool                        $merge Que ce soit pour fusionner ou écraser de manière récursive la configuration existante, la valeur par défaut est true.
+     * @param mixed|null                  $value
+     *
      * @throws Exception Lorsque vous essayez de définir une clé qui n'est pas valide.
      */
     public function setConfig($key, $value = null, bool $merge = true): self
     {
-        if (!$this->_configInitialized) {
-            $this->_config = $this->_defaultConfig;
+        if (! $this->_configInitialized) {
+            $this->_config            = $this->_defaultConfig;
             $this->_configInitialized = true;
         }
 
@@ -76,13 +88,13 @@ trait InstanceConfigTrait
      * $this->getConfig();
      * ```
      *
-     * Lecture d'une valeur spécifique :
+     * Lecture d'une valeur spécifique :
      *
      * ```
      * $this->getConfig('key');
      * ```
      *
-     * Lecture d'une valeur imbriquée :
+     * Lecture d'une valeur imbriquée :
      *
      * ```
      * $this->getConfig('some.nested.key');
@@ -94,12 +106,14 @@ trait InstanceConfigTrait
      * $this->getConfig('some-key', 'default-value');
      * ```
      *
+     * @param mixed|null $default
+     *
      * @return mixed Données de configuration à la clé nommée ou null si la clé n'existe pas.
      */
-	public function getConfig(?string $key = null, $default = null)
+    public function getConfig(?string $key = null, $default = null)
     {
-        if (!$this->_configInitialized) {
-            $this->_config = $this->_defaultConfig;
+        if (! $this->_configInitialized) {
+            $this->_config            = $this->_defaultConfig;
             $this->_configInitialized = true;
         }
 
@@ -113,7 +127,7 @@ trait InstanceConfigTrait
      *
      * La valeur de configuration de cette clé doit exister, elle ne peut jamais être nulle.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getConfigOrFail(string $key)
     {
@@ -129,30 +143,31 @@ trait InstanceConfigTrait
      * Fusionnez la configuration fournie avec la configuration existante. Contrairement à `config()` qui fait
      * une fusion récursive pour les clés imbriquées, cette méthode effectue une fusion simple.
      *
-     * Définition d'une valeur spécifique :
+     * Définition d'une valeur spécifique :
      *
      * ```
      * $this->configShallow('key', $value);
      * ```
      *
-     * Définition d'une valeur imbriquée :
+     * Définition d'une valeur imbriquée :
      *
      * ```
      * $this->configShallow('some.nested.key', $value);
      * ```
      *
-     * Mise à jour de plusieurs paramètres de configuration en même temps :
+     * Mise à jour de plusieurs paramètres de configuration en même temps :
      *
      * ```
      * $this->configShallow(['one' => 'value', 'other' => 'value']);
      * ```
      *
-     * @param array<string, mixed>|string $key La clé à définir, ou un tableau complet de configurations.
+     * @param array<string, mixed>|string $key   La clé à définir, ou un tableau complet de configurations.
+     * @param mixed|null                  $value
      */
     public function configShallow($key, $value = null): self
     {
-        if (!$this->_configInitialized) {
-            $this->_config = $this->_defaultConfig;
+        if (! $this->_configInitialized) {
+            $this->_config            = $this->_defaultConfig;
             $this->_configInitialized = true;
         }
 
@@ -177,7 +192,7 @@ trait InstanceConfigTrait
         $return = $this->_config;
 
         foreach (explode('.', $key) as $k) {
-            if (!is_array($return) || !isset($return[$k])) {
+            if (! is_array($return) || ! isset($return[$k])) {
                 $return = null;
                 break;
             }
@@ -191,9 +206,11 @@ trait InstanceConfigTrait
     /**
      * Écrit une clé de configuration.
      *
-     * @param array<string, mixed>|string $key Clé sur laquelle écrire.
-     * @param string|bool $merge True pour fusionner de manière récursive, 'shallow' pour une fusion simple,
-     * 							false pour écraser, la valeur par défaut est false.
+     * @param array<string, mixed>|string $key   Clé sur laquelle écrire.
+     * @param bool|string                 $merge True pour fusionner de manière récursive, 'shallow' pour une fusion simple,
+     *                                           false pour écraser, la valeur par défaut est false.
+     * @param mixed                       $value
+     *
      * @throws Exception si vous tentez d'écraser la configuration existante
      */
     protected function _configWrite($key, $value, $merge = false): void
@@ -230,14 +247,14 @@ trait InstanceConfigTrait
         }
 
         $update = &$this->_config;
-        $stack = explode('.', $key);
+        $stack  = explode('.', $key);
 
         foreach ($stack as $k) {
-            if (!is_array($update)) {
+            if (! is_array($update)) {
                 throw new Exception(sprintf('Cannot set %s value', $key));
             }
 
-            $update[$k] = $update[$k] ?? [];
+            $update[$k] ??= [];
 
             $update = &$update[$k];
         }
@@ -247,7 +264,7 @@ trait InstanceConfigTrait
 
     /**
      * Supprime une seule clé de configuration.
-	 *
+     *
      * @throws Exception si vous tentez d'écraser la configuration existante
      */
     protected function _configDelete(string $key): void
@@ -259,15 +276,15 @@ trait InstanceConfigTrait
         }
 
         $update = &$this->_config;
-        $stack = explode('.', $key);
+        $stack  = explode('.', $key);
         $length = count($stack);
 
         foreach ($stack as $i => $k) {
-            if (!is_array($update)) {
+            if (! is_array($update)) {
                 throw new Exception(sprintf('Cannot unset %s value', $key));
             }
 
-            if (!isset($update[$k])) {
+            if (! isset($update[$k])) {
                 break;
             }
 
