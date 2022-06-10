@@ -15,7 +15,7 @@ use ArrayAccess;
 use ArrayIterator;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Contracts\Support\Jsonable;
-use BlitzPHP\Contracts\Traits\Macroable;
+use BlitzPHP\Traits\Macroable;
 use CachingIterator;
 use Closure;
 use Countable;

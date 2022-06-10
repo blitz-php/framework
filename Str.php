@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Utilities;
 
-use BlitzPHP\Contracts\Traits\Macroable;
+use BlitzPHP\Traits\Macroable;
 use Transliterator;
 
 if (! defined('MB_ENABLED')) {

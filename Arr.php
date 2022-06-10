@@ -12,7 +12,7 @@
 namespace BlitzPHP\Utilities;
 
 use ArrayAccess;
-use BlitzPHP\Contracts\Traits\Macroable;
+use BlitzPHP\Traits\Macroable;
 use Exception;
 use InvalidArgumentException;
 
