@@ -36,19 +36,19 @@ class SmartyAdapter extends AbstractAdapter
 	}
 
     /**
-	 * Rend une vue en associant le layout si celui ci est defini
-	 *
-	 * @param string|null $template
-	 * @param mixed $cache_id
-	 * @param mixed $compile_id
-	 * @param mixed $parent
-	 * @return string
+	 * {@inheritDoc}
 	 */
 	public function render(string $view, ?array $options = null, ?bool $saveData = null): string
 	{
+        $view = str_replace([$this->viewPath, ' '], '', $view);
         if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
-            $view .= '.tpl';
+            $view .= '.' .str_replace('.', '', $this->config['extension'] ?? 'tpl');
         }
+
+        $this->renderVars['start'] = microtime(true);
+        $this->renderVars['view']    = $view;
+        $this->renderVars['options'] = $options ?? [];
+        $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
 
 		$layout = $this->layout;
 		if (!empty($layout)) {
@@ -57,9 +57,7 @@ class SmartyAdapter extends AbstractAdapter
 			}
 			$view = 'extends:[layouts]'.$layout.'|'.$view;
 		}
-
-        $this->renderVars['options'] = $options ?? [];
-
+   
         $this->engine->assign($this->data);
 		
         // Doit-on mettre en cache?

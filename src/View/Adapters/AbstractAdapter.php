@@ -129,4 +129,21 @@ abstract class AbstractAdapter implements RendererInterface
     {
         return $this->render($view, $options, $saveData);
     }
+
+    /**
+     * Construit la sortie en fonction d'un nom de fichier et de tout données déjà définies.
+     *
+     * Options valides :
+     * - cache Nombre de secondes à mettre en cache pour
+     * - cache_name Nom à utiliser pour le cache
+     *
+     * @param string     $view     Nom de fichier de la source de la vue
+     * @param array|null $options  Réservé à des utilisations tierces car
+     *                             il peut être nécessaire de transmettre des
+     *                             informations supplémentaires à d'autres moteurs de modèles.
+     * @param bool|null  $saveData Si vrai, enregistre les données pour les appels suivants,
+     *                             si faux, nettoie les données après affichage,
+     *                             si null, utilise le paramètre de configuration.
+     */
+    public abstract function render(string $view, ?array $options = null, ?bool $saveData = null): string;
 }

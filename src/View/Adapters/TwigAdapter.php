@@ -44,13 +44,19 @@ class TwigAdapter extends AbstractAdapter
 	 */
 	public function render(string $view, ?array $options = null, ?bool $saveData = null): string
 	{
+        $view = str_replace([$this->viewPath, ' '], '', $view);
         if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
-            $view .= '.twig';
+            $view .= '.' .str_replace('.', '', $this->config['extension'] ?? 'twig');
         }
 
+        $this->renderVars['start'] = microtime(true);
+
+        $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
 
-		return $this->engine->render($view, $this->data);
+        $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
+
+		return $this->engine->render($this->renderVars['view'], $this->data);
 	}
 
     /**

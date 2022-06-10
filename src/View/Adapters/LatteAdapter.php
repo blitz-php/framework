@@ -41,12 +41,13 @@ class LatteAdapter extends AbstractAdapter
     public function render(string $view, ?array $options = null, ?bool $saveData = null): string
     {
         $view = str_replace([$this->viewPath, ' '], '', $view);
+        if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
+            $view .= '.' .str_replace('.', '', $this->config['extension'] ?? 'latte');
+        }
 
         $this->renderVars['start'] = microtime(true);
 
-        $fileExt                     = pathinfo($view, PATHINFO_EXTENSION);
-        $realPath                    = empty($fileExt) ? $view . '.latte' : $view;
-        $this->renderVars['view']    = $realPath;
+        $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
 
         $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));

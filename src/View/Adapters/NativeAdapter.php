@@ -82,18 +82,19 @@ class NativeAdapter extends AbstractAdapter
     public function render(string $view, ?array $options = null, ?bool $saveData = null): string
     {
         $view = str_replace([$this->viewPath, ' '], '', $view);
+        if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
+            $view .= '.' .str_replace('.', '', $this->config['extension'] ?? 'php');
+        }
 
         $this->renderVars['start'] = microtime(true);
+        $this->renderVars['view']    = $view;
+        $this->renderVars['options'] = $options ?? [];
 
         // Stocke les résultats ici donc même si
         // plusieurs vues sont appelées dans une vue, ce ne sera pas le cas
         // nettoyez-le sauf si nous le voulons.
         $saveData ??= $this->saveData;
-        $fileExt                     = pathinfo($view, PATHINFO_EXTENSION);
-        $realPath                    = empty($fileExt) ? $view . '.php' : $view; // autoriser les vues en .html, .tpl, etc.
-        $this->renderVars['view']    = $realPath;
-        $this->renderVars['options'] = $options ?? [];
-
+       
         // A-t-il été mis en cache ?
         if (isset($this->renderVars['options']['cache'])) {
             $cacheName = $this->renderVars['options']['cache_name'] ?? str_replace('.php', '', $this->renderVars['view']);
