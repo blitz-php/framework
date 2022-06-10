@@ -42,7 +42,7 @@ class LatteAdapter extends AbstractAdapter
     {
         $view = str_replace([$this->viewPath, ' '], '', $view);
         if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
-            $view .= '.' .str_replace('.', '', $this->config['extension'] ?? 'latte');
+            $view .= '.' . str_replace('.', '', $this->config['extension'] ?? 'latte');
         }
 
         $this->renderVars['start'] = microtime(true);
@@ -55,7 +55,6 @@ class LatteAdapter extends AbstractAdapter
         return $this->latte->renderToString($this->renderVars['view'], $this->data);
     }
 
-    
     /**
      * Configure le moteur de template
      */

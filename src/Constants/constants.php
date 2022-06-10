@@ -60,7 +60,6 @@ defined('VIEW_PATH') || define('VIEW_PATH', APP_PATH . 'Views' . DS);
  */
 defined('LAYOUT_PATH') || define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
 
-
 if (! defined('MIDDLEWARE_PATH')) {
     /**
      * Middlewares directory path
@@ -137,9 +136,6 @@ if (! defined('DB_CACHE_PATH')) {
      */
     define('DB_CACHE_PATH', DATABASE_PATH . 'cache' . DS);
 }
-
-
-
 
 if (! defined('SMARTY_CACHE_PATH')) {
     /**

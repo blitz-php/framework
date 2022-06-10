@@ -49,7 +49,7 @@ abstract class AbstractAdapter implements RendererInterface
      *
      * @var string|null
      */
-    protected $layout = null;
+    protected $layout;
 
     /**
      * {@inheritDoc}
@@ -113,14 +113,14 @@ abstract class AbstractAdapter implements RendererInterface
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-	public function setLayout(?string $layout): self
-	{
-		$this->layout = $layout;
+     * {@inheritDoc}
+     */
+    public function setLayout(?string $layout): self
+    {
+        $this->layout = $layout;
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * {@inheritDoc}
@@ -145,5 +145,5 @@ abstract class AbstractAdapter implements RendererInterface
      *                             si faux, nettoie les données après affichage,
      *                             si null, utilise le paramètre de configuration.
      */
-    public abstract function render(string $view, ?array $options = null, ?bool $saveData = null): string;
+    abstract public function render(string $view, ?array $options = null, ?bool $saveData = null): string;
 }

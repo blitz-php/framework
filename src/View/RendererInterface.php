@@ -80,7 +80,7 @@ interface RendererInterface
     public function resetData(): self;
 
     /**
-	 * Definit le layout a utiliser par les vues
-	 */
-	public function setLayout(?string $layout): self;
+     * Definit le layout a utiliser par les vues
+     */
+    public function setLayout(?string $layout): self;
 }

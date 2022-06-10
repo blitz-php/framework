@@ -33,21 +33,19 @@ class View
      */
     private $adapter;
 
-    public static $validAdapters = [
-        'native' => NativeAdapter::class,
-        'blade' => BladeAdapter::class,
-        'latte' => LatteAdapter::class,
-        'plates' => PlatesAdapter::class,
-        'smarty' => SmartyAdapter::class,
-        'twig' => TwigAdapter::class,
-    ];
-
     /**
-     * Configuration de l'adapteur actuel
+     * Liste des adapters pris en comptes
      *
      * @var array
      */
-    private $adapterConfig;
+    public static $validAdapters = [
+        'native' => NativeAdapter::class,
+        'blade'  => BladeAdapter::class,
+        'latte'  => LatteAdapter::class,
+        'plates' => PlatesAdapter::class,
+        'smarty' => SmartyAdapter::class,
+        'twig'   => TwigAdapter::class,
+    ];
 
     /**
      * Options de la vue
@@ -179,7 +177,6 @@ class View
             throw ConfigException::viewAdapterConfigNotFound($adapter);
         }
 
-        $this->adapterConfig = $config;
         $this->adapter       = new self::$validAdapters[$adapter]($config, $this->config['view_base'] ?? VIEW_PATH);
 
         return $this;

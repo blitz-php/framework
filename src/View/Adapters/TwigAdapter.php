@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\View\Adapters;
 
 use Twig\Environment;
@@ -15,18 +24,18 @@ class TwigAdapter extends AbstractAdapter
      * @var Environment
      */
     private $engine;
-    
+
     /**
      * {@inheritDoc}
      */
     public function __construct(array $config, string $viewPath = VIEW_PATH)
     {
         parent::__construct($config, $viewPath);
-   
+
         $loader = new FilesystemLoader([
             $this->viewPath,
             VIEW_PATH . 'partials',
-            LAYOUT_PATH
+            LAYOUT_PATH,
         ]);
         $this->engine = new Environment($loader);
 
@@ -34,19 +43,18 @@ class TwigAdapter extends AbstractAdapter
     }
 
     /**
-	 * Rend une vue en associant le layout si celui ci est defini
-	 *
-	 * @param string|null $template
-	 * @param mixed $cache_id
-	 * @param mixed $compile_id
-	 * @param mixed $parent
-	 * @return string
-	 */
-	public function render(string $view, ?array $options = null, ?bool $saveData = null): string
-	{
+     * Rend une vue en associant le layout si celui ci est defini
+     *
+     * @param string|null $template
+     * @param mixed       $cache_id
+     * @param mixed       $compile_id
+     * @param mixed       $parent
+     */
+    public function render(string $view, ?array $options = null, ?bool $saveData = null): string
+    {
         $view = str_replace([$this->viewPath, ' '], '', $view);
         if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
-            $view .= '.' .str_replace('.', '', $this->config['extension'] ?? 'twig');
+            $view .= '.' . str_replace('.', '', $this->config['extension'] ?? 'twig');
         }
 
         $this->renderVars['start'] = microtime(true);
@@ -56,8 +64,8 @@ class TwigAdapter extends AbstractAdapter
 
         $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
 
-		return $this->engine->render($this->renderVars['view'], $this->data);
-	}
+        return $this->engine->render($this->renderVars['view'], $this->data);
+    }
 
     /**
      * Configure le moteur de template
@@ -77,19 +85,17 @@ class TwigAdapter extends AbstractAdapter
         }
         if (true === $autoReload) {
             $this->engine->enableAutoReload();
-        }
-        else {
+        } else {
             $this->engine->disableAutoReload();
         }
-        
+
         $debug = $this->config['debug'] ?: 'auto';
         if ('auto' === $debug) {
             $debug = on_dev();
         }
         if (true === $debug) {
             $this->engine->enableDebug();
-        }
-        else {
+        } else {
             $this->engine->disableDebug();
         }
 
@@ -99,35 +105,37 @@ class TwigAdapter extends AbstractAdapter
         }
         if (true === $strictVariables) {
             $this->engine->enableStrictVariables();
-        }
-        else {
+        } else {
             $this->engine->disableStrictVariables();
         }
 
         $this->engine->setCharset($this->config['charset'] ?: config('app.charset'));
 
-        $this->engine->setCache($this->config['cache_dir'] ?: VIEW_CACHE_PATH.'twig');
+        $this->engine->setCache($this->config['cache_dir'] ?: VIEW_CACHE_PATH . 'twig');
 
         // Ajout des variables globals
         $globals = (array) ($this->config['globals'] ?? []);
-		foreach ($globals as $name => $global) {
-			$this->engine->addGlobal($name, $global);
-		}
 
-		// Ajout des filtres
+        foreach ($globals as $name => $global) {
+            $this->engine->addGlobal($name, $global);
+        }
+
+        // Ajout des filtres
         $filters = (array) ($this->config['filters'] ?? []);
-		foreach ($filters as  $filter) {
+
+        foreach ($filters as $filter) {
             if ($filter instanceof TwigFilter) {
                 $this->engine->addFilter($filter);
             }
-		}
+        }
 
         // Ajout des fonctions
         $functions = (array) ($this->config['functions'] ?? []);
-		foreach ($functions as  $function) {
+
+        foreach ($functions as $function) {
             if ($function instanceof TwigFunction) {
                 $this->engine->addFunction($function);
             }
-		}
+        }
     }
 }

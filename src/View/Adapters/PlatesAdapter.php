@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\View\Adapters;
 
 use League\Plates\Engine;
@@ -20,7 +29,7 @@ class PlatesAdapter extends AbstractAdapter
      * @var string
      */
     private $extension;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -29,16 +38,16 @@ class PlatesAdapter extends AbstractAdapter
         parent::__construct($config, $viewPath);
 
         $this->extension = str_replace('.', '', $this->config['extension'] ?? 'tpl');
-        $this->engine = new Engine(rtrim($this->viewPath, '/\\'), $this->extension);
+        $this->engine    = new Engine(rtrim($this->viewPath, '/\\'), $this->extension);
 
         $this->configure();
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-	public function render(string $view, ?array $options = null, ?bool $saveData = null): string
-	{
+     * {@inheritDoc}
+     */
+    public function render(string $view, ?array $options = null, ?bool $saveData = null): string
+    {
         $view = str_replace([$this->viewPath, ' '], '', $view);
 
         $this->renderVars['start'] = microtime(true);
@@ -49,8 +58,7 @@ class PlatesAdapter extends AbstractAdapter
         $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
 
         return $this->engine->render($this->renderVars['view'], $this->data);
-	}
-
+    }
 
     /**
      * Configure le moteur de template
@@ -68,8 +76,9 @@ class PlatesAdapter extends AbstractAdapter
         $this->engine->addFolder('layouts', LAYOUT_PATH, true);
 
         $this->engine->loadExtension(new Asset(WEBROOT));
-        
+
         $functions = (array) ($this->config['functions'] ?? []);
+
         foreach ($functions as $name => $callable) {
             if (is_callable($callable)) {
                 $this->engine->registerFunction($name, $callable);
