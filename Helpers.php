@@ -530,4 +530,55 @@ class Helpers
         }
         trigger_error($message, E_USER_WARNING);
     }
+
+    /**
+     * Divise un nom de plugin de syntaxe à points en son plugin et son nom de classe.
+     * Si $name n'a pas de point, alors l'index 0 sera nul.
+     *
+     * Couramment utilisé comme
+     * ```
+     * list($plugin, $name) = Helpers::pluginSplit($name);
+     * ```
+     *
+     * @param string      $name      Le nom que vous voulez diviser en plugin.
+     * @param bool        $dotAppend Définir sur true si vous voulez que le plugin ait un '.' qui y est annexé.
+     * @param string|null $plugin    Plugin optionnel par défaut à utiliser si aucun plugin n'est trouvé. La valeur par défaut est nulle.
+     *
+     * @return array Tableau avec 2 index. 0 => nom du plugin, 1 => nom de la classe.
+     * @credit <a href="https://book.cakephp.org/4/en/core-libraries/global-constants-and-functions.html#pluginSplit">CakePHP</a>
+     * @psalm-return array{string|null, string}
+     */
+    public static function pluginSplit(string $name, bool $dotAppend = false, ?string $plugin = null): array
+    {
+        if (strpos($name, '.') !== false) {
+            $parts = explode('.', $name, 2);
+            if ($dotAppend) {
+                $parts[0] .= '.';
+            }
+
+            /** @psalm-var array{string, string}*/
+            return $parts;
+        }
+
+        return [$plugin, $name];
+    }
+
+    /**
+     * Séparez l'espace de noms du nom de classe.
+     *
+     * Couramment utilisé comme `list($namespace, $className) = Helpers::namespaceSplit($class);`.
+     *
+     * @param string $class Le nom complet de la classe, ie `BlitzPHP\Core\App`.
+     *
+     * @return array<string> Tableau avec 2 index. 0 => namespace, 1 => nom de la classe.
+     */
+    public static function namespaceSplit(string $class): array
+    {
+        $pos = strrpos($class, '\\');
+        if ($pos === false) {
+            return ['', $class];
+        }
+
+        return [substr($class, 0, $pos), substr($class, $pos + 1)];
+    }
 }
