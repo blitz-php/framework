@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Cache\Handler;
+namespace BlitzPHP\Cache\Handlers;
 
 use BlitzPHP\Cache\InvalidArgumentException;
 use CallbackFilterIterator;
@@ -80,14 +80,6 @@ class File extends BaseHandler
         }
 
         return $this->_active();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isSupported(): bool
-    {
-        return is_writable($this->_config['path']);
     }
 
     /**

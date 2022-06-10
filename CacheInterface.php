@@ -17,11 +17,6 @@ namespace BlitzPHP\Cache;
 interface CacheInterface extends \Psr\SimpleCache\CacheInterface
 {
     /**
-     * Détermine si le pilote est pris en charge sur ce système.
-     */
-    public function isSupported(): bool;
-
-    /**
      * Écrivez les données de la clé dans un moteur de cache si elles n'existent pas déjà.
      *
      * @param mixed $value Tout sauf une ressource.

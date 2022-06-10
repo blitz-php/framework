@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Cache;
 
-use BlitzPHP\Cache\Handler\BaseHandler;
-use BlitzPHP\Cache\Handler\Dummy;
+use BlitzPHP\Cache\Handlers\BaseHandler;
+use BlitzPHP\Cache\Handlers\Dummy;
 use DateInterval;
 use RuntimeException;
 
@@ -45,7 +45,7 @@ use RuntimeException;
  *
  * Voir la documentation du moteur de cache pour les clés de configuration attendues.
  */
-class Cache
+class Cache implements CacheInterface
 {
     /**
      * Un tableau mappant les schémas d'URL aux noms de classe de moteur de mise en cache complets.
@@ -54,8 +54,8 @@ class Cache
      * @psalm-var array<string, class-string>
      */
     protected static $validHandlers = [
-        'dummy' => Engine\Dummy::class,
-        'file'  => Engine\File::class,
+        'dummy' => Handlers\Dummy::class,
+        'file'  => Handlers\File::class,
     ];
 
     /**
@@ -125,14 +125,14 @@ class Cache
             throw new InvalidArgumentException('Cache config has an invalid handler specified.');
         }
 
-        $adapter = new $validHandlers[$handler]($this->config);
+        $adapter = new $validHandlers[$handler]();
         if (! ($adapter instanceof BaseHandler)) {
             if (empty($fallback)) {
                 $adapter = new Dummy();
             } elseif (! array_key_exists($fallback, $validHandlers)) {
                 throw new InvalidArgumentException('Cache config has an invalid fallback handler specified.');
             } else {
-                $adapter = new $validHandlers[$fallback]($this->config);
+                $adapter = new $validHandlers[$fallback]();
             }
         }
 
@@ -140,10 +140,6 @@ class Cache
             throw new InvalidArgumentException(
                 'Cache handler must use BlitzPHP\Cache\Handlers\BaseHandler as a base class.'
             );
-        }
-
-        if (! $adapter->isSupported()) {
-            $adapter = new Dummy();
         }
 
         if (! $adapter->init($this->config)) {
@@ -199,6 +195,14 @@ class Cache
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function set($key, $value, $ttl = null): bool
+    {
+        return $this->write($key, $value, $ttl);
+    }
+
+    /**
      * Écrire des données pour de nombreuses clés dans le cache.
      *
      * ### Utilisation :
@@ -224,6 +228,14 @@ class Cache
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function setMultiple($values, $ttl = null)
+    {
+        return $this->writeMany($values, $ttl);
+    }
+
+    /**
      * Lire une clé du cache.
      *
      * ### Utilisation :
@@ -241,6 +253,14 @@ class Cache
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function get($key, $default = null)
+    {
+        return $this->read($key, $default);
+    }
+
+    /**
      * Lire plusieurs clés du cache.
      *
      * ### Utilisation :
@@ -255,6 +275,14 @@ class Cache
     public function readMany(iterable $keys, $default = null): iterable
     {
         return $this->factory()->getMultiple($keys, $default);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMultiple($keys, $default = null)
+    {
+        return $this->readMany($keys, $default);
     }
 
     /**
@@ -305,8 +333,10 @@ class Cache
      * ```
      * $cache->delete('my_data');
      * ```
+     *
+     * @param mixed $key
      */
-    public function delete(string $key): bool
+    public function delete($key): bool
     {
         return $this->factory()->delete($key);
     }
@@ -329,6 +359,14 @@ class Cache
     public function deleteMany(iterable $keys): bool
     {
         return $this->factory()->deleteMultiple($keys);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteMultiple($keys)
+    {
+        return $this->deleteMany($keys);
     }
 
     /**
@@ -431,5 +469,24 @@ class Cache
         }
 
         return $this->factory()->add($key, $value);
+    }
+
+    /**
+     * Détermine si un élément est présent dans le cache.
+     *
+     * REMARQUE : Il est recommandé que has() ne soit utilisé qu'à des fins de type réchauffement du cache
+     * et à ne pas utiliser dans vos opérations d'applications en direct pour get/set, car cette méthode
+     * est soumis à une condition de concurrence où votre has() renverra vrai et immédiatement après,
+     * un autre script peut le supprimer, rendant l'état de votre application obsolète.
+     *
+     * @param string $key La clé de l'élément de cache.
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException DOIT être lancé si la chaîne $key n'est pas une valeur légale.
+     *
+     * @return bool
+     */
+    public function has($key)
+    {
+        return $this->factory()->has($key);
     }
 }
