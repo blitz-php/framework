@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Router;
 
+use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\PageNotFoundException;

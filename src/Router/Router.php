@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Router;
 
+use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Contracts\Router\RouterInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\RouterException;
