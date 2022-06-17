@@ -12,6 +12,7 @@
 namespace BlitzPHP\Loader;
 
 use BlitzPHP\Exceptions\LoadException;
+use BlitzPHP\Utilities\Helpers;
 
 class FileLocator
 {
@@ -20,7 +21,7 @@ class FileLocator
      */
     public static function lang(string $lang, string $locale): array
     {
-        $file  = self::ensureExt($lang, 'php');
+        $file  = Helpers::ensureExt($lang, 'php');
         $paths = [
             // Path to system languages
             SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
@@ -58,7 +59,7 @@ class FileLocator
      */
     public static function helper(string $helper)
     {
-        $file  = self::ensureExt($helper, 'php');
+        $file  = Helpers::ensureExt($helper, 'php');
         $paths = [
             // Helpers système
             SYST_PATH . 'Helpers' . DS . $file,
@@ -93,7 +94,7 @@ class FileLocator
         $lib                          = ucfirst(end($library));
         $library[count($library) - 1] = $lib;
 
-        $file  = self::ensureExt(implode(DS, $library), 'php');
+        $file  = Helpers::ensureExt(implode(DS, $library), 'php');
         $paths = [
             SYST_PATH . 'Libraries' . DS . $file,
 
@@ -140,7 +141,7 @@ class FileLocator
             }
         }
 
-        $path = MODEL_PATH . self::ensureExt(implode(DS, $model), 'php');
+        $path = MODEL_PATH . Helpers::ensureExt(implode(DS, $model), 'php');
 
         if (! file_exists($path)) {
             throw LoadException::modelNotFound($mod, $path);
@@ -180,7 +181,7 @@ class FileLocator
             }
         }
 
-        $path = CONTROLLER_PATH . self::ensureExt(implode(DS, $controller), 'php');
+        $path = CONTROLLER_PATH . Helpers::ensureExt(implode(DS, $controller), 'php');
 
         if (! file_exists($path)) {
             throw LoadException::controllerNotFound(str_replace('Controller', '', $con), $path);
@@ -198,21 +199,5 @@ class FileLocator
         }
 
         return Injector::make($con);
-    }
-
-    /**
-     * Ensures a extension is at the end of a filename
-     */
-    private static function ensureExt(string $path, string $ext = 'php'): string
-    {
-        if ($ext) {
-            $ext = '.' . $ext;
-
-            if (substr($path, -strlen($ext)) !== $ext) {
-                $path .= $ext;
-            }
-        }
-
-        return trim($path);
     }
 }

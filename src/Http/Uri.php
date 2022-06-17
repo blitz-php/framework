@@ -17,90 +17,88 @@ use Psr\Http\Message\UriInterface;
 
 /**
  * Abstraction pour un identificateur de ressource uniforme (URI).
+ *
+ * @credit CodeIgniter 4 <a href="https://codeigniter.com">CodeIgniter\HTTP\URI</a>
  */
 class Uri implements UriInterface
 {
     /**
-     * Sub-delimiters used in query strings and fragments.
-     *
-     * @const string
+     * Sous-délimiteurs utilisés dans les chaînes de requête et les fragments.
      */
     public const CHAR_SUB_DELIMS = '!\$&\'\(\)\*\+,;=';
 
     /**
-     * Unreserved characters used in paths, query strings, and fragments.
-     *
-     * @const string
+     * Caractères non réservés utilisés dans les chemins, les chaînes de requête et les fragments.
      */
     public const CHAR_UNRESERVED = 'a-zA-Z0-9_\-\.~';
 
     /**
-     * Current URI string
-     *
+     * Chaîne d'URI actuelle
+     * 
      * @var string
      */
     protected $uriString;
 
     /**
-     * List of URI segments.
+     * Liste des segments d'URI.
      *
-     * Starts at 1 instead of 0
+     * Commence à 1 au lieu de 0
      *
      * @var array
      */
     protected $segments = [];
 
     /**
-     * The URI Scheme.
+     * Schéma
      *
      * @var string
      */
     protected $scheme = 'http';
 
     /**
-     * URI User Info
+     * Informations utilisateur
      *
      * @var string
      */
     protected $user = '';
 
     /**
-     * URI User Password
+     * Mot de passe
      *
      * @var string
      */
     protected $password = '';
 
     /**
-     * URI Host
+     * Hôte
      *
      * @var string
      */
     protected $host = '';
 
     /**
-     * URI Port
+     * Port
      *
      * @var int
      */
     protected $port = 80;
 
     /**
-     * URI path.
+     * Chemin.
      *
      * @var string
      */
     protected $path = '';
 
     /**
-     * The name of any fragment.
+     * Le nom de n'importe quel fragment.
      *
      * @var string
      */
     protected $fragment = '';
 
     /**
-     * The query string.
+     * La chaîne de requête.
      *
      * @var array
      */
@@ -119,17 +117,15 @@ class Uri implements UriInterface
     ];
 
     /**
-     * Whether passwords should be shown in userInfo/authority calls.
-     * Default to false because URIs often show up in logs
+     * Indique si les mots de passe doivent être affichés dans les appels userInfo/authority.
+     * La valeur par défaut est false car les URI apparaissent souvent dans les journaux
      *
      * @var bool
      */
     protected $showPassword = false;
 
     /**
-     * Constructor.
-     *
-     * @param string $uri
+     * Constructeur.
      *
      * @throws InvalidArgumentException
      */
@@ -140,7 +136,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets and overwrites any current URI information.
+     * Définit et écrase toute information URI actuelle.
      */
     public function setURI(?string $uri = null): self
     {
@@ -158,19 +154,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the scheme component of the URI.
-     *
-     * If no scheme is present, this method MUST return an empty string.
-     *
-     * The value returned MUST be normalized to lowercase, per RFC 3986
-     * Section 3.1.
-     *
-     * The trailing ":" character is not part of the scheme and MUST NOT be
-     * added.
-     *
-     * @see    https://tools.ietf.org/html/rfc3986#section-3.1
-     *
-     * @return string The URI scheme.
+     * {@inheritDoc}
      */
     public function getScheme(): string
     {
@@ -178,23 +162,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the authority component of the URI.
-     *
-     * If no authority information is present, this method MUST return an empty
-     * string.
-     *
-     * The authority syntax of the URI is:
-     *
-     * <pre>
-     * [user-info@]host[:port]
-     * </pre>
-     *
-     * If the port component is not set or is the standard port for the current
-     * scheme, it SHOULD NOT be included.
-     *
-     * @see https://tools.ietf.org/html/rfc3986#section-3.2
-     *
-     * @return string The URI authority, in "[user-info@]host[:port]" format.
+     * {@inheritDoc}
      */
     public function getAuthority(bool $ignorePort = false): string
     {
@@ -209,8 +177,7 @@ class Uri implements UriInterface
         }
 
         if (! empty($this->port) && ! $ignorePort) {
-            // Don't add port if it's a standard port for
-            // this scheme
+            // N'ajoute pas de port s'il s'agit d'un port standard pour ce schéma
             if ($this->port !== $this->defaultPorts[$this->scheme]) {
                 $authority .= ':' . $this->port;
             }
@@ -222,24 +189,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the user information component of the URI.
-     *
-     * If no user information is present, this method MUST return an empty
-     * string.
-     *
-     * If a user is present in the URI, this will return that value;
-     * additionally, if the password is also present, it will be appended to the
-     * user value, with a colon (":") separating the values.
-     *
-     * NOTE that be default, the password, if available, will NOT be shown
-     * as a security measure as discussed in RFC 3986, Section 7.5. If you know
-     * the password is not a security issue, you can force it to be shown
-     * with $this->showPassword();
-     *
-     * The trailing "@" character is not part of the user information and MUST
-     * NOT be added.
-     *
-     * @return string|null The URI user information, in "username[:password]" format.
+     * {@inheritDoc}
      */
     public function getUserInfo()
     {
@@ -253,12 +203,10 @@ class Uri implements UriInterface
     }
 
     /**
-     * Temporarily sets the URI to show a password in userInfo. Will
-     * reset itself after the first call to authority().
-     *
-     * @return URI
+     * Définit temporairement l'URI pour afficher un mot de passe dans userInfo. 
+     * Se réinitialisera après le premier appel à l'autorité().
      */
-    public function showPassword(bool $val = true)
+    public function showPassword(bool $val = true): self
     {
         $this->showPassword = $val;
 
@@ -266,16 +214,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the host component of the URI.
-     *
-     * If no host is present, this method MUST return an empty string.
-     *
-     * The value returned MUST be normalized to lowercase, per RFC 3986
-     * Section 3.2.2.
-     *
-     * @see    http://tools.ietf.org/html/rfc3986#section-3.2.2
-     *
-     * @return string The URI host.
+     * {@inheritDoc}
      */
     public function getHost(): string
     {
@@ -283,19 +222,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the port component of the URI.
-     *
-     * If a port is present, and it is non-standard for the current scheme,
-     * this method MUST return it as an integer. If the port is the standard port
-     * used with the current scheme, this method SHOULD return null.
-     *
-     * If no port is present, and no scheme is present, this method MUST return
-     * a null value.
-     *
-     * If no port is present, but a scheme is present, this method MAY return
-     * the standard port for that scheme, but SHOULD return null.
-     *
-     * @return int|null The URI port.
+     * {@inheritDoc}
      */
     public function getPort()
     {
@@ -303,30 +230,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the path component of the URI.
-     *
-     * The path can either be empty or absolute (starting with a slash) or
-     * rootless (not starting with a slash). Implementations MUST support all
-     * three syntaxes.
-     *
-     * Normally, the empty path "" and absolute path "/" are considered equal as
-     * defined in RFC 7230 Section 2.7.3. But this method MUST NOT automatically
-     * do this normalization because in contexts with a trimmed base path, e.g.
-     * the front controller, this difference becomes significant. It's the task
-     * of the user to handle both "" and "/".
-     *
-     * The value returned MUST be percent-encoded, but MUST NOT double-encode
-     * any characters. To determine what characters to encode, please refer to
-     * RFC 3986, Sections 2 and 3.3.
-     *
-     * As an example, if the value should include a slash ("/") not intended as
-     * delimiter between path segments, that value MUST be passed in encoded
-     * form (e.g., "%2F") to the instance.
-     *
-     * @see    https://tools.ietf.org/html/rfc3986#section-2
-     * @see    https://tools.ietf.org/html/rfc3986#section-3.3
-     *
-     * @return string The URI path.
+     * {@inheritDoc}
      */
     public function getPath(): string
     {
@@ -334,7 +238,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve the query string
+     * {@inheritDoc}
      */
     public function getQuery(array $options = []): string
     {
@@ -368,7 +272,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Retrieve a URI fragment
+     * {@inheritDoc}
      */
     public function getFragment(): string
     {
@@ -376,7 +280,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Returns the segments of the path as an array.
+     * Renvoie les segments du chemin sous forme de tableau.
      */
     public function getSegments(): array
     {
@@ -384,15 +288,14 @@ class Uri implements UriInterface
     }
 
     /**
-     * Returns the value of a specific segment of the URI path.
+     * Renvoie la valeur d'un segment spécifique du chemin URI.
      *
-     * @return string The value of the segment. If no segment is found,
-     *                throws InvalidArgumentError
+     * @return string La valeur du segment. Si aucun segment n'est trouvé, lance InvalidArgumentError
      */
     public function getSegment(int $number): string
     {
-        // The segment should treat the array as 1-based for the user
-        // but we still have to deal with a zero-based array.
+        // Le segment doit traiter le tableau comme basé sur 1 pour l'utilisateur
+        // mais nous devons encore gérer un tableau de base zéro.
         $number--;
 
         if ($number > count($this->segments)) {
@@ -403,17 +306,15 @@ class Uri implements UriInterface
     }
 
     /**
-     * Set the value of a specific segment of the URI path.
-     * Allows to set only existing segments or add new one.
+     * Définissez la valeur d'un segment spécifique du chemin URI.
+     * Permet de définir uniquement des segments existants ou d'en ajouter un nouveau.
      *
-     * @param mixed $value (string or int)
-     *
-     * @return $this
+     * @param mixed $value (string ou int)
      */
     public function setSegment(int $number, $value)
     {
-        // The segment should treat the array as 1-based for the user
-        // but we still have to deal with a zero-based array.
+        // Le segment doit traiter le tableau comme basé sur 1 pour l'utilisateur
+        // mais nous devons encore gérer un tableau de base zéro.
         $number--;
 
         if ($number > count($this->segments) + 1) {
@@ -427,7 +328,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Returns the total number of segments.
+     * Renvoie le nombre total de segments.
      */
     public function getTotalSegments(): int
     {
@@ -435,28 +336,22 @@ class Uri implements UriInterface
     }
 
     /**
-     * Allow the URI to be output as a string by simply casting it to a string
-     * or echoing out.
+     * Autoriser la sortie de l'URI sous forme de chaîne en le convertissant simplement en chaîne
+     * ou en écho.
      */
     public function __toString(): string
     {
         return static::createURIString(
             $this->getScheme(),
             $this->getAuthority(),
-            $this->getPath(), // Absolute URIs should use a "/" for an empty path
-                        $this->getQuery(),
+            $this->getPath(), // Les URI absolus doivent utiliser un "/" pour un chemin vide
+            $this->getQuery(),
             $this->getFragment()
         );
     }
 
     /**
-     * Builds a representation of the string from the component parts.
-     *
-     * @param string $scheme
-     * @param string $authority
-     * @param string $path
-     * @param string $query
-     * @param string $fragment
+     * Construit une représentation de la chaîne à partir des parties du composant.
      */
     public static function createURIString(?string $scheme = null, ?string $authority = null, ?string $path = null, ?string $query = null, ?string $fragment = null): string
     {
@@ -485,11 +380,9 @@ class Uri implements UriInterface
     }
 
     /**
-     * Parses the given string an saves the appropriate authority pieces.
-     *
-     * @return $this
+     * Analyse la chaîne donnée et enregistre les pièces d'autorité appropriées.
      */
-    public function setAuthority(string $str)
+    public function setAuthority(string $str): self
     {
         $parts = parse_url($str);
 
@@ -504,18 +397,14 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the scheme for this URI.
+     * Définit le schéma pour cet URI.
      *
-     * Because of the large number of valid schemes we cannot limit this
-     * to only http or https.
+     * En raison du grand nombre de schémas valides, nous ne pouvons pas limiter ce
+     * uniquement sur http ou https.
      *
      * @see https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
-     *
-     * @param $str
-     *
-     * @return $this
      */
-    public function setScheme(string $str)
+    public function setScheme(string $str): self
     {
         $str = strtolower($str);
         $str = preg_replace('#:(//)?$#', '', $str);
@@ -534,14 +423,12 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the userInfo/Authority portion of the URI.
+     * Définit la partie userInfo/Authority de l'URI.
      *
-     * @param string $user The user's username
-     * @param string $pass The user's password
-     *
-     * @return $this
+     * @param string $user Le nom d'utilisateur de l'utilisateur
+     * @param string $pass Le mot de passe de l'utilisateur
      */
-    public function setUserInfo(string $user, string $pass)
+    public function setUserInfo(string $user, string $pass): self
     {
         $this->user     = trim($user);
         $this->password = trim($pass);
@@ -558,11 +445,9 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the host name to use.
-     *
-     * @return $this
+     * Définit le nom d'hôte à utiliser.
      */
-    public function setHost(string $str)
+    public function setHost(string $str): self
     {
         $this->host = trim($str);
 
@@ -578,13 +463,9 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the port portion of the URI.
-     *
-     * @param int $port
-     *
-     * @return $this
+     * Définit la partie port de l'URI.
      */
-    public function setPort(?int $port = null)
+    public function setPort(?int $port = null): self
     {
         if (null === $port) {
             return $this;
@@ -608,11 +489,9 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the path portion of the URI.
-     *
-     * @return $this
+     * Définit la partie chemin de l'URI.
      */
-    public function setPath(string $path)
+    public function setPath(string $path): self
     {
         $this->path = $this->filterPath($path);
 
@@ -630,13 +509,9 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the path portion of the URI based on segments.
-     *
-     * @param string $path
-     *
-     * @return $this
+     * Définit la partie chemin de l'URI en fonction des segments.
      */
-    public function refreshPath()
+    public function refreshPath(): self
     {
         $this->path = $this->filterPath(implode('/', $this->segments));
 
@@ -646,8 +521,8 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the query portion of the URI, while attempting
-     * to clean the various parts of the query keys and values.
+     * Définit la partie requête de l'URI, tout en essayant
+     * de nettoyer les différentes parties des clés et des valeurs de la requête.
      */
     public function setQuery(string $query): self
     {
@@ -655,7 +530,7 @@ class Uri implements UriInterface
             throw new FrameworkException('La chaine de requete est mal formée');
         }
 
-        // Can't have leading ?
+        // Ne peut pas avoir de début ?
         if (! empty($query) && strpos($query, '?') === 0) {
             $query = substr($query, 1);
         }
@@ -674,8 +549,8 @@ class Uri implements UriInterface
     }
 
     /**
-     * A convenience method to pass an array of items in as the Query
-     * portion of the URI.
+     * Une méthode pratique pour transmettre un tableau d'éléments en tant que requête
+     * partie de l'URI.
      */
     public function setQueryArray(array $query): self
     {
@@ -685,13 +560,11 @@ class Uri implements UriInterface
     }
 
     /**
-     * Adds a single new element to the query vars.
+     * Ajoute un seul nouvel élément à la requête vars.
      *
      * @param mixed $value
-     *
-     * @return $this
      */
-    public function addQuery(string $key, $value = null)
+    public function addQuery(string $key, $value = null): self
     {
         $this->query[$key] = $value;
 
@@ -699,13 +572,11 @@ class Uri implements UriInterface
     }
 
     /**
-     * Removes one or more query vars from the URI.
+     * Supprime une ou plusieurs variables de requête de l'URI.
      *
      * @param array ...$params
-     *
-     * @return $this
      */
-    public function stripQuery(...$params)
+    public function stripQuery(...$params): self
     {
         foreach ($params as $param) {
             unset($this->query[$param]);
@@ -715,14 +586,12 @@ class Uri implements UriInterface
     }
 
     /**
-     * Filters the query variables so that only the keys passed in
-     * are kept. The rest are removed from the object.
+     * Filtre les variables de requête afin que seules les clés transmises
+     * sont gardés. Le reste est supprimé de l'objet.
      *
      * @param array ...$params
-     *
-     * @return $this
      */
-    public function keepQuery(...$params)
+    public function keepQuery(...$params): self
     {
         $temp = [];
 
@@ -740,13 +609,11 @@ class Uri implements UriInterface
     }
 
     /**
-     * Sets the fragment portion of the URI.
+     * Définit la partie fragment de l'URI.
      *
      * @see https://tools.ietf.org/html/rfc3986#section-3.5
-     *
-     * @return $this
      */
-    public function setFragment(string $string)
+    public function setFragment(string $string): self
     {
         $this->fragment = trim($string, '# ');
 
@@ -762,24 +629,22 @@ class Uri implements UriInterface
     }
 
     /**
-     * Encodes any dangerous characters, and removes dot segments.
-     * While dot segments have valid uses according to the spec,
-     * this URI class does not allow them.
-     *
-     * @param $path
+     * Encode tous les caractères dangereux et supprime les segments de points.
+     * Bien que les segments de points aient des utilisations valides selon la spécification,
+     * cette classe ne les autorise pas.
      */
     protected function filterPath(?string $path = null): string
     {
         $orig = $path;
 
-        // Decode/normalize percent-encoded chars so
-        // we can always have matching for Routes, etc.
+        // Décode/normalise les caractères codés en pourcentage afin que
+        // nous pouissions toujours avoir une correspondance pour les routes, etc.
         $path = urldecode($path);
 
-        // Remove dot segments
+        // Supprimer les segments de points
         $path = $this->removeDotSegments($path);
 
-        // Fix up some leading slash edge cases...
+        // Correction de certains cas de bord de barre oblique...
         if (strpos($orig, './') === 0) {
             $path = '/' . $path;
         }
@@ -787,7 +652,7 @@ class Uri implements UriInterface
             $path = '/' . $path;
         }
 
-        // Encode characters
+        // Encode les caractères
         $path = preg_replace_callback(
             '/(?:[^' . static::CHAR_UNRESERVED . ':@&=\+\$,\/;%]+|%(?![A-Fa-f0-9]{2}))/',
             static fn (array $matches) => rawurlencode($matches[0]),
@@ -798,7 +663,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Saves our parts from a parse_url call.
+     * Enregistre nos pièces à partir d'un appel parse_url.
      */
     protected function applyParts(array $parts)
     {
@@ -818,17 +683,15 @@ class Uri implements UriInterface
             $this->fragment = $parts['fragment'];
         }
 
-        // Scheme
         if (isset($parts['scheme'])) {
             $this->setScheme(rtrim($parts['scheme'], ':/'));
         } else {
             $this->setScheme('http');
         }
 
-        // Port
         if (isset($parts['port'])) {
             if (null !== $parts['port']) {
-                // Valid port numbers are enforced by earlier parse_url or setPort()
+                // Les numéros de port valides sont appliqués par les précédents parse_url ou setPort()
                 $port       = $parts['port'];
                 $this->port = $port;
             }
@@ -838,14 +701,13 @@ class Uri implements UriInterface
             $this->password = $parts['pass'];
         }
 
-        // Populate our segments array
         if (! empty($parts['path'])) {
             $this->segments = explode('/', trim($parts['path'], '/'));
         }
     }
 
     /**
-     * Combines one URI string with this one based on the rules set out in
+     * Combine une chaîne d'URI avec celle-ci en fonction des règles définies dans
      * RFC 3986 Section 2
      *
      * @see http://tools.ietf.org/html/rfc3986#section-5.2
@@ -853,8 +715,8 @@ class Uri implements UriInterface
     public function resolveRelativeURI(string $uri): self
     {
         /*
-         * NOTE: We don't use removeDotSegments in this
-         * algorithm since it's already done by this line!
+         * REMARQUE : Nous n'utilisons pas removeDotSegments dans cet
+         * algorithme puisque c'est déjà fait par cette ligne !
          */
         $relative = new self();
         $relative->setURI($uri);
@@ -865,7 +727,7 @@ class Uri implements UriInterface
 
         $transformed = clone $relative;
 
-        // 5.2.2 Transform References in a non-strict method (no scheme)
+        // 5.2.2 Transformer les références dans une méthode non stricte (pas de schéma)
         if (! empty($relative->getAuthority())) {
             $transformed->setAuthority($relative->getAuthority())
                 ->setPath($relative->getPath())
@@ -900,12 +762,11 @@ class Uri implements UriInterface
     }
 
     /**
-     * Given 2 paths, will merge them according to rules set out in RFC 2986,
-     * Section 5.2
+     * Étant donné 2 chemins, les fusionnera conformément aux règles énoncées dans RFC 2986, section 5.2
      *
      * @see http://tools.ietf.org/html/rfc3986#section-5.2.3
      */
-    protected function mergePaths(URI $base, URI $reference): string
+    protected function mergePaths(self $base, self $reference): string
     {
         if (! empty($base->getAuthority()) && empty($base->getPath())) {
             return '/' . ltrim($reference->getPath(), '/ ');
@@ -924,15 +785,12 @@ class Uri implements UriInterface
     }
 
     /**
-     * Used when resolving and merging paths to correctly interpret and
-     * remove single and double dot segments from the path per
-     * RFC 3986 Section 5.2.4
+     * Utilisé lors de la résolution et de la fusion de chemins pour interpréter et
+     * supprimer correctement les segments à un ou deux points du chemin selon RFC 3986 Section 5.2.4
      *
      * @see http://tools.ietf.org/html/rfc3986#section-5.2.4
-     *
-     * @internal param \CodeIgniter\HTTP\URI $uri
      */
-    public function removeDotSegments(string $path): string
+    public static function removeDotSegments(string $path): string
     {
         if (empty($path) || $path === '/') {
             return $path;
@@ -947,10 +805,10 @@ class Uri implements UriInterface
             $input = array_values($input);
         }
 
-        // This is not a perfect representation of the
-        // RFC, but matches most cases and is pretty
-        // much what Guzzle uses. Should be good enough
-        // for almost every real use case.
+        // Ce n'est pas une représentation parfaite de la
+        // RFC, mais correspond à la plupart des cas et est joli
+        // beaucoup ce que Guzzle utilise. Devrait être assez bon
+        // pour presque tous les cas d'utilisation réels.
         foreach ($input as $segment) {
             if ($segment === '..') {
                 array_pop($output);
@@ -963,12 +821,12 @@ class Uri implements UriInterface
         $output = ltrim($output, '/ ');
 
         if ($output !== '/') {
-            // Add leading slash if necessary
+            // Ajouter une barre oblique au début si nécessaire
             if (strpos($path, '/') === 0) {
                 $output = '/' . $output;
             }
 
-            // Add trailing slash if necessary
+            // Ajouter une barre oblique à la fin si nécessaire
             if (substr($path, -1, 1) === '/') {
                 $output .= '/';
             }

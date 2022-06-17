@@ -10,8 +10,9 @@
  */
 
 return [
-    BlitzPHP\Router\RouteCollectionInterface::class => service('routes'),
-    Psr\Container\ContainerInterface::class         => service('container'),
-    Psr\Http\Message\ResponseInterface::class       => service('response'),
-    Psr\Http\Message\ServerRequestInterface::class  => service('request'),
+    BlitzPHP\Contracts\Router\RouteCollectionInterface::class => service('routes'),
+    Psr\Container\ContainerInterface::class                   => service('container'),
+    Psr\Http\Message\ResponseInterface::class                 => service('response'),
+    Psr\Http\Message\ServerRequestInterface::class            => service('request'),
+    Psr\SimpleCache\CacheInterface::class                     => service('cache'),
 ];
