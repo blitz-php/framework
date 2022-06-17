@@ -17,9 +17,11 @@ use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Event\EventManager;
 use BlitzPHP\Http\Negotiator;
+use BlitzPHP\HTTP\Redirection;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
+use BlitzPHP\Http\Session;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Output\Language;
 use BlitzPHP\Router\RouteCollection;
@@ -140,6 +142,18 @@ class Services
     }
 
     /**
+     * La classe des redirections HTTP
+     */
+    public static function redirection(bool $shared = true): Redirection
+    {
+        if (true === $shared) {
+            return self::singleton(Redirection::class);
+        }
+
+        return self::factory(Redirection::class);
+    }
+
+    /**
      * La classe Resquest modélise une reqûete HTTP.
      */
     public static function request(bool $shared = true): ServerRequest
@@ -193,6 +207,27 @@ class Services
         }
 
         return self::factory(Router::class)->init($routes, $request);
+    }
+
+    /**
+     * Return the session manager.
+     */
+    public static function session(bool $shared = true): Session
+    {
+        if (true === $shared) {
+            return self::singleton(Session::class);
+        }
+
+        /**
+         * @var Session
+         */
+        $session = self::factory(Session::class);
+
+        if (session_status() === PHP_SESSION_NONE) {
+            $session->start();
+        }
+
+        return $session;
     }
 
     /**

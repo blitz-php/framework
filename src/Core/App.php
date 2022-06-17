@@ -11,7 +11,9 @@
 
 namespace BlitzPHP\Core;
 
+use BlitzPHP\Http\Uri;
 use BlitzPHP\Utilities\Helpers;
+use InvalidArgumentException;
 
 /**
  * Il est responsable de l'emplacement des ressources et de la gestion des chemins.
@@ -170,5 +172,56 @@ class App
     public static function core(string $type): array
     {
         return [SYST_PATH . str_replace('/', DIRECTORY_SEPARATOR, $type) . DIRECTORY_SEPARATOR];
+    }
+
+    /**
+     * Utilisé par les autres fonctions d'URL pour construire un
+     * URI spécifique au framework basé sur la configuration de l'application.
+     *
+     * @internal En dehors du framework, ceci ne doit pas être utilisé directement.
+     *
+     * @param string $relativePath Peut inclure des requêtes ou des fragments
+     *
+     * @throws InvalidArgumentException Pour les chemins ou la configuration non valides
+     */
+    public static function getUri(string $relativePath = ''): Uri
+    {
+        $config = (object) config('app');
+
+        if ($config->base_url === '') {
+            throw new InvalidArgumentException(__METHOD__ . ' requires a valid baseURL.');
+        }
+
+        // Si un URI complet a été passé, convertissez-le
+        if (is_int(strpos($relativePath, '://'))) {
+            $full         = new Uri($relativePath);
+            $relativePath = Uri::createURIString(null, null, $full->getPath(), $full->getQuery(), $full->getFragment());
+        }
+
+        $relativePath = URI::removeDotSegments($relativePath);
+
+        // Construire l'URL complète basée sur $config et $relativePath
+        $url = rtrim($config->base_url, '/ ') . '/';
+
+        // Recherche une page d'index
+        if ($config->index_page !== '') {
+            $url .= $config->index_page;
+
+            // Vérifie si nous avons besoin d'un séparateur
+            if ($relativePath !== '' && $relativePath[0] !== '/' && $relativePath[0] !== '?') {
+                $url .= '/';
+            }
+        }
+
+        $url .= $relativePath;
+
+        $uri = new Uri($url);
+
+        // Vérifie si le schéma baseURL doit être contraint dans sa version sécurisée
+        if ($config->force_global_secure_requests && $uri->getScheme() === 'http') {
+            $uri->setScheme('https');
+        }
+
+        return $uri;
     }
 }

@@ -10,12 +10,13 @@
  */
 
 use BlitzPHP\Config\Config;
+use BlitzPHP\Core\App;
+use BlitzPHP\HTTP\Redirection;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Helpers;
 use Kint\Kint;
-use Psr\Http\Message\ResponseInterface;
 
 // ================================= FONCTIONS D'ACCESSIBILITE ================================= //
 
@@ -78,7 +79,7 @@ if (! function_exists('single_service')) {
      */
     function single_service(string $name, ...$params)
     {
-        // Ensure it's NOT a shared instance
+        // Assurez-vous qu'il ne s'agit PAS d'une instance partagée
         $params[] = false;
 
         return Services::$name(...$params);
@@ -118,8 +119,6 @@ if (! function_exists('config')) {
 if (! function_exists('on_dev')) {
     /**
      * Testez pour voir si nous sommes dans un environnement de développement.
-     *
-     * @param bool checkOnline
      */
     function on_dev(bool $checkOnline = false): bool
     {
@@ -177,8 +176,7 @@ if (! function_exists('is_php')) {
      */
     function is_php(string $version): bool
     {
-        return false;
-        // return Helpers::is_php($version);
+        return Helpers::isPhp($version);
     }
 }
 
@@ -237,15 +235,25 @@ if (! function_exists('is_ajax_request')) {
 
 if (! function_exists('site_url')) {
     /**
-     * Créez une URL locale basée sur votre chemin de base. Les segments peuvent être passés via le
-     * premier paramètre sous forme de chaîne ou de tableau.
+     * Renvoie une URL de site telle que définie par la configuration de l'application.
      *
-     * @param mixed $uri
+     * @param mixed $relativePath Chaîne d'URI ou tableau de segments d'URI
      */
-    function site_url($uri = '', ?string $protocol = null): string
+    function site_url($relativePath = '', ?string $scheme = null): string
     {
-        return '';
-        // return Helpers::site_url($uri, $protocol);
+        if (is_array($relativePath)) {
+            $relativePath = implode('/', $relativePath);
+        }
+
+        $uri = App::getUri($relativePath);
+
+        return Uri::createURIString(
+            $scheme ?? $uri->getScheme(),
+            $uri->getAuthority(),
+            $uri->getPath(),
+            $uri->getQuery(),
+            $uri->getFragment()
+        );
     }
 }
 
@@ -273,7 +281,7 @@ if (! function_exists('current_url')) {
      *
      * @param bool $returnObject True to return an object instead of a strong
      *
-     * @return \dFramework\core\http\Uri|string
+     * @return \BlitzPHP\Http\Uri|string
      */
     function current_url(bool $returnObject = false)
     {
@@ -312,17 +320,21 @@ if (! function_exists('previous_url')) {
     }
 }
 
-if (! function_exists('redirect')) {
+if (! function_exists('redirection')) {
     /**
      * Redirige l'utilisateur
      */
-    function redirect(string $uri = '', string $method = 'location', ?int $code = 302)
+    function redirection(string $uri = '', string $method = 'location', ?int $code = 302)
     {
-        Services::response()->redirect($uri, $method, $code);
+        $response = redirect()->to($uri, $code, $method);
+
+        Services::emitter()->emitHeaders($response);
+
+        exit(EXIT_SUCCESS);
     }
 }
 
-if (! function_exists('redirection')) {
+if (! function_exists('redirect')) {
     /**
      * Méthode pratique qui fonctionne avec la $request globale actuelle et
      * l'instance $router à rediriger à l'aide de routes nommées et le routage inversé
@@ -331,10 +343,8 @@ if (! function_exists('redirection')) {
      * $redirection->redirect() détermine la méthode et le code corrects.
      *
      * Si plus de contrôle est nécessaire, vous devez utiliser explicitement $response->redirect.
-     *
-     * @return \BlitzPHP\Http\Redirection|void
      */
-    function redirection(?string $uri = null)
+    function redirect(?string $uri = null): Redirection
     {
         $redirection = Services::redirection();
 
@@ -357,9 +367,6 @@ if (! function_exists('link_to')) {
     function link_to(string $method, ...$params): string
     {
         $url = Services::routes()->reverseRoute($method, ...$params);
-        if (empty($url)) {
-            $rul = '';
-        }
 
         return site_url($url);
     }
@@ -453,8 +460,6 @@ if (! function_exists('logger')) {
      *  - debug
      *
      * @param int|string $level
-     * @param string     $message
-     * @param array|null $context
      *
      * @return \BlitzPHP\Debug\Logger|mixed
      */
@@ -557,13 +562,10 @@ if (! function_exists('vd')) {
     /**
      * Shortcut to ref, HTML mode
      *
-     * @param mixed $args
-     *
      * @return string|void
      */
-    function vd()
+    function vd(...$params)
     {
-        $params = func_get_args();
         // return 	Helpers::r(...$params);
     }
 }
@@ -572,13 +574,10 @@ if (! function_exists('vdt')) {
     /**
      * Shortcut to ref, plain text mode
      *
-     * @param mixed $args
-     *
      * @return string|void
      */
-    function vdt()
+    function vdt(...$params)
     {
-        $params = func_get_args();
         // return 	Helpers::rt(...$params);
     }
 }
@@ -596,30 +595,27 @@ if (! function_exists('force_https')) {
      *
      * @param int $duration Combien de temps l'en-tête SSL doit-il être défini ? (en secondes)
      *                      Par défaut à 1 an.
+     * @credit CodeIgniter <a href="http://codeigniter.com/">helpers force_https() - /system/Common.php</a>
      *
      * Non testable, car il sortira !
-     *
-     * @credit CodeIgniter 4.0.0
      * @codeCoverageIgnore
      */
-    function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?ResponseInterface $response = null)
+    function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?Redirection $response = null)
     {
         if (null === $request) {
             $request = Services::request();
         }
         if (null === $response) {
-            $response = Services::response();
+            $response = Services::redirection();
         }
 
         if (is_cli() || $request->is('ssl')) {
             return;
         }
 
-        // If the session library is loaded, we should regenerate
-        // the session ID for safety sake.
-        if (class_exists('Session', false)) {
-            // Session::regenerate();
-        }
+        // Si la bibliothèque de session est chargée, nous devons régénérer
+        // l'ID de session pour des raisons de sécurité.
+        Services::session()->renew();
 
         $baseURL = base_url();
 
@@ -630,16 +626,17 @@ if (! function_exists('force_https')) {
         $uri = Uri::createURIString(
             'https',
             $baseURL,
-            $request->getUri()->getPath(), // Absolute URIs should use a "/" for an empty path
+            $request->getUri()->getPath(), // Les URI absolus doivent utiliser un "/" pour un chemin vide
             $request->getUri()->getQuery(),
             $request->getUri()->getFragment()
         );
 
-        // Set an HSTS header
-        $response = $response->withHeader('Strict-Transport-Security', 'max-age=' . $duration);
-        $response->redirect($uri);
+        // Définir un en-tête HSTS
+        $response = $response->to($uri)->withHeader('Strict-Transport-Security', 'max-age=' . $duration);
 
-        exit(1);
+        Services::emitter()->emitHeaders($response);
+
+        exit(EXIT_SUCCESS);
     }
 }
 
