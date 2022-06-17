@@ -39,7 +39,7 @@ class ResponseEmitter
                 trigger_error($message, E_USER_WARNING);
             }
 
-            // Logger::warning($message, __FILE__, __LINE__);
+            logger()->warning($message);
         }
 
         $this->emitStatusLine($response);
@@ -57,6 +57,44 @@ class ResponseEmitter
             session_write_close();
             fastcgi_finish_request();
         }
+    }
+
+    /**
+     * Émettre des en-têtes de réponse.
+     *
+     * Boucle à travers chaque en-tête, émettant chacun ; si la valeur d'en-tête
+     * est un tableau avec plusieurs valeurs, garantit que chacune est envoyée
+     * de manière à créer des en-têtes agrégés (au lieu de remplacer
+     * la précédente).
+     *
+     * @return void
+     */
+    public function emitHeaders(Response $response)
+    {
+        $cookies = [];
+        if (method_exists($response, 'getCookies')) {
+            $cookies = $response->getCookies();
+        }
+
+        foreach ($response->getHeaders() as $name => $values) {
+            if (strtolower($name) === 'set-cookie') {
+                $cookies = array_merge($cookies, $values);
+
+                continue;
+            }
+            $first = true;
+
+            foreach ($values as $value) {
+                header(sprintf(
+                    '%s: %s',
+                    $name,
+                    $value
+                ), $first);
+                $first = false;
+            }
+        }
+
+        $this->emitCookies($cookies);
     }
 
     /**
@@ -140,44 +178,6 @@ class ResponseEmitter
             $response->getStatusCode(),
             ($reasonPhrase ? ' ' . $reasonPhrase : '')
         ));
-    }
-
-    /**
-     * Émettre des en-têtes de réponse.
-     *
-     * Boucle à travers chaque en-tête, émettant chacun ; si la valeur d'en-tête
-     * est un tableau avec plusieurs valeurs, garantit que chacune est envoyée
-     * de manière à créer des en-têtes agrégés (au lieu de remplacer
-     * la précédente).
-     *
-     * @return void
-     */
-    protected function emitHeaders(Response $response)
-    {
-        $cookies = [];
-        if (method_exists($response, 'getCookies')) {
-            $cookies = $response->getCookies();
-        }
-
-        foreach ($response->getHeaders() as $name => $values) {
-            if (strtolower($name) === 'set-cookie') {
-                $cookies = array_merge($cookies, $values);
-
-                continue;
-            }
-            $first = true;
-
-            foreach ($values as $value) {
-                header(sprintf(
-                    '%s: %s',
-                    $name,
-                    $value
-                ), $first);
-                $first = false;
-            }
-        }
-
-        $this->emitCookies($cookies);
     }
 
     /**
