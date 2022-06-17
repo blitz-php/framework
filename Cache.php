@@ -73,7 +73,7 @@ class Cache implements CacheInterface
     protected $config = [];
 
     /**
-     * @var CacheInterface
+     * @var ?CacheInterface
      */
     private $adapter;
 
@@ -86,7 +86,7 @@ class Cache implements CacheInterface
     }
 
     /**
-     * Modifie lles configuration du cache pour la fabrique actuelle
+     * Modifie les configuration du cache pour la fabrique actuelle
      */
     public function setConfig(array $config): self
     {
