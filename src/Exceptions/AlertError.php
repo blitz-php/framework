@@ -14,7 +14,7 @@ namespace BlitzPHP\Exceptions;
 use Error;
 
 /**
- * Error: Action must be taken immediately (system/db down, etc)
+ * Erreur : une action doit être entreprise immédiatement (système/base de données en panne, etc.)
  */
 class AlertError extends Error
 {

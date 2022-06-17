@@ -214,8 +214,6 @@ class DotEnv
      *
      * Ceci a été emprunté à l'excellent phpdotenv avec très peu de modifications.
      * https://github.com/vlucas/phpdotenv
-     *
-     * @param $value
      */
     protected function resolveNestedVariables(string $value): string
     {

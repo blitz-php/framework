@@ -192,7 +192,7 @@ class Language
      * renverra le contenu du fichier, sinon fusionnera avec
      * les lignes linguistiques existantes.
      *
-     * @return array|null
+     * @return array|void
      */
     protected function load(string $file, string $locale, bool $return = false)
     {

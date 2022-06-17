@@ -12,14 +12,14 @@
 namespace BlitzPHP\Exceptions;
 
 /**
- * Exception for automatic logging.
+ * Exception pour la journalisation automatique.
  */
 class ConfigException extends CriticalError
 {
     use DebugTraceableTrait;
 
     /**
-     * Error code
+     * code d'erreur
      *
      * @var int
      */

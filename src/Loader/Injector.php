@@ -129,10 +129,10 @@ class Injector
      *
      * Les paramètres manquants seront résolus à partir du conteneur.
      *
-     * @param callable $callable   Fonction à appeler.
-     * @param array    $parameters Paramètres à utiliser. Peut être indexé par les noms de paramètre
-     *                             ou non indexé (même ordre que les paramètres).
-     *                             Le tableau peut également contenir des définitions DI, par ex. DI\get().
+     * @param callable $callable Fonction à appeler.
+     * @param array    $params   Paramètres à utiliser. Peut être indexé par les noms de paramètre
+     *                           ou non indexé (même ordre que les paramètres).
+     *                           Le tableau peut également contenir des définitions DI, par ex. DI\get().
      *
      * @return mixed Resultat de la fonction.
      */

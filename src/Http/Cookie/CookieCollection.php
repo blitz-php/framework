@@ -30,6 +30,7 @@ use Traversable;
  *
  * @credit <a href="https://api.cakephp.org/4.3/class-Cake.Http.Cookie.CookieCollection.html">CakePHP - \Cake\Http\Cookie\CookieCollection</a>
  */
+/** @phpstan-consistent-constructor */
 class CookieCollection implements IteratorAggregate, Countable
 {
     /**
@@ -40,9 +41,9 @@ class CookieCollection implements IteratorAggregate, Countable
     protected $cookies = [];
 
     /**
-     * Constructor
+     * Constructeur
      *
-     * @param CookieInterface[] $cookies Array of cookie objects
+     * @param CookieInterface[] $cookies Tableau de cookies
      */
     public function __construct(array $cookies = [])
     {

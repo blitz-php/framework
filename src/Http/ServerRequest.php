@@ -827,9 +827,8 @@ class ServerRequest implements ServerRequestInterface
      * Les valeurs d'en-tête existantes seront conservées. La valeur fournie
      * sera ajouté aux valeurs existantes.
      *
-     * @param chaîne|tableau $valeur
-     * @param mixed           $name
-     * @param mixed           $value
+     * @param string       $name
+     * @param array|string $value
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
@@ -1069,7 +1068,7 @@ class ServerRequest implements ServerRequestInterface
      * Généralement, vous souhaitez utiliser {@link \BlitzPHP\Http\ServerRequest::accepts()} pour obtenir une liste simple
      * des types de contenu acceptés.
      *
-     * @return tableau Un tableau de `prefValue => [contenu/types]`
+     * @return array Un tableau de `prefValue => [contenu/types]`
      */
     public function parseAccept(): array
     {

@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Http;
 
-use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Loader\Services;
 use LogicException;
 use Psr\Http\Message\ResponseInterface;
@@ -201,17 +200,14 @@ class Middleware implements RequestHandlerInterface
         if (is_string($middleware)) {
             return Services::container()->get($middleware);
         }
-        if (is_callable($middleware) || is_object($middleware)) {
-            return $middleware;
-        }
 
-        throw new HttpException('Unknow middleware type');
+        return $middleware;
     }
 
     /**
      * Recuperation du middleware actuel
      *
-     * @return callable|object
+     * @return callable|object|null
      */
     private function getMiddleware()
     {

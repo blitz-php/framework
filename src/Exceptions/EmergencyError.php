@@ -14,7 +14,7 @@ namespace BlitzPHP\Exceptions;
 use Error;
 
 /**
- * Error: system is unusable
+ * Erreur : le système est inutilisable
  */
 class EmergencyError extends Error
 {

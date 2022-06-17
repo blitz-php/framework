@@ -14,7 +14,7 @@ namespace BlitzPHP\Exceptions;
 use Error;
 
 /**
- * Error: Critical conditions, like component unavailable, etc.
+ * Erreur : conditions critiques, telles que composant indisponible, etc.
  */
 class CriticalError extends Error
 {

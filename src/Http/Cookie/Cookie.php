@@ -236,7 +236,7 @@ class Cookie implements CookieInterface
 
         if ($expires instanceof DateTimeInterface) {
             /** @psalm-suppress UndefinedInterfaceMethod */
-            return $expires->setTimezone(new DateTimeZone('GMT'));
+            return $expires->setTimezone(new DateTimeZone('GMT')); // @phpstan-ignore-line
         }
 
         if (! is_string($expires) && ! is_int($expires)) {
@@ -464,7 +464,7 @@ class Cookie implements CookieInterface
     /**
      * {@inheritDoc}
      */
-    public function withDomain(string $domain): self
+    public function withDomain(string $domain)
     {
         $new         = clone $this;
         $new->domain = $domain;

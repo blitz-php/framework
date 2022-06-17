@@ -12,6 +12,7 @@
 namespace BlitzPHP\Core;
 
 use BlitzPHP\Config\Config;
+use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Loader\DotEnv;
 use BlitzPHP\Loader\FileLocator;
 use BlitzPHP\Loader\Injector;
@@ -46,7 +47,7 @@ class Application
     ];
 
     /**
-     * @throws Exception
+     * @throws ExceptionInterface
      * @throws ReflectionException
      */
     public function init(): self

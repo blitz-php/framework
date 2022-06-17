@@ -21,6 +21,7 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\Traits\SingletonTrait;
 use BlitzPHP\View\View;
 use Closure;
 use Psr\Http\Message\ResponseInterface;
@@ -29,6 +30,8 @@ use stdClass;
 
 class Dispatcher
 {
+    use SingletonTrait;
+
     /**
      * Heure de démarrage de l'application.
      *
@@ -127,11 +130,6 @@ class Dispatcher
     protected $useSafeOutput = false;
 
     /**
-     * @var self|null
-     */
-    private static $_instance;
-
-    /**
      * Constructor.
      */
     private function __construct()
@@ -142,21 +140,22 @@ class Dispatcher
         $this->initMiddlewareQueue();
     }
 
-    /**
-     * Renvoi une instance unique de la classe
-     */
-    public static function instance(): self
-    {
-        if (null === self::$_instance) {
-            self::$_instance = new self();
-        }
-
-        return self::$_instance;
-    }
-
     public static function init(bool $returnResponse = false)
     {
         return self::instance()->run(null, $returnResponse);
+    }
+
+    /**
+     * Retourne la methode invoquee
+     */
+    public static function getMethod(): ?string
+    {
+        $method = self::instance()->method;
+        if (empty($method)) {
+            $method = Services::routes()->getDefaultMethod();
+        }
+
+        return $method;
     }
 
     /**

@@ -161,6 +161,16 @@ class View
     }
 
     /**
+     * Definit le layout a utiliser par les vues
+     */
+    public function setLayout(string $layout): self
+    {
+        $this->adapter->setLayout($layout);
+
+        return $this;
+    }
+
+    /**
      * Defini l'adapteur à utiliser
      */
     public function setAdapter(string $adapter, array $config = []): self
@@ -177,7 +187,7 @@ class View
             throw ConfigException::viewAdapterConfigNotFound($adapter);
         }
 
-        $this->adapter       = new self::$validAdapters[$adapter]($config, $this->config['view_base'] ?? VIEW_PATH);
+        $this->adapter = new self::$validAdapters[$adapter]($config, $this->config['view_base'] ?? VIEW_PATH);
 
         return $this;
     }

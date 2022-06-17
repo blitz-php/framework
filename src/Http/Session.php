@@ -32,6 +32,7 @@ use SessionHandlerInterface;
  *
  * @credit <a href="http://https://api.cakephp.org/4.3/namespace-Cake.Http.Session.html">CakePHP - Http\Session</a>
  */
+/** @phpstan-consistent-constructor */
 class Session
 {
     /**
