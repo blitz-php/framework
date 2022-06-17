@@ -20,8 +20,6 @@ interface RouterInterface
 {
     /**
      * Stocke une référence à l'objet RouteCollection.
-     *
-     * @param Request $request
      */
     public function init(RouteCollectionInterface $routes, ServerRequestInterface $request);
 
