@@ -26,6 +26,7 @@ use JsonSerializable;
 use stdClass;
 use Traversable;
 
+/** @phpstan-consistent-constructor */
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
     use Macroable;
