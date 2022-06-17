@@ -11,81 +11,123 @@
 
 namespace BlitzPHP\Controllers;
 
+use BlitzPHP\Exceptions\HttpException;
+use BlitzPHP\Http\Response;
+use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Router\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
+use ReflectionException;
 
 /**
- * Class Controller
+ * Contrôleur de base pour toute application BlitzPHP
  */
-class BaseController
+abstract class BaseController
 {
     /**
-     * Helpers that will be automatically loaded on class instantiation.
+     * Helpers qui seront automatiquement chargés lors de l'instanciation de la classe.
      *
      * @var array
      */
     protected $helpers = [];
 
     /**
-     * Instance of the main Request object.
+     * Le modèle qui contient les données de cette ressource
      *
-     * @var ServerRequestInterface
+     * @var string|null
+     */
+    protected $modelName;
+
+    /**
+     * Le modèle qui contient les données de cette ressource
+     *
+     * @var object|null
+     */
+    protected $model;
+
+    /**
+     * Instance de l'objet Request principal.
+     *
+     * @var ServerRequest
      */
     protected $request;
 
     /**
-     * Instance of the main response object.
+     * Instance de l'objet de Response principal.
      *
-     * @var ResponseInterface
+     * @var Response
      */
     protected $response;
 
     /**
-     * Instance of logger to use.
+     * Instance de logger à utiliser.
      *
      * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * Should enforce HTTPS access for all methods in this controller.
+     * Devrait appliquer l'accès HTTPS pour toutes les méthodes de ce contrôleur.
      *
-     * @var int Number of seconds to set HSTS header
+     * @var int Nombre de secondes pour définir l'en-tête HSTS
      */
     protected $forceHTTPS = 0;
 
     /**
      * Constructor.
      *
-     * @throws HTTPException
+     * @throws HttpException
      */
     public function initialize(ServerRequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        $this->request  = $request;
-        $this->response = $response;
+        $this->request  = $request; // @phpstan-ignore-line
+        $this->response = $response; // @phpstan-ignore-line
         $this->logger   = $logger;
 
         if ($this->forceHTTPS > 0) {
             $this->forceHTTPS($this->forceHTTPS);
         }
 
-        // Autoload helper files.
-        //helper($this->helpers);
+        $this->getModel();
+
+        helper($this->helpers);
     }
 
     /**
-     * A convenience method to use when you need to ensure that a single
-     * method is reached only via HTTPS. If it isn't, then a redirect
-     * will happen back to this method and HSTS header will be sent
-     * to have modern browsers transform requests automatically.
+     * Définissez ou modifiez le modèle auquel ce contrôleur est lié.
+     * Étant donné le nom ou l'objet, déterminer l'autre.
      *
-     * @param int $duration The number of seconds this link should be
-     *                      considered secure for. Only with HSTS header.
-     *                      Default value is 1 year.
+     * @param object|string|null $which
+     */
+    protected function setModel($which = null)
+    {
+        if ($which) {
+            $this->model     = is_object($which) ? $which : null;
+            $this->modelName = is_object($which) ? null : $which;
+        }
+
+        if (empty($this->model) && ! empty($this->modelName) && class_exists($this->modelName)) {
+            // $this->model = model($this->modelName);
+        }
+
+        if (! empty($this->model) && empty($this->modelName)) {
+            $this->modelName = get_class($this->model);
+        }
+    }
+
+    /**
+     * Une méthode pratique à utiliser lorsque vous devez vous assurer qu'un seul
+     * La méthode est accessible uniquement via HTTPS. Si ce n'est pas le cas, alors une redirection
+     * reviendra à cette méthode et l'en-tête HSTS sera envoyé
+     * pour que les navigateurs modernes transforment automatiquement les requêtes.
      *
-     * @throws HTTPException
+     * @param int $duration Le nombre de secondes pendant lesquelles ce lien doit être
+     *                      considéré comme sûr pour. Uniquement avec en-tête HSTS.
+     *                      La valeur par défaut est 1 an.
+     *
+     * @throws HttpException
      */
     protected function forceHTTPS(int $duration = 31536000)
     {
@@ -93,11 +135,32 @@ class BaseController
     }
 
     /**
-     * Provides a simple way to tie into the main CodeIgniter class and
-     * tell it how long to cache the current page for.
+     * Fournit un moyen simple de se lier à la classe principale de BlitzPHP
+     * et de lui indiquer la durée de mise en cache de la page actuelle.
      */
     protected function cachePage(int $time)
     {
         Dispatcher::cache($time);
+    }
+
+    /**
+     * Recherche le model par defaut (à base de son nom) du controleur
+     *
+     * @throws ReflectionException
+     */
+    private function getModel()
+    {
+        if (! empty($this->modelName)) {
+            $this->setModel($this->modelName);
+
+            return;
+        }
+
+        $reflection = new ReflectionClass(static::class);
+        $model      = str_replace([CONTROLLER_PATH, 'Controller', '.php'], '', $reflection->getFileName()) . 'Model';
+
+        if (file_exists(MODEL_PATH . $model . '.php')) {
+            $this->setModel($model);
+        }
     }
 }
