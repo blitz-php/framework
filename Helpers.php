@@ -265,6 +265,22 @@ class Helpers
     }
 
     /**
+     * Garantit qu'une extension se trouve à la fin d'un nom de fichier
+     */
+    public static function ensureExt(string $path, string $ext = 'php'): string
+    {
+        if ($ext) {
+            $ext = '.' . preg_replace('#^\.#', '', $ext);
+
+            if (substr($path, -strlen($ext)) !== $ext) {
+                $path .= $ext;
+            }
+        }
+
+        return trim($path);
+    }
+
+    /**
      * Purifiez l'entrée à l'aide de la classe autonome HTMLPurifier.
      * Utilisez facilement plusieurs configurations de purificateur.
      *
