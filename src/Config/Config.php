@@ -13,8 +13,10 @@ namespace BlitzPHP\Config;
 
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Traits\SingletonTrait;
+use BlitzPHP\Utilities\Helpers;
 use InvalidArgumentException;
 use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 
 class Config
 {
@@ -34,14 +36,7 @@ class Config
 
     protected function __construct()
     {
-        $this->configurator = new Configurator([
-            'app' => Expect::structure([
-                'base_url'    => Expect::string()->default('auto'),
-                'charset'     => Expect::string()->default('UTF-8'),
-                'environment' => Expect::string()->default('auto'),
-                'language'    => Expect::string()->default('en'),
-            ])->otherItems(),
-        ]);
+        $this->configurator = new Configurator();
     }
 
     /**
@@ -80,7 +75,7 @@ class Config
     {
         self::load(['autoload', 'data', 'app']);
 
-        self::instance()->initialize(); // @phpstan-ignore-line
+        self::instance()->initialize();
     }
 
     /**
@@ -88,7 +83,7 @@ class Config
      *
      * @param string|string[] $config
      */
-    public static function load($config, ?string $file = null)
+    public static function load($config, ?string $file = null, ?Schema $schema = null)
     {
         if (is_array($config)) {
             foreach ($config as $key => $value) {
@@ -112,8 +107,13 @@ class Config
                 throw ConfigException::configDontExist($config, $file);
             }
             if (! in_array($file, get_included_files(), true)) {
-                self::instance()->configurator->addSchema($config, Expect::mixed(), false);
+                if (empty($schema)) {
+                    $schema = self::schema($config);
+                }
+
+                self::instance()->configurator->addSchema($config, $schema, false);
                 self::instance()->configurator->merge([$config => require($file)]);
+
                 self::$loaded[$config] = $file;
             }
         }
@@ -130,14 +130,10 @@ class Config
         if (is_array($accepts_values)) {
             $accepts_values = '(Accept values: ' . implode('/', $accepts_values) . ')';
         } elseif (! is_string($accepts_values)) {
-            throw new InvalidArgumentException('Mauvaise utilisation de la methode ' . __METHOD__);
+            throw new InvalidArgumentException('Misuse of the method ' . __METHOD__);
         }
 
-        throw new ConfigException('
-			The <b>' . $group . '.' . $config_key . '</b> configuration is not set correctly. ' . $accepts_values . '.
-			<br>
-			Please edit &laquo; ' . self::path($group) . ' &raquo; file to correct it
-		');
+        throw new ConfigException("The '{$group}.{$config_key} configuration is not set correctly. {$accepts_values} \n Please edit '{" . self::path($group) . "}' file to correct it");
     }
 
     /**
@@ -195,6 +191,28 @@ class Config
     }
 
     /**
+     * Retrouve le schema de configuration d'un groupe
+     */
+    public static function schema(string $key): Schema
+    {
+        $file        = 'schema' . DS . Helpers::ensureExt($key . '.config', 'php');
+        $syst_schema = SYST_PATH . 'Constants' . DS . $file;
+        $app_schema  = CONFIG_PATH . $file;
+
+        if (file_exists($syst_schema)) {
+            $schema = require $syst_schema;
+        } elseif (file_exists($app_schema)) {
+            $schema = require $app_schema;
+        }
+
+        if (empty($schema) || ! ($schema instanceof Schema)) {
+            $schema = Expect::mixed();
+        }
+
+        return $schema;
+    }
+
+    /**
      * Initialiser la configuration du système avec les données des fichier de configuration
      */
     private function initialize()
@@ -204,7 +222,6 @@ class Config
 
         $this->initializeURL();
         $this->initializeEnvironment();
-        $this->initializeView();
         $this->initializeDebugbar();
     }
 
@@ -259,25 +276,6 @@ class Config
 
             default:
                 self::exceptBadConfigValue('environment', ['development', 'production', 'test', 'auto'], 'app');
-        }
-    }
-
-    /**
-     * Initialise les paramètres de compression de la vue
-     */
-    private function initializeView()
-    {
-        if (! $this->configurator->exists('app.compress_output')) {
-            $config = 'auto';
-        } else {
-            $config = $this->configurator->get('app.compress_output');
-        }
-
-        if (! in_array($config, ['auto', true, false], true)) {
-            self::exceptBadConfigValue('compress_output', ['auto', true, false], 'app');
-        }
-        if ($config === 'auto') {
-            $this->configurator->set('app.compress_output', is_online());
         }
     }
 

@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Config;
 
+use BlitzPHP\Exceptions\ConfigException;
 use Dflydev\DotAccessData\Data;
 use Dflydev\DotAccessData\Exception\DataException;
 use Dflydev\DotAccessData\Exception\InvalidPathException;
@@ -153,13 +154,17 @@ final class Configurator
      */
     private function build(): Data
     {
-        $schema    = Expect::structure($this->configSchemas);
-        $processor = new Processor();
-        $processed = $processor->process($schema, $this->userConfig->export());
+        try {
+            $schema    = Expect::structure($this->configSchemas);
+            $processor = new Processor();
+            $processed = $processor->process($schema, $this->userConfig->export());
 
-        $this->raiseAnyDeprecationNotices($processor->getWarnings());
+            $this->raiseAnyDeprecationNotices($processor->getWarnings());
 
-        return $this->finalConfig = new Data(self::convertStdClassesToArrays($processed));
+            return $this->finalConfig = new Data(self::convertStdClassesToArrays($processed));
+        } catch (ValidationException $ex) {
+            throw new ConfigException($ex->getMessage(), $ex->getCode());
+        }
     }
 
     /**
