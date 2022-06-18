@@ -13,8 +13,6 @@ namespace BlitzPHP\Controllers;
 
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Formatter\Formatter;
-use BlitzPHP\Http\Response;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\ApiResponseTrait;
 use stdClass;
 
