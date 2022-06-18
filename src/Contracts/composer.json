@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "name": "blitz-php/framework",
     "description": "The Blitz framework core",
     "keywords": ["framework", "blitz php", "flash", "rapid"],
@@ -8,12 +9,19 @@
         "issues": "https://github.com/blitz-php/framework/issues",
         "source": "https://github.com/blitz-php/framework"
     },
+=======
+    "name": "blitz-php/contracts",
+    "type": "library",
+    "description": "Contrats (interfaces) utilisés pour Blitz PHP",
+    "license": "MIT",
+>>>>>>> Contracts/main
     "authors": [
         {
             "name": "Dimitri Sitchet Tomkeu",
             "email": "devcode.dst@gmail.com"
         }
     ],
+<<<<<<< HEAD
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.4 | ^8.0",
@@ -66,16 +74,38 @@
         "blitz-php/contracts": "self.version",
         "blitz-php/traits": "self.version",
         "blitz-php/utilities": "self.version"
+=======
+    "require": {
+        "php": ">=7.4 | ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BlitzPHP\\Contracts\\": ""
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+>>>>>>> Contracts/main
     },
     "extra": {
         "branch-alias": {
             "dev-master": "1.x-dev"
         }
     },
+<<<<<<< HEAD
     "suggest": {
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "fakerphp/faker": "Required to make seed of database (^1.9.1).",
         "filp/whoops": "Required for friendly error pages in development (^2.14.3)."
     },
+=======
+    "support": {
+        "issues": "https://github.com/blitz-php/utilities/issues",
+        "source": "https://github.com/blitz-php/utilities"
+    },
+    "minimum-stability": "dev",
+>>>>>>> Contracts/main
     "prefer-stable": true
 }
