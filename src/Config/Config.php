@@ -73,7 +73,7 @@ class Config
      */
     public static function init()
     {
-        self::load(['autoload', 'data', 'app']);
+        self::load(['app']);
 
         self::instance()->initialize();
     }
@@ -103,19 +103,20 @@ class Config
             if (empty($file)) {
                 $file = self::path($config);
             }
-            if (! file_exists($file)) {
-                throw ConfigException::configDontExist($config, $file);
-            }
-            if (! in_array($file, get_included_files(), true)) {
-                if (empty($schema)) {
-                    $schema = self::schema($config);
-                }
 
-                self::instance()->configurator->addSchema($config, $schema, false);
-                self::instance()->configurator->merge([$config => require($file)]);
-
-                self::$loaded[$config] = $file;
+            $configurations = [];
+            if (file_exists($file) && ! in_array($file, get_included_files(), true)) {
+                $configurations = (array) require $file;
             }
+
+            if (empty($schema)) {
+                $schema = self::schema($config);
+            }
+
+            self::instance()->configurator->addSchema($config, $schema, false);
+            self::instance()->configurator->merge([$config => (array) $configurations]);
+
+            self::$loaded[$config] = $file;
         }
     }
 
@@ -195,7 +196,7 @@ class Config
      */
     public static function schema(string $key): Schema
     {
-        $file        = 'schema' . DS . Helpers::ensureExt($key . '.config', 'php');
+        $file        = 'schemas' . DS . Helpers::ensureExt($key . '.config', 'php');
         $syst_schema = SYST_PATH . 'Constants' . DS . $file;
         $app_schema  = CONFIG_PATH . $file;
 

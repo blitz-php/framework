@@ -34,7 +34,7 @@ class Uri implements UriInterface
 
     /**
      * Chaîne d'URI actuelle
-     * 
+     *
      * @var string
      */
     protected $uriString;
@@ -203,7 +203,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Définit temporairement l'URI pour afficher un mot de passe dans userInfo. 
+     * Définit temporairement l'URI pour afficher un mot de passe dans userInfo.
      * Se réinitialisera après le premier appel à l'autorité().
      */
     public function showPassword(bool $val = true): self
@@ -530,7 +530,7 @@ class Uri implements UriInterface
             throw new FrameworkException('La chaine de requete est mal formée');
         }
 
-        // Ne peut pas avoir de début ?
+        // Ne peut pas avoir de début ?
         if (! empty($query) && strpos($query, '?') === 0) {
             $query = substr($query, 1);
         }
@@ -715,7 +715,7 @@ class Uri implements UriInterface
     public function resolveRelativeURI(string $uri): self
     {
         /*
-         * REMARQUE : Nous n'utilisons pas removeDotSegments dans cet
+         * REMARQUE : Nous n'utilisons pas removeDotSegments dans cet
          * algorithme puisque c'est déjà fait par cette ligne !
          */
         $relative = new self();

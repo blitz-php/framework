@@ -13,8 +13,6 @@ namespace BlitzPHP\Controllers;
 
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Formatter\Formatter;
-use BlitzPHP\Http\Response;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\ApiResponseTrait;
 use stdClass;
 
@@ -72,7 +70,7 @@ class RestController extends BaseController
      * @param mixed    $data   Les donnees a renvoyer
      * @param int|null $status Le statut de la reponse
      */
-    final protected function respond($data, ?int $status = StatusCode::OK): Response
+    final protected function respond($data, ?int $status = StatusCode::OK)
     {
         // Si les données sont NULL et qu'aucun code d'état HTTP n'est fourni, affichage, erreur et sortie
         if ($data === null && $status === null) {
@@ -94,7 +92,7 @@ class RestController extends BaseController
      * @param int|string|null $code    Code d'erreur personnalisé, spécifique à l'API
      * @param array           $errors  La liste des erreurs rencontrées
      */
-    final protected function respondFail(?string $message = "Une erreur s'est produite", int $status = StatusCode::INTERNAL_ERROR, int|string|null $code = null, array $errors = []): Response
+    final protected function respondFail(?string $message = "Une erreur s'est produite", ?int $status = StatusCode::INTERNAL_ERROR, int|string|null $code = null, array $errors = [])
     {
         $message = $message ?: "Une erreur s'est produite";
         $code    = ! empty($code) ? $code : $status;
@@ -124,7 +122,7 @@ class RestController extends BaseController
      *
      * @param mixed|null $result
      */
-    final protected function respondSuccess(?string $message = 'Resultat', $result = null, ?int $status = StatusCode::OK): Response
+    final protected function respondSuccess(?string $message = 'Resultat', $result = null, ?int $status = StatusCode::OK)
     {
         $message = $message ?: 'Resultat';
         $status  = ! empty($status) ? $status : StatusCode::OK;
@@ -153,6 +151,7 @@ class RestController extends BaseController
      */
     protected function formatEntity($element)
     {
+        /*
         if ($element instanceof Entity) {
             if (method_exists($element, 'format')) {
                 return Services::injector()->call([$element, 'format']);
@@ -160,7 +159,7 @@ class RestController extends BaseController
 
             return call_user_func([$element, 'toArray']);
         }
-
+        */
         return $element;
     }
 
