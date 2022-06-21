@@ -6,7 +6,7 @@ on:
 
 jobs:
   phpcs:
-    name: PHPCS
+    name: PHP-CS-Fixer
     runs-on: ubuntu-latest
 
     steps:
@@ -17,11 +17,11 @@ jobs:
           php-version: 7.4
           extensions: curl
           coverage: none
-          tools: composer:v2, cs2pr
+          tools: composer:v2
 
       - run: composer update --no-progress
 
-      - run: vendor/bin/phpcs -q --report=checkstyle | cs2pr
+      - run: vendor/bin/php-cs-fixer fix --verbose --ansi --dry-run --using-cache=no --diff
 
   kahlan:
     name: Kahlan on ${{ matrix.php }} ${{ matrix.composer-flags }}
