@@ -35,8 +35,8 @@ if (is_file(COMPOSER_PATH)) {
 defined('VENDOR_PATH') || define('VENDOR_PATH', realpath(HOME_PATH . 'vendor') . DS);
 
 // Define necessary framework path constants
-defined('SYST_PATH')    || define('SYST_PATH', rtrim(dirname(__DIR__), '/\\') . DS);
-defined('TEST_PATH')    || define('TEST_PATH', realpath(HOME_PATH . 'tests') . DS);
+defined('SYST_PATH')    || define('SYST_PATH', realpath(HOME_PATH . 'src') . DS);
+defined('TEST_PATH')    || define('TEST_PATH', realpath(HOME_PATH . 'spec') . DS);
 defined('APP_PATH')     || define('APP_PATH', TEST_PATH . 'TestApp' . DS);
 defined('STORAGE_PATH') || define('STORAGE_PATH', TEST_PATH . 'storage' . DS);
 defined('WEBROOT')      || define('WEBROOT', TEST_PATH . 'public' . DS);
