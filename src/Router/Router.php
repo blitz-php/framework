@@ -169,7 +169,7 @@ class Router implements RouterInterface
      */
     public function controllerName(): string
     {
-        return str_replace('-', '_', $this->controller);
+        return str_replace('-', '_', trim($this->controller, '/\\'));
     }
 
     /**
@@ -297,7 +297,7 @@ class Router implements RouterInterface
 
         $uri = $uri === '/'
             ? $uri
-            : trim($uri, '/ ');
+            : trim($uri, '/');
 
         // Boucle dans le tableau de routes à la recherche de caractères génériques
         foreach ($routes as $key => $val) {
@@ -502,7 +502,7 @@ class Router implements RouterInterface
         $c = count($segments);
 
         while ($c-- > 0) {
-            $segmentConvert = ucfirst($this->translateURIDashes === true ? str_replace('-', '_', $segments[0]) : $segments[0]);
+            $segmentConvert = ucfirst(str_replace('-', '_', $segments[0]));
             // dès que nous rencontrons un segment non conforme à PSR-4, arrêtons la recherche
             if (! $this->isValidSegment($segmentConvert)) {
                 return $segments;
