@@ -101,6 +101,8 @@ interface CookieInterface
     /**
      * Crée un cookie avec une valeur mise à jour
      *
+     * @param mixed $value
+     *
      * @return static
      */
     public function withValue($value);
@@ -182,9 +184,9 @@ interface CookieInterface
 
     /**
      * Vérifiez si un cookie a expiré par rapport à $time
-	 *
+     *
      * Les cookies sans date d'expiration renvoient toujours faux.
-	 *
+     *
      * @param DateTime|DateTimeImmutable $time L'heure de test. Par défaut, 'maintenant' en UTC.
      */
     public function isExpired($time = null): bool;
@@ -222,7 +224,7 @@ interface CookieInterface
      * Créez un cookie avec une option SameSite mise à jour.
      *
      * @param string|null $sameSite Valeur à définir pour l'option Samesite.
-     * 								Une des constantes CookieInterface::SAMESITE_*.
+     *                              Une des constantes CookieInterface::SAMESITE_*.
      *
      * @return static
      */
