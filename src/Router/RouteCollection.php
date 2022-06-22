@@ -341,7 +341,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function getDefaultController(): string
     {
-        return preg_replace('#Controller$#i', '', $this->defaultController).'Controller';
+        return preg_replace('#Controller$#i', '', $this->defaultController) . 'Controller';
     }
 
     /**

@@ -23,5 +23,5 @@ return Expect::structure([
     'negotiate_locale'             => Expect::bool()->default(true),
     'supported_locales'            => Expect::listOf('string')->default(['fr', 'en']),
     'timezone'                     => Expect::string()->default('Africa/Douala'),
-    
+
 ])->otherItems();

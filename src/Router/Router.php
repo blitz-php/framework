@@ -166,10 +166,14 @@ class Router implements RouterInterface
 
     /**
      * Renvoie le nom du contrôleur matché
+     *
+     * @return closure|string
      */
-    public function controllerName(): string
+    public function controllerName()
     {
-        return str_replace('-', '_', trim($this->controller, '/\\'));
+        return is_string($this->controller)
+            ? str_replace('-', '_', trim($this->controller, '/\\'))
+            : $this->controller;
     }
 
     /**
@@ -608,7 +612,7 @@ class Router implements RouterInterface
 
         // La méthode est-elle spécifiée ?
         if (sscanf($this->controller, '%[^/]/%s', $class, $this->method) !== 2) {
-            $this->method = 'index';
+            $this->method = $this->collection->getDefaultMethod();
         }
 
         if (! is_file(CONTROLLER_PATH . $this->directory . $this->makeController($class) . '.php')) {
@@ -617,7 +621,7 @@ class Router implements RouterInterface
 
         $this->setController($class);
 
-        // log_message('info', 'Used the default controller.');
+        logger()->info('Used the default controller.');
     }
 
     /**
