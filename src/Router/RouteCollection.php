@@ -341,7 +341,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function getDefaultController(): string
     {
-        return $this->defaultController;
+        return preg_replace('#Controller$#i', '', $this->defaultController) . 'Controller';
     }
 
     /**
@@ -376,6 +376,7 @@ class RouteCollection implements RouteCollectionInterface
         if (empty($verb)) {
             $verb = $this->getHTTPVerb();
         }
+        $verb = strtolower($verb);
 
         // Since this is the entry point for the Router,
         // take a moment to do any route discovery

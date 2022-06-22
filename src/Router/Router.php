@@ -166,10 +166,14 @@ class Router implements RouterInterface
 
     /**
      * Renvoie le nom du contrôleur matché
+     *
+     * @return closure|string
      */
-    public function controllerName(): string
+    public function controllerName()
     {
-        return str_replace('-', '_', $this->controller);
+        return is_string($this->controller)
+            ? str_replace('-', '_', trim($this->controller, '/\\'))
+            : $this->controller;
     }
 
     /**
@@ -297,7 +301,7 @@ class Router implements RouterInterface
 
         $uri = $uri === '/'
             ? $uri
-            : trim($uri, '/ ');
+            : trim($uri, '/');
 
         // Boucle dans le tableau de routes à la recherche de caractères génériques
         foreach ($routes as $key => $val) {
@@ -502,7 +506,7 @@ class Router implements RouterInterface
         $c = count($segments);
 
         while ($c-- > 0) {
-            $segmentConvert = ucfirst($this->translateURIDashes === true ? str_replace('-', '_', $segments[0]) : $segments[0]);
+            $segmentConvert = ucfirst(str_replace('-', '_', $segments[0]));
             // dès que nous rencontrons un segment non conforme à PSR-4, arrêtons la recherche
             if (! $this->isValidSegment($segmentConvert)) {
                 return $segments;
@@ -608,7 +612,7 @@ class Router implements RouterInterface
 
         // La méthode est-elle spécifiée ?
         if (sscanf($this->controller, '%[^/]/%s', $class, $this->method) !== 2) {
-            $this->method = 'index';
+            $this->method = $this->collection->getDefaultMethod();
         }
 
         if (! is_file(CONTROLLER_PATH . $this->directory . $this->makeController($class) . '.php')) {
@@ -617,7 +621,7 @@ class Router implements RouterInterface
 
         $this->setController($class);
 
-        // log_message('info', 'Used the default controller.');
+        logger()->info('Used the default controller.');
     }
 
     /**
@@ -645,6 +649,6 @@ class Router implements RouterInterface
      */
     private function setMethod(string $name): void
     {
-        $this->method = preg_replace('#' . config('app.url_suffix') . '$#i', '', strtolower($name));
+        $this->method = preg_replace('#' . config('app.url_suffix') . '$#i', '', $name);
     }
 }

@@ -17,4 +17,11 @@ return Expect::structure([
     'environment'                  => Expect::string()->default('auto'),
     'language'                     => Expect::string()->default('en'),
     'force_global_secure_requests' => Expect::bool()->default(false),
+    'url_suffix'                   => Expect::string()->default(''),
+    'show_debugbar'                => Expect::anyOf(true, false, 'auto')->default('auto'),
+    'use_absolute_link'            => Expect::bool()->default(true),
+    'negotiate_locale'             => Expect::bool()->default(true),
+    'supported_locales'            => Expect::listOf('string')->default(['fr', 'en']),
+    'timezone'                     => Expect::string()->default('Africa/Douala'),
+
 ])->otherItems();
