@@ -645,6 +645,6 @@ class Router implements RouterInterface
      */
     private function setMethod(string $name): void
     {
-        $this->method = preg_replace('#' . config('app.url_suffix') . '$#i', '', strtolower($name));
+        $this->method = preg_replace('#' . config('app.url_suffix') . '$#i', '', $name);
     }
 }
