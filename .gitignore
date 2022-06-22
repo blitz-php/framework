@@ -105,4 +105,6 @@ nb-configuration.xml
 /phpunit*.xml
 /.phpunit.*.cache
 
-/.php-cs-fixer.php
+codeclimate.json
+coveralls.json
+clover.xml
