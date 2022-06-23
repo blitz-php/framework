@@ -47,6 +47,20 @@ class Logger implements LoggerInterface
      */
     private $config;
 
+     /**
+     * Met en cache les appels de journalisation pour la barre de débogage.
+     *
+     * @var array
+     */
+    public $logCache;
+
+    /**
+     * Devrions-nous mettre en cache nos éléments enregistrés ?
+     *
+     * @var bool
+     */
+    protected $cacheLogs = false;
+
     /**
      * Instance monolog
      *
@@ -54,7 +68,7 @@ class Logger implements LoggerInterface
      */
     private $monolog;
 
-    public function __construct()
+    public function __construct(bool $debug = BLITZ_DEBUG)
     {
         $this->config = (object) config('log');
 
@@ -67,6 +81,11 @@ class Logger implements LoggerInterface
         foreach (($this->config->processors ?? []) as $processor) {
             $this->pushProcessor($processor);
         }
+
+        $this->cacheLogs = $debug;
+        if ($this->cacheLogs) {
+            $this->logCache = [];
+        }
     }
 
     /**
@@ -74,7 +93,7 @@ class Logger implements LoggerInterface
      */
     public function emergency(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->emergency($message, $context);
+        $this->log(LogLevel::EMERGENCY, $message, $context);
     }
 
     /**
@@ -82,7 +101,7 @@ class Logger implements LoggerInterface
      */
     public function alert(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->alert($message, $context);
+        $this->log(LogLevel::ALERT, $message, $context);
     }
 
     /**
@@ -90,7 +109,7 @@ class Logger implements LoggerInterface
      */
     public function critical(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->critical($message, $context);
+        $this->log(LogLevel::CRITICAL, $message, $context);
     }
 
     /**
@@ -98,7 +117,7 @@ class Logger implements LoggerInterface
      */
     public function error(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->error($message, $context);
+        $this->log(LogLevel::ERROR, $message, $context);
     }
 
     /**
@@ -106,7 +125,7 @@ class Logger implements LoggerInterface
      */
     public function warning(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->warning($message, $context);
+        $this->log(LogLevel::WARNING, $message, $context);
     }
 
     /**
@@ -114,7 +133,7 @@ class Logger implements LoggerInterface
      */
     public function notice(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->notice($message, $context);
+        $this->log(LogLevel::NOTICE, $message, $context);
     }
 
     /**
@@ -122,7 +141,7 @@ class Logger implements LoggerInterface
      */
     public function info(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->info($message, $context);
+        $this->log(LogLevel::INFO, $message, $context);
     }
 
     /**
@@ -130,7 +149,7 @@ class Logger implements LoggerInterface
      */
     public function debug(string|Stringable $message, array $context = []): void
     {
-        $this->monolog->debug($message, $context);
+        $this->log(LogLevel::DEBUG, $message, $context);
     }
 
     /**
@@ -139,6 +158,13 @@ class Logger implements LoggerInterface
     public function log($level, string|Stringable $message, array $context = []): void
     {
         $this->monolog->log($level, $message, $context);
+
+        if ($this->cacheLogs) {
+            $this->logCache[] = [
+                'level' => $level,
+                'msg'   => $message,
+            ];
+        }
     }
 
     /**
