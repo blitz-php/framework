@@ -76,12 +76,16 @@ class SmartyAdapter extends AbstractAdapter
             $this->engine->setCompileId($this->renderVars['options']['cache_name'] ?? null);
         }
 
-        return $this->engine->fetch(
+        $output = $this->engine->fetch(
             $view,
             $this->renderVars['options']['cache_id'] ?? null,
             $this->renderVars['options']['cache_name'] ?? ($this->renderVars['options']['compile_id'] ?? null),
             $this->renderVars['options']['parent'] ?? null,
         );
+
+        $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
+
+        return $output;
     }
 
     /**
