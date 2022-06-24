@@ -52,6 +52,21 @@ abstract class AbstractAdapter implements RendererInterface
     protected $layout;
 
     /**
+     * Les statistiques sur nos performances ici
+     *
+     * @var array
+     */
+    protected $performanceData = [];
+
+    /**
+     * Devrions-nous stocker des informations sur les performances ?
+     *
+     * @var bool
+     */
+    protected $debug = false;
+
+
+    /**
      * {@inheritDoc}
      */
     public function __construct(array $config, string $viewPath = VIEW_PATH)
@@ -66,7 +81,7 @@ abstract class AbstractAdapter implements RendererInterface
     public function setData(array $data = [], ?string $context = null): self
     {
         if ($context) {
-            // $data = \esc($data, $context);
+            $data = esc($data, $context);
         }
 
         $this->data = $data;
@@ -77,10 +92,19 @@ abstract class AbstractAdapter implements RendererInterface
     /**
      * {@inheritDoc}
      */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     public function addData(array $data = [], ?string $context = null): self
     {
         if ($context) {
-            // $data = \esc($data, $context);
+            $data = esc($data, $context);
         }
 
         $this->data = array_merge($this->data, $data);
@@ -94,7 +118,7 @@ abstract class AbstractAdapter implements RendererInterface
     public function setVar(string $name, $value = null, ?string $context = null): self
     {
         if ($context) {
-            // $value = esc($value, $context);
+            $value = esc($value, $context);
         }
 
         $this->data[$name] = $value;
@@ -128,6 +152,28 @@ abstract class AbstractAdapter implements RendererInterface
     public function renderString(string $view, ?array $options = null, bool $saveData = false): string
     {
         return $this->render($view, $options, $saveData);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPerformanceData(): array
+    {
+        return $this->performanceData;
+    }
+
+    /**
+     * Consigne les données de performances pour le rendu d'une vue.
+     */
+    protected function logPerformance(float $start, float $end, string $view)
+    {
+        if ($this->debug) {
+            $this->performanceData[] = [
+                'start' => $start,
+                'end'   => $end,
+                'view'  => $view,
+            ];
+        }
     }
 
     /**

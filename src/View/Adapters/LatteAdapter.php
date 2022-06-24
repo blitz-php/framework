@@ -52,7 +52,11 @@ class LatteAdapter extends AbstractAdapter
 
         $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
 
-        return $this->latte->renderToString($this->renderVars['view'], $this->data);
+        $output = $this->latte->renderToString($this->renderVars['view'], $this->data);
+
+        $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
+
+        return $output;
     }
 
     /**

@@ -26,7 +26,7 @@ class View
      *
      * @var array
      */
-    private $config;
+    protected $config;
 
     /**
      * @var RendererInterface
@@ -151,6 +151,14 @@ class View
     }
 
     /**
+     * Remplacer toutes les données de vue par de nouvelles données
+     */
+    public function getData(): array
+    {
+        return $this->adapter->getData();
+    }
+
+    /**
      * Supprime toutes les données de vue du système.
      */
     public function resetData(): self
@@ -193,11 +201,20 @@ class View
     }
 
     /**
+     * Renvoie les données de performances qui ont pu être collectées
+     * lors de l'exécution. Utilisé principalement dans la barre d'outils de débogage.
+     */
+    public function getPerformanceData(): array
+    {
+        return $this->adapter->getPerformanceData();
+    }
+
+    /**
      * Compresse le code html d'une vue
      *
      * @param bool|string $compress
      */
-    private function compressView(string $output, $compress = 'auto'): string
+    protected function compressView(string $output, $compress = 'auto'): string
     {
         if ($compress === 'auto') {
             $compress = is_online();

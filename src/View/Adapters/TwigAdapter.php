@@ -64,7 +64,11 @@ class TwigAdapter extends AbstractAdapter
 
         $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
 
-        return $this->engine->render($this->renderVars['view'], $this->data);
+        $output = $this->engine->render($this->renderVars['view'], $this->data);
+        
+        $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
+
+        return $output;
     }
 
     /**

@@ -66,6 +66,11 @@ interface RendererInterface
     public function setData(array $data = [], ?string $context = null): self;
 
     /**
+     * Renvoie les données actuelles qui seront affichées dans la vue.
+     */
+    public function getData(): array;
+
+    /**
      * Définit une seule donnée de vue.
      *
      * @param mixed  $value
@@ -83,4 +88,10 @@ interface RendererInterface
      * Definit le layout a utiliser par les vues
      */
     public function setLayout(?string $layout): self;
+
+    /**
+     * Renvoie les données de performances qui ont pu être collectées
+     * lors de l'exécution. Utilisé principalement dans la barre d'outils de débogage.
+     */
+    public function getPerformanceData(): array;
 }
