@@ -170,7 +170,7 @@ class RestController extends BaseController
      */
     private function _parseResponse($data)
     {
-        $format = strtolower($this->config['return_format']);
+        $format = strtolower($this->config->format);
         $mime   = null;
 
         if (array_key_exists($format, $this->mimes)) {
