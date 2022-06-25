@@ -11,5 +11,6 @@
 
 // Files language settings
 return [
+    'langNotFound' => 'No translation file for `{0}` was found',
     'providersDefinitionDontExist' => 'Unable to load system services definition file. The `{0}` file does not exist or cannot be read.',
 ];

@@ -13,8 +13,10 @@ namespace BlitzPHP\Controllers;
 
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Formatter\Formatter;
+use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\ApiResponseTrait;
 use stdClass;
+use Throwable;
 
 /**
  * Le contrôleur de base pour les API REST
@@ -59,8 +61,43 @@ class RestController extends BaseController
         $this->config = (object) config('rest');
 
         $locale       = $this->config->language ?? null;
-        $locale       = ! empty($locale) ? $locale : config('app.language');
-        $this->locale = ! empty($locale) ? $locale : 'en';
+        $this->locale = ! empty($locale) ? $locale : $this->request->getLocale();
+    }
+
+    /**
+     * 
+     */
+    public function _remap(string $method, array $params = [])
+    {
+        $class = get_called_class();
+
+        // Bien sûr qu'il existe, mais peuvent-ils en faire quelque chose ?
+        if (!method_exists($class, $method)) {
+            return $this->respondNotImplemented($this->_translate('notImplemented', [$class, $method]));
+        }
+
+        // Appel de la méthode du contrôleur et passage des arguments
+        try {
+            $instance = Services::injector()->get($class);
+            $instance->initialize($this->request, $this->response, $this->logger);
+
+            return Services::injector()->call([$instance, $method], (array) $params);
+        }
+        catch (Throwable $ex) {
+            if (!on_dev()) {
+                $url = explode('?', $this->request->getRequestTarget())[0];
+                
+                return $this->respondBadRequest($this->_translate('badUsed', [$url]));
+            }
+
+			return $this->respondInternalError('Internal Server Error', [
+				"type"    => get_class($ex),
+				'message' => $ex->getMessage(),
+				'code'    => $ex->getCode(),
+				'file'    => $ex->getFile(),
+				'line'    => $ex->getLine()
+			]);
+        }
     }
 
     /**
@@ -161,6 +198,19 @@ class RestController extends BaseController
         }
         */
         return $element;
+    }
+
+    /**
+     * Une méthode pratique pour traduire une chaîne ou un tableau d'entrées et 
+     * formater le résultat avec le MessageFormatter de l'extension intl.
+     */
+    protected function lang(string $line, ?array $args = null): string
+    {
+        return lang($line, $args, $this->locale);
+    }
+    private function _translate(string $line, array $args = null): string
+    {
+        return $this->lang('Rest.'.$line, $args);
     }
 
     /**
