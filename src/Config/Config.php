@@ -278,6 +278,8 @@ class Config
             default:
                 self::exceptBadConfigValue('environment', ['development', 'production', 'test', 'auto'], 'app');
         }
+
+        defined('BLITZ_DEBUG') || define('BLITZ_DEBUG', $config !== 'production');
     }
 
     /**
