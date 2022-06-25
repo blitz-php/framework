@@ -23,18 +23,20 @@ class FileLocator
     {
         $file  = Helpers::ensureExt($lang, 'php');
         $paths = [
-            // Path to system languages
-            SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
-
-            // Path to app languages
-            LANG_PATH . config('app.language') . DS . $file,
-
-            // Path to system languages
-            SYST_PATH . 'Constants' . DS . 'language' . DS . $locale . DS . $file,
-
-            // Path to app languages
+            // Chemin d'accès aux langues de l'application
             LANG_PATH . $locale . DS . $file,
+            
+            // Chemin vers les langues du système
+            SYST_PATH . 'Constants' . DS . 'language' . DS . $locale . DS . $file,
+            
+            // Chemin d'accès aux langues de l'application
+            LANG_PATH . config('app.language') . DS . $file,
+            
+            // Chemin vers les langues du système
+            SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
         ];
+        $paths = array_unique($paths);
+
         $file_exist = false;
         $languages  = [];
 
@@ -42,6 +44,7 @@ class FileLocator
             if (file_exists($path) && ! in_array($path, get_included_files(), true)) {
                 $languages  = array_merge($languages, (array) require($path));
                 $file_exist = true;
+                break;
             }
         }
 
