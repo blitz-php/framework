@@ -195,7 +195,16 @@ class View
             throw ConfigException::viewAdapterConfigNotFound($adapter);
         }
 
-        $this->adapter = new self::$validAdapters[$adapter]($config, $this->config['view_base'] ?? VIEW_PATH);
+        $debug = $this->config['debug'] ?? 'auto';
+        if ($debug === 'auto') {
+            $debug = on_dev();
+        } 
+
+        $this->adapter = new self::$validAdapters[$adapter](
+            $config, 
+            $this->config['view_base'] ?? VIEW_PATH,
+            $debug
+        );
 
         return $this;
     }

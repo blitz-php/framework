@@ -55,9 +55,9 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Constructor.
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
     {
-        parent::__construct($config, $viewPath);
+        parent::__construct($config, $viewPath, $debug);
 
         $this->saveData = (bool) ($config['save_data'] ?? true);
     }

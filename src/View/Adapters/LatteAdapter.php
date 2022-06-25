@@ -26,9 +26,9 @@ class LatteAdapter extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
     {
-        parent::__construct($config, $viewPath);
+        parent::__construct($config, $viewPath, $debug);
 
         $this->latte = new Engine();
 

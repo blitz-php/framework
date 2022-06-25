@@ -44,7 +44,7 @@ class ApplicationController extends BaseController
         $path       = str_replace([CONTROLLER_PATH, 'Controller', '.php'], '', $reflection->getFileName());
         $path       = trim(strtolower($path), '/\\');
 
-        $object = Services::viewer(false);
+        $object = Services::viewer();
 
         $object->setData($data)->setOptions($options);
 

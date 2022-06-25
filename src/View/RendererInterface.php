@@ -21,7 +21,7 @@ interface RendererInterface
     /**
      * Constructeur
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH);
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null);
 
     /**
      * Définit plusieurs éléments de données de vue à la fois.

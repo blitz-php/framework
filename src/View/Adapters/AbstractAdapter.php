@@ -69,9 +69,10 @@ abstract class AbstractAdapter implements RendererInterface
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
     {
         $this->config   = $config;
+        $this->debug = $debug ?? BLITZ_DEBUG;
         $this->viewPath = rtrim($viewPath, '\\/ ') . DS;
     }
 

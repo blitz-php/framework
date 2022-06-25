@@ -33,9 +33,9 @@ class PlatesAdapter extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
     {
-        parent::__construct($config, $viewPath);
+        parent::__construct($config, $viewPath, $debug);
 
         $this->extension = str_replace('.', '', $this->config['extension'] ?? 'tpl');
         $this->engine    = new Engine(rtrim($this->viewPath, '/\\'), $this->extension);
