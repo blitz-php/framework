@@ -15,6 +15,7 @@ use BlitzPHP\Cache\Cache;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
+use BlitzPHP\Debug\Toolbar;
 use BlitzPHP\Event\EventManager;
 use BlitzPHP\Http\Negotiator;
 use BlitzPHP\HTTP\Redirection;
@@ -28,6 +29,7 @@ use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
 use BlitzPHP\View\View;
 use DI\NotFoundException;
+use stdClass;
 
 /**
  * Service
@@ -241,6 +243,20 @@ class Services
 
         return self::factory(Timer::class);
     }
+
+    /**
+	 * Renvoie la barre d'outils de débogage.
+	 */
+	public static function toolbar(?stdClass $config = null, bool $shared = true): Toolbar
+	{
+		if ($shared) {
+            return self::singleton(Toolbar::class);
+		}
+
+        $config = $config ?? (object) config('toolbar');
+
+		return self::factory(Toolbar::class, [$config]);
+	}
 
     /**
      * La classe URI fournit un moyen de modéliser et de manipuler les URI.
