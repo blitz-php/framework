@@ -28,6 +28,9 @@
             "dev-master": "1.x-dev"
         }
     },
+	"suggest": {
+        "firebase/php-jwt": "Réquis pour la gestion des token JWT via le helper `\\BlitzPHP\\Utilities\\Jwt`"
+    },
     "support": {
         "issues": "https://github.com/blitz-php/utilities/issues",
         "source": "https://github.com/blitz-php/utilities"
