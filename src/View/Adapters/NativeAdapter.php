@@ -25,20 +25,6 @@ class NativeAdapter extends AbstractAdapter
     protected $tempData;
 
     /**
-     * Devrions-nous stocker des informations sur les performances ?
-     *
-     * @var bool
-     */
-    protected $debug = false;
-
-    /**
-     * Cachez les statistiques sur nos performances ici
-     *
-     * @var array
-     */
-    protected $performanceData = [];
-
-    /**
      * Indique si les données doivent être enregistrées entre les rendus.
      *
      * @var bool
@@ -69,9 +55,9 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Constructor.
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
     {
-        parent::__construct($config, $viewPath);
+        parent::__construct($config, $viewPath, $debug);
 
         $this->saveData = (bool) ($config['save_data'] ?? true);
     }
@@ -243,7 +229,7 @@ class NativeAdapter extends AbstractAdapter
     }
 
     /**
-     * Renvoie les données actuelles qui seront affichées dans la vue.
+     * {@inheritDoc}
      */
     public function getData(): array
     {
@@ -409,29 +395,6 @@ class NativeAdapter extends AbstractAdapter
     public function include(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
     {
         return $this->insert($view, $data, $options, $saveData);
-    }
-
-    /**
-     * Renvoie les données de performances qui ont pu être collectées
-     * lors de l'exécution. Utilisé principalement dans la barre d'outils de débogage.
-     */
-    public function getPerformanceData(): array
-    {
-        return $this->performanceData;
-    }
-
-    /**
-     * Consigne les données de performances pour le rendu d'une vue.
-     */
-    protected function logPerformance(float $start, float $end, string $view)
-    {
-        if ($this->debug) {
-            $this->performanceData[] = [
-                'start' => $start,
-                'end'   => $end,
-                'view'  => $view,
-            ];
-        }
     }
 
     protected function prepareTemplateData(bool $saveData): void

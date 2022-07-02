@@ -138,36 +138,6 @@ class Config
     }
 
     /**
-     * Recherche l'URL de base de l'application independamment de la configuration de l'utilisateur
-     */
-    public static function findBaseUrl(): string
-    {
-        if (isset($_SERVER['SERVER_ADDR'])) {
-            $server_addr = $_SERVER['HTTP_HOST'] ?? ((strpos($_SERVER['SERVER_ADDR'], ':') !== false) ? '[' . $_SERVER['SERVER_ADDR'] . ']' : $_SERVER['SERVER_ADDR']);
-
-            if (isset($_SERVER['SERVER_PORT'])) {
-                $server_addr .= ':' . ((! preg_match('#:' . $_SERVER['SERVER_PORT'] . '$#', $server_addr)) ? $_SERVER['SERVER_PORT'] : '80');
-            }
-
-            if (
-                (! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
-                || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
-                || (! empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off')
-            ) {
-                $base_url = 'https';
-            } else {
-                $base_url = 'http';
-            }
-
-            $base_url .= '://' . $server_addr . dirname(substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], basename($_SERVER['SCRIPT_FILENAME']))));
-        } else {
-            $base_url = 'http://localhost:' . ($_SERVER['SERVER_PORT'] ?? '80');
-        }
-
-        return $base_url;
-    }
-
-    /**
      * Renvoie le chemin du fichier d'un groupe de configuration donné
      */
     public static function path(string $path): string
@@ -238,7 +208,7 @@ class Config
         }
 
         if ($config === 'auto' || empty($config)) {
-            $config = rtrim(str_replace('\\', '/', self::findBaseUrl()), '/');
+            $config = rtrim(str_replace('\\', '/', Helpers::findBaseUrl()), '/');
         }
 
         $this->configurator->set('app.base_url', $config);
@@ -278,6 +248,8 @@ class Config
             default:
                 self::exceptBadConfigValue('environment', ['development', 'production', 'test', 'auto'], 'app');
         }
+
+        defined('BLITZ_DEBUG') || define('BLITZ_DEBUG', $config !== 'production');
     }
 
     /**

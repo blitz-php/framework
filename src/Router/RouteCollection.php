@@ -371,7 +371,7 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Returns the raw array of available routes.
      */
-    public function getRoutes(?string $verb = null): array
+    public function getRoutes(?string $verb = null, bool $withName = false): array
     {
         if (empty($verb)) {
             $verb = $this->getHTTPVerb();
@@ -394,9 +394,17 @@ class RouteCollection implements RouteCollectionInterface
                 $collection = array_merge($this->routes[$verb], $extraRules);
             }
 
-            foreach ($collection as $r) {
-                $key          = key($r['route']);
-                $routes[$key] = $r['route'][$key];
+            foreach ($collection as $name => $r) {
+                $key = key($r['route']);
+
+                if (! $withName) {
+                    $routes[$key] = $r['route'][$key];
+                } else {
+                    $routes[$key] = [
+                        'name'    => $name,
+                        'handler' => $r['route'][$key],
+                    ];
+                }
             }
         }
 

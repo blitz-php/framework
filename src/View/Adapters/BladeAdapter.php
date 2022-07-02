@@ -25,9 +25,9 @@ class BladeAdapter extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
     {
-        parent::__construct($config, $viewPath);
+        parent::__construct($config, $viewPath, $debug);
 
         $this->engine = new Blade(
             $this->viewPath,
@@ -51,7 +51,11 @@ class BladeAdapter extends AbstractAdapter
 
         $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
 
-        return $this->engine->render($this->renderVars['view'], $this->data);
+        $output = $this->engine->render($this->renderVars['view'], $this->data);
+
+        $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
+
+        return $output;
     }
 
     /**

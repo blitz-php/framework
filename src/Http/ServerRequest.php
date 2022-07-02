@@ -15,6 +15,7 @@ use BadMethodCallException;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Http\Cookie\CookieCollection;
+use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Arr;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
 use GuzzleHttp\Psr7\Stream;
@@ -32,7 +33,7 @@ use Psr\Http\Message\UriInterface;
 class ServerRequest implements ServerRequestInterface
 {
     /**
-     * Array of parameters parsed from the URL.
+     * Tableau de paramètres analysés à partir de l'URL.
      *
      * @var array
      */
@@ -45,70 +46,68 @@ class ServerRequest implements ServerRequestInterface
     ];
 
     /**
-     * Array of POST data. Will contain form data as well as uploaded files.
-     * In PUT/PATCH/DELETE requests this property will contain the form-urlencoded
-     * data.
+     * Tableau de données POST. Contiendra des données de formulaire ainsi que des fichiers téléchargés.
+     * Dans les requêtes PUT/PATCH/DELETE, cette propriété contiendra les données encodées du formulaire.
      *
      * @var array|object|null
      */
     protected $data = [];
 
     /**
-     * Array of query string arguments
+     * Tableau d'arguments de chaîne de requête
      *
      * @var array
      */
     protected $query = [];
 
     /**
-     * Array of cookie data.
+     * Tableau de données de cookie.
      *
      * @var array
      */
     protected $cookies = [];
 
     /**
-     * Array of environment data.
+     * Tableau de données d'environnement.
      *
      * @var array
      */
     protected $_environment = [];
 
     /**
-     * Base URL path.
+     * Chemin de l'URL de base.
      *
      * @var string
      */
     protected $base;
 
     /**
-     * webroot path segment for the request.
+     * segment de chemin webroot pour la demande.
      *
      * @var string
      */
     protected $webroot = '/';
 
     /**
-     * Whether to trust HTTP_X headers set by most load balancers.
-     * Only set to true if your application runs behind load balancers/proxies
-     * that you control.
+     * S'il faut faire confiance aux en-têtes HTTP_X définis par la plupart des équilibreurs de charge.
+     * Défini sur vrai uniquement si votre application s'exécute derrière des équilibreurs de charge/proxies que vous contrôlez.
      *
      * @var bool
      */
     public $trustProxy = false;
 
     /**
-     * Trusted proxies list
+     * Liste des proxys de confiance
      *
      * @var array<string>
      */
     protected $trustedProxies = [];
 
     /**
-     * The built in detectors used with `is()` can be modified with `addDetector()`.
+     * Les détecteurs intégrés utilisés avec `is()` peuvent être modifiés avec `addDetector()`.
      *
-     * There are several ways to specify a detector, see \Cake\Http\ServerRequest::addDetector() for the
-     * various formats and ways to define detectors.
+     * Il existe plusieurs façons de spécifier un détecteur, voir `addDetector()` pour
+     * les différents formats et façons de définir des détecteurs.
      *
      * @var array<array|callable>
      */
@@ -127,89 +126,96 @@ class ServerRequest implements ServerRequestInterface
     ];
 
     /**
-     * Instance cache for results of is(something) calls
+     * Cache d'instance pour les résultats des appels is(something)
      *
      * @var array
      */
     protected $_detectorCache = [];
 
     /**
-     * Request body stream. Contains php://input unless `input` constructor option is used.
+     * Flux du corps de la requête. Contient php://input sauf si l'option constructeur `input` est utilisée.
      *
      * @var \Psr\Http\Message\StreamInterface
      */
     protected $stream;
 
     /**
-     * Uri instance
+     * instance Uri
      *
      * @var \Psr\Http\Message\UriInterface
      */
     protected $uri;
 
     /**
-     * Instance of a Session object relative to this request
+     * Instance d'un objet Session relative à cette requête
      *
      * @var Session
      */
     protected $session;
 
     /**
-     * Store the additional attributes attached to the request.
+     * Stockez les attributs supplémentaires attachés à la requête.
      *
      * @var array
      */
     protected $attributes = [];
 
     /**
-     * A list of properties that emulated by the PSR7 attribute methods.
+     * Une liste de propriétés émulées par les méthodes d'attribut PSR7.
      *
      * @var array<string>
      */
     protected $emulatedAttributes = ['session', 'flash', 'webroot', 'base', 'params', 'here'];
 
     /**
-     * Array of Psr\Http\Message\UploadedFileInterface objects.
+     * Tableau d'objets Psr\Http\Message\UploadedFileInterface.
      *
      * @var array
      */
     protected $uploadedFiles = [];
 
     /**
-     * The HTTP protocol version used.
+     * La version du protocole HTTP utilisée.
      *
      * @var string|null
      */
     protected $protocol;
 
     /**
-     * The request target if overridden
+     * La cible de la requête si elle est remplacée
      *
      * @var string|null
      */
     protected $requestTarget;
 
     /**
-     * Create a new request object.
+     * Negotiator
      *
-     * You can supply the data as either an array or as a string. If you use
-     * a string you can only supply the URL for the request. Using an array will
-     * let you provide the following keys:
+     * @var Negotiator
+     */
+    protected $negotiator;
+
+    /**
+     * Créer un nouvel objet de requête.
      *
-     * - `post` POST data or non query string data
-     * - `query` Additional data from the query string.
-     * - `files` Uploaded files in a normalized structure, with each leaf an instance of UploadedFileInterface.
-     * - `cookies` Cookies for this request.
-     * - `environment` $_SERVER and $_ENV data.
-     * - `url` The URL without the base path for the request.
-     * - `uri` The PSR7 UriInterface object. If null, one will be created from `url` or `environment`.
-     * - `base` The base URL for the request.
-     * - `webroot` The webroot directory for the request.
-     * - `input` The data that would come from php://input this is useful for simulating
-     *   requests with put, patch or delete data.
-     * - `session` An instance of a Session object
+     * Vous pouvez fournir les données sous forme de tableau ou de chaîne. Si tu utilises
+     * une chaîne, vous ne pouvez fournir que l'URL de la demande. L'utilisation d'un tableau
+     * vous permettent de fournir les clés suivantes :
      *
-     * @param array<string, mixed> $config An array of request data to create a request with.
+     * - `post` Données POST ou données de chaîne sans requête
+     * - `query` Données supplémentaires de la chaîne de requête.
+     * - `files` Fichiers téléchargés dans une structure normalisée, avec chaque feuille une instance de UploadedFileInterface.
+     * - `cookies` Cookies pour cette demande.
+     * - `environment` $_SERVER et $_ENV données.
+     * - `url` L'URL sans le chemin de base de la requête.
+     * - `uri` L'objet PSR7 UriInterface. Si nul, un sera créé à partir de `url` ou `environment`.
+     * - `base` L'URL de base de la requête.
+     * - `webroot` Le répertoire webroot pour la requête.
+     * - `input` Les données qui proviendraient de php://input ceci est utile pour simuler
+     * requêtes avec mise, patch ou suppression de données.
+     * - `session` Une instance d'un objet Session
+     *
+     * @param array<string, mixed> $config Un tableau de données de requête avec lequel créer une requête.
      */
     public function __construct(array $config = [])
     {
@@ -1767,5 +1773,63 @@ class ServerRequest implements ServerRequestInterface
         [$path] = explode('?', $this->requestTarget);
 
         return $path;
+    }
+
+    /**
+     * Fournit un moyen pratique de travailler avec la classe Negotiate
+     * pour la négociation de contenu.
+     */
+    public function negotiate(string $type, array $supported, bool $strictMatch = false): string
+    {
+        if (null === $this->negotiator) {
+            $this->negotiator = Services::negotiator($this, true);
+        }
+
+        switch (strtolower($type)) {
+            case 'media':
+                return $this->negotiator->media($supported, $strictMatch);
+
+            case 'charset':
+                return $this->negotiator->charset($supported);
+
+            case 'encoding':
+                return $this->negotiator->encoding($supported);
+
+            case 'language':
+                return $this->negotiator->language($supported);
+        }
+
+        throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.');
+    }
+
+    /**
+     * Définit la chaîne locale pour cette requête.
+     */
+    public function withLocale(string $locale): self
+    {
+        $validLocales = config('app.supported_locales');
+        // S'il ne s'agit pas d'un paramètre régional valide, définissez-le
+        // aux paramètres régionaux par défaut du site.
+        if (! in_array($locale, $validLocales, true)) {
+            $locale = config('app.language');
+        }
+
+        Services::language()->setLocale($locale);
+
+        return $this->withAttribute('locale', $locale);
+    }
+
+    /**
+     * Obtient les paramètres régionaux actuels, avec un retour à la valeur par défaut
+     * locale si aucune n'est définie.
+     */
+    public function getLocale(): string
+    {
+        $locale = $this->getAttribute('locale');
+        if (empty($locale)) {
+            $locale = $this->getAttribute('lang');
+        }
+
+        return $locale ?? Services::language()->getLocale();
     }
 }

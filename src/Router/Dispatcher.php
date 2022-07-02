@@ -159,6 +159,21 @@ class Dispatcher
     }
 
     /**
+     * Retourne le contrôleur utilisé
+     *
+     * @return Closure|string
+     */
+    public static function getController()
+    {
+        $controller = self::instance()->controller;
+        if (empty($controller)) {
+            $controller = Services::routes()->getDefaultController();
+        }
+
+        return $controller;
+    }
+
+    /**
      * Lancez l'application !
      *
      * C'est "la boucle" si vous voulez. Le principal point d'entrée dans le script
@@ -808,10 +823,8 @@ class Dispatcher
     protected function sendResponse()
     {
         $this->totalTime = $this->timer->getElapsedTime('total_execution');
-
         Services::emitter()->emit(
-            $this->response
-            // Services::toolbar()->prepare($this, $this->request, $this->response)
+            Services::toolbar()->prepare($this->getPerformanceStats(), $this->request, $this->response)
         );
     }
 

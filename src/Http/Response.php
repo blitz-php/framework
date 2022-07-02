@@ -1408,10 +1408,8 @@ class Response implements ResponseInterface
     public function withStringBody(?string $string): static
     {
         $new = clone $this;
-        $new->_createStream();
-        $new->stream->write((string) $string);
 
-        return $new;
+        return $new->withBody(Utils::streamFor($string));
     }
 
     /**

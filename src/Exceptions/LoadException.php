@@ -68,4 +68,9 @@ class LoadException extends OutOfBoundsException implements ExceptionInterface
     {
         return new static('Unable to load system services definition file. The `' . $filename . '` file does not exist or cannot be read.');
     }
+
+    public static function fileNotFound(string $filename): self
+    {
+        return new static('The `' . $filename . '` file does not exist or cannot be read.');
+    }
 }

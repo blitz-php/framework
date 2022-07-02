@@ -114,6 +114,97 @@ if (! function_exists('config')) {
     }
 }
 
+// =========================== FONCTIONS DE PREVENTION D'ATTAQUE =========================== //
+
+if (! function_exists('esc')) {
+    /**
+     * Effectue un simple échappement automatique des données pour des raisons de sécurité.
+     * Pourrait envisager de rendre cela plus complexe à une date ultérieure.
+     *
+     * Si $data est une chaîne, il suffit alors de l'échapper et de la renvoyer.
+     * Si $data est un tableau, alors il boucle dessus, s'échappant de chaque
+     * 'valeur' des paires clé/valeur.
+     *
+     * Valeurs de contexte valides : html, js, css, url, attr, raw, null
+     *
+     * @param array|string $data
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return array|string
+     */
+    function esc($data, ?string $context = 'html', ?string $encoding = null)
+    {
+        if (class_exists('\Laminas\Escaper\Escaper')) {
+            return Helpers::esc($data, $context, $encoding);
+        }
+
+        return h($data, true, $encoding);
+    }
+}
+
+if (! function_exists('h')) {
+    /**
+     * Méthode pratique pour htmlspecialchars.
+     *
+     * @param mixed       $text    Texte à envelopper dans htmlspecialchars. Fonctionne également avec des tableaux et des objets.
+     *                             Les tableaux seront mappés et tous leurs éléments seront échappés. Les objets seront transtypés s'ils
+     *                             implémenter une méthode `__toString`. Sinon, le nom de la classe sera utilisé.
+     *                             Les autres types de scalaires seront renvoyés tels quels.
+     * @param bool        $double  Encodez les entités html existantes.
+     * @param string|null $charset Jeu de caractères à utiliser lors de l'échappement. La valeur par défaut est la valeur de configuration dans `mb_internal_encoding()` ou 'UTF-8'.
+     *
+     * @return mixed Texte enveloppé.
+     */
+    function h($text, bool $double = true, ?string $charset = null)
+    {
+        return Helpers::h($text, $double, $charset);
+    }
+}
+
+if (! function_exists('purify')) {
+    /**
+     * Purifiez l'entrée à l'aide de la classe autonome HTMLPurifier.
+     * Utilisez facilement plusieurs configurations de purificateur.
+     *
+     * @param string|string[]
+     * @param false|string
+     * @param mixed $dirty_html
+     * @param mixed $config
+     *
+     * @return string|string[]
+     */
+    function purify($dirty_html, $config = false)
+    {
+        return Helpers::purify($dirty_html, $config);
+    }
+}
+
+if (! function_exists('remove_invisible_characters')) {
+    /**
+     * Supprimer les caractères invisibles
+     *
+     * Cela empêche de prendre en sandwich des caractères nuls
+     * entre les caractères ascii, comme Java\0script.
+     */
+    function remove_invisible_characters(string $str, bool $url_encoded = true): string
+    {
+        return Helpers::removeInvisibleCharacters($str, $url_encoded);
+    }
+}
+
+if (! function_exists('stringify_attributes')) {
+    /**
+     * Chaîner les attributs à utiliser dans les balises HTML.
+     *
+     * @param array|object|string $attributes
+     */
+    function stringify_attributes($attributes, bool $js = false): string
+    {
+        return Helpers::stringifyAttributes($attributes, $js);
+    }
+}
+
 // ================================= FONCTIONS D'ENVIRONNEMENT D'EXECUTION ================================= //
 
 if (! function_exists('on_dev')) {
@@ -428,6 +519,20 @@ if (! function_exists('dd')) {
     }
 }
 
+if (! function_exists('dump')) {
+    /**
+     * Prints a Kint debug report and exits.
+     *
+     * @param array ...$vars
+     *
+     * @codeCoverageIgnore Can't be tested ... exits
+     */
+    function dump(...$vars)
+    {
+        Kint::dump(...$vars);
+    }
+}
+
 if (! function_exists('deprecationWarning')) {
     /**
      * Méthode d'assistance pour générer des avertissements d'obsolescence
@@ -648,7 +753,7 @@ if (! function_exists('getTypeName')) {
      *
      * @return string Renvoie le nom de la classe ou le type de variable
      */
-    function getTypeName($var): string
+    function get_type_name($var): string
     {
         return is_object($var) ? get_class($var) : gettype($var);
     }
@@ -701,7 +806,7 @@ if (! function_exists('namespaceSplit')) {
      *
      * @return array Tableau avec 2 index. 0 => namespace, 1 => classname.
      */
-    function namespaceSplit(string $class): array
+    function namespace_split(string $class): array
     {
         $pos = strrpos($class, '\\');
         if ($pos === false) {

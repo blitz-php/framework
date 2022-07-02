@@ -25,9 +25,9 @@ class SmartyAdapter extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH)
+    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
     {
-        parent::__construct($config, $viewPath);
+        parent::__construct($config, $viewPath, $debug);
 
         $this->engine = new Smarty();
 
@@ -76,12 +76,16 @@ class SmartyAdapter extends AbstractAdapter
             $this->engine->setCompileId($this->renderVars['options']['cache_name'] ?? null);
         }
 
-        return $this->engine->fetch(
+        $output = $this->engine->fetch(
             $view,
             $this->renderVars['options']['cache_id'] ?? null,
             $this->renderVars['options']['cache_name'] ?? ($this->renderVars['options']['compile_id'] ?? null),
             $this->renderVars['options']['parent'] ?? null,
         );
+
+        $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
+
+        return $output;
     }
 
     /**
