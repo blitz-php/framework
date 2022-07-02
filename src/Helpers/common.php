@@ -521,6 +521,20 @@ if (! function_exists('dd')) {
     }
 }
 
+if (! function_exists('dump')) {
+    /**
+     * Prints a Kint debug report and exits.
+     *
+     * @param array ...$vars
+     *
+     * @codeCoverageIgnore Can't be tested ... exits
+     */
+    function dump(...$vars)
+    {
+        Kint::dump(...$vars);
+    }
+}
+
 if (! function_exists('deprecationWarning')) {
     /**
      * Méthode d'assistance pour générer des avertissements d'obsolescence
@@ -741,7 +755,7 @@ if (! function_exists('getTypeName')) {
      *
      * @return string Renvoie le nom de la classe ou le type de variable
      */
-    function getTypeName($var): string
+    function get_type_name($var): string
     {
         return is_object($var) ? get_class($var) : gettype($var);
     }
@@ -794,7 +808,7 @@ if (! function_exists('namespaceSplit')) {
      *
      * @return array Tableau avec 2 index. 0 => namespace, 1 => classname.
      */
-    function namespaceSplit(string $class): array
+    function namespace_split(string $class): array
     {
         $pos = strrpos($class, '\\');
         if ($pos === false) {
