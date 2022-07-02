@@ -96,10 +96,10 @@ trait ApiResponseTrait
      */
     final protected function respondBadRequest(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['invalid_request'] ?? StatusCode::BAD_REQUEST, $code, $errors);
     }
@@ -111,10 +111,10 @@ trait ApiResponseTrait
      */
     final protected function respondConflict(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['conflict'] ?? StatusCode::CONFLICT, $code, $errors);
     }
@@ -151,10 +151,10 @@ trait ApiResponseTrait
      */
     final protected function respondForbidden(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['forbidden'] ?? StatusCode::FORBIDDEN, $code, $errors);
     }
@@ -168,25 +168,25 @@ trait ApiResponseTrait
      */
     final protected function respondGone(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['resource_gone'] ?? StatusCode::GONE, $code, $errors);
     }
 
     /**
      * Utilisé lorsqu'il y a une erreur de serveur.
-	 *
+     *
      * @return \Psr\Http\Message\ResponseInterface
      */
     final protected function respondInternalError(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['server_error'] ?? StatusCode::INTERNAL_ERROR, $code, $errors);
     }
@@ -198,10 +198,10 @@ trait ApiResponseTrait
      */
     final protected function respondInvalidToken(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['invalid_token'] ?? StatusCode::INVALID_TOKEN, $code, $errors);
     }
@@ -213,10 +213,10 @@ trait ApiResponseTrait
      */
     final protected function respondMethodNotAllowed(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['not_allowed'] ?? StatusCode::METHOD_NOT_ALLOWED, $code, $errors);
     }
@@ -239,10 +239,10 @@ trait ApiResponseTrait
      */
     final protected function respondNotAcceptable(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['not_acceptable'] ?? StatusCode::NOT_ACCEPTABLE, $code, $errors);
     }
@@ -254,10 +254,10 @@ trait ApiResponseTrait
      */
     final protected function respondNotFound(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['resource_not_found'] ?? StatusCode::NOT_FOUND, $code, $errors);
     }
@@ -269,10 +269,10 @@ trait ApiResponseTrait
      */
     final protected function respondNotImplemented(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['not_implemented'] ?? StatusCode::NOT_IMPLEMENTED, $code, $errors);
     }
@@ -296,10 +296,10 @@ trait ApiResponseTrait
      */
     final protected function respondTooManyRequests(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
 
         return $this->respondFail($message, $this->codes['too_many_requests'] ?? StatusCode::TOO_MANY_REQUESTS, $code, $errors);
     }
@@ -313,11 +313,11 @@ trait ApiResponseTrait
      */
     final protected function respondUnauthorized(string $message, int|string|null|array $code = null, array $errors = [])
     {
-		if (is_array($code)) {
-			$errors = $code;
-			$code = null;
-		}
-		
+        if (is_array($code)) {
+            $errors = $code;
+            $code   = null;
+        }
+
         return $this->respondFail($message, $this->codes['unauthorized'] ?? StatusCode::UNAUTHORIZED, $code, $errors);
     }
 
