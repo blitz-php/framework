@@ -245,18 +245,18 @@ class Services
     }
 
     /**
-	 * Renvoie la barre d'outils de débogage.
-	 */
-	public static function toolbar(?stdClass $config = null, bool $shared = true): Toolbar
-	{
-		if ($shared) {
+     * Renvoie la barre d'outils de débogage.
+     */
+    public static function toolbar(?stdClass $config = null, bool $shared = true): Toolbar
+    {
+        if ($shared) {
             return self::singleton(Toolbar::class);
-		}
+        }
 
-        $config = $config ?? (object) config('toolbar');
+        $config ??= (object) config('toolbar');
 
-		return self::factory(Toolbar::class, [$config]);
-	}
+        return self::factory(Toolbar::class, [$config]);
+    }
 
     /**
      * La classe URI fournit un moyen de modéliser et de manipuler les URI.

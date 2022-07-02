@@ -47,7 +47,7 @@ class Logger implements LoggerInterface
      */
     private $config;
 
-     /**
+    /**
      * Met en cache les appels de journalisation pour la barre de débogage.
      *
      * @var array
@@ -55,7 +55,7 @@ class Logger implements LoggerInterface
     public $logCache;
 
     /**
-     * Devrions-nous mettre en cache nos éléments enregistrés ?
+     * Devrions-nous mettre en cache nos éléments enregistrés ?
      *
      * @var bool
      */

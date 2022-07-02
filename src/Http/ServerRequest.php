@@ -106,7 +106,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Les détecteurs intégrés utilisés avec `is()` peuvent être modifiés avec `addDetector()`.
      *
-     * Il existe plusieurs façons de spécifier un détecteur, voir `addDetector()` pour 
+     * Il existe plusieurs façons de spécifier un détecteur, voir `addDetector()` pour
      * les différents formats et façons de définir des détecteurs.
      *
      * @var array<array|callable>
@@ -189,19 +189,18 @@ class ServerRequest implements ServerRequestInterface
     protected $requestTarget;
 
     /**
-	 * Negotiator
-	 *
-	 * @var Negotiator
-	 */
-	protected $negotiator;
-
+     * Negotiator
+     *
+     * @var Negotiator
+     */
+    protected $negotiator;
 
     /**
      * Créer un nouvel objet de requête.
      *
      * Vous pouvez fournir les données sous forme de tableau ou de chaîne. Si tu utilises
      * une chaîne, vous ne pouvez fournir que l'URL de la demande. L'utilisation d'un tableau
-     * vous permettent de fournir les clés suivantes :
+     * vous permettent de fournir les clés suivantes :
      *
      * - `post` Données POST ou données de chaîne sans requête
      * - `query` Données supplémentaires de la chaîne de requête.
@@ -1776,60 +1775,61 @@ class ServerRequest implements ServerRequestInterface
         return $path;
     }
 
-    //--------------------------------------------------------------------
-
-	/**
-	 * Fournit un moyen pratique de travailler avec la classe Negotiate
+    /**
+     * Fournit un moyen pratique de travailler avec la classe Negotiate
      * pour la négociation de contenu.
-	 */
-	public function negotiate(string $type, array $supported, bool $strictMatch = false): string
-	{
-		if (is_null($this->negotiator)) {
-			$this->negotiator = Services::negotiator($this, true);
-		}
+     */
+    public function negotiate(string $type, array $supported, bool $strictMatch = false): string
+    {
+        if (null === $this->negotiator) {
+            $this->negotiator = Services::negotiator($this, true);
+        }
 
-		switch (strtolower($type)) {
-			case 'media':
-				return $this->negotiator->media($supported, $strictMatch);
-			case 'charset':
-				return $this->negotiator->charset($supported);
-			case 'encoding':
-				return $this->negotiator->encoding($supported);
-			case 'language':
-				return $this->negotiator->language($supported);
-		}
+        switch (strtolower($type)) {
+            case 'media':
+                return $this->negotiator->media($supported, $strictMatch);
 
-		throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.');
-	}
+            case 'charset':
+                return $this->negotiator->charset($supported);
 
-	/**
+            case 'encoding':
+                return $this->negotiator->encoding($supported);
+
+            case 'language':
+                return $this->negotiator->language($supported);
+        }
+
+        throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.');
+    }
+
+    /**
      * Définit la chaîne locale pour cette requête.
      */
     public function withLocale(string $locale): self
     {
-		$validLocales = config('app.supported_locales');
-		// S'il ne s'agit pas d'un paramètre régional valide, définissez-le
+        $validLocales = config('app.supported_locales');
+        // S'il ne s'agit pas d'un paramètre régional valide, définissez-le
         // aux paramètres régionaux par défaut du site.
-        if (!in_array($locale, $validLocales, true)) {
+        if (! in_array($locale, $validLocales, true)) {
             $locale = config('app.language');
         }
 
-		Services::language()->setLocale($locale);
+        Services::language()->setLocale($locale);
 
         return $this->withAttribute('locale', $locale);
     }
 
-	/**
+    /**
      * Obtient les paramètres régionaux actuels, avec un retour à la valeur par défaut
      * locale si aucune n'est définie.
      */
     public function getLocale(): string
     {
-		$locale = $this->getAttribute('locale');
+        $locale = $this->getAttribute('locale');
         if (empty($locale)) {
             $locale = $this->getAttribute('lang');
         }
 
-		return $locale ?? Services::language()->getLocale();
+        return $locale ?? Services::language()->getLocale();
     }
 }

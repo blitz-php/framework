@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Debug;
 
 use BlitzPHP\Core\Application;
@@ -12,6 +21,7 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\View\Parser;
+use Exception;
 use GuzzleHttp\Psr7\Utils;
 use Kint\Kint;
 use Psr\Http\Message\RequestInterface;
@@ -22,7 +32,7 @@ use stdClass;
  * Affiche une barre d'outils avec des bits de statistiques pour aider un développeur dans le débogage.
  *
  * Inspiration: http://prophiler.fabfuel.de
- * 
+ *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.2 - CodeIgniter\Debug\Toolbar</a>
  */
 class Toolbar
@@ -41,24 +51,23 @@ class Toolbar
      */
     protected $collectors = [];
 
-	/**
-	 * Dossier de sauvegarde des information de debogage
-	 *
-	 * @var string
-	 */
-	private $debugPath = STORAGE_PATH . 'debugbar';
+    /**
+     * Dossier de sauvegarde des information de debogage
+     *
+     * @var string
+     */
+    private $debugPath = STORAGE_PATH . 'debugbar';
 
-
-	/**
-	 * Constructeur
-	 */
+    /**
+     * Constructeur
+     */
     public function __construct(?stdClass $config = null)
     {
         $this->config = $config ?? (object) config('toolbar');
 
         foreach ($this->config->collectors as $collector) {
             if (! class_exists($collector)) {
-				logger()->critical(
+                logger()->critical(
                     'Toolbar collector does not exist (' . $collector . ').'
                     . ' Please check $collectors in the app/Config/toolbar.php file.'
                 );
@@ -73,7 +82,7 @@ class Toolbar
     /**
      * Renvoie toutes les données requises par la barre de débogage
      *
-     * @param float           $startTime Heure de début de l'application
+     * @param float $startTime Heure de début de l'application
      *
      * @return string Données encodées en JSON
      */
@@ -134,36 +143,35 @@ class Toolbar
             }
         }
 
+        foreach ($request->getQueryParams() as $name => $value) {
+            $data['vars']['get'][esc($name)] = is_array($value) ? '<pre>' . esc(print_r($value, true)) . '</pre>' : esc($value);
+        }
 
-		foreach ($request->getQueryParams() as $name => $value) {
-			$data['vars']['get'][esc($name)] = is_array($value) ? '<pre>' . esc(print_r($value, true)) . '</pre>' : esc($value);
-		}
+        foreach ($request->getParsedBody() as $name => $value) {
+            $data['vars']['post'][esc($name)] = is_array($value) ? '<pre>' . esc(print_r($value, true)) . '</pre>' : esc($value);
+        }
 
-		foreach ($request->getParsedBody() As $name => $value) {
-			$data['vars']['post'][esc($name)] = is_array($value) ? '<pre>' . esc(print_r($value, true)) . '</pre>' : esc($value);
-		}
+        foreach ($request->getHeaders() as $header => $value) {
+            if (empty($value)) {
+                continue;
+            }
 
-		foreach ($request->getHeaders() As $header => $value) {
-			if (empty($value)) {
-				continue;
-			}
+            if (! is_array($value)) {
+                $value = [$value];
+            }
 
-			if (! is_array($value)) {
-				$value = [$value];
-			}
+            foreach ($value as $h) {
+                if (is_object($h) && method_exists($h, 'getName') && method_exists($h, 'getValueLine')) {
+                    $data['vars']['headers'][esc($h->getName())] = esc($h->getValueLine());
+                }
+            }
+        }
 
-			foreach ($value As $h) {
-				if (is_object($h) AND method_exists($h, 'getName') AND method_exists($h, 'getValueLine')) {
-					$data['vars']['headers'][esc($h->getName())] = esc($h->getValueLine());
-				}
-			}
-		}
+        foreach ($request->getCookieParams() as $name => $value) {
+            $data['vars']['cookies'][esc($name)] = esc($value);
+        }
 
-		foreach ($request->getCookieParams() As $name => $value) {
-			$data['vars']['cookies'][esc($name)] = esc($value);
-		}
-
-		$data['vars']['request'] = ($request->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
+        $data['vars']['request'] = ($request->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
 
         $data['vars']['response'] = [
             'statusCode'  => $response->getStatusCode(),
@@ -172,24 +180,23 @@ class Toolbar
             'headers'     => [],
         ];
 
-		foreach ($response->getHeaders() As $header => $value) {
-			if (empty($value)) {
-				continue;
-			}
+        foreach ($response->getHeaders() as $header => $value) {
+            if (empty($value)) {
+                continue;
+            }
 
-			if (! is_array($value)) {
-				$value = [$value];
-			}
+            if (! is_array($value)) {
+                $value = [$value];
+            }
 
-			foreach ($value As $h) {
-				if (is_object($h) AND method_exists($h, 'getName') AND method_exists($h, 'getValueLine')) {
-					$data['vars']['response']['headers'][esc($h->getName())] = esc($h->getValueLine());
-				}
-			}
-		}
+            foreach ($value as $h) {
+                if (is_object($h) && method_exists($h, 'getName') && method_exists($h, 'getValueLine')) {
+                    $data['vars']['response']['headers'][esc($h->getName())] = esc($h->getValueLine());
+                }
+            }
+        }
 
         $data['config'] = Config::display();
-
 
         return json_encode($data);
     }
@@ -273,6 +280,8 @@ class Toolbar
 
     /**
      * Renvoie un tableau trié de tableaux de données chronologiques à partir des collecteurs.
+     *
+     * @param mixed $collectors
      */
     protected function collectTimelineData($collectors): array
     {
@@ -372,86 +381,84 @@ class Toolbar
      */
     public function prepare(array $stats, ?RequestInterface $request = null, ?ResponseInterface $response = null): ResponseInterface
     {
-		$request ??= Services::request();
-		$response ??= Services::response();
+        $request ??= Services::request();
+        $response ??= Services::response();
 
-		// Si on est en CLI ou en prod, pas la peine de continuer car la debugbar n'est pas utilisable dans ces environnements
-		if (is_cli() || on_prod()) {
-			return $response;
-		}
+        // Si on est en CLI ou en prod, pas la peine de continuer car la debugbar n'est pas utilisable dans ces environnements
+        if (is_cli() || on_prod()) {
+            return $response;
+        }
 
-		// Si on a desactiver le debogage ou l'affichage de la debugbar, on s'arrete
-		if (! BLITZ_DEBUG || ! $this->config->show_debugbar) {
-			return $response;
-		}
-		
-		$toolbar = Services::toolbar($this->config);
-		$data    = $toolbar->run(
-			$stats['startTime'],
-			$stats['totalTime'],
-			$request,
-			$response
-		);
+        // Si on a desactiver le debogage ou l'affichage de la debugbar, on s'arrete
+        if (! BLITZ_DEBUG || ! $this->config->show_debugbar) {
+            return $response;
+        }
 
-		// Mise à jour vers microtime() pour que nous puissions obtenir l'historique
-		$time = sprintf('%.6f', microtime(true));
+        $toolbar = Services::toolbar($this->config);
+        $data    = $toolbar->run(
+            $stats['startTime'],
+            $stats['totalTime'],
+            $request,
+            $response
+        );
 
-		if (! is_dir($this->debugPath)) {
-			mkdir($this->debugPath, 0777);
-		}
+        // Mise à jour vers microtime() pour que nous puissions obtenir l'historique
+        $time = sprintf('%.6f', microtime(true));
 
-		$this->writeFile($this->debugPath . '/debugbar_' . $time . '.json', $data, 'w+');
+        if (! is_dir($this->debugPath)) {
+            mkdir($this->debugPath, 0777);
+        }
 
-		$format = $response->getHeaderLine('content-type');
+        $this->writeFile($this->debugPath . '/debugbar_' . $time . '.json', $data, 'w+');
 
-		// Les formats non HTML ne doivent pas inclure la barre de débogage, 
-		// puis nous envoyons des en-têtes indiquant où trouver les données de débogage pour cette réponse
-		if ($request->isAJAX() || strpos($format, 'html') === false) {
-			return $response
-				->withHeader('Debugbar-Time', "{$time}")
-				->withHeader('Debugbar-Link', site_url("?debugbar_time={$time}"));
-		}
+        $format = $response->getHeaderLine('content-type');
 
-		$_SESSION['_blitz_debugbar_'] = array_merge($_SESSION['_blitz_debugbar_'] ?? [], compact('time'));
+        // Les formats non HTML ne doivent pas inclure la barre de débogage,
+        // puis nous envoyons des en-têtes indiquant où trouver les données de débogage pour cette réponse
+        if ($request->isAJAX() || strpos($format, 'html') === false) {
+            return $response
+                ->withHeader('Debugbar-Time', "{$time}")
+                ->withHeader('Debugbar-Link', site_url("?debugbar_time={$time}"));
+        }
 
-		$debugRenderer = $this->respond();
+        $_SESSION['_blitz_debugbar_'] = array_merge($_SESSION['_blitz_debugbar_'] ?? [], compact('time'));
 
-		// Extract css
-		preg_match('/<style (?:.+)>(.+)<\/style>/', $debugRenderer, $matches);
-		$style = $matches[0] ?? '';
+        $debugRenderer = $this->respond();
+
+        // Extract css
+        preg_match('/<style (?:.+)>(.+)<\/style>/', $debugRenderer, $matches);
+        $style         = $matches[0] ?? '';
         $debugRenderer = str_replace($style, '', $debugRenderer);
-	
+
         // Extract js
-		preg_match('/<script (?:.+)>(.+)<\/script>/', $debugRenderer, $matches);
-		$js = $matches[0] ?? '';
-		$debugRenderer = str_replace($js, '', $debugRenderer);
-	
-		$responseContent = $response->getBody()->getContents();
-		
-		if (strpos($responseContent, '<head>') !== false) {
-			$responseContent = preg_replace('/<head>/', '<head>' . $style, $responseContent, 1);
-		}
-		else {
-			$responseContent .= $style;
-		}
+        preg_match('/<script (?:.+)>(.+)<\/script>/', $debugRenderer, $matches);
+        $js            = $matches[0] ?? '';
+        $debugRenderer = str_replace($js, '', $debugRenderer);
+
+        $responseContent = $response->getBody()->getContents();
+
+        if (strpos($responseContent, '<head>') !== false) {
+            $responseContent = preg_replace('/<head>/', '<head>' . $style, $responseContent, 1);
+        } else {
+            $responseContent .= $style;
+        }
 
         if (strpos($responseContent, '</body>') !== false) {
-			$responseContent = preg_replace('/<\/body>/', '<div id="toolbarContainer">'.trim(preg_replace('/\s+/', ' ', $debugRenderer)).'</div>'.$js.'<script>ciDebugBar.init();</script></body>', $responseContent, 1);
-		}
-		else {
-			$responseContent .= '<div id="toolbarContainer">'.trim(preg_replace('/\s+/', ' ', $debugRenderer)).'</div>'.$js.'<script>ciDebugBar.init();</script>';
-		}
+            $responseContent = preg_replace('/<\/body>/', '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>ciDebugBar.init();</script></body>', $responseContent, 1);
+        } else {
+            $responseContent .= '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>ciDebugBar.init();</script>';
+        }
 
-		return $response->withBody(
-			Utils::streamFor($responseContent)
-		);
+        return $response->withBody(
+            Utils::streamFor($responseContent)
+        );
     }
 
     /**
      * Injectez la barre d'outils de débogage dans la réponse.
      *
-	 * @return string
-	 * 
+     * @return string
+     *
      * @codeCoverageIgnore
      */
     public function respond()
@@ -471,13 +478,13 @@ class Toolbar
             include $this->config->view_path . 'toolbarloader.js';
             $output = ob_get_clean();
             $output = str_replace('{url}', rtrim(site_url(), '/'), $output);
-            
-			return $output;
+
+            return $output;
         }
 
         // Sinon, s'il inclut ?debugbar_time, alors
         // nous devrions retourner la barre de débogage entière.
-		$debugbarTime = $_SESSION['_blitz_debugbar_']['time'] ?? $request->getQuery('debugbar_time');
+        $debugbarTime = $_SESSION['_blitz_debugbar_']['time'] ?? $request->getQuery('debugbar_time');
         if ($debugbarTime) {
             // Négociation du type de contenu pour formater la sortie
             $format = $request->negotiate('media', ['text/html', 'application/json', 'application/xml']);
@@ -497,7 +504,7 @@ class Toolbar
             exit; // Quitter ici est nécessaire pour éviter de charger la page d'index
         }
 
-		return '';
+        return '';
     }
 
     /**
@@ -522,7 +529,7 @@ class Toolbar
             case 'html':
                 $data['styles'] = [];
                 extract($data);
-				$parser = new Parser([], $this->config->view_path);
+                $parser = new Parser([], $this->config->view_path);
                 // $parser = Services::parser($this->config->view_path, null, false);
                 ob_start();
                 include rtrim($this->config->view_path, '/\\') . DS . 'toolbar.tpl.php';
@@ -543,30 +550,29 @@ class Toolbar
         return $output;
     }
 
-	/**
-	 * Écrit des données dans le fichier spécifié dans le chemin.
-	 * Crée un nouveau fichier s'il n'existe pas.
-	 */
-	protected function writeFile(string $path, string $data, string $mode = 'wb'): bool
-	{
-		try {
-			$fp = fopen($path, $mode);
+    /**
+     * Écrit des données dans le fichier spécifié dans le chemin.
+     * Crée un nouveau fichier s'il n'existe pas.
+     */
+    protected function writeFile(string $path, string $data, string $mode = 'wb'): bool
+    {
+        try {
+            $fp = fopen($path, $mode);
 
-			flock($fp, LOCK_EX);
+            flock($fp, LOCK_EX);
 
-			for ($result = $written = 0, $length = strlen($data); $written < $length; $written += $result) {
-				if (($result = fwrite($fp, substr($data, $written))) === false) {
-					break;
-				}
-			}
+            for ($result = $written = 0, $length = strlen($data); $written < $length; $written += $result) {
+                if (($result = fwrite($fp, substr($data, $written))) === false) {
+                    break;
+                }
+            }
 
-			flock($fp, LOCK_UN);
-			fclose($fp);
+            flock($fp, LOCK_UN);
+            fclose($fp);
 
-			return is_int($result);
-		}
-		catch (\Exception $fe) {
-			return false;
-		}
-	}
+            return is_int($result);
+        } catch (Exception $fe) {
+            return false;
+        }
+    }
 }

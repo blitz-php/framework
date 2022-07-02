@@ -160,8 +160,8 @@ class Dispatcher
 
     /**
      * Retourne le contrôleur utilisé
-     * 
-     * @return string|Closure
+     *
+     * @return Closure|string
      */
     public static function getController()
     {

@@ -1,12 +1,21 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
 use BlitzPHP\Event\Event;
 
 /**
  * Collecteur pour l'onglet Base de données de la barre d'outils de débogage.
- * 
+ *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.2 - CodeIgniter\Debug\Toolbar\Collectors\Database</a>
  */
 class DatabaseCollector extends BaseCollector
@@ -61,9 +70,9 @@ class DatabaseCollector extends BaseCollector
     public static function collect(Event $event)
     {
         /**
-		 * @var \BlitzPHP\Database\Query\Result
-		 */
-		$result = $event->getTarget();
+         * @var \BlitzPHP\Database\Query\Result
+         */
+        $result = $event->getTarget();
 
         $config = (object) config('toolbar');
 
@@ -71,8 +80,8 @@ class DatabaseCollector extends BaseCollector
         $max = $config->max_queries ?: 100;
 
         if (count(static::$queries) < $max) {
-			static::$queries[] = (object) $result->details();
-		}
+            static::$queries[] = (object) $result->details();
+        }
 
         /*if (count(static::$queries) < $max) {
             $queryString = $query->getQuery();
@@ -93,7 +102,6 @@ class DatabaseCollector extends BaseCollector
             ];
         }*/
     }
-
 
     /**
      * Returns timeline data formatted for the toolbar.
@@ -200,8 +208,8 @@ class DatabaseCollector extends BaseCollector
     {
         $this->getConnections();
 
-        $queryCount      = count(static::$queries);
-        $uniqueCount     = count(array_filter(static::$queries, static fn ($query) => $query['duplicate'] === false));
+        $queryCount  = count(static::$queries);
+        $uniqueCount = count(array_filter(static::$queries, static fn ($query) => $query['duplicate'] === false));
         $connectionCount = count($this->connections);
 
         return sprintf(

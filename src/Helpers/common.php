@@ -116,10 +116,8 @@ if (! function_exists('config')) {
 
 // =========================== FONCTIONS DE PREVENTION D'ATTAQUE =========================== //
 
-
-if (!function_exists('esc'))
-{
-	/**
+if (! function_exists('esc')) {
+    /**
      * Effectue un simple échappement automatique des données pour des raisons de sécurité.
      * Pourrait envisager de rendre cela plus complexe à une date ultérieure.
      *
@@ -136,16 +134,16 @@ if (!function_exists('esc'))
      * @return array|string
      */
     function esc($data, ?string $context = 'html', ?string $encoding = null)
-	{
+    {
         if (class_exists('\Laminas\Escaper\Escaper')) {
             return Helpers::esc($data, $context, $encoding);
         }
 
         return h($data, true, $encoding);
-	}
+    }
 }
 
-if (!function_exists('h')) {
+if (! function_exists('h')) {
     /**
      * Méthode pratique pour htmlspecialchars.
      *
@@ -160,51 +158,51 @@ if (!function_exists('h')) {
      */
     function h($text, bool $double = true, ?string $charset = null)
     {
-		return Helpers::h($text, $double, $charset);
+        return Helpers::h($text, $double, $charset);
     }
 }
 
-if (!function_exists('purify'))
-{
-	/**
+if (! function_exists('purify')) {
+    /**
      * Purifiez l'entrée à l'aide de la classe autonome HTMLPurifier.
      * Utilisez facilement plusieurs configurations de purificateur.
      *
      * @param string|string[]
-     * @param string|false
+     * @param false|string
+     * @param mixed $dirty_html
+     * @param mixed $config
+     *
      * @return string|string[]
      */
     function purify($dirty_html, $config = false)
     {
         return Helpers::purify($dirty_html, $config);
-	}
+    }
 }
 
-if (!function_exists('remove_invisible_characters'))
-{
-	/**
+if (! function_exists('remove_invisible_characters')) {
+    /**
      * Supprimer les caractères invisibles
      *
      * Cela empêche de prendre en sandwich des caractères nuls
      * entre les caractères ascii, comme Java\0script.
      */
-	function remove_invisible_characters(string $str, bool $url_encoded = true) : string
-	{
-		return Helpers::removeInvisibleCharacters($str, $url_encoded);
-	}
+    function remove_invisible_characters(string $str, bool $url_encoded = true): string
+    {
+        return Helpers::removeInvisibleCharacters($str, $url_encoded);
+    }
 }
 
-if (!function_exists('stringify_attributes'))
-{
-	/**
-	 * Chaîner les attributs à utiliser dans les balises HTML.
-	 *
-	 * @param string|array|object $attributes
-	 */
-	function stringify_attributes($attributes, bool $js = false) : string
-	{
+if (! function_exists('stringify_attributes')) {
+    /**
+     * Chaîner les attributs à utiliser dans les balises HTML.
+     *
+     * @param array|object|string $attributes
+     */
+    function stringify_attributes($attributes, bool $js = false): string
+    {
         return Helpers::stringifyAttributes($attributes, $js);
-	}
+    }
 }
 
 // ================================= FONCTIONS D'ENVIRONNEMENT D'EXECUTION ================================= //

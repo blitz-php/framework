@@ -395,18 +395,17 @@ class RouteCollection implements RouteCollectionInterface
             }
 
             foreach ($collection as $name => $r) {
-				$key          = key($r['route']);
+                $key = key($r['route']);
 
-				if (! $withName) {
-					$routes[$key] = $r['route'][$key];
-				}
-				else {
-					$routes[$key] = [
-						'name'    => $name,
-						'handler' => $r['route'][$key]
-					];
-				}
-			}
+                if (! $withName) {
+                    $routes[$key] = $r['route'][$key];
+                } else {
+                    $routes[$key] = [
+                        'name'    => $name,
+                        'handler' => $r['route'][$key],
+                    ];
+                }
+            }
         }
 
         // sorting routes by priority

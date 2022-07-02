@@ -198,10 +198,10 @@ class View
         $debug = $this->config['debug'] ?? 'auto';
         if ($debug === 'auto') {
             $debug = on_dev();
-        } 
+        }
 
         $this->adapter = new self::$validAdapters[$adapter](
-            $config, 
+            $config,
             $this->config['view_base'] ?? VIEW_PATH,
             $debug
         );

@@ -1,25 +1,34 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
 /**
  * Collecteur de la barre d'outils de base
- * 
+ *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.2 - CodeIgniter\Debug\Toolbar\Collectors\BaseCollector</a>
  */
 abstract class BaseCollector
 {
     /**
-     * Si ce collecteur possède des données pouvant 
-	 * être affichées dans la chronologie.
+     * Si ce collecteur possède des données pouvant
+     * être affichées dans la chronologie.
      *
      * @var bool
      */
     protected $hasTimeline = false;
 
     /**
-     * Indique si ce collecteur doit afficher 
-	 * du contenu dans un onglet ou non.
+     * Indique si ce collecteur doit afficher
+     * du contenu dans un onglet ou non.
      *
      * @var bool
      */
@@ -34,8 +43,8 @@ abstract class BaseCollector
     protected $hasLabel = false;
 
     /**
-     * Indique si ce collecteur contient des données qui 
-	 * doivent être affichées dans l'onglet Vars.
+     * Indique si ce collecteur contient des données qui
+     * doivent être affichées dans l'onglet Vars.
      *
      * @var bool
      */
@@ -70,7 +79,7 @@ abstract class BaseCollector
     }
 
     /**
-     * Ce collecteur a-t-il besoin de son propre onglet ?
+     * Ce collecteur a-t-il besoin de son propre onglet ?
      */
     public function hasTabContent(): bool
     {
@@ -86,7 +95,7 @@ abstract class BaseCollector
     }
 
     /**
-     * Ce collecteur a-t-il des informations pour la chronologie ?
+     * Ce collecteur a-t-il des informations pour la chronologie ?
      */
     public function hasTimelineData(): bool
     {
@@ -107,8 +116,8 @@ abstract class BaseCollector
     }
 
     /**
-     * Ce collecteur contient-il des données 
-	 * qui doivent être affichées dans l'onglet "Vars" ?
+     * Ce collecteur contient-il des données
+     * qui doivent être affichées dans l'onglet "Vars" ?
      */
     public function hasVarData(): bool
     {
@@ -117,7 +126,7 @@ abstract class BaseCollector
 
     /**
      * Obtient une collection de données qui doivent être affichées dans l'onglet "Vars".
-     * Le format est un tableau de sections, chacune avec son propre tableau de paires clé/valeur :
+     * Le format est un tableau de sections, chacune avec son propre tableau de paires clé/valeur :
      *
      *  $data = [
      *      'section 1' => [
@@ -136,10 +145,10 @@ abstract class BaseCollector
     }
 
     /**
-     * Les classes enfants doivent l'implémenter 
-	 * pour renvoyer les données de la chronologie formatées pour une utilisation correcte.
+     * Les classes enfants doivent l'implémenter
+     * pour renvoyer les données de la chronologie formatées pour une utilisation correcte.
      *
-     * Les données de la chronologie doivent être formatées dans des tableaux qui ressemblent à :
+     * Les données de la chronologie doivent être formatées dans des tableaux qui ressemblent à :
      *
      *  [
      *      'name'      => 'Database::Query',
@@ -149,9 +158,9 @@ abstract class BaseCollector
      *  ]
      */
     protected function formatTimelineData(): array
-	{
-		return [];
-	}
+    {
+        return [];
+    }
 
     /**
      * Renvoie les données de ce collecteur à formater dans la barre d'outils
@@ -172,7 +181,7 @@ abstract class BaseCollector
     }
 
     /**
-     * Ce collecteur a-t-il collecté des données ?
+     * Ce collecteur a-t-il collecté des données ?
      *
      * Si ce n'est pas le cas, le bouton de la barre d'outils ne s'affichera pas.
      */

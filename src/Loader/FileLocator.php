@@ -25,13 +25,13 @@ class FileLocator
         $paths = [
             // Chemin d'accès aux langues de l'application
             LANG_PATH . $locale . DS . $file,
-            
+
             // Chemin vers les langues du système
             SYST_PATH . 'Constants' . DS . 'language' . DS . $locale . DS . $file,
-            
+
             // Chemin d'accès aux langues de l'application
             LANG_PATH . config('app.language') . DS . $file,
-            
+
             // Chemin vers les langues du système
             SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
         ];
