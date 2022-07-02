@@ -473,6 +473,36 @@ class Helpers
     }
 
     /**
+     * Recherche l'URL de base de l'application independamment de la configuration de l'utilisateur
+     */
+    public static function findBaseUrl(): string
+    {
+        if (isset($_SERVER['SERVER_ADDR'])) {
+            $server_addr = $_SERVER['HTTP_HOST'] ?? ((strpos($_SERVER['SERVER_ADDR'], ':') !== false) ? '[' . $_SERVER['SERVER_ADDR'] . ']' : $_SERVER['SERVER_ADDR']);
+
+            if (isset($_SERVER['SERVER_PORT'])) {
+                $server_addr .= ':' . ((! preg_match('#:' . $_SERVER['SERVER_PORT'] . '$#', $server_addr)) ? $_SERVER['SERVER_PORT'] : '80');
+            }
+
+            if (
+                (! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+                || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+                || (! empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off')
+            ) {
+                $base_url = 'https';
+            } else {
+                $base_url = 'http';
+            }
+
+            $base_url .= '://' . $server_addr . dirname(substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], basename($_SERVER['SCRIPT_FILENAME']))));
+        } else {
+            $base_url = 'http://localhost:' . ($_SERVER['SERVER_PORT'] ?? '80');
+        }
+
+        return $base_url;
+    }
+
+    /**
      * Jolie fonction de commodité d'impression JSON.
      *
      * Dans les terminaux, cela agira de la même manière que json_encode() avec JSON_PRETTY_PRINT directement, lorsqu'il n'est pas exécuté sur cli
