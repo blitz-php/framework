@@ -36,7 +36,7 @@ final class Console extends Application
      */
     public function registerCommands()
     {
-        
+        $this->addCommand(\BlitzPHP\Cli\Commands\Server\Serve::class);
     }
 
     /**
