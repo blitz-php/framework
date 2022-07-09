@@ -14,5 +14,6 @@ return [
     Psr\Container\ContainerInterface::class                   => service('container'),
     Psr\Http\Message\ResponseInterface::class                 => service('response'),
     Psr\Http\Message\ServerRequestInterface::class            => service('request'),
+    Psr\Log\LoggerInterface::class                            => service('logger'),
     Psr\SimpleCache\CacheInterface::class                     => service('cache'),
 ];
