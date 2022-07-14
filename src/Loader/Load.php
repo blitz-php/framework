@@ -52,6 +52,25 @@ class Load
     }
 
     /**
+     * Charge un fichier d'aide
+     *
+     * @param string|array $helpers
+     * @throws LoadException
+     * @throws InvalidArgumentException
+     */
+    public static function helper(string|array $helpers)
+    {
+        if (empty($helpers)) {
+            throw new LoadException('Veuillez specifier le helper à charger');
+        }
+
+        $helpers = (array) $helpers;
+        foreach ($helpers As $helper) {
+           FileLocator::helper($helper);
+        }
+    }
+
+    /**
      * Verifie si un element est chargé dans la liste des modules
      *
      * @param $element

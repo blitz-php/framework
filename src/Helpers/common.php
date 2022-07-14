@@ -14,6 +14,7 @@ use BlitzPHP\Core\App;
 use BlitzPHP\HTTP\Redirection;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
+use BlitzPHP\Loader\Load;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Helpers;
 use Kint\Kint;
@@ -51,7 +52,7 @@ if (! function_exists('helper')) {
      */
     function helper($filenames)
     {
-        // Load::helper($filenames);
+        Load::helper($filenames);
     }
 }
 
