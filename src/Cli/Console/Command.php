@@ -43,7 +43,7 @@ abstract class Command
      *
      * @var string
      */
-    protected $usage;
+    protected $usage = '';
 
     /**
      * La description courte de la commande

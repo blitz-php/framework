@@ -19,7 +19,7 @@ class Serve extends Command
     protected $name = 'serve';
 
     /** @var string Description */
-    protected $description = 'Launches the BlitzPHP Development Server.';
+    protected $description = 'Lance le serveur de développement BlitzPHP.';
 
     /** @var string Usage */
     protected $usage = 'php klinge serve';
