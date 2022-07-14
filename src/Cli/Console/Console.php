@@ -5,7 +5,9 @@ namespace BlitzPHP\Cli\Console;
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command As AhcCommand;
 use BlitzPHP\Exceptions\CLIException;
+use BlitzPHP\Loader\Filesystem;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\Utilities\Str;
 
 /**
  * Classe abstraite pour le fonctionnement de la console
@@ -27,6 +29,8 @@ final class Console extends Application
         $this->logo($this->logos[array_rand($this->logos)]);
 
         $this->suppress = $suppress;
+
+        $this->registerCommands();
     }
 
     /**
@@ -34,9 +38,28 @@ final class Console extends Application
      *
      * @return void
      */
-    public function registerCommands()
+    private function registerCommands()
     {
-        $this->addCommand(\BlitzPHP\Cli\Commands\Server\Serve::class);
+        // Collection des commandes système
+        $path = SYST_PATH . 'Cli' . DS . 'Commands' . DS;
+        if (Filesystem::isDirectory($path)) {
+            foreach (Filesystem::allFiles($path) as $file) {
+                $name = str_replace([$path, '.'.$file->getExtension(), DS], ['', '', '\\'], $file->getPathname());
+                
+                if (! Str::contains($name, 'Generators'.DS.'Views')) {
+                    $this->addCommand('\BlitzPHP\Cli\Commands\\' . $name);
+                }
+            }
+        }
+
+        // Collection des commandes definies par l'utilisateur
+        $path = APP_PATH . 'Commands' . DS;
+        if (Filesystem::isDirectory($path)) {
+            foreach (Filesystem::allFiles($path) as $file) {
+                $name = str_replace([$path, '.'.$file->getExtension(), DS], ['', '', '\\'], $file->getPathname());
+                $this->addCommand('\\'.trim(APP_NAMESPACE, '/\\').'\Commands\\' . $name);
+            }
+        }
     }
 
     /**
@@ -50,7 +73,7 @@ final class Console extends Application
             throw new CLIException("La classe `$commandName` n'existe pas");
         }
         
-        $instance = Services::container()->make($commandName, [$this]);
+        $instance =  new $commandName($this, Services::logger());
         
         if (! ($instance instanceof Command)) {
             throw CLIException::invalidCommand($commandName);
@@ -109,7 +132,7 @@ final class Console extends Application
             if (!$console->suppress) {
                 $console->start($instance->service);
             }
-
+            
             $result = $instance->execute($command->values(false));
 
             if (!$console->suppress) {
@@ -128,7 +151,7 @@ final class Console extends Application
      *
      * @return void
      */
-    public function start(string $service)
+    private function start(string $service)
     {
         $io = $this->io();
 
@@ -145,7 +168,7 @@ final class Console extends Application
      *
      * @return void
      */
-    public function end()
+    private function end()
     {
         $io = $this->io();
         
@@ -155,7 +178,11 @@ final class Console extends Application
         $io->writer()->bold->info($info, true);
     }
 
-
+    /**
+     * Differents logos
+     *
+     * @var array
+     */
     private $logos = [
         '
         /$$$$$$$  /$$ /$$   /$$              /$$$$$$$  /$$   /$$ /$$$$$$$ 
