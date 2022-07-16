@@ -54,6 +54,15 @@ class RouteCollection implements RouteCollectionInterface
      * @var string
      */
     protected $defaultPlaceholder = 'any';
+    
+    /**
+     * S'il faut convertir les tirets en traits de soulignement dans l'URI.
+     *
+     * Non utilisé ici. Valeur d'intercommunication pour la classe Routeur.
+     *
+     * @var bool
+     */
+    protected $translateURIDashes = true;
 
     /**
      * S'il faut faire correspondre l'URI aux contrôleurs
@@ -206,14 +215,7 @@ class RouteCollection implements RouteCollectionInterface
     } */
 
     /**
-     * Enregistre une nouvelle contrainte auprès du système. Les contraintes sont utilisées
-     * par les routes en tant qu'espaces réservés pour les expressions régulières afin de définir
-     * les parcours plus humains.
-     *
-     * Vous pouvez passer un tableau associatif en tant que $placeholder et avoir
-     * plusieurs espaces réservés ajoutés à la fois.
-     *
-     * @param array|string $placeholder
+     * {@inheritDoc}
      */
     public function addPlaceholder($placeholder, ?string $pattern = null): self
     {
@@ -227,7 +229,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Définit l'espace de noms par défaut à utiliser pour les contrôleurs lorsqu'aucun autre n'a été spécifié.
+     * {@inheritDoc}
      */
     public function setDefaultNamespace(string $value): self
     {
@@ -238,7 +240,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Définit le contrôleur par défaut à utiliser lorsqu'aucun autre contrôleur n'a été spécifié.
+     * {@inheritDoc}
      */
     public function setDefaultController(string $value): self
     {
@@ -248,8 +250,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Définit la méthode par défaut pour appeler le contrôleur lorsqu'aucun autre
-     * méthode a été définie dans la route.
+     * {@inheritDoc}
      */
     public function setDefaultMethod(string $value): self
     {
@@ -259,11 +260,17 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Si TRUE, le système tentera de faire correspondre l'URI avec
-     * Contrôleurs en faisant correspondre chaque segment avec des dossiers/fichiers
-     * dans CONTROLLER_PATH, lorsqu'aucune correspondance n'a été trouvée pour les routes définies.
-     *
-     * Si FAUX, la recherche s'arrêtera et n'effectuera AUCUN routage automatique.
+     * {@inheritDoc}
+     */
+    public function setTranslateURIDashes(bool $value): self
+    {
+        $this->translateURIDashes = $value;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function setAutoRoute(bool $value): self
     {
@@ -273,12 +280,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
-     * Il peut s'agir soit d'une closure, soit d'un contrôleur/méthode exactement comme une route est définie : Users::index
-     *
-     * Ce paramètre est transmis à la classe Routeur et y est géré.
-     *
-     * @param callable|null $callable
+     * {@inheritDoc}
      */
     public function set404Override($callable = null): self
     {
@@ -288,9 +290,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Renvoie le paramètre 404 Override, qui peut être nul, une fermeture une chaîne contrôleur/méthode.
-     *
-     * @return Closure|string|null
+     * {@inheritDoc}
      */
     public function get404Override()
     {
@@ -337,7 +337,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Renvoie le nom du contrôleur par défaut. Avec l'espace de noms.
+     * {@inheritDoc}
      */
     public function getDefaultController(): string
     {
@@ -345,7 +345,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Renvoie le nom de la méthode par défaut à utiliser dans le contrôleur.
+     * {@inheritDoc}
      */
     public function getDefaultMethod(): string
     {
@@ -353,7 +353,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Renvoie l'espace de noms par défaut tel qu'il est défini dans le fichier de configuration Routes.
+     * {@inheritDoc}
      */
     public function getDefaultNamespace(): string
     {
@@ -361,7 +361,15 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Returns the flag that tells whether to autoRoute URI against Controllers.
+     *{@inheritDoc}
+     */
+    public function shouldTranslateURIDashes(): bool
+    {
+        return $this->translateURIDashes;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function shouldAutoRoute(): bool
     {
@@ -369,7 +377,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Returns the raw array of available routes.
+     * {@inheritDoc}
      */
     public function getRoutes(?string $verb = null, bool $withName = false): array
     {
@@ -378,17 +386,17 @@ class RouteCollection implements RouteCollectionInterface
         }
         $verb = strtolower($verb);
 
-        // Since this is the entry point for the Router,
-        // take a moment to do any route discovery
-        // we might need to do.
+        // Puisqu'il s'agit du point d'entrée du routeur, 
+        // prenez un moment pour faire toute découverte de route 
+        // que nous pourrions avoir besoin de faire.
         $this->discoverRoutes();
 
         $routes     = [];
         $collection = [];
 
         if (isset($this->routes[$verb])) {
-            // Keep current verb's routes at the beginning so they're matched
-            // before any of the generic, "add" routes.
+            // Conserve les itinéraires du verbe actuel au début afin qu'ils soient 
+            // mis en correspondance avant l'un des itinéraires génériques "add".
             if (isset($this->routes['*'])) {
                 $extraRules = array_diff_key($this->routes['*'], $this->routes[$verb]);
                 $collection = array_merge($this->routes[$verb], $extraRules);
@@ -408,7 +416,7 @@ class RouteCollection implements RouteCollectionInterface
             }
         }
 
-        // sorting routes by priority
+        // tri des routes par priorité
         if ($this->prioritizeDetected && $this->prioritize && $routes !== []) {
             $order = [];
 
@@ -436,7 +444,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Renvoie le verbe HTTP actuellement utilisé.
+     * {@inheritDoc}
      */
     public function getHTTPVerb(): string
     {
@@ -444,8 +452,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Définit le verbe HTTP actuel.
-     * Utilisé principalement pour les tests.
+     * {@inheritDoc}
      */
     public function setHTTPVerb(string $verb): self
     {
@@ -469,12 +476,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Ajoute une seule route à la collection.
-     *
-     * Example:
-     *      $routes->add('news', 'Posts::index');
-     *
-     * @param array|Closure|string $to
+     * {@inheritDoc}
      */
     public function add(string $from, $to, ?array $options = null): self
     {
@@ -507,7 +509,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Détermine si la route est une route de redirection.
+     * {@inheritDoc}
      */
     public function isRedirect(string $from): bool
     {
@@ -522,7 +524,7 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Récupère le code d'état HTTP d'une route de redirection.
+     * {@inheritDoc}
      */
     public function getRedirectCode(string $from): int
     {
@@ -899,31 +901,16 @@ class RouteCollection implements RouteCollectionInterface
      * Limite les itinéraires à un ENVIRONNEMENT spécifié ou ils ne fonctionneront pas.
      */
     public function environment(string $env, Closure $callback): self
-    {
-        /*
-        if ($env === ENVIRONMENT) {
+    {  
+        if ($env === config('app.environment')) {
             $callback($this);
-        }*/
+        }
 
         return $this;
     }
 
     /**
-     * Tente de rechercher une route en fonction de sa destination.
-     *
-     * Si une route existe :
-     *
-     * 'path/(:any)/(:any)' => 'Controller::method/$1/$2'
-     *
-     * Cette méthode vous permet de connaître le contrôleur et la méthode
-     * et obtenir la route qui y mène.
-     *
-     * // Égal à 'chemin/$param1/$param2'
-     * reverseRoute('Controller::method', $param1, $param2);
-     *
-     * @param mixed ...$params
-     *
-     * @return false|string
+     * {@inheritDoc}
      */
     public function reverseRoute(string $search, ...$params)
     {
@@ -1271,5 +1258,44 @@ class RouteCollection implements RouteCollectionInterface
         $this->prioritize = $enabled;
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRegisteredControllers(?string $verb = '*'): array
+    {
+        $routes = [];
+
+        if ($verb === '*') {
+            $rawRoutes = [];
+
+            foreach ($this->defaultHTTPMethods as $tmpVerb) {
+                $rawRoutes = array_merge($rawRoutes, $this->routes[$tmpVerb]);
+            }
+
+            foreach ($rawRoutes as $route) {
+                $key     = key($route['route']);
+                $handler = $route['route'][$key];
+
+                $routes[$key] = $handler;
+            }
+        } else {
+            $routes = $this->getRoutes($verb);
+        }
+
+        $controllers = [];
+
+        foreach ($routes as $handler) {
+            if (! is_string($handler)) {
+                continue;
+            }
+
+            [$controller] = explode('::', $handler, 2);
+
+            $controllers[] = $controller;
+        }
+
+        return array_unique($controllers);
     }
 }
