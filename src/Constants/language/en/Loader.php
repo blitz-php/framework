@@ -11,6 +11,7 @@
 
 // Files language settings
 return [
+    'helperNotFound'               => 'The helper `{0}` was found',
     'langNotFound'                 => 'No translation file for `{0}` was found',
     'providersDefinitionDontExist' => 'Unable to load system services definition file. The `{0}` file does not exist or cannot be read.',
 ];

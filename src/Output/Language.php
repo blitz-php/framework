@@ -12,7 +12,7 @@
 namespace BlitzPHP\Output;
 
 use BlitzPHP\Config\Config;
-use BlitzPHP\Loader\FileLocator;
+use BlitzPHP\Loader\Load;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Arr;
 use MessageFormatter;
@@ -211,7 +211,7 @@ class Language
             $this->language[$locale][$file] = [];
         }
 
-        $lang = FileLocator::lang($file, $locale);
+        $lang = Load::lang($file, $locale);
 
         if ($return) {
             return $lang;

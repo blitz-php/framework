@@ -24,6 +24,11 @@ class LoadException extends OutOfBoundsException implements ExceptionInterface
      */
     protected $code = 404;
 
+    public static function fileNotFound(string $path)
+    {
+        return new static(lang('Files.fileNotFound', [$path]));
+    }
+
     public static function helperNotFound(string $helper): self
     {
         return new static(self::lang('Loader.helperNotFound', [$helper]));
@@ -67,10 +72,5 @@ class LoadException extends OutOfBoundsException implements ExceptionInterface
     public static function providersDefinitionDontExist(string $filename): self
     {
         return new static('Unable to load system services definition file. The `' . $filename . '` file does not exist or cannot be read.');
-    }
-
-    public static function fileNotFound(string $filename): self
-    {
-        return new static('The `' . $filename . '` file does not exist or cannot be read.');
     }
 }
