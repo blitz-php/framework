@@ -10,7 +10,6 @@
  */
 
 use BlitzPHP\Config\Config;
-use BlitzPHP\Core\App;
 use BlitzPHP\HTTP\Redirection;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
@@ -323,95 +322,6 @@ if (! function_exists('is_ajax_request')) {
     }
 }
 
-// ================================= FONCTIONS DE MANIPULATION D'URL ================================= //
-
-if (! function_exists('site_url')) {
-    /**
-     * Renvoie une URL de site telle que définie par la configuration de l'application.
-     *
-     * @param mixed $relativePath Chaîne d'URI ou tableau de segments d'URI
-     */
-    function site_url($relativePath = '', ?string $scheme = null): string
-    {
-        if (is_array($relativePath)) {
-            $relativePath = implode('/', $relativePath);
-        }
-
-        $uri = App::getUri($relativePath);
-
-        return Uri::createURIString(
-            $scheme ?? $uri->getScheme(),
-            $uri->getAuthority(),
-            $uri->getPath(),
-            $uri->getQuery(),
-            $uri->getFragment()
-        );
-    }
-}
-
-if (! function_exists('base_url')) {
-    /**
-     * Créez une URL locale basée sur votre chemin de base.
-     * Les segments peuvent être transmis sous forme de chaîne ou de tableau, comme site_url
-     * ou une URL vers un fichier peut être transmise, par ex. à un fichier image.
-     *
-     * @param mixed $uri
-     */
-    function base_url($uri = '', ?string $protocol = null): string
-    {
-        return '';
-        // return Helpers::base_url($uri, $protocol);
-    }
-}
-
-if (! function_exists('current_url')) {
-    /**
-     * Current URL
-     *
-     * Returns the full URL (including segments) of the page where this
-     * function is placed
-     *
-     * @param bool $returnObject True to return an object instead of a strong
-     *
-     * @return \BlitzPHP\Http\Uri|string
-     */
-    function current_url(bool $returnObject = false)
-    {
-        $uri = Services::uri(site_url($_SERVER['REQUEST_URI']));
-
-        // Since we're basing off of the IncomingRequest URI,
-        // we are guaranteed to have a host based on our own configs.
-        return $returnObject
-            ? $uri
-            : (string) $uri->setQuery('');
-    }
-}
-
-if (! function_exists('previous_url')) {
-    /**
-     * Renvoie l'URL précédente sur laquelle se trouvait le visiteur actuel. Pour des raisons de sécurité
-     * nous vérifions d'abord une variable de session enregistrée, si elle existe, et l'utilisons.
-     * Si ce n'est pas disponible, cependant, nous utiliserons une URL épurée de $_SERVER['HTTP_REFERER']
-     * qui peut être défini par l'utilisateur, il n'est donc pas fiable et n'est pas défini par certains navigateurs/serveurs.
-     *
-     * @return \BlitzPHP\Http\Uri|mixed|string
-     */
-    function previous_url(bool $returnObject = false)
-    {
-        // Récupérez d'abord la session, si nous l'avons,
-        // car c'est plus fiable et plus sûr.
-        // Sinon, récupérez une version épurée de $_SERVER.
-        $referer = $_SESSION['_blitz_previous_url'] ?? null;
-        if (false === filter_var($referer, FILTER_VALIDATE_URL)) {
-            $referer = Services::request()->getServer('HTTP_REFERER', FILTER_SANITIZE_URL);
-        }
-
-        $referer ??= site_url('/');
-
-        return $returnObject ? Services::uri($referer) : $referer;
-    }
-}
-
 if (! function_exists('redirection')) {
     /**
      * Redirige l'utilisateur
@@ -464,13 +374,6 @@ if (! function_exists('link_to')) {
     }
 }
 
-if (! function_exists('clean_url')) {
-    function clean_url(string $url): string
-    {
-        return Helpers::cleanUrl($url);
-    }
-}
-
 if (! function_exists('clean_path')) {
     /**
      * Une méthode pratique pour nettoyer les chemins pour
@@ -479,7 +382,6 @@ if (! function_exists('clean_path')) {
      */
     function clean_path(string $path): string
     {
-        // Resolve relative paths
         $path = realpath($path) ?: $path;
 
         switch (true) {

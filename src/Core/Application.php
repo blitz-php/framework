@@ -58,9 +58,10 @@ class Application
         self::checkRequirements();
 
         /**
-         * On charge le helper global
+         * On charge les helpers `common` et `url` qui sont utilisés par le framework et presque toutes les applications
          */
         FileLocator::helper('common');
+        FileLocator::helper('url');
 
         /**
          * On initialise le parsing du fichier .env
