@@ -1,8 +1,10 @@
 <?php
 
 use BlitzPHP\Exceptions\PageNotFoundException;
+use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Router\RouteCollection;
+use BlitzPHP\Spec\Middlewares\CustomMiddleware;
 
 describe("Router", function() {
     beforeEach(function() {
@@ -304,5 +306,219 @@ describe("Router", function() {
             })->toThrow(new PageNotFoundException());
         });
 
+    });
+
+    describe('Route', function() {
+        it(': Message d\'exception quand la route n\'existe pas', function() {
+            $this->collection->setAutoRoute(false);
+            $router = Services::router($this->collection, $this->request, false);
+
+            expect(function() use ($router) {
+                $router->handle('url/not-exists');
+            })->toThrow(new PageNotFoundException("Can't find a route for 'get: url/not-exists'."));
+        });
+        
+        it(': Détection de la langue', function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('fr/pages');
+    
+            expect($router->hasLocale())->toBeTruthy();
+            expect($router->getLocale())->toBe('fr');
+            
+            $router->handle('test/123/lang/bg');
+
+            expect($router->hasLocale())->toBeTruthy();
+            expect($router->getLocale())->toBe('bg');
+        });
+
+        it(': Route resource', function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('admin/admins');
+
+            expect($router->controllerName())->toBe('App\Admin\AdminsController');
+            expect($router->methodName())->toBe('list_all');
+        });
+
+        it(': Route avec barre oblique dans le nom du contrôleur', function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            expect(function() use ($router) {
+                $router->handle('admin/admins/edit/1');
+            })->toThrow(new RouterException( 'The namespace delimiter is a backslash (\), not a slash (/). Route handler: \App/Admin/Admins::edit_show/$1'));
+        });
+
+        it(': Route avec barre oblique en tête', function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('some/slash');
+
+            expect($router->controllerName())->toBe('App\SlashController');
+            expect($router->methodName())->toBe('index');
+        });
+
+        it(': Routage avec contrôleur dynamique', function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            expect(function() use ($router) {
+                $router->handle('en/zoo/bar');
+            })->toThrow(new RouterException('A dynamic controller is not allowed for security reasons. Route handler: \$2::$3/$1'));
+        
+        });
+
+        it(': Options de route', function() {
+            $this->collection->add('foo', static function () {}, [
+                'as'  => 'login',
+                'foo' => 'baz',
+            ]);
+            $this->collection->add('baz', static function () {}, [
+                'as'  => 'admin',
+                'foo' => 'bar',
+            ]);
+            
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('foo');
+
+            expect($router->getMatchedRouteOptions())->toBe(['as' => 'login', 'foo' => 'baz']);
+        });
+
+        it(': Ordre de routage', function() {
+            $this->collection->post('auth', 'Main::auth_post');
+            $this->collection->add('auth', 'Main::index');
+            
+            $router = Services::router($this->collection, $this->request, false);
+            $this->collection->setHTTPVerb('post');
+
+            $router->handle('auth');
+
+            expect($router->controllerName())->toBe('MainController');
+            expect($router->methodName())->toBe('auth_post');
+        });
+
+        it(': Ordre de priorité de routage', function() {
+            $this->collection->add('main', 'Main::index');
+            $this->collection->add('(.*)', 'Main::wildcard', ['priority' => 1]);
+            $this->collection->add('module', 'Module::index');
+            
+            $router = Services::router($this->collection, $this->request, false);
+            $this->collection->setHTTPVerb('get');
+
+            $router->handle('module');
+            expect($router->controllerName())->toBe('MainController');
+            expect($router->methodName())->toBe('wildcard');
+
+            $this->collection->setPrioritize();
+
+            $router->handle('module');
+            expect($router->controllerName())->toBe('ModuleController');
+            expect($router->methodName())->toBe('index');
+        });
+    });
+
+    describe('Groupes et middlewares', function() {
+        it(': Le routeur fonctionne avec les middlewares', function() {
+            $this->collection->group('foo', ['filter' => 'test'], static function (RouteCollection $routes) {
+                $routes->add('bar', 'TestController::foobar');
+            });
+            
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('foo/bar');
+            expect($router->controllerName())->toBe('TestController');
+            expect($router->methodName())->toBe('foobar');
+            expect($router->getMiddlewares())->toBe(['test']);
+        });
+
+        it(': Le routeur fonctionne avec un nom de classe comme filtre', function() {
+            $this->collection->add('foo', 'TestController::foo', ['filter' => CustomMiddleware::class]);
+            
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('foo');
+            expect($router->controllerName())->toBe('TestController');
+            expect($router->methodName())->toBe('foo');
+            expect($router->getMiddlewares())->toBe([CustomMiddleware::class]);
+        });
+
+        it(': Le routeur fonctionne avec plusieurs middlewares', function() {
+            $this->collection->add('foo', 'TestController::foo', ['filter' => ['filter1', 'filter2:param']]);
+            
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('foo');
+            expect($router->controllerName())->toBe('TestController');
+            expect($router->methodName())->toBe('foo');
+            expect($router->getMiddlewares())->toBe(['filter1', 'filter2:param']);
+        });
+        
+        it(': Correspond correctement aux verbes mixtes', function() {
+            $this->collection->setHTTPVerb('get');
+
+            $this->collection->add('/', 'Home::index');
+            $this->collection->get('news', 'News::index');
+            $this->collection->get('news/(:segment)', 'News::view/$1');
+            $this->collection->add('(:any)', 'Pages::view/$1');
+            
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('/');
+            expect($router->controllerName())->toBe('HomeController');
+            expect($router->methodName())->toBe('index');
+
+            $router->handle('news');
+            expect($router->controllerName())->toBe('NewsController');
+            expect($router->methodName())->toBe('index');
+
+            $router->handle('news/daily');
+            expect($router->controllerName())->toBe('NewsController');
+            expect($router->methodName())->toBe('view');
+
+            $router->handle('about');
+            expect($router->controllerName())->toBe('PagesController');
+            expect($router->methodName())->toBe('view');
+        });
+    });
+
+    describe('Traduction des tirets d\'URI', function() {
+        it(': Traduire les tirets URI', function() {
+            $this->collection->setTranslateURIDashes(true);
+            
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('user-setting/show-list');
+            expect($router->controllerName())->toBe('User_settingController');
+            expect($router->methodName())->toBe('show_list');
+        });
+
+        it(': Traduire les tirets URI pour les paramètres', function() {
+            $this->collection->setTranslateURIDashes(true);
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('user-setting/2018-12-02');
+            expect($router->controllerName())->toBe('User_settingController');
+            expect($router->methodName())->toBe('detail');
+            expect($router->params())->toBe(['2018-12-02']);
+        });
+
+        it(': Traduire les tirets URI pour l\'autorouter', function() {
+            $this->collection->setAutoRoute(true);
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->autoRoute('admin-user/show-list');
+            expect($router->controllerName())->toBe('Admin_userController');
+            expect($router->methodName())->toBe('show_list');
+        });
+        
+        it(': La route automatique correspond à zéro paramètre', function() {
+            $this->collection->setAutoRoute(true);
+            $router = Services::router($this->collection, $this->request, false);
+    
+            $router->autoRoute('myController/someMethod/0/abc');
+            expect($router->controllerName())->toBe('MyController');
+            expect($router->methodName())->toBe('someMethod');
+            expect($router->params())->toBe(['0', 'abc']);
+        });
     });
 });

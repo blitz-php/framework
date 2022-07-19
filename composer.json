@@ -49,6 +49,11 @@
             "BlitzPHP\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "BlitzPHP\\Spec\\": "spec/_support/"
+        }
+    },
     "scripts": {
         "analyze": "phpstan analyse",
         "test": "kahlan",

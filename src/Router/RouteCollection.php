@@ -976,7 +976,7 @@ class RouteCollection implements RouteCollectionInterface
     {
         $options = $this->loadRoutesOptions($verb);
 
-        return isset($options[$search]['filter']);
+        return isset($options[$search]['middlewares']) || isset($options[$search]['filter']);
     }
 
     /**
@@ -993,11 +993,9 @@ class RouteCollection implements RouteCollectionInterface
     {
         $options = $this->loadRoutesOptions($verb);
 
-        if (is_string($options[$search]['filter'])) {
-            return [$options[$search]['filter']];
-        }
+        $middlewares = $options[$search]['middlewares'] ?? ($options[$search]['filter'] ?? []);
 
-        return $options[$search]['filter'] ?? [];
+        return (array) $middlewares;
     }
 
     /**
