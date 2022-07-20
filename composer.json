@@ -29,7 +29,8 @@
         }
     },
 	"suggest": {
-        "firebase/php-jwt": "Réquis pour la gestion des token JWT via le helper `\\BlitzPHP\\Utilities\\Jwt`"
+        "firebase/php-jwt": "Réquis pour la gestion des token JWT via le helper `\\BlitzPHP\\Utilities\\Jwt`",
+		"jawira/case-converter": "Réquis pour la convertion des chaîne de caractère via le helper `\\BlitzPHP\\Utilities\\Str`"
     },
     "support": {
         "issues": "https://github.com/blitz-php/utilities/issues",
