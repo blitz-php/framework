@@ -429,6 +429,26 @@ class Router implements RouterInterface
     }
 
     /**
+     * Définit le sous-répertoire dans lequel se trouve le contrôleur.
+     *
+     * @param bool $validate si vrai, vérifie que $dir se compose uniquement de segments conformes à PSR4
+     *
+     * @deprecated Cette méthode sera retirée
+     */
+    public function setDirectory(?string $dir = null, bool $append = false, bool $validate = true)
+    {
+        if (empty($dir)) {
+            $this->directory = null;
+
+            return;
+        }
+
+        if ($this->autoRouter instanceof AutoRouter) {
+            $this->autoRouter->setDirectory($dir, $append, $validate);
+        }
+    }
+
+    /**
      * Définir la route de la requête
      *
      * Prend un tableau de segments URI en entrée et définit la classe/méthode
@@ -496,11 +516,11 @@ class Router implements RouterInterface
      */
     private function makeController(string $name): string
     {
-        return preg_replace(
-            ['#Controller$#', '#' . config('app.url_suffix') . '$#i'],
-            '',
-            ucfirst($name)
-        ) . 'Controller';
+        if ($this->autoRouter instanceof AutoRouter) {
+            return $this->autoRouter->makeController($name);
+        }
+
+        return $name;
     }
 
     /**

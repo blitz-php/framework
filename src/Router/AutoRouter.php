@@ -13,41 +13,41 @@ use BlitzPHP\Exceptions\PageNotFoundException;
 final class AutoRouter implements AutoRouterInterface
 {
     /**
-     * List of controllers registered for the CLI verb that should not be accessed in the web.
+     * Liste des contrôleurs enregistrés pour le verbe CLI qui ne doivent pas être accessibles sur le Web.
      *
      * @var class-string[]
      */
     private array $protectedControllers;
 
     /**
-     * Sub-directory that contains the requested controller class.
-     * Primarily used by 'autoRoute'.
+     * Sous-répertoire contenant la classe contrôleur demandée.
+     * Principalement utilisé par 'autoRoute'.
      */
     private ?string $directory = null;
 
     /**
-     * The name of the controller class.
+     * Le nom de la classe du contrôleur.
      */
     private string $controller;
 
     /**
-     * The name of the method to use.
+     * Nom de la méthode à utiliser.
      */
     private string $method;
 
     /**
-     * Whether dashes in URI's should be converted
-     * to underscores when determining method names.
+     * Indique si les tirets dans les URI doivent être convertis 
+     * en traits de soulignement lors de la détermination des noms de méthode.
      */
     private bool $translateURIDashes;
 
     /**
-     * HTTP verb for the request.
+     * Verbe HTTP pour la requête.
      */
     private string $httpVerb;
 
     /**
-     * Default namespace for controllers.
+     * Espace de noms par défaut pour les contrôleurs.
      */
     private string $defaultNamespace;
 
@@ -69,8 +69,8 @@ final class AutoRouter implements AutoRouterInterface
     }
 
     /**
-     * Attempts to match a URI path against Controllers and directories
-     * found in APPPATH/Controllers, to find a matching route.
+     * Tente de faire correspondre un chemin d'URI avec les contrôleurs et 
+     * les répertoires trouvés dans CONTROLLER_PATH, pour trouver une route correspondante.
      *
      * @return array [directory_name, controller_name, controller_method, params]
      */
@@ -293,10 +293,10 @@ final class AutoRouter implements AutoRouterInterface
     /**
      * Construit un nom de contrôleur valide
      */
-    private function makeController(string $name): string
+    public function makeController(string $name): string
     {
         return preg_replace(
-            ['#Controller$#', '#' . config('app.url_suffix') . '$#i'],
+            ['#(\_)?Controller$#i', '#' . config('app.url_suffix') . '$#i'],
             '',
             ucfirst($name)
         ) . 'Controller';

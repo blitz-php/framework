@@ -306,6 +306,36 @@ describe("Router", function() {
             })->toThrow(new PageNotFoundException());
         });
 
+        it(": Méthode de routage automatique Vide", function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('Home/');
+            expect($router->controllerName())->toBe('HomeController');
+            expect($router->methodName())->toBe('index');
+            
+            $router->handle('Home');
+            expect($router->controllerName())->toBe('HomeController');
+            expect($router->methodName())->toBe('index');
+        });
+        
+        it(": Répertoire prioritaire du routeur", function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->setDirectory('foo/bar/baz', false, true);
+            $router->handle('Some_controller/some_method/param1/param2/param3');
+
+            expect($router->directory())->toBe('foo/bar/baz/');
+            expect($router->controllerName())->toBe('SomeController');
+            expect($router->methodName())->toBe('some_method');
+        });
+        
+        it(": Définir le répertoire valide", function() {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->setDirectory('foo/bar/baz', false, true);
+
+            expect($router->directory())->toBe('foo/bar/baz/');
+        });
     });
 
     describe('Route', function() {
@@ -414,6 +444,27 @@ describe("Router", function() {
             $router->handle('module');
             expect($router->controllerName())->toBe('ModuleController');
             expect($router->methodName())->toBe('index');
+        });
+
+        it(': Expression régulière avec Unicode', function() {
+            $this->collection->get('news/([a-z0-9\x{0980}-\x{09ff}-]+)', 'News::view/$1');
+            $router = Services::router($this->collection, $this->request, false);
+          
+            $router->handle('news/a0%E0%A6%80%E0%A7%BF-');
+            expect($router->controllerName())->toBe('NewsController');
+            expect($router->methodName())->toBe('view');
+            expect($router->params())->toBe(['a0ঀ৿-']);
+        });
+        
+        it(': Espace réservé d\'expression régulière avec Unicode', function() {
+            $this->collection->addPlaceholder('custom', '[a-z0-9\x{0980}-\x{09ff}-]+');
+            $this->collection->get('news/(:custom)', 'News::view/$1');
+            $router = Services::router($this->collection, $this->request, false);
+          
+            $router->handle('news/a0%E0%A6%80%E0%A7%BF-');
+            expect($router->controllerName())->toBe('NewsController');
+            expect($router->methodName())->toBe('view');
+            expect($router->params())->toBe(['a0ঀ৿-']);
         });
     });
 
