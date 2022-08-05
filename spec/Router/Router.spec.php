@@ -4,7 +4,7 @@ use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Router\RouteCollection;
-use BlitzPHP\Spec\Middlewares\CustomMiddleware;
+use BlitzPHP\Spec\App\Middlewares\CustomMiddleware;
 
 describe("Router", function() {
     beforeEach(function() {

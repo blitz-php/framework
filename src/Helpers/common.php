@@ -432,6 +432,7 @@ if (! function_exists('dump')) {
      */
     function dump(...$vars)
     {
+        Kint::$aliases[] = 'dump';
         Kint::dump(...$vars);
     }
 }
