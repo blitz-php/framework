@@ -16,7 +16,7 @@ return Expect::structure([
     'allowed_methods' => Expect::listOf('string')->default(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
     'format'          => Expect::string()->default('json'),
     'strict'          => Expect::bool()->default(true),
-    'fields'          => Expect::arrayOf('string', 'string'),
+    'field'           => Expect::arrayOf('string', 'string'),
     'ip_blacklist'    => Expect::listOf('string'),
     'ip_whitelist'    => Expect::listOf('string'),
     'ajax_only'       => Expect::bool()->default(false),
