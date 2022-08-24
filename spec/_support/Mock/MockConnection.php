@@ -6,6 +6,8 @@ use BlitzPHP\Database\BaseConnection;
 
 class MockConnection extends BaseConnection
 {
+    public $escapeChar = '';
+
     protected $returnValues = [];
 
     /**
@@ -129,7 +131,7 @@ class MockConnection extends BaseConnection
      *
      * @return mixed
      */
-    protected function execute(string $sql)
+    protected function execute(string $sql, array $params = [])
     {
         return $this->returnValues['execute'];
     }
@@ -138,6 +140,14 @@ class MockConnection extends BaseConnection
      * Returns the total number of rows affected by this query.
      */
     public function affectedRows(): int
+    {
+        return 1;
+    }
+    
+    /**
+     * Returns the total number of rows affected by this query.
+     */
+    public function numRows(): int
     {
         return 1;
     }
