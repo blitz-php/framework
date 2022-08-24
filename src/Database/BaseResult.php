@@ -2,485 +2,369 @@
 namespace BlitzPHP\Database;
 
 use BlitzPHP\Contracts\Database\ResultInterface;
+use PDO;
 
-/**
- * Class BaseResult
- */
 abstract class BaseResult implements ResultInterface
 {
     /**
-     * Connection ID
-     *
-     * @var object|resource
-     */
-    public $connID;
-
-    /**
-     * Result ID
-     *
-     * @var false|object|resource
-     */
-    public $resultID;
-
-    /**
-     * Result Array
-     *
-     * @var array[]
-     */
-    public $resultArray = [];
-
-    /**
-     * Result Object
-     *
-     * @var object[]
-     */
-    public $resultObject = [];
-
-    /**
-     * Custom Result Object
+     * Details de la requete
      *
      * @var array
      */
-    public $customResultObject = [];
+    private $details = [
+        'num_rows'      => 0,
+		'affected_rows' => 0,
+		'insert_id'     => -1
+    ];
 
     /**
-     * Current Row index
+     * Database query object
      *
-     * @var int
+     * @var object|resource
      */
-    public $currentRow = 0;
+    protected $query;
 
     /**
-     * The number of records in the query result
-     *
-     * @var int|null
+     * @var BaseConnection
      */
-    protected $numRows;
+    protected $db;
 
     /**
-     * Row data
-     *
-     * @var array|null
+     * @var integer
      */
-    public $rowData;
+    private $currentRow = 0;
+
 
     /**
      * Constructor
      *
-     * @param object|resource $connID
-     * @param object|resource $resultID
+     * @param BaseConnection $db
+     * @param object|resource $query
      */
-    public function __construct(&$connID, &$resultID)
+    public function __construct(BaseConnection &$db, &$query)
     {
-        $this->connID   = $connID;
-        $this->resultID = $resultID;
+        $this->query = &$query;
+        $this->db = &$db;
+
+        // Service::event()->trigger('db.query', $this);
     }
 
     /**
-     * Retrieve the results of the query. Typically an array of
-     * individual data rows, which can be either an 'array', an
-     * 'object', or a custom class name.
-     *
-     * @param string $type The row type. Either 'array', 'object', or a class name to use
+     * Verifie si on utilise un objet pdo pour la connexion à la base de donnees
      */
-    public function getResult(string $type = 'object'): array
+    protected function isPdo(): bool
     {
-        if ($type === 'array') {
-            return $this->getResultArray();
-        }
+        return $this->db->isPdo();
+    }
+    
 
-        if ($type === 'object') {
-            return $this->getResultObject();
-        }
-
-        return $this->getCustomResultObject($type);
+    /**
+     * Fetch multiple rows from a select query.
+     *
+     * @param int|string $type
+     * @alias result()
+     */
+    public function all($type = PDO::FETCH_OBJ): array
+    {
+       return $this->result($type);
     }
 
     /**
-     * Returns the results as an array of custom objects.
+     * {@inheritDoc}
+     */
+    public function first($type = PDO::FETCH_OBJ)
+    {
+        $records = $this->result($type);
+
+        return empty($records) ? null : $records[0];
+    }
+    /**
+     * Recupere le premier resultat d'une requete en BD
      *
+     * @param int|string $type
      * @return mixed
+     * @alias first()
      */
-    public function getCustomResultObject(string $className)
+    public function one($type = PDO::FETCH_OBJ)
     {
-        if (isset($this->customResultObject[$className])) {
-            return $this->customResultObject[$className];
+        return $this->first($type);
+    }
+    
+    /**
+     * Recupere le dernier element des resultats d'une requete en BD
+     *
+     * @param int|string $type
+     * @return mixed Row
+     */
+    public function last($type = PDO::FETCH_OBJ)
+    {
+        $records = $this->all($type);
+
+        if (empty($records)) {
+            return null;
         }
 
-        if (is_bool($this->resultID) || ! $this->resultID) {
-            return [];
+        return $records[count($records) - 1];
+    }
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public function next($type = PDO::FETCH_OBJ)
+	{
+        $records = $this->result($type);
+
+		if (empty($records)) {
+			return null;
+		}
+
+		return isset($records[$this->currentRow + 1]) ? $records[++ $this->currentRow] : null;
+	}
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public function previous($type = PDO::FETCH_OBJ)
+	{
+		$records = $this->result($type);
+
+		if (empty($records)) {
+			return null;
+		}
+
+		if (isset($records[$this->currentRow - 1])) {
+			-- $this->currentRow;
+		}
+
+		return $records[$this->currentRow];
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+    public function row(int $index, $type = PDO::FETCH_OBJ)
+    {
+        $records = $this->result($type);
+
+        if (empty($records[$index])) {
+            return null;
         }
 
-        // Don't fetch the result set again if we already have it
-        $_data = null;
-        if (($c = count($this->resultArray)) > 0) {
-            $_data = 'resultArray';
-        } elseif (($c = count($this->resultObject)) > 0) {
-            $_data = 'resultObject';
+        return $records[$this->currentRow = $index];
+    }
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public function countField(): int
+	{
+        if ($this->isPdo()) {
+            return $this->query->columnCount();
         }
 
-        if ($_data !== null) {
-            for ($i = 0; $i < $c; $i++) {
-                $this->customResultObject[$className][$i] = new $className();
+        return $this->_countField();
+	}
 
-                foreach ($this->{$_data}[$i] as $key => $value) {
-                    $this->customResultObject[$className][$i]->{$key} = $value;
+    /**
+     * {@inheritDoc}
+     */
+    public function result($type = PDO::FETCH_OBJ) : array
+    {
+        $data = [];
+
+        if ($type === PDO::FETCH_OBJ OR $type === 'object') {
+            $data = $this->resultObject();
+        }
+        else if ($type === PDO::FETCH_ASSOC OR $type === 'array') {
+            $data = $this->resultArray();
+        }
+        else if (is_int($type) && $this->isPdo()) {
+            $this->query->setFetchMode($type);
+            $data = $this->query->fetchAll();
+            $this->query->closeCursor();
+        }
+        else if (is_string($type))
+        {
+            if (is_subclass_of($type, Entity::class)) {
+                $records = $this->resultArray();
+
+                foreach ($records As $key => $value) {
+                    if (!isset($data[$key])) {
+                        // $data[$key] = Hydrator::hydrate($value, $type);
+                    }
                 }
             }
-
-            return $this->customResultObject[$className];
-        }
-
-        if ($this->rowData !== null) {
-            $this->dataSeek();
-        }
-        $this->customResultObject[$className] = [];
-
-        while ($row = $this->fetchObject($className)) {
-            if (! is_subclass_of($row, Entity::class) && method_exists($row, 'syncOriginal')) {
-                $row->syncOriginal();
+            else if ($this->isPdo()) {
+                $this->query->setFetchMode(PDO::FETCH_CLASS, $type);
+                $data = $this->query->fetchAll();
+                $this->query->closeCursor();
             }
-
-            $this->customResultObject[$className][] = $row;
-        }
-
-        return $this->customResultObject[$className];
-    }
-
-    /**
-     * Returns the results as an array of arrays.
-     *
-     * If no results, an empty array is returned.
-     */
-    public function getResultArray(): array
-    {
-        if (! empty($this->resultArray)) {
-            return $this->resultArray;
-        }
-
-        // In the event that query caching is on, the result_id variable
-        // will not be a valid resource so we'll simply return an empty
-        // array.
-        if (is_bool($this->resultID) || ! $this->resultID) {
-            return [];
-        }
-
-        if ($this->resultObject) {
-            foreach ($this->resultObject as $row) {
-                $this->resultArray[] = (array) $row;
+            else {
+                $data = $this->_result($type);
             }
-
-            return $this->resultArray;
         }
 
-        if ($this->rowData !== null) {
-            $this->dataSeek();
-        }
+        $this->details['num_rows'] = count($data);
 
-        while ($row = $this->fetchAssoc()) {
-            $this->resultArray[] = $row;
-        }
-
-        return $this->resultArray;
+        return $data;
     }
 
     /**
-     * Returns the results as an array of objects.
-     *
-     * If no results, an empty array is returned.
+     * {@inheritDoc}
      */
-    public function getResultObject(): array
+    public function resultObject(): array
     {
-        if (! empty($this->resultObject)) {
-            return $this->resultObject;
+        if ($this->isPdo()) {
+            $data = $this->query->fetchAll(PDO::FETCH_OBJ);
+            
+            $this->query->closeCursor();
+
+            return $data;
         }
 
-        // In the event that query caching is on, the result_id variable
-        // will not be a valid resource so we'll simply return an empty
-        // array.
-        if (is_bool($this->resultID) || ! $this->resultID) {
-            return [];
-        }
-
-        if ($this->resultArray) {
-            foreach ($this->resultArray as $row) {
-                $this->resultObject[] = (object) $row;
-            }
-
-            return $this->resultObject;
-        }
-
-        if ($this->rowData !== null) {
-            $this->dataSeek();
-        }
-
-        while ($row = $this->fetchObject()) {
-            if (! is_subclass_of($row, Entity::class) && method_exists($row, 'syncOriginal')) {
-                $row->syncOriginal();
-            }
-
-            $this->resultObject[] = $row;
-        }
-
-        return $this->resultObject;
+        return $this->_resultObject();
     }
 
     /**
-     * Wrapper object to return a row as either an array, an object, or
-     * a custom class.
-     *
-     * If row doesn't exist, returns null.
-     *
-     * @param mixed  $n    The index of the results to return
-     * @param string $type The type of result object. 'array', 'object' or class name.
-     *
-     * @return mixed
+     * {@inheritDoc}
      */
-    public function getRow($n = 0, string $type = 'object')
+    public function resultArray(): array
     {
-        if (! is_numeric($n)) {
-            // We cache the row data for subsequent uses
-            if (! is_array($this->rowData)) {
-                $this->rowData = $this->getRowArray();
-            }
+        if ($this->isPdo()) {
+            $data = $this->query->fetchAll(PDO::FETCH_ASSOC);
+            $this->query->closeCursor();
 
-            // array_key_exists() instead of isset() to allow for NULL values
-            if (empty($this->rowData) || ! array_key_exists($n, $this->rowData)) {
-                return null;
-            }
-
-            return $this->rowData[$n];
+            return $data;
         }
-
-        if ($type === 'object') {
-            return $this->getRowObject($n);
-        }
-
-        if ($type === 'array') {
-            return $this->getRowArray($n);
-        }
-
-        return $this->getCustomRowObject($n, $type);
+        
+        return $this->_resultArray();
     }
 
     /**
-     * Returns a row as a custom class instance.
-     *
-     * If row doesn't exists, returns null.
-     *
-     * @return mixed
+     * {@inheritDoc}
      */
-    public function getCustomRowObject(int $n, string $className)
+    public function unbufferedRow($type = PDO::FETCH_OBJ)
     {
-        if (! isset($this->customResultObject[$className])) {
-            $this->getCustomResultObject($className);
-        }
-
-        if (empty($this->customResultObject[$className])) {
-            return null;
-        }
-
-        if ($n !== $this->currentRow && isset($this->customResultObject[$className][$n])) {
-            $this->currentRow = $n;
-        }
-
-        return $this->customResultObject[$className][$this->currentRow];
-    }
-
-    /**
-     * Returns a single row from the results as an array.
-     *
-     * If row doesn't exist, returns null.
-     *
-     * @return mixed
-     */
-    public function getRowArray(int $n = 0)
-    {
-        $result = $this->getResultArray();
-        if (empty($result)) {
-            return null;
-        }
-
-        if ($n !== $this->currentRow && isset($result[$n])) {
-            $this->currentRow = $n;
-        }
-
-        return $result[$this->currentRow];
-    }
-
-    /**
-     * Returns a single row from the results as an object.
-     *
-     * If row doesn't exist, returns null.
-     *
-     * @return mixed
-     */
-    public function getRowObject(int $n = 0)
-    {
-        $result = $this->getResultObject();
-        if (empty($result)) {
-            return null;
-        }
-
-        if ($n !== $this->customResultObject && isset($result[$n])) {
-            $this->currentRow = $n;
-        }
-
-        return $result[$this->currentRow];
-    }
-
-    /**
-     * Assigns an item into a particular column slot.
-     *
-     * @param mixed $key
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function setRow($key, $value = null)
-    {
-        // We cache the row data for subsequent uses
-        if (! is_array($this->rowData)) {
-            $this->rowData = $this->getRowArray();
-        }
-
-        if (is_array($key)) {
-            foreach ($key as $k => $v) {
-                $this->rowData[$k] = $v;
-            }
-
-            return;
-        }
-
-        if ($key !== '' && $value !== null) {
-            $this->rowData[$key] = $value;
-        }
-    }
-
-    /**
-     * Returns the "first" row of the current results.
-     *
-     * @return mixed
-     */
-    public function getFirstRow(string $type = 'object')
-    {
-        $result = $this->getResult($type);
-
-        return (empty($result)) ? null : $result[0];
-    }
-
-    /**
-     * Returns the "last" row of the current results.
-     *
-     * @return mixed
-     */
-    public function getLastRow(string $type = 'object')
-    {
-        $result = $this->getResult($type);
-
-        return (empty($result)) ? null : $result[count($result) - 1];
-    }
-
-    /**
-     * Returns the "next" row of the current results.
-     *
-     * @return mixed
-     */
-    public function getNextRow(string $type = 'object')
-    {
-        $result = $this->getResult($type);
-        if (empty($result)) {
-            return null;
-        }
-
-        return isset($result[$this->currentRow + 1]) ? $result[++$this->currentRow] : null;
-    }
-
-    /**
-     * Returns the "previous" row of the current results.
-     *
-     * @return mixed
-     */
-    public function getPreviousRow(string $type = 'object')
-    {
-        $result = $this->getResult($type);
-        if (empty($result)) {
-            return null;
-        }
-
-        if (isset($result[$this->currentRow - 1])) {
-            $this->currentRow--;
-        }
-
-        return $result[$this->currentRow];
-    }
-
-    /**
-     * Returns an unbuffered row and move the pointer to the next row.
-     *
-     * @return mixed
-     */
-    public function getUnbufferedRow(string $type = 'object')
-    {
-        if ($type === 'array') {
+        if ($type === 'array' || $type === PDO::FETCH_ASSOC) {
             return $this->fetchAssoc();
         }
 
-        if ($type === 'object') {
+        if ($type === 'object' || $type === PDO::FETCH_OBJ) {
             return $this->fetchObject();
         }
 
         return $this->fetchObject($type);
     }
-
+    
     /**
-     * Number of rows in the result set; checks for previous count, falls
-     * back on counting resultArray or resultObject, finally fetching resultArray
-     * if nothing was previously fetched
-     */
-    public function getNumRows(): int
-    {
-        if (is_int($this->numRows)) {
-            return $this->numRows;
-        }
-        if ($this->resultArray !== []) {
-            return $this->numRows = count($this->resultArray);
-        }
-        if ($this->resultObject !== []) {
-            return $this->numRows = count($this->resultObject);
-        }
-
-        return $this->numRows = count($this->getResultArray());
-    }
-
-    /**
-     * Gets the number of fields in the result set.
-     */
-    abstract public function getFieldCount(): int;
-
-    /**
-     * Generates an array of column names in the result set.
-     */
-    abstract public function getFieldNames(): array;
-
-    /**
-     * Generates an array of objects representing field meta-data.
-     */
-    abstract public function getFieldData(): array;
-
-    /**
-     * Frees the current result.
-     */
-    abstract public function freeResult();
-
-    /**
-     * Moves the internal pointer to the desired offset. This is called
-     * internally before fetching results to make sure the result set
-     * starts at zero.
+     * Returns the result set as an array.
      *
      * @return mixed
      */
-    abstract public function dataSeek(int $n = 0);
+    protected function fetchAssoc()
+    {
+        if ($this->isPdo()) {
+            return $this->query->fetch(PDO::FETCH_ASSOC);
+        }
+
+        return $this->_fetchAssoc();
+    }
+    
+    /**
+     * Returns the result set as an object.
+     * 
+     * @return object
+     */
+    protected function fetchObject(string $className = 'stdClass')
+    {
+        if (is_subclass_of($className, Entity::class)) {
+            return empty($data = $this->fetchAssoc()) ? false : (new $className())->setAttributes($data);
+        }
+
+        if ($this->isPdo()) {
+            $this->query->setFetchMode(PDO::FETCH_CLASS, $className);
+        
+            return $this->query->fetch();
+        }
+
+        return $this->_fetchObject($className);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function freeResult()
+    {
+        if ($this->isPdo()) {
+
+            return;
+        }
+
+        $this->_freeResult();
+    }
+
+    /**
+     * Recupere les details de la requete courrante
+     *
+     * @return array
+     */
+    public function details(): array
+    {
+        if (!$this->query) {
+            return $this->details;
+        }
+
+        $last = $this->db->getLastQuery();
+
+        return $this->details = array_merge((array) $last, [
+            'affected_rows' => $this->affectedRows(),
+            'num_rows'      => $this->numRows(),
+            'insert_id'     => $this->insertID(),
+        ]);
+    }
+
+	/**
+	 * Returns the total number of rows affected by this query.
+	 *
+	 * @return int
+	 */
+	public function affectedRows() : int
+	{
+		return $this->db->affectedRows();
+	}
+
+	/**
+	 * Returns the number of rows in the result set.
+	 */
+	public function numRows(): int
+	{
+		return $this->db->numRows();
+	}
+
+	/**
+     * Return the last id generated by autoincrement
+     *
+     * @return int|string
+     */
+    public function insertID()
+    {
+        return $this->db->insertID();
+    }
+	/**
+	 * Return the last id generated by autoincrement
+	 *
+	 * @alias self::insertID()
+	 * @return int|null
+	 */
+	public function lastId()
+	{
+		return $this->insertID();
+	}
+
+    protected function _resultObject(): array
+    {
+        return array_map(static fn($data) => (object) $data, $this->resultArray());
+    }
 
     /**
      * Returns the result set as an array.
@@ -489,14 +373,31 @@ abstract class BaseResult implements ResultInterface
      *
      * @return mixed
      */
-    abstract protected function fetchAssoc();
-
+    abstract protected function _fetchAssoc();
+    
     /**
      * Returns the result set as an object.
      *
      * Overridden by child classes.
-     *
+     * 
      * @return object
      */
-    abstract protected function fetchObject(string $className = 'stdClass');
+    abstract protected function _fetchObject(string $className = 'stdClass');
+
+    /**
+	 * Gets the number of fields in the result set.
+	 */
+    abstract protected function _countField(): int;
+
+    abstract protected function _result($type): array;
+
+    /**
+     * Retourne un table contenant les resultat de la requete sous forme de tableau associatif
+     */
+    abstract protected function _resultArray(): array;
+
+    /**
+     * Frees the current result.
+     */
+    abstract protected function _freeResult();
 }

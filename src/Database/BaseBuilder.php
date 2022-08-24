@@ -1315,7 +1315,7 @@ class BaseBuilder
      */
     final public function query(string $sql, array $params = []): BaseResult
     {
-        return Database::query($sql, $params);
+        return $this->db->query($sql, $params);
     }
 
     /**
@@ -1335,23 +1335,22 @@ class BaseBuilder
      * @param int|string $type
      * @param string|null $key Cache key
      * @param int $expire Expiration time in seconds
-     * @return array Rows
      */
-    final public function all($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0) : array
+    final public function result($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0): array
     {
-        $this->execute($key, $expire);
-        return $this->result->all($type);
+        return $this->execute($key, $expire)->result($type);  
     }
     /**
-     * @alias self::all()
+     * Fetch multiple rows from a select query.
+     * 
      * @param int|string $type
-     * @param string|null $key
-     * @param integer $expire
-     * @return array
+     * @param string|null $key Cache key
+     * @param int $expire Expiration time in seconds
+     * @alias self::result()
      */
-    final public function result($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0) : array
+    final public function all($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0): array
     {
-        return $this->all($type, $key, $expire);
+        return $this->result($type, $key, $expire);
     }
 
     /**
@@ -1362,25 +1361,22 @@ class BaseBuilder
      * @param int $expire Expiration time in seconds
      * @return mixed
      */
-    final public function one($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0)
+    final public function first($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0)
     {
 		$this->limit(1);
-        $this->execute($key, $expire);
 
-        return $this->result->first($type);
+        return $this->execute($key, $expire)->first($type);
     }
     /**
      * Recupere le premier resultat d'une requete en BD
      *
-     * @alias self::one()
      * @param int|string $type
-     * @param string|null $key
-     * @param int $expire
      * @return mixed
+     * @alias self::first()
      */
-    final public function first($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0)
+    final public function one($type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0)
     {
-        return $this->one($type, $key, $expire);
+        return $this->first($type, $key, $expire);
     }
 
     /**
@@ -1393,8 +1389,7 @@ class BaseBuilder
      */
     final public function row(int $index, $type = PDO::FETCH_OBJ, ?string $key = null, int $expire = 0)
     {
-        $this->execute($key, $expire);
-        return $this->result->row($index, $type);
+        return $this->execute($key, $expire)->row($index, $type);
     }
 
     /**
@@ -1407,7 +1402,7 @@ class BaseBuilder
      */
     final public function value(string $name, ?string $key = null, int $expire = 0)
     {
-        $row = $this->one(PDO::FETCH_OBJ, $key, $expire);
+        $row = $this->first(PDO::FETCH_OBJ, $key, $expire);
 
         return $row->{$name} ?? null;
     }
@@ -1430,16 +1425,14 @@ class BaseBuilder
 	final public function findAll($fields = '*', array $options = [], $type = PDO::FETCH_OBJ) : array
 	{
 		$this->select($fields);
-		if (isset($options['limit']))
-		{
+        
+		if (isset($options['limit'])) {
 			$this->limit($options['limit']);
 		}
-		if (isset($options['offset']))
-		{
+		if (isset($options['offset'])) {
 			$this->offset($options['offset']);
 		}
-		if (isset($options['where']) AND is_array($options['where']))
-		{
+		if (isset($options['where']) AND is_array($options['where'])) {
 			$this->where($options['where']);
 		}
 
@@ -1459,12 +1452,11 @@ class BaseBuilder
 	final public function findOne($fields = '*', array $options = [], $type = PDO::FETCH_OBJ)
 	{
 		$this->select($fields);
-		if (isset($options['offset']))
-		{
+
+		if (isset($options['offset'])) {
 			$this->offset($options['offset']);
 		}
-		if (isset($options['where']) AND is_array($options['where']))
-		{
+		if (isset($options['where']) AND is_array($options['where'])) {
 			$this->where($options['where']);
 		}
 
