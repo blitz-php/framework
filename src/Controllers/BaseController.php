@@ -92,7 +92,9 @@ abstract class BaseController
 
         $this->getModel();
 
-        helper($this->helpers);
+        if (!empty($this->helpers)) {
+            helper($this->helpers);
+        }
     }
 
     /**
