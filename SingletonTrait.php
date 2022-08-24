@@ -31,9 +31,11 @@ trait SingletonTrait
     protected static $_instance;
 
     /**
-     * Vérifie, instancie et renvoie la seule instance de la classe using.
+     * Vérifie, instancie et renvoie la seule instance de la classe appelée.
+	 *
+	 * @return static
      */
-    public static function getInstance()
+    public static function instance()
     {
         if (! (static::$_instance instanceof static)) {
             $params            = func_get_args();
@@ -44,13 +46,13 @@ trait SingletonTrait
     }
 
     /**
-     * @alias getInstance
+     * @alias instance
      */
-    public static function instance()
+    public static function getInstance()
     {
         $params = func_get_args();
 
-        return static::getInstance(...$params);
+        return static::instance(...$params);
     }
 
     /**
