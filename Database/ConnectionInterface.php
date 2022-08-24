@@ -8,119 +8,116 @@ namespace BlitzPHP\Contracts\Database;
 interface ConnectionInterface
 {
     /**
-     * Initializes the database connection/settings.
+     * Initialise la connexion/les paramètres de la base de données.
      *
      * @return mixed
      */
     public function initialize();
 
     /**
-     * Connect to the database.
+     * Connexion à la base de données.
      *
      * @return mixed
      */
     public function connect(bool $persistent = false);
 
     /**
-     * Create a persistent database connection.
+     * Créez une connexion persistante à la base de données.
      *
      * @return mixed
      */
     public function persistentConnect();
 
     /**
-     * Keep or establish the connection if no queries have been sent for
-     * a length of time exceeding the server's idle timeout.
+     * Conservez ou établissez la connexion si aucune requête n'a été envoyée pendant une durée supérieure au délai d'inactivité du serveur.
      *
      * @return mixed
      */
     public function reconnect();
 
     /**
-     * Returns the actual connection object. If both a 'read' and 'write'
-     * connection has been specified, you can pass either term in to
-     * get that connection. If you pass either alias in and only a single
-     * connection is present, it must return the sole connection.
+     * Renvoie l'objet de connexion réel. Si une connexion 'lecture' et 'écriture' a été spécifiée,
+	 * vous pouvez transmettre l'un ou l'autre terme pour obtenir cette connexion.
+	 * Si vous transmettez l'un ou l'autre des alias et qu'une seule connexion est présente, il doit renvoyer la seule connexion.
      *
      * @return mixed
      */
     public function getConnection(?string $alias = null);
 
     /**
-     * Select a specific database table to use.
+     * Sélectionnez une table de base de données spécifique à utiliser.
      *
      * @return mixed
      */
     public function setDatabase(string $databaseName);
 
     /**
-     * Returns the name of the current database being used.
+     * Renvoie le nom de la base de données en cours d'utilisation.
      */
     public function getDatabase(): string;
 
     /**
-     * Returns the last error encountered by this connection.
-     * Must return this format: ['code' => string|int, 'message' => string]
-     * intval(code) === 0 means "no error".
+     * Renvoie la dernière erreur rencontrée par cette connexion.
+     * Doit retourner ce format : ['code' => string|int, 'message' => string]
+     * intval(code) === 0 signifie "pas d'erreur".
      *
      * @return array<string, int|string>
      */
     public function error(): array;
 
     /**
-     * The name of the platform in use (MySQLi, mssql, etc)
+     * Le nom de la plateforme utilisée (MySQLi, mssql, etc)
      */
     public function getPlatform(): string;
 
     /**
-     * Returns a string containing the version of the database being used.
+     * Renvoie une chaîne contenant la version de la base de données utilisée.
      */
     public function getVersion(): string;
 
     /**
-     * Orchestrates a query against the database. Queries must use
-     * Database\Statement objects to store the query and build it.
-     * This method works with the cache.
+     * Orchestre une requête sur la base de données.
+	 * Les requêtes doivent utiliser des objets Database\Statement pour stocker la requête et la construire.
+	 * Cette méthode fonctionne avec le cache.
      *
-     * Should automatically handle different connections for read/write
-     * queries if needed.
+     * Doit gérer automatiquement différentes connexions pour les requêtes de lecture/écriture si nécessaire.
      *
      * @param mixed ...$binds
      *
-     * @return BaseResult|bool|Query
+     * @return ResultInterface|bool|Query
      */
     public function query(string $sql, $binds = null);
 
     /**
-     * Performs a basic query against the database. No binding or caching
-     * is performed, nor are transactions handled. Simply takes a raw
-     * query string and returns the database-specific result id.
+     * Effectue une requête de base sur la base de données.
+	 * Aucune liaison ou mise en cache n'est effectuée, et les transactions ne sont pas traitées.
+	 * Prend simplement une chaîne de requête brute et renvoie l'ID de résultat spécifique à la base de données.
      *
      * @return mixed
      */
     public function simpleQuery(string $sql);
 
     /**
-     * Returns an instance of the query builder for this connection.
+     * Renvoie une instance du générateur de requêtes pour cette connexion.
      *
-     * @param array|string $tableName Table name.
+     * @param array|string $tableName
      *
      * @return BaseBuilder Builder.
      */
     public function table($tableName);
 
     /**
-     * Returns the last query's statement object.
+     * Renvoie l'objet d'instruction de la dernière requête.
      *
      * @return mixed
      */
     public function getLastQuery();
 
     /**
-     * "Smart" Escaping
+     * Escapade "intelligente"
      *
-     * Escapes data based on type.
-     * Sets boolean and null types.
+     * Échappe les données en fonction du type.
+     * Définit les types booléens et nuls.
      *
      * @param mixed $str
      *
@@ -129,8 +126,8 @@ interface ConnectionInterface
     public function escape($str);
 
     /**
-     * Allows for custom calls to the database engine that are not
-     * supported through our database layer.
+     * Autorise les appels personnalisés au moteur de base de données qui ne sont pas
+     * pris en charge via notre couche de base de données.
      *
      * @param array ...$params
      *
@@ -139,7 +136,7 @@ interface ConnectionInterface
     public function callFunction(string $functionName, ...$params);
 
     /**
-     * Determines if the statement is a write-type query or not.
+     * Détermine si l'instruction est une requête de type écriture ou non.
      *
      * @param string $sql
      */
