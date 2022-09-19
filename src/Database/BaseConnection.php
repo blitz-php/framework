@@ -667,7 +667,7 @@ abstract class BaseConnection implements ConnectionInterface
      *
      * @return mixed Valeur cotée
      */
-    public function quote($value, ?string $group = null)
+    public function quote($value)
     {
         if ($value === null) {
             return 'NULL';
@@ -714,14 +714,7 @@ abstract class BaseConnection implements ConnectionInterface
     abstract protected function execute(string $sql, array $params = []);
 
     /**
-     * Orchestrates a query against the database. Queries must use
-     * Database\Statement objects to store the query and build it.
-     * This method works with the cache.
-     *
-     * Should automatically handle different connections for read/write
-     * queries if needed.
-     *
-     * @param mixed ...$binds
+     * {@inheritDoc}
      *
      * @return BaseResult|bool|Query BaseResult when “read” type query, bool when “write” type query, Query when prepared query
      *
@@ -1021,7 +1014,7 @@ abstract class BaseConnection implements ConnectionInterface
 
         $className = str_replace('Connection', 'Builder', static::class);
 
-        return new $className($tableName, $this);
+        return (new $className($this))->table($tableName);
     }
 
     /**
