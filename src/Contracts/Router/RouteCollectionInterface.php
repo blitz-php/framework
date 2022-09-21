@@ -26,142 +26,136 @@ use Closure;
 interface RouteCollectionInterface
 {
     /**
-     * Ajoute une seule route à collection.
+     * Ajoute une seule route à la collection.
+     *
+     * Example:
+     *      $routes->add('news', 'Posts::index');
      *
      * @param array|Closure|string $to
-     * @param array                $options
-     *
-     * @return mixed
      */
     public function add(string $from, $to, ?array $options = null);
 
     /**
-     * Registers a new constraint with the system. Constraints are used
-     * by the routes as placeholders for regular expressions to make defining
-     * the routes more human-friendly.
+     * Enregistre une nouvelle contrainte auprès du système. Les contraintes sont utilisées
+     * par les routes en tant qu'espaces réservés pour les expressions régulières afin de définir
+     * les parcours plus humains.
      *
-     * You can pass an associative array as $placeholder, and have
-     * multiple placeholders added at once.
+     * Vous pouvez passer un tableau associatif en tant que $placeholder et avoir
+     * plusieurs espaces réservés ajoutés à la fois.
      *
      * @param array|string $placeholder
-     * @param string       $pattern
-     *
-     * @return mixed
+	 *
+	 * @return mixed
      */
     public function addPlaceholder($placeholder, ?string $pattern = null);
 
     /**
-     * Sets the default namespace to use for Controllers when no other
-     * namespace has been specified.
+     * Définit l'espace de noms par défaut à utiliser pour les contrôleurs lorsqu'aucun autre n'a été spécifié.
      *
      * @return mixed
      */
     public function setDefaultNamespace(string $value);
 
     /**
-     * Returns the default namespace as set in the Routes config file.
+     * Renvoie l'espace de noms par défaut tel qu'il est défini dans le fichier de configuration Routes.
      */
     public function getDefaultNamespace(): string;
 
     /**
-     * Sets the default controller to use when no other controller has been
-     * specified.
+     * Définit le contrôleur par défaut à utiliser lorsqu'aucun autre contrôleur n'a été spécifié.
      *
      * @return mixed
      */
     public function setDefaultController(string $value);
 
     /**
-     * Sets the default method to call on the controller when no other
-     * method has been set in the route.
+     * Définit la méthode par défaut pour appeler le contrôleur lorsqu'aucun autre
+     * méthode a été définie dans la route.
      *
      * @return mixed
      */
     public function setDefaultMethod(string $value);
 
     /**
-     * If TRUE, the system will attempt to match the URI against
-     * Controllers by matching each segment against folders/files
-     * in APPPATH/Controllers, when a match wasn't found against
-     * defined routes.
+     *  Si TRUE, le système tentera de faire correspondre l'URI avec
+     * Contrôleurs en faisant correspondre chaque segment avec des dossiers/fichiers
+     * dans CONTROLLER_PATH, lorsqu'aucune correspondance n'a été trouvée pour les routes définies.
      *
-     * If FALSE, will stop searching and do NO automatic routing.
+     * Si FAUX, la recherche s'arrêtera et n'effectuera AUCUN routage automatique.
      */
     public function setAutoRoute(bool $value): self;
 
     /**
-     * Sets the class/method that should be called if routing doesn't
-     * find a match. It can be either a closure or the controller/method
-     * name exactly like a route is defined: Users::index
+     * Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
+     * Il peut s'agir soit d'une closure, soit d'un contrôleur/méthode exactement comme une route est définie : Users::index
      *
-     * This setting is passed to the Router class and handled there.
+     * Ce paramètre est transmis à la classe Routeur et y est géré.
      *
      * @param callable|null $callable
      */
     public function set404Override($callable = null): self;
 
     /**
-     * Returns the 404 Override setting, which can be null, a closure
-     * or the controller/string.
+     * Renvoie le paramètre 404 Override, qui peut être nul, une closure, une chaîne contrôleur/méthode.
      *
      * @return Closure|string|null
      */
     public function get404Override();
 
     /**
-     * Returns the name of the default controller. With Namespace.
+     * Renvoie le nom du contrôleur par défaut. Avec l'espace de noms.
      */
     public function getDefaultController(): string;
 
     /**
-     * Returns the name of the default method to use within the controller.
+     * Renvoie le nom de la méthode par défaut à utiliser dans le contrôleur.
      */
     public function getDefaultMethod(): string;
 
     /**
-     * Returns the flag that tells whether to autoRoute URI against Controllers.
+     * Renvoie l'indicateur qui indique s'il faut auto-router l'URI pour trouver les contrôleurs/méthodes.
      */
     public function shouldAutoRoute(): bool;
 
     /**
-     * Returns the raw array of available routes.
+     * Renvoie le tableau brut des routes disponibles.
      *
      * @return mixed
      */
     public function getRoutes();
 
     /**
-     * Returns the current HTTP Verb being used.
+     * Renvoie le verbe HTTP actuellement utilisé.
      */
     public function getHTTPVerb(): string;
 
     /**
-     * Sets the current HTTP verb.
-     * Used primarily for testing.
+     * Définit le verbe HTTP actuel.
+     * Utilisé principalement pour les tests.
      */
     public function setHTTPVerb(string $verb): self;
 
     /**
-     * Attempts to look up a route based on it's destination.
+     * Tente de rechercher une route en fonction de sa destination.
      *
-     * If a route exists:
+     * Si une route existe :
      *
-     *      'path/(:any)/(:any)' => 'Controller::method/$1/$2'
+     * 'path/(:any)/(:any)' => 'Controller::method/$1/$2'
      *
-     * This method allows you to know the Controller and method
-     * and get the route that leads to it.
+     * Cette méthode vous permet de connaître le contrôleur et la méthode
+     * et obtenir la route qui y mène.
      *
-     *      // Equals 'path/$param1/$param2'
-     *      reverseRoute('Controller::method', $param1, $param2);
+     * // Égal à 'chemin/$param1/$param2'
+     * reverseRoute('Controller::method', $param1, $param2);
      *
-     * @param array ...$params
+     * @param mixed ...$params
      *
      * @return false|string
      */
     public function reverseRoute(string $search, ...$params);
 
     /**
-     * Determines if the route is a redirecting route.
+     * Détermine si la route est une route de redirection.
      */
     public function isRedirect(string $from): bool;
 
@@ -169,4 +163,24 @@ interface RouteCollectionInterface
      * Récupère le code d'état HTTP d'une route de redirection.
      */
     public function getRedirectCode(string $from): int;
+
+	/**
+     * Renvoie la valeur actuelle du paramètre translateURIDashes.
+     */
+    public function shouldTranslateURIDashes(): bool;
+
+	/**
+     * Indique au système s'il faut convertir les tirets des chaînes URI en traits de soulignement.
+	 * Dans certains moteurs de recherche, y compris Google, les tirets créent plus de sens et permettent au moteur de recherche
+	 * de trouver plus facilement des mots et une signification dans l'URI pour un meilleur référencement.
+	 * Mais cela ne fonctionne pas bien avec les noms de méthodes PHP...
+     */
+    public function setTranslateURIDashes(bool $value): self;
+
+	/**
+     * Obtenez tous les contrôleurs dans Route Handlers
+     *
+     * @param string|null $verbe HTTP verbe. `'*'` renvoie tous les contrôleurs dans n'importe quel verbe.
+     */
+    public function getRegisteredControllers(?string $verb = '*'): array;
 }
