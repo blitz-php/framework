@@ -5,11 +5,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/blitz-php/annotations.svg?style=flat-square)](https://scrutinizer-ci.com/g/blitz-php/annotations)
 [![Build Status](https://scrutinizer-ci.com/g/blitz-php/annotations/badges/build.png?b=main)](https://scrutinizer-ci.com/g/blitz-php/annotations/build-status/main)
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/blitz-php/annotations/badges/code-intelligence.svg?b=main)](https://scrutinizer-ci.com/code-intelligence)
-
-[![Coding Standards](https://github.com/blitz-php/annotations/actions/workflows/test-annotationss.yml/badge.svg)](https://github.com/blitz-php/annotations/actions/workflows/test-annotationss.yml)
-[![PHPStan Static Analysis](https://github.com/blitz-php/annotations/actions/workflows/test-phpstan.yml/badge.svg)](https://github.com/blitz-php/annotations/actions/workflows/test-phpstan.yml)
-[![PHPStan level](https://img.shields.io/badge/PHPStan-max%20level-brightgreen)](phpstan.neon.dist)
-[![Coverage Status](https://coveralls.io/repos/github/blitz-php/annotations/badge.svg?branch=develop)](https://coveralls.io/github/blitz-php/annotations?branch=develop)
+[![PHPStan level](https://img.shields.io/badge/PHPStan-level%204-brightgreen)](phpstan.neon.dist)
 [![Total Downloads](http://poser.pugx.org/blitz-php/annotations/downloads)](https://packagist.org/packages/blitz-php/annotations)
 
 **blitz-php/annotations** est un lecteur d'annotations et d'attributs pour [PHP] 7.4+. Bien qu'étant principalement créé pour le framework [BlitzPHP][BlitzPHP], cette bibliothèque est conçu de façon à pouvoir s'intégrée aisement dans tout type de projet PHP. Basée sur [mindplay/annotations](mindplay), elle fournit un lecteur simple, rapide et léger des annotations pour votre projet.
@@ -143,20 +139,18 @@ Cela permettra aux tests blitz-php/annotations de fonctionner avec la version PH
 ## 🏛️ Gouvernance
 
 Ce projet est principalement maintenu par [Dimitri Sitchet Tomkeu][@dimtrovich]. Les membres de l'équipe de [Blitz PHP Lap][] peuvent occasionnellement participer à certaines de ces tâches.
-## 🏛️ Governance
-
-This project is primarily maintained by [Divine Niiquaye Ibok][dimtrovich]. Members of the [Biurad Lap][] Leadership Team may occasionally assist with some of these duties.
 
 ## 🗺️ Qui l'utilise ?
 
 Vous êtes libre d'utiliser ce package comme vous le souhaitez. Découvrez les autres choses intéressantes que les gens font avec `blitz-php/annotations` : <https://packagist.org/packages/blitz-php/annotations/dependents>
 
+[@dimtrovich]: https://github.com/dimtrovich
 [PHP]: https://php.net
 [Composer]: https://getcomposer.org
 [BlitzPHP]: https://github.com/blitz-php/framework
-[docs]: https://docs.biurad.com/php-annotations
+[mindplay]: https://github.com/php-annotations/php-annotations
 [UPGRADE]: UPGRADE-1.x.md
 [CHANGELOG]: CHANGELOG-0.x.md
-[CONTRIBUTING]: ./.github/CONTRIBUTING.md
+[CONTRIBUTING]: https://github.com/blitz-php/framework/blob/main/.github/CONTRIBUTING.md
 [Tous les contributeurs]: https://github.com/blitz-php/annotations/contributors
 [Blitz PHP Lap]: https://github.com/orgs/blitz-php/people
