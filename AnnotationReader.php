@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Annotations;
 
-use BlitzPHP\Traits\SingletonTrait;
 use mindplay\annotations\AnnotationCache;
 use mindplay\annotations\AnnotationException;
 use mindplay\annotations\Annotations;
@@ -25,14 +24,34 @@ use ReflectionProperty;
  */
 class AnnotationReader
 {
-    use SingletonTrait;
+    /**
+     * La seule instance d'utilisation de la classe
+     *
+     * @var object
+     */
+    protected static $_instance;
+
+    /**
+     * Vérifie, instancie et renvoie la seule instance de la classe appelée.
+	 *
+	 * @return static
+     */
+    public static function instance()
+    {
+        if (! (static::$_instance instanceof static)) {
+            $params            = func_get_args();
+            static::$_instance = new static(...$params);
+        }
+
+        return static::$_instance;
+    }
 
     /**
      * Constructeur
      */
     protected function __construct()
     {
-        $cacheDir = rtrim(sys_get_temp_dir(), '/\\') . DS . 'blitz-php' . DS . 'annotations';
+        $cacheDir = rtrim(sys_get_temp_dir(), '/\\') . DIRECTORY_SEPARATOR . 'blitz-php' . DIRECTORY_SEPARATOR . 'annotations';
         if (! is_dir($cacheDir)) {
             mkdir($cacheDir, 0777, true);
         }
