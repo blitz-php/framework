@@ -1,9 +1,12 @@
 <?php
 
 /**
- * BlitzPHP File System Helpers
- * 
- * @credit <a href="http://www.codeigniter.com/">CodeIgniter - v4.1</a>
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
  */
 
 use BlitzPHP\Loader\Filesystem;
@@ -15,14 +18,14 @@ if (! function_exists('directory_map')) {
      * Lit le répertoire spécifié et construit un tableau
      * représentation de celui-ci. Les sous-dossiers contenus dans le répertoire seront également mappés.
      *
-     * @param string $sourceDir Chemin d'accès à la source
-     * @param int $directoryDepth Profondeur des répertoires à parcourir
-     * (0 = entièrement récursif, 1 = répertoire actuel, etc.)
-     * @param bool $hidden Afficher ou non les fichiers cachés
+     * @param string $sourceDir      Chemin d'accès à la source
+     * @param int    $directoryDepth Profondeur des répertoires à parcourir
+     *                               (0 = entièrement récursif, 1 = répertoire actuel, etc.)
+     * @param bool   $hidden         Afficher ou non les fichiers cachés
      */
     function directory_map(string $sourceDir, int $directoryDepth = 0, bool $hidden = false): array
     {
-       return Filesystem::directories($sourceDir, $directoryDepth, $hidden);
+        return Filesystem::directories($sourceDir, $directoryDepth, $hidden);
     }
 }
 

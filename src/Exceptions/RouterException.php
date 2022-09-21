@@ -57,7 +57,7 @@ class RouterException extends FrameworkException
         return new static(lang('HTTP.invalidRoute', [$route]));
     }
 
-     /**
+    /**
      * Throw when dynamic controller.
      *
      * @return RouterException

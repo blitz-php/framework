@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Cli\Commands\Server;
 
 use BlitzPHP\Cli\Console\Command;
@@ -12,28 +22,39 @@ use BlitzPHP\Cli\Console\Command;
  */
 class Serve extends Command
 {
-    /** @var string Groupe */
+    /**
+     * @var string Groupe
+     */
     protected $group = 'BlitzPHP';
 
-    /** @var string Nom */
+    /**
+     * @var string Nom
+     */
     protected $name = 'serve';
 
-    /** @var string Description */
+    /**
+     * @var string Description
+     */
     protected $description = 'Lance le serveur de développement BlitzPHP.';
 
-    /** @var string Usage */
+    /**
+     * @var string Usage
+     */
     protected $usage = 'php klinge serve';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $service = 'Service de lancement du serveur de developpement';
 
-    /** @var array Options */
+    /**
+     * @var array Options
+     */
     protected $options = [
         '--php'  => ['The PHP Binary [default: "PHP_BINARY"]', PHP_BINARY],
         '--host' => ['The HTTP Host [default: "localhost"]', 'localhost'],
         '--port' => ['The HTTP Host Port [default: "3300"]', 3300],
     ];
-
 
     /**
      * Le décalage de port actuel.
@@ -63,7 +84,7 @@ class Serve extends Command
 
         $this->io->ok('Le serveur de développement BlitzPHP a démarré sur ');
         $this->writer->boldGreen('http://' . $host . ':' . $port, true);
-        $this->write("Appuyez sur Control-C pour arrêter.\n", true);;
+        $this->write("Appuyez sur Control-C pour arrêter.\n", true);
 
         // Appelez le serveur Web intégré de PHP, en veillant à définir notre
         // chemin de base vers le dossier public et pour utiliser le fichier de réécriture

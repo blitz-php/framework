@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Cli\Commands\Generators;
 
 use BlitzPHP\Cli\Console\Command as ConsoleCommand;
@@ -12,16 +21,24 @@ class Command extends ConsoleCommand
 {
     use GeneratorTrait;
 
-    /** @var string Groupe */
+    /**
+     * @var string Groupe
+     */
     protected $group = 'Generators';
 
-    /** @var string Nom */
+    /**
+     * @var string Nom
+     */
     protected $name = 'make:command';
 
-    /** @var string Description */
+    /**
+     * @var string Description
+     */
     protected $description = 'Génère une nouvelle commande klinge.';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $service = 'Service de génération de code';
 
     /**
@@ -30,7 +47,9 @@ class Command extends ConsoleCommand
         'name' => 'Le nom de la classe de commande.',
     ];
 
-    /** @var array Options */
+    /**
+     * @var array Options
+     */
     protected $options = [
         '--command'   => 'Le nom de la commande. Par défault: "command:name"',
         '--type'      => ['Le type de commande. Options [basic, generator]. Par défault: "basic".', 'basic'],

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Database;
 
 use BlitzPHP\Contracts\Database\ConnectionInterface;
@@ -14,14 +23,13 @@ use Throwable;
 /**
  * @property array      $aliasedTables
  * @property string     $charset
+ * @property string     $collation
  * @property bool       $compress
  * @property float      $connectDuration
  * @property float      $connectTime
  * @property string     $database
- * @property string     $collation
  * @property bool       $debug
  * @property string     $driver
- * @property string     $prefix
  * @property string     $dsn
  * @property mixed      $encrypt
  * @property array      $failover
@@ -30,6 +38,7 @@ use Throwable;
  * @property string     $password
  * @property bool       $persistent
  * @property int|string $port
+ * @property string     $prefix
  * @property bool       $pretend
  * @property string     $queryClass
  * @property array      $reservedIdentifiers
@@ -324,38 +333,34 @@ abstract class BaseConnection implements ConnectionInterface
     protected $queryClass = Query::class;
 
     /**
-	 * Liste des connexions etablies
-	 *
-	 * @var array
-	 */
-	protected static $allConnections = [];
+     * Liste des connexions etablies
+     *
+     * @var array
+     */
+    protected static $allConnections = [];
 
     /**
      * Statistiques de la requete
-     * 
-	 * @var array 
-	 */
+     *
+     * @var array
+     */
     protected $stats = [
-		'queries' => []
-	];
+        'queries' => [],
+    ];
 
-	/**
+    /**
      * Commandes sql a executer a l'initialisation de la connexion a la base de donnees
-     * 
-	 * @var array 
-	 */
+     *
+     * @var array
+     */
     protected $commands = [];
 
     /**
-	 * Specifie si on doit ouvrir la connexion au serveur en se connectant automatiquement à la base de donnees
-     * 
+     * Specifie si on doit ouvrir la connexion au serveur en se connectant automatiquement à la base de donnees
+     *
      * @var bool
-	 */
-	protected $withDatabase = true;
-
-
-	//--------------------------------------------------------------------
-
+     */
+    protected $withDatabase = true;
 
     /**
      * Saves our connection settings.
@@ -453,42 +458,40 @@ abstract class BaseConnection implements ConnectionInterface
         $this->connectDuration = microtime(true) - $this->connectTime;
     }
 
-
     /**
-	 * Renvoi la liste des toutes les connexions a la base de donnees
-	 */
-	public static function getAllConnections(): array
+     * Renvoi la liste des toutes les connexions a la base de donnees
+     */
+    public static function getAllConnections(): array
     {
         return static::$allConnections;
-	}
+    }
 
-	/**
-	 * Ajoute une connexion etablie
-	 *
-	 * @param string $name
-	 * @param BaseConnection $driver
-	 * @param object|resource $conn
-	 * @return object|resource
-	 */
-	protected static function pushConnection(string $name, BaseConnection $driver, $conn)
-	{
-		static::$allConnections[$name] = compact('driver', 'conn');
+    /**
+     * Ajoute une connexion etablie
+     *
+     * @param object|resource $conn
+     *
+     * @return object|resource
+     */
+    protected static function pushConnection(string $name, BaseConnection $driver, $conn)
+    {
+        static::$allConnections[$name] = compact('driver', 'conn');
 
-		return $conn;
-	}
+        return $conn;
+    }
 
     /**
      * Verifie si on utilise une connexion pdo ou pas
      */
     public function isPdo(): bool
     {
-        if (!empty($this->conn)) {
+        if (! empty($this->conn)) {
             if ($this->conn instanceof PDO) {
                 return true;
             }
         }
-     
-        return preg_match('#pdo#', $this->driver);  
+
+        return preg_match('#pdo#', $this->driver);
     }
 
     /**
@@ -591,7 +594,7 @@ abstract class BaseConnection implements ConnectionInterface
      * Returns a string containing the version of the database being used.
      */
     abstract public function getVersion(): string;
-    
+
     /**
      * Crée le nom de la table avec son alias et le prefix des table de la base de données
      */
@@ -600,7 +603,7 @@ abstract class BaseConnection implements ConnectionInterface
         $table = str_replace($this->prefix, '', trim($table));
 
         [$alias, $table] = $this->getTableAlias($table);
-        
+
         return $this->prefixTable($table) . ' As ' . $this->escapeIdentifiers($alias);
     }
 
@@ -613,34 +616,31 @@ abstract class BaseConnection implements ConnectionInterface
 
         if (empty($this->aliasedTables[$table])) {
             $tabs = explode(' ', $table);
-            
-            if (count($tabs) == 2) {
+
+            if (count($tabs) === 2) {
                 $alias = $tabs[1];
-                $table = $tabs[0];  
-            }
-            elseif (preg_match('/\s+AS(.+)/i', $table, $matches)) {
-                if (!empty($matches[1])) {
+                $table = $tabs[0];
+            } elseif (preg_match('/\s+AS(.+)/i', $table, $matches)) {
+                if (! empty($matches[1])) {
                     $alias = trim($matches[1]);
                     $table = str_replace($matches[0], '', $table);
-                }     
-            }
-            else {
-                $key = array_search($table, $this->aliasedTables);
+                }
+            } else {
+                $key = array_search($table, $this->aliasedTables, true);
 
-                if (!empty($this->aliasedTables[$key])) {
+                if (! empty($this->aliasedTables[$key])) {
                     $alias = $this->aliasedTables[$key];
                     $table = $key;
-                }
-                else {
+                } else {
                     $alias = $table . '_' . uniqid();
                 }
             }
 
-            if (!empty($this->aliasedTables[$alias])) {
+            if (! empty($this->aliasedTables[$alias])) {
                 $alias = $this->aliasedTables[$alias];
             }
 
-            if ($alias != $table) {
+            if ($alias !== $table) {
                 $this->aliasedTables[$table] = $alias;
             }
         }
@@ -661,9 +661,11 @@ abstract class BaseConnection implements ConnectionInterface
 
         return $this->escapeIdentifiers($this->prefix . $table);
     }
-    
+
     /**
      * Entoure une chaîne de guillemets et échappe le contenu d'un paramètre de chaîne.
+     *
+     * @param mixed $value
      *
      * @return mixed Valeur cotée
      */
@@ -679,7 +681,7 @@ abstract class BaseConnection implements ConnectionInterface
 
         return $value;
     }
-    
+
     /**
      * Sets the Table Aliases to use. These are typically
      * collected during use of the Builder, and set here
@@ -756,13 +758,13 @@ abstract class BaseConnection implements ConnectionInterface
 
         // Run the query for real
         try {
-            $exception      = null;
+            $exception    = null;
             $this->result = $this->simpleQuery($query->getQuery());
         } catch (Exception $exception) {
             $this->result = false;
         }
 
-        if ($this->result=== false) {
+        if ($this->result === false) {
             $query->setDuration($startTime, $startTime);
 
             // This will trigger a rollback if transactions are being used
@@ -1053,9 +1055,9 @@ abstract class BaseConnection implements ConnectionInterface
 
         $this->pretend(false);
 
-       /*  if ($sql instanceof QueryInterface) {
-            $sql = $sql->getOriginalQuery();
-        } */
+        /*  if ($sql instanceof QueryInterface) {
+             $sql = $sql->getOriginalQuery();
+         } */
 
         $class = str_ireplace('Connection', 'PreparedQuery', static::class);
         /** @var BasePreparedQuery $class */
@@ -1341,7 +1343,6 @@ abstract class BaseConnection implements ConnectionInterface
         );
     }
 
-
     /**
      * "Smart" Escape String
      *
@@ -1621,14 +1622,16 @@ abstract class BaseConnection implements ConnectionInterface
 
         return $this->query($sql);
     }
+
     public function disableFk()
-	{
-		return $this->disableForeignKeyChecks();
-	}
+    {
+        return $this->disableForeignKeyChecks();
+    }
+
     /**
-	 * Returns platform-specific SQL to disable foreign key checks.
-	 */
-	abstract protected function _disableForeignKeyChecks(): string;
+     * Returns platform-specific SQL to disable foreign key checks.
+     */
+    abstract protected function _disableForeignKeyChecks(): string;
 
     /**
      * Enables foreign key checks temporarily.
@@ -1639,9 +1642,10 @@ abstract class BaseConnection implements ConnectionInterface
 
         return $this->query($sql);
     }
+
     /**
-	 * Returns platform-specific SQL to disable foreign key checks.
-	 */
+     * Returns platform-specific SQL to disable foreign key checks.
+     */
     abstract protected function _enableForeignKeyChecks(): string;
 
     /**
@@ -1698,22 +1702,23 @@ abstract class BaseConnection implements ConnectionInterface
     {
         return $this->insertID();
     }
-	/**
-	 * Insert ID
-	 *
-	 * @return int|string
-	 */
-	abstract public function insertID();
 
-	/**
-	 * Returns the total number of rows affected by this query.
-	 */
-	abstract public function affectedRows(): int;
+    /**
+     * Insert ID
+     *
+     * @return int|string
+     */
+    abstract public function insertID();
 
-	/**
+    /**
+     * Returns the total number of rows affected by this query.
+     */
+    abstract public function affectedRows(): int;
+
+    /**
      * Returns the number of rows in the result set.
-	 */
-	abstract public function numRows(): int;
+     */
+    abstract public function numRows(): int;
 
     /**
      * Generates the SQL for listing tables in a platform-dependent manner.

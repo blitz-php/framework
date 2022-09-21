@@ -18,13 +18,11 @@ use BlitzPHP\Utilities\Helpers;
 
 /**
  * FONCTIONS DE MANIPULATION D'URL
- * 
+ *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.2 - url_helper</a>
  */
 
-
 // =================================  ================================= //
-
 
 if (! function_exists('site_url')) {
     /**
@@ -149,8 +147,9 @@ if (! function_exists('anchor')) {
     /**
      * Crée une ancre basée sur l'URL locale.
      *
-     * @param string $title le titre du lien
-     * @param string|array|false $attributes tous les attributs
+     * @param string             $title      le titre du lien
+     * @param array|false|string $attributes tous les attributs
+     * @param mixed              $uri
      */
     function anchor($uri = '', string $title = '', $attributes = ''): string
     {
@@ -176,8 +175,8 @@ if (! function_exists('anchor_popup')) {
      * Crée une ancre basée sur l'URL locale. Le lien
      * ouvre une nouvelle fenêtre basée sur les attributs spécifiés.
      *
-     * @param string $title le titre du lien
-     * @param string|array|false $attributes tous les attributs
+     * @param string             $title      le titre du lien
+     * @param array|false|string $attributes tous les attributs
      */
     function anchor_popup(string $uri = '', string $title = '', $attributes = false): string
     {
@@ -221,8 +220,8 @@ if (! function_exists('mailto')) {
     /**
      * Lien Mailto
      *
-     * @param string $title le titre du lien
-     * @param string|array $attributes tous les attributs
+     * @param string       $title      le titre du lien
+     * @param array|string $attributes tous les attributs
      */
     function mailto(string $email, string $title = '', $attributes = ''): string
     {
@@ -235,13 +234,13 @@ if (! function_exists('mailto')) {
 }
 
 if (! function_exists('safe_mailto')) {
-   /**
+    /**
      * Lien Mailto codé
      *
      * Créer un lien mailto protégé contre les spams écrit en Javascript
      *
-     * @param string $title le titre du lien
-     * @param mixed $attributes tous les attributs
+     * @param string $title      le titre du lien
+     * @param mixed  $attributes tous les attributs
      */
     function safe_mailto(string $email, string $title = '', $attributes = ''): string
     {
@@ -328,18 +327,18 @@ if (! function_exists('auto_link')) {
      * Lien automatique
      *
      * Liens automatiquement URL et adresses e-mail.
-     * Remarque : il y a un peu de code supplémentaire ici à gérer
+     * Remarque : il y a un peu de code supplémentaire ici à gérer
      * URL ou e-mails se terminant par un point. Nous allons les dépouiller
      * off et ajoutez-les après le lien.
      *
-     * @param string $type le type : email, url, ou les deux
-     * @param bool $popup s'il faut créer des liens contextuels
+     * @param string $type  le type : email, url, ou les deux
+     * @param bool   $popup s'il faut créer des liens contextuels
      */
     function auto_link(string $str, string $type = 'both', bool $popup = false): string
     {
         // Recherche et remplace tous les URLs.
         if ($type !== 'email' && preg_match_all('#(\w*://|www\.)[^\s()<>;]+\w#i', $str, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
-           // Définissez notre HTML cible si vous utilisez des liens contextuels.
+            // Définissez notre HTML cible si vous utilisez des liens contextuels.
             $target = ($popup) ? ' target="_blank"' : '';
 
             // Nous traitons les liens dans l'ordre inverse (dernier -> premier) de sorte que
@@ -403,7 +402,7 @@ if (! function_exists('url_title')) {
      * comme séparateur de mots.
      *
      * @param string $separator Séparateur de mots (généralement '-' ou '_')
-     * @param bool $lowercase Indique s'il faut transformer la chaîne de sortie en minuscules
+     * @param bool   $lowercase Indique s'il faut transformer la chaîne de sortie en minuscules
      */
     function url_title(string $str, string $separator = '-', bool $lowercase = false): string
     {
@@ -439,7 +438,7 @@ if (! function_exists('mb_url_title')) {
      * comme séparateur de mots.
      *
      * @param string $separator Séparateur de mots (généralement '-' ou '_')
-     * @param bool $lowercase Indique s'il faut transformer la chaîne de sortie en minuscules
+     * @param bool   $lowercase Indique s'il faut transformer la chaîne de sortie en minuscules
      */
     function mb_url_title(string $str, string $separator = '-', bool $lowercase = false): string
     {
@@ -454,7 +453,7 @@ if (! function_exists('url_to')) {
      * Obtenir l'URL complète et absolue d'une méthode de contrôleur
      * (avec arguments supplémentaires)
      *
-     * REMARQUE : Cela nécessite que le contrôleur/la méthode ait une route définie dans le fichier de configuration des routes.
+     * REMARQUE : Cela nécessite que le contrôleur/la méthode ait une route définie dans le fichier de configuration des routes.
      *
      * @param mixed ...$args
      *
@@ -478,9 +477,9 @@ if (! function_exists('url_to')) {
 
 if (! function_exists('url_is')) {
     /**
-     * Détermine si le chemin d'URL actuel contient le chemin donné. 
+     * Détermine si le chemin d'URL actuel contient le chemin donné.
      * Il peut contenir un caractère générique (*) qui autorisera tout caractère valide.
-      *
+     *
      * Exemple:
      *   if (url_is('admin*)) ...
      */

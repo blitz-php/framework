@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Database;
 
 use BlitzPHP\Contracts\Database\ConnectionInterface;
@@ -14,7 +23,7 @@ use InvalidArgumentException;
 class Database
 {
     use SingletonTrait;
-    
+
     /**
      * Maintains an array of the instances of all connections that have
      * been created.
@@ -130,13 +139,4 @@ class Database
 
         return new $class($argument);
     }
-
-
-
-
-
-
-
-
-
 }

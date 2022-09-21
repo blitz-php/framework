@@ -847,17 +847,17 @@ class Dispatcher
      */
     private function spoofRequestMethod(): callable
     {
-        return function(ServerRequestInterface $request, ResponseInterface $response, callable $next) {
+        return static function (ServerRequestInterface $request, ResponseInterface $response, callable $next) {
             $post = $request->getParsedBody();
 
             // Ne fonctionne qu'avec les formulaires POST
-            if (strtoupper($request->getMethod()) == 'POST' && ! empty($post['_method'])) {
+            if (strtoupper($request->getMethod()) === 'POST' && ! empty($post['_method'])) {
                 // Accepte seulement PUT, PATCH, DELETE
                 if (in_array(strtoupper($post['_method']), ['PUT', 'PATCH', 'DELETE'], true)) {
                     $request = $request->withMethod($post['_method']);
                 }
             }
-            
+
             return $next($request, $response);
         };
     }

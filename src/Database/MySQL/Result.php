@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Database\MySQL;
 
 use BlitzPHP\Database\BaseResult;
-use PDO;
 use stdClass;
 
 /**
@@ -29,12 +37,12 @@ class Result extends BaseResult
         while ($row = $this->query->fetch_object($type)) {
             $data[] = $row;
         }
-        
+
         $this->query->close();
 
         return $data;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -50,7 +58,7 @@ class Result extends BaseResult
 
         return $data;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -151,7 +159,7 @@ class Result extends BaseResult
      * {@inheritDoc}
      */
     protected function _fetchAssoc()
-    {   
+    {
         return $this->query->fetch_assoc();
     }
 

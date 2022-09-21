@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Database;
 
 use BlitzPHP\Contracts\Database\ResultInterface;
@@ -13,8 +23,8 @@ abstract class BaseResult implements ResultInterface
      */
     private $details = [
         'num_rows'      => 0,
-		'affected_rows' => 0,
-		'insert_id'     => -1
+        'affected_rows' => 0,
+        'insert_id'     => -1,
     ];
 
     /**
@@ -30,21 +40,19 @@ abstract class BaseResult implements ResultInterface
     protected $db;
 
     /**
-     * @var integer
+     * @var int
      */
     private $currentRow = 0;
-
 
     /**
      * Constructor
      *
-     * @param BaseConnection $db
      * @param object|resource $query
      */
     public function __construct(BaseConnection &$db, &$query)
     {
         $this->query = &$query;
-        $this->db = &$db;
+        $this->db    = &$db;
 
         // Service::event()->trigger('db.query', $this);
     }
@@ -56,7 +64,6 @@ abstract class BaseResult implements ResultInterface
     {
         return $this->db->isPdo();
     }
-    
 
     /**
      * Fetch multiple rows from a select query.
@@ -66,7 +73,7 @@ abstract class BaseResult implements ResultInterface
      */
     public function all($type = PDO::FETCH_OBJ): array
     {
-       return $this->result($type);
+        return $this->result($type);
     }
 
     /**
@@ -78,10 +85,12 @@ abstract class BaseResult implements ResultInterface
 
         return empty($records) ? null : $records[0];
     }
+
     /**
      * Recupere le premier resultat d'une requete en BD
      *
      * @param int|string $type
+     *
      * @return mixed
      * @alias first()
      */
@@ -89,11 +98,12 @@ abstract class BaseResult implements ResultInterface
     {
         return $this->first($type);
     }
-    
+
     /**
      * Recupere le dernier element des resultats d'une requete en BD
      *
      * @param int|string $type
+     *
      * @return mixed Row
      */
     public function last($type = PDO::FETCH_OBJ)
@@ -108,36 +118,36 @@ abstract class BaseResult implements ResultInterface
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-	public function next($type = PDO::FETCH_OBJ)
-	{
+     * {@inheritDoc}
+     */
+    public function next($type = PDO::FETCH_OBJ)
+    {
         $records = $this->result($type);
 
-		if (empty($records)) {
-			return null;
-		}
+        if (empty($records)) {
+            return null;
+        }
 
-		return isset($records[$this->currentRow + 1]) ? $records[++ $this->currentRow] : null;
-	}
+        return isset($records[$this->currentRow + 1]) ? $records[++$this->currentRow] : null;
+    }
 
     /**
-	 * {@inheritDoc}
-	 */
-	public function previous($type = PDO::FETCH_OBJ)
-	{
-		$records = $this->result($type);
+     * {@inheritDoc}
+     */
+    public function previous($type = PDO::FETCH_OBJ)
+    {
+        $records = $this->result($type);
 
-		if (empty($records)) {
-			return null;
-		}
+        if (empty($records)) {
+            return null;
+        }
 
-		if (isset($records[$this->currentRow - 1])) {
-			-- $this->currentRow;
-		}
+        if (isset($records[$this->currentRow - 1])) {
+             $this->currentRow--;
+        }
 
-		return $records[$this->currentRow];
-	}
+        return $records[$this->currentRow];
+    }
 
     /**
      * {@inheritDoc}
@@ -154,52 +164,46 @@ abstract class BaseResult implements ResultInterface
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-	public function countField(): int
-	{
+     * {@inheritDoc}
+     */
+    public function countField(): int
+    {
         if ($this->isPdo()) {
             return $this->query->columnCount();
         }
 
         return $this->_countField();
-	}
+    }
 
     /**
      * {@inheritDoc}
      */
-    public function result($type = PDO::FETCH_OBJ) : array
+    public function result($type = PDO::FETCH_OBJ): array
     {
         $data = [];
 
-        if ($type === PDO::FETCH_OBJ OR $type === 'object') {
+        if ($type === PDO::FETCH_OBJ || $type === 'object') {
             $data = $this->resultObject();
-        }
-        else if ($type === PDO::FETCH_ASSOC OR $type === 'array') {
+        } elseif ($type === PDO::FETCH_ASSOC || $type === 'array') {
             $data = $this->resultArray();
-        }
-        else if (is_int($type) && $this->isPdo()) {
+        } elseif (is_int($type) && $this->isPdo()) {
             $this->query->setFetchMode($type);
             $data = $this->query->fetchAll();
             $this->query->closeCursor();
-        }
-        else if (is_string($type))
-        {
+        } elseif (is_string($type)) {
             if (is_subclass_of($type, Entity::class)) {
                 $records = $this->resultArray();
 
-                foreach ($records As $key => $value) {
-                    if (!isset($data[$key])) {
+                foreach ($records as $key => $value) {
+                    if (! isset($data[$key])) {
                         // $data[$key] = Hydrator::hydrate($value, $type);
                     }
                 }
-            }
-            else if ($this->isPdo()) {
+            } elseif ($this->isPdo()) {
                 $this->query->setFetchMode(PDO::FETCH_CLASS, $type);
                 $data = $this->query->fetchAll();
                 $this->query->closeCursor();
-            }
-            else {
+            } else {
                 $data = $this->_result($type);
             }
         }
@@ -216,7 +220,7 @@ abstract class BaseResult implements ResultInterface
     {
         if ($this->isPdo()) {
             $data = $this->query->fetchAll(PDO::FETCH_OBJ);
-            
+
             $this->query->closeCursor();
 
             return $data;
@@ -236,7 +240,7 @@ abstract class BaseResult implements ResultInterface
 
             return $data;
         }
-        
+
         return $this->_resultArray();
     }
 
@@ -255,7 +259,7 @@ abstract class BaseResult implements ResultInterface
 
         return $this->fetchObject($type);
     }
-    
+
     /**
      * Returns the result set as an array.
      *
@@ -269,10 +273,10 @@ abstract class BaseResult implements ResultInterface
 
         return $this->_fetchAssoc();
     }
-    
+
     /**
      * Returns the result set as an object.
-     * 
+     *
      * @return object
      */
     protected function fetchObject(string $className = 'stdClass')
@@ -283,7 +287,7 @@ abstract class BaseResult implements ResultInterface
 
         if ($this->isPdo()) {
             $this->query->setFetchMode(PDO::FETCH_CLASS, $className);
-        
+
             return $this->query->fetch();
         }
 
@@ -296,7 +300,6 @@ abstract class BaseResult implements ResultInterface
     public function freeResult()
     {
         if ($this->isPdo()) {
-
             return;
         }
 
@@ -305,12 +308,10 @@ abstract class BaseResult implements ResultInterface
 
     /**
      * Recupere les details de la requete courrante
-     *
-     * @return array
      */
     public function details(): array
     {
-        if (!$this->query) {
+        if (! $this->query) {
             return $this->details;
         }
 
@@ -323,25 +324,23 @@ abstract class BaseResult implements ResultInterface
         ]);
     }
 
-	/**
-	 * Returns the total number of rows affected by this query.
-	 *
-	 * @return int
-	 */
-	public function affectedRows() : int
-	{
-		return $this->db->affectedRows();
-	}
+    /**
+     * Returns the total number of rows affected by this query.
+     */
+    public function affectedRows(): int
+    {
+        return $this->db->affectedRows();
+    }
 
-	/**
-	 * Returns the number of rows in the result set.
-	 */
-	public function numRows(): int
-	{
-		return $this->db->numRows();
-	}
+    /**
+     * Returns the number of rows in the result set.
+     */
+    public function numRows(): int
+    {
+        return $this->db->numRows();
+    }
 
-	/**
+    /**
      * Return the last id generated by autoincrement
      *
      * @return int|string
@@ -350,20 +349,22 @@ abstract class BaseResult implements ResultInterface
     {
         return $this->db->insertID();
     }
-	/**
-	 * Return the last id generated by autoincrement
-	 *
-	 * @alias self::insertID()
-	 * @return int|null
-	 */
-	public function lastId()
-	{
-		return $this->insertID();
-	}
+
+    /**
+     * Return the last id generated by autoincrement
+     *
+     * @alias self::insertID()
+     *
+     * @return int|null
+     */
+    public function lastId()
+    {
+        return $this->insertID();
+    }
 
     protected function _resultObject(): array
     {
-        return array_map(static fn($data) => (object) $data, $this->resultArray());
+        return array_map(static fn ($data) => (object) $data, $this->resultArray());
     }
 
     /**
@@ -374,19 +375,19 @@ abstract class BaseResult implements ResultInterface
      * @return mixed
      */
     abstract protected function _fetchAssoc();
-    
+
     /**
      * Returns the result set as an object.
      *
      * Overridden by child classes.
-     * 
+     *
      * @return object
      */
     abstract protected function _fetchObject(string $className = 'stdClass');
 
     /**
-	 * Gets the number of fields in the result set.
-	 */
+     * Gets the number of fields in the result set.
+     */
     abstract protected function _countField(): int;
 
     abstract protected function _result($type): array;

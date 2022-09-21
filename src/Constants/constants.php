@@ -80,11 +80,6 @@ defined('LANG_PATH') || define('LANG_PATH', RESOURCE_PATH . 'lang' . DS);
  */
 defined('LAYOUT_PATH') || define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
 
-
-
-
-
-
 if (! defined('SERVICE_PATH')) {
     /**
      * Services directory path
@@ -134,18 +129,17 @@ if (! defined('DB_CACHE_PATH')) {
     define('DB_CACHE_PATH', DATABASE_PATH . 'cache' . DS);
 }
 
-
 /**
- * Cela définit l'espace de noms par défaut qui est utilisé dans BlitzPHP pour faire référence au répertoire de l'application. 
+ * Cela définit l'espace de noms par défaut qui est utilisé dans BlitzPHP pour faire référence au répertoire de l'application.
  * Modifiez cette constante pour modifier l'espace de noms que toutes les classes d'application doivent utiliser.
- * 
- *  REMARQUE : changer cela nécessitera de modifier manuellement les espaces de noms existants des classes d'espaces de noms App\*.
+ *
+ *  REMARQUE : changer cela nécessitera de modifier manuellement les espaces de noms existants des classes d'espaces de noms App\*.
  */
 defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
 
 /**
  * Constantes de temps
- * 
+ *
  * Fournissez des moyens simples de travailler avec la myriade de fonctions PHP qui nécessitent des informations en quelques secondes.
  */
 defined('SECOND') || define('SECOND', 1);
@@ -161,16 +155,16 @@ defined('DECADE') || define('DECADE', 315360000);
  * --------------------------------------------------------------------------
  * | Codes d'état de sortie
  * --------------------------------------------------------------------------
- * 
+ *
  * Utilisé pour indiquer les conditions dans lesquelles le script sort().
- * 
- * Bien qu'il n'existe pas de norme universelle pour les codes d'erreur, il existe quelques conventions générales. 
- * Trois de ces conventions sont mentionnées ci-dessous, pour ceux qui souhaitent en faire usage. 
- * Les valeurs par défaut de BlitzPHP ont été choisies pour le moins de chevauchement avec ces conventions, 
+ *
+ * Bien qu'il n'existe pas de norme universelle pour les codes d'erreur, il existe quelques conventions générales.
+ * Trois de ces conventions sont mentionnées ci-dessous, pour ceux qui souhaitent en faire usage.
+ * Les valeurs par défaut de BlitzPHP ont été choisies pour le moins de chevauchement avec ces conventions,
  * tout en laissant de la place pour que d'autres soient définies dans les futures versions et applications utilisateur.
- * 
- * Les trois principales conventions utilisées pour déterminer les codes d'état de sortie sont les suivantes :
- * 
+ *
+ * Les trois principales conventions utilisées pour déterminer les codes d'état de sortie sont les suivantes :
+ *
  * - Librairie Standard C/C++ (stdlibc): http://www.gnu.org/software/libc/manual/html_node/Exit-Status.html
  * - BSD sysexits.h: http://www.gsp.com/cgi-bin/man.cgi?section=3&topic=sysexits
  * - Bash scripting: http://tldp.org/LDP/abs/html/exitcodes.html

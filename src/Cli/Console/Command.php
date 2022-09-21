@@ -1,4 +1,13 @@
-<?php 
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
 
 namespace BlitzPHP\Cli\Console;
 
@@ -11,15 +20,15 @@ use Psr\Log\LoggerInterface;
 /**
  * Classe de base utilisée pour créer des commandes pour la console
  *
+ * @property string          $alias
  * @property array           $arguments
  * @property string          $description
  * @property string          $group
- * @property string          $alias
  * @property LoggerInterface $logger
  * @property string          $name
  * @property array           $options
- * @property string          $usage
  * @property string          $service
+ * @property string          $usage
  */
 abstract class Command
 {
@@ -56,7 +65,7 @@ abstract class Command
      * la description des options de la commande
      *
      * @var array
-     * 
+     *
      * @example
      * `[
      *      'option' => [string $description, mixed|null $default_value, callable|null $filter]
@@ -68,7 +77,7 @@ abstract class Command
      * La description des arguments de la commande
      *
      * @var array
-     * 
+     *
      * @example
      * `[
      *      'argument' => [string $description, mixed|null $default_value]
@@ -104,7 +113,6 @@ abstract class Command
      */
     protected $service = '';
 
-
     /**
      * Application Console
      *
@@ -132,8 +140,6 @@ abstract class Command
      */
     protected $color;
 
-
-
     public function __construct(Console $app, LoggerInterface $logger)
     {
         $this->app    = $app;
@@ -156,13 +162,12 @@ abstract class Command
      */
     abstract public function execute(array $params);
 
-
     /**
      * Ecrit un message dans une couleur spécifique
      */
     final protected function colorize(string $message, string $color): self
     {
-        $this->writer->colors("<".$color.">".$message."</end><eol>");
+        $this->writer->colors('<' . $color . '>' . $message . '</end><eol>');
 
         return $this;
     }
@@ -174,7 +179,6 @@ abstract class Command
     {
         $this->write('>> ' . $task, true);
     }
-
 
     /**
      * Écrit EOL n fois.
@@ -189,13 +193,13 @@ abstract class Command
     /**
      * Générer une table pour la console. Les clés de la première ligne sont prises comme en-tête.
      *
-     * @param array[] $rows Tableau de tableaux associés.
-     * @param array $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
+     * @param array[] $rows   Tableau de tableaux associés.
+     * @param array   $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
      */
     public function table(array $rows, array $styles = []): self
     {
         $this->writer->table($rows, $styles);
-        
+
         return $this;
     }
 
@@ -209,14 +213,13 @@ abstract class Command
         return $this;
     }
 
-
     /**
      * Laissez l'utilisateur faire un choix parmi les choix disponibles.
      *
-     * @param string $text Texte d'invite.
-     * @param array $choices Choix possibles pour l'utilisateur.
-     * @param mixed $default Valeur par défaut - si non choisie ou invalide.
-     * @param bool $case Si l'entrée utilisateur doit être sensible à la casse.
+     * @param string $text    Texte d'invite.
+     * @param array  $choices Choix possibles pour l'utilisateur.
+     * @param mixed  $default Valeur par défaut - si non choisie ou invalide.
+     * @param bool   $case    Si l'entrée utilisateur doit être sensible à la casse.
      *
      * @return mixed Entrée utilisateur ou valeur par défaut.
      */
@@ -228,10 +231,10 @@ abstract class Command
     /**
      * Laissez l'utilisateur faire plusieurs choix parmi les choix disponibles.
      *
-     * @param string $text Texte d'invite.
-     * @param array $choices Choix possibles pour l'utilisateur.
-     * @param mixed $default Valeur par défaut - si non choisie ou invalide.
-     * @param bool $case Si l'entrée utilisateur doit être sensible à la casse.
+     * @param string $text    Texte d'invite.
+     * @param array  $choices Choix possibles pour l'utilisateur.
+     * @param mixed  $default Valeur par défaut - si non choisie ou invalide.
+     * @param bool   $case    Si l'entrée utilisateur doit être sensible à la casse.
      *
      * @return mixed Entrée utilisateur ou valeur par défaut.
      */
@@ -253,9 +256,10 @@ abstract class Command
     /**
      * Demander à l'utilisateur d'entrer une donnée
      *
-     * @param callable|null $fn L'assainisseur/validateur pour l'entrée utilisateur
-     *                          Tout message d'exception est imprimé et démandé à nouveau.
-     * @param int $retry Combien de fois encore pour réessayer en cas d'échec.
+     * @param callable|null $fn      L'assainisseur/validateur pour l'entrée utilisateur
+     *                               Tout message d'exception est imprimé et démandé à nouveau.
+     * @param int           $retry   Combien de fois encore pour réessayer en cas d'échec.
+     * @param mixed|null    $default
      */
     public function prompt(string $text, $default = null, ?callable $fn = null, int $retry = 3): mixed
     {
@@ -265,15 +269,14 @@ abstract class Command
     /**
      * Demander à l'utilisateur une entrée secrète comme un mot de passe. Actuellement pour unix uniquement.
      *
-     * @param callable|null $fn L'assainisseur/validateur pour l'entrée utilisateur
-     *                          Tout message d'exception est imprimé en tant qu'erreur.
-     * @param int $retry Combien de fois encore pour réessayer en cas d'échec.
+     * @param callable|null $fn    L'assainisseur/validateur pour l'entrée utilisateur
+     *                             Tout message d'exception est imprimé en tant qu'erreur.
+     * @param int           $retry Combien de fois encore pour réessayer en cas d'échec.
      */
     public function promptHidden(string $text, ?callable $fn = null, int $retry = 3): mixed
     {
         return $this->io->promptHidden($text, $fn, $retry);
     }
-
 
     /**
      * Can be used by a command to run other commands.
@@ -304,7 +307,6 @@ abstract class Command
     {
         return isset($this->{$key});
     }
-
 
     /**
      * Initalisation des proprieté necessaires
