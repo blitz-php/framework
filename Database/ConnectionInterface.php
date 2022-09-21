@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Contracts\Database;
 
 /**
@@ -37,8 +46,8 @@ interface ConnectionInterface
 
     /**
      * Renvoie l'objet de connexion réel. Si une connexion 'lecture' et 'écriture' a été spécifiée,
-	 * vous pouvez transmettre l'un ou l'autre terme pour obtenir cette connexion.
-	 * Si vous transmettez l'un ou l'autre des alias et qu'une seule connexion est présente, il doit renvoyer la seule connexion.
+     * vous pouvez transmettre l'un ou l'autre terme pour obtenir cette connexion.
+     * Si vous transmettez l'un ou l'autre des alias et qu'une seule connexion est présente, il doit renvoyer la seule connexion.
      *
      * @return mixed
      */
@@ -58,7 +67,7 @@ interface ConnectionInterface
 
     /**
      * Renvoie la dernière erreur rencontrée par cette connexion.
-     * Doit retourner ce format : ['code' => string|int, 'message' => string]
+     * Doit retourner ce format : ['code' => string|int, 'message' => string]
      * intval(code) === 0 signifie "pas d'erreur".
      *
      * @return array<string, int|string>
@@ -77,21 +86,21 @@ interface ConnectionInterface
 
     /**
      * Orchestre une requête sur la base de données.
-	 * Les requêtes doivent utiliser des objets Database\Statement pour stocker la requête et la construire.
-	 * Cette méthode fonctionne avec le cache.
+     * Les requêtes doivent utiliser des objets Database\Statement pour stocker la requête et la construire.
+     * Cette méthode fonctionne avec le cache.
      *
      * Doit gérer automatiquement différentes connexions pour les requêtes de lecture/écriture si nécessaire.
      *
      * @param mixed ...$binds
      *
-     * @return ResultInterface|bool|Query
+     * @return bool|Query|ResultInterface
      */
     public function query(string $sql, $binds = null);
 
     /**
      * Effectue une requête de base sur la base de données.
-	 * Aucune liaison ou mise en cache n'est effectuée, et les transactions ne sont pas traitées.
-	 * Prend simplement une chaîne de requête brute et renvoie l'ID de résultat spécifique à la base de données.
+     * Aucune liaison ou mise en cache n'est effectuée, et les transactions ne sont pas traitées.
+     * Prend simplement une chaîne de requête brute et renvoie l'ID de résultat spécifique à la base de données.
      *
      * @return mixed
      */

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Contracts\Database;
 
 /**
@@ -12,7 +21,7 @@ interface ResultInterface
      * des lignes de données individuelles, qui peuvent être soit un "tableau", soit un
      * 'object', ou un nom de classe personnalisé.
      *
-     * @param string|int $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      */
     public function result($type = 'object'): array;
 
@@ -36,8 +45,8 @@ interface ResultInterface
      *
      * Si la ligne n'existe pas, renvoie null.
      *
-     * @param mixed $index L'index des résultats à retourner
-     * @param string|int $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param mixed      $index L'index des résultats à retourner
+     * @param int|string $type  Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
@@ -46,7 +55,7 @@ interface ResultInterface
     /**
      * Renvoie la "première" ligne des résultats actuels.
      *
-     * @param string|int $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
@@ -55,8 +64,8 @@ interface ResultInterface
     /**
      * Returns the "last" row of the current results.
      *
-	 * @param string|int $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
-	 *
+     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     *
      * @return mixed
      */
     public function last($type = 'object');
@@ -64,8 +73,8 @@ interface ResultInterface
     /**
      * Renvoie la ligne "suivante" des résultats actuels.
      *
-	 * @param string|int $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
-	 *
+     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     *
      * @return mixed
      */
     public function next($type = 'object');
@@ -73,16 +82,16 @@ interface ResultInterface
     /**
      * Renvoie la ligne "précédente" des résultats actuels.
      *
-	 * @param string|int $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
-	 *
+     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     *
      * @return mixed
      */
     public function previous($type = 'object');
 
     /**
      * Renvoie une ligne non tamponnée et déplace le pointeur vers la ligne suivante.
-	 *
-	 * @param string|int $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     *
+     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
