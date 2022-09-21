@@ -1,4 +1,14 @@
 <?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Cli\Console;
 
 use BlitzPHP\View\Adapters\NativeAdapter;
@@ -108,7 +118,7 @@ trait GeneratorTrait
 
         $isFile = is_file($path);
 
-        // Écraser des fichiers sans le savoir est une gêne sérieuse, nous allons donc vérifier si nous dupliquons des choses, 
+        // Écraser des fichiers sans le savoir est une gêne sérieuse, nous allons donc vérifier si nous dupliquons des choses,
         // si l'option "forcer" n'est pas fournie, nous renvoyons.
         if (! $this->getOption('force') && $isFile) {
             $this->io->error(lang('CLI.generator.fileExist', [clean_path($path)]), true);
@@ -125,8 +135,8 @@ trait GeneratorTrait
 
         helper('filesystem');
 
-        // Construisez la classe en fonction des détails dont nous disposons. 
-        // Nous obtiendrons le contenu de notre fichier à partir du modèle, 
+        // Construisez la classe en fonction des détails dont nous disposons.
+        // Nous obtiendrons le contenu de notre fichier à partir du modèle,
         // puis nous effectuerons les remplacements nécessaires.
         if (! write_file($path, $this->buildContent($class))) {
             // @codeCoverageIgnoreStart
@@ -199,7 +209,7 @@ trait GeneratorTrait
         // Coupe l'entrée, normalise les séparateurs et s'assure que tous les chemins sont en Pascalcase.
         $class = ltrim(implode('\\', array_map('pascalize', explode('\\', str_replace('/', '\\', trim($class))))), '\\/');
 
-        // Obtient l'espace de noms à partir de l'entrée. N'oubliez pas la barre oblique inverse finale !
+        // Obtient l'espace de noms à partir de l'entrée. N'oubliez pas la barre oblique inverse finale !
         $namespace = trim(str_replace('/', '\\', $this->getOption('namespace') ?? APP_NAMESPACE), '\\') . '\\';
 
         if (strncmp($class, $namespace, strlen($namespace)) === 0) {
@@ -237,7 +247,7 @@ trait GeneratorTrait
     }
 
     /**
-     * Construit le contenu de la classe générée, effectue tous les remplacements nécessaires et 
+     * Construit le contenu de la classe générée, effectue tous les remplacements nécessaires et
      * trie par ordre alphabétique les importations pour un modèle donné.
      */
     protected function buildContent(string $class): string
@@ -298,7 +308,7 @@ trait GeneratorTrait
     }
 
     /**
-     * Obtient une seule option de ligne de commande. 
+     * Obtient une seule option de ligne de commande.
      * Renvoie VRAI si l'option existe, mais n'a pas de valeur et agit simplement comme un indicateur.
      *
      * @return mixed

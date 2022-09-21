@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Router;
 
 use BlitzPHP\Contracts\Router\AutoRouterInterface;
@@ -7,7 +16,7 @@ use BlitzPHP\Exceptions\PageNotFoundException;
 
 /**
  * Routeur sécurisé pour le routage automatique
- * 
+ *
  * @credit <a href="http://www.codeigniter.com">CodeIgniter 4.2 - CodeIgniter\Router\AutoRouterImproved</a>
  */
 final class AutoRouter implements AutoRouterInterface
@@ -36,7 +45,7 @@ final class AutoRouter implements AutoRouterInterface
     private string $method;
 
     /**
-     * Indique si les tirets dans les URI doivent être convertis 
+     * Indique si les tirets dans les URI doivent être convertis
      * en traits de soulignement lors de la détermination des noms de méthode.
      */
     private bool $translateURIDashes;
@@ -69,7 +78,7 @@ final class AutoRouter implements AutoRouterInterface
     }
 
     /**
-     * Tente de faire correspondre un chemin d'URI avec les contrôleurs et 
+     * Tente de faire correspondre un chemin d'URI avec les contrôleurs et
      * les répertoires trouvés dans CONTROLLER_PATH, pour trouver une route correspondante.
      *
      * @return array [directory_name, controller_name, controller_method, params]
@@ -149,10 +158,10 @@ final class AutoRouter implements AutoRouterInterface
         if (strpos($this->controller, '\\') === false && strlen($this->defaultNamespace) > 1) {
             $this->setController('\\' . ltrim(
                 str_replace(
-                    '/', 
-                    '\\', 
+                    '/',
+                    '\\',
                     $this->defaultNamespace . $this->directory . $controllerName
-                ), 
+                ),
                 '\\'
             ));
         }
@@ -218,7 +227,7 @@ final class AutoRouter implements AutoRouterInterface
         return (bool) preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/', $segment);
     }
 
-     /**
+    /**
      * Définit le sous-répertoire dans lequel se trouve le contrôleur.
      *
      * @param bool $validate si vrai, vérifie que $dir se compose uniquement de segments conformes à PSR4
@@ -267,6 +276,7 @@ final class AutoRouter implements AutoRouterInterface
         if (! is_string($this->controller)) {
             return $this->controller;
         }
+
         return $this->translateURIDashes
             ? str_replace('-', '_', trim($this->controller, '/\\'))
             : $this->controller;

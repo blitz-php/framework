@@ -1,12 +1,23 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Database\MySQL;
 
 use BlitzPHP\Database\BaseConnection;
 use BlitzPHP\Exceptions\DatabaseException;
+use LogicException;
 use mysqli;
 use PDO;
 use PDOException;
+use stdClass;
 
 /**
  * Connexion MySQL
@@ -15,10 +26,10 @@ class Connection extends BaseConnection
 {
     protected $error = [
         'message' => '',
-        'code' => 0
+        'code'    => 0,
     ];
 
-	/**
+    /**
      * DELETE hack flag
      *
      * Whether to use the MySQL "delete hack" which allows the number
@@ -29,25 +40,23 @@ class Connection extends BaseConnection
      */
     public $deleteHack = true;
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public $escapeChar = '`';
-	
+
     /**
-	 * Connect to the database.
-	 *
-	 * @param boolean $persistent
-	 *
-	 * @return mixed
-	 * @throws DatabaseException
-	 */
-	public function connect(bool $persistent = false)
-	{
+     * Connect to the database.
+     *
+     * @throws DatabaseException
+     *
+     * @return mixed
+     */
+    public function connect(bool $persistent = false)
+    {
         $db = null;
 
-        switch ($this->driver)
-        {
+        switch ($this->driver) {
             case 'mysqli':
                 $db = new mysqli(
                     $this->host,
@@ -58,10 +67,11 @@ class Connection extends BaseConnection
                 );
 
                 if ($db->connect_error) {
-                    throw new DatabaseException('Connection error: '.$db->connect_error);
+                    throw new DatabaseException('Connection error: ' . $db->connect_error);
                 }
 
                 break;
+
             case 'pdomysql':
             case 'pdo_mysql':
                 $this->dsn = true === $this->withDatabase ? sprintf(
@@ -69,59 +79,60 @@ class Connection extends BaseConnection
                     $this->host,
                     $this->port,
                     $this->database
-				) : sprintf(
+                ) : sprintf(
                     'mysql:host=%s;port=%d',
                     $this->host,
                     $this->port
-				);
-				$db = new PDO($this->dsn, $this->username, $this->password);
-				$this->commands[] = 'SET SQL_MODE=ANSI_QUOTES';
+                );
+                $db               = new PDO($this->dsn, $this->username, $this->password);
+                $this->commands[] = 'SET SQL_MODE=ANSI_QUOTES';
 
-				break;
+                break;
+
             default:
-                # code...
+                // code...
                 break;
         }
-		
-        if (!empty($this->charset)) {
-            $this->commands[] = "SET NAMES '{$this->charset}'" . (!empty($this->collation) ? " COLLATE '{$this->collation}'" : '');
+
+        if (! empty($this->charset)) {
+            $this->commands[] = "SET NAMES '{$this->charset}'" . (! empty($this->collation) ? " COLLATE '{$this->collation}'" : '');
         }
         $this->type = strpos($this->driver, 'pdo') !== false ? 'pdo' : $this->driver;
 
-		return self::pushConnection('mysql', $this, $db);
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function reconnect()
-	{
-		$this->close();
-		$this->initialize();
-	}
+        return self::pushConnection('mysql', $this, $db);
+    }
 
     /**
-	 * {@inheritDoc}
-	 */
-	protected function _close()
-	{
-		if ($this->isPdo()) {
-			return $this->conn = null;
-		}
-
-		$this->conn->close();
-	}
+     * {@inheritDoc}
+     */
+    public function reconnect()
+    {
+        $this->close();
+        $this->initialize();
+    }
 
     /**
-	 * {@inheritDoc}
-	 */
-	public function setDatabase(string $databaseName): bool
-	{
-		if ($databaseName === '') {
-			$databaseName = $this->database;
-		}
-		if (empty($this->conn)) {
-			$this->initialize();
+     * {@inheritDoc}
+     */
+    protected function _close()
+    {
+        if ($this->isPdo()) {
+            return $this->conn = null;
+        }
+
+        $this->conn->close();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDatabase(string $databaseName): bool
+    {
+        if ($databaseName === '') {
+            $databaseName = $this->database;
+        }
+        if (empty($this->conn)) {
+            $this->initialize();
         }
 
         if (! $this->isPdo()) {
@@ -130,74 +141,72 @@ class Connection extends BaseConnection
 
                 return true;
             }
-        
-			return false;
+
+            return false;
         }
 
-		return true;
-	}
+        return true;
+    }
 
     /**
-	 * The name of the platform in use (MySQLi, mssql, etc)
-	 */
-	public function getPlatform(): string
-	{
-		if (isset($this->dataCache['platform'])) {
-			return $this->dataCache['platform'];
-		}
-
-		if (empty($this->conn)) {
-			$this->initialize();
+     * The name of the platform in use (MySQLi, mssql, etc)
+     */
+    public function getPlatform(): string
+    {
+        if (isset($this->dataCache['platform'])) {
+            return $this->dataCache['platform'];
         }
 
-		return $this->dataCache['platform'] = !$this->isPdo() ? 'mysql' : $this->conn->getAttribute(PDO::ATTR_DRIVER_NAME);
-	}
-
-	/**
-	 * Returns a string containing the version of the database being used.
-	 */
-	public function getVersion(): string
-	{
-		if (isset($this->dataCache['version'])) {
-			return $this->dataCache['version'];
-		}
-
-		if (empty($this->conn)) {
-			$this->initialize();
+        if (empty($this->conn)) {
+            $this->initialize();
         }
 
-		return $this->dataCache['version'] = !$this->isPdo() ? $this->conn->server_version : $this->conn->getAttribute(PDO::ATTR_SERVER_VERSION);
-	}
+        return $this->dataCache['platform'] = ! $this->isPdo() ? 'mysql' : $this->conn->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
 
     /**
-	 * Executes the query against the database.
-	 * 
-	 * @return mixed
-	 */
-	public function execute(string $sql, array $params = [])
-	{
-		$sql = $this->prepQuery($sql);
+     * Returns a string containing the version of the database being used.
+     */
+    public function getVersion(): string
+    {
+        if (isset($this->dataCache['version'])) {
+            return $this->dataCache['version'];
+        }
 
-        $error = null;
+        if (empty($this->conn)) {
+            $this->initialize();
+        }
+
+        return $this->dataCache['version'] = ! $this->isPdo() ? $this->conn->server_version : $this->conn->getAttribute(PDO::ATTR_SERVER_VERSION);
+    }
+
+    /**
+     * Executes the query against the database.
+     *
+     * @return mixed
+     */
+    public function execute(string $sql, array $params = [])
+    {
+        $sql = $this->prepQuery($sql);
+
+        $error  = null;
         $result = false;
-		$time = microtime(true);
+        $time   = microtime(true);
 
-        if (!$this->isPdo()) {
+        if (! $this->isPdo()) {
             $result = $this->conn->query($sql);
-            if (!$result) {
-                $this->error['code'] = $this->conn->errno;
+            if (! $result) {
+                $this->error['code']    = $this->conn->errno;
                 $this->error['message'] = $error = $this->conn->error;
             }
-        }
-        else {
+        } else {
             try {
                 $result = $this->conn->prepare($sql);
 
-                if (!$result) {
+                if (! $result) {
                     $error = $this->conn->errorInfo();
-                }
-                else {
-                    foreach ($params As $key => $value) {
+                } else {
+                    foreach ($params as $key => $value) {
                         $result->bindValue(
                             is_int($key) ? $key + 1 : $key,
                             $value,
@@ -206,30 +215,29 @@ class Connection extends BaseConnection
                     }
                     $result->execute();
                 }
-            }
-            catch (PDOException $ex) {
-                $this->error['code'] = $ex->getCode();
+            } catch (PDOException $ex) {
+                $this->error['code']    = $ex->getCode();
                 $this->error['message'] = $error = $ex->getMessage();
             }
         }
 
         if ($error !== null) {
-			$error = "Database Error: " . $error . "\nSQL: ".$sql;
-			if (on_dev()) {
-				throw new DatabaseException($error);
-			}
-			logger()->error($error);
+            $error = 'Database Error: ' . $error . "\nSQL: " . $sql;
+            if (on_dev()) {
+                throw new DatabaseException($error);
+            }
+            logger()->error($error);
         }
 
         $this->lastQuery = [
-			'sql'      => $sql,
-			'start'    => $time,
-			'duration' => microtime(true) - $time,
+            'sql'      => $sql,
+            'start'    => $time,
+            'duration' => microtime(true) - $time,
         ];
         $this->stats['queries'][] = &$this->lastQuery;
 
         return $result;
-	}
+    }
 
     /**
      * Returns the last error code and message.
@@ -243,8 +251,7 @@ class Connection extends BaseConnection
         return $this->error;
     }
 
-
-	/**
+    /**
      * Prep the query. If needed, each database adapter can prep the query string
      */
     protected function prepQuery(string $sql): string
@@ -257,172 +264,173 @@ class Connection extends BaseConnection
 
         return $sql;
     }
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function _escapeString(string $str): string
-	{
-		if (is_bool($str)) {
-			return (string) $str;
-		}
 
-		if (! $this->conn) {
-			$this->initialize();
-		}
+    /**
+     * {@inheritDoc}
+     */
+    protected function _escapeString(string $str): string
+    {
+        if (is_bool($str)) {
+            return (string) $str;
+        }
+
+        if (! $this->conn) {
+            $this->initialize();
+        }
 
         if (! $this->isPdo()) {
-            return "'".$this->conn->real_escape_string($str)."'";
+            return "'" . $this->conn->real_escape_string($str) . "'";
         }
- 
-		return $this->conn->quote($str);
+
+        return $this->conn->quote($str);
     }
 
     /**
-	 * Escape Like String Direct
-	 * There are a few instances where MySQLi queries cannot take the
-	 * additional "ESCAPE x" parameter for specifying the escape character
-	 * in "LIKE" strings, and this handles those directly with a backslash.
-	 *
-	 * @param  string|string[] $str Input string
-	 * @return string|string[]
-	 */
-	public function escapeLikeStringDirect($str)
-	{
-		if (is_array($str)) {
-			foreach ($str as $key => $val) {
-				$str[$key] = $this->escapeLikeStringDirect($val);
-			}
+     * Escape Like String Direct
+     * There are a few instances where MySQLi queries cannot take the
+     * additional "ESCAPE x" parameter for specifying the escape character
+     * in "LIKE" strings, and this handles those directly with a backslash.
+     *
+     * @param string|string[] $str Input string
+     *
+     * @return string|string[]
+     */
+    public function escapeLikeStringDirect($str)
+    {
+        if (is_array($str)) {
+            foreach ($str as $key => $val) {
+                $str[$key] = $this->escapeLikeStringDirect($val);
+            }
 
-			return $str;
-		}
+            return $str;
+        }
 
-		$str = $this->_escapeString($str);
+        $str = $this->_escapeString($str);
 
-		// Escape LIKE condition wildcards
-		return str_replace(
-			[$this->likeEscapeChar, '%', '_'], 
-			['\\' . $this->likeEscapeChar, '\\' . '%', '\\' . '_'], 
-			$str
-		);
-	}
+        // Escape LIKE condition wildcards
+        return str_replace(
+            [$this->likeEscapeChar, '%', '_'],
+            ['\\' . $this->likeEscapeChar, '\\' . '%', '\\' . '_'],
+            $str
+        );
+    }
 
     /**
-	 * {@inheritDoc}
-	 * 
-	 * @uses escapeLikeStringDirect().
-	 */
-	protected function _listTables(bool $prefixLimit = false): string
-	{
-		$sql = 'SHOW TABLES FROM ' . $this->escapeIdentifiers($this->database);
+     * {@inheritDoc}
+     *
+     * @uses escapeLikeStringDirect().
+     */
+    protected function _listTables(bool $prefixLimit = false): string
+    {
+        $sql = 'SHOW TABLES FROM ' . $this->escapeIdentifiers($this->database);
 
-		if ($prefixLimit !== false AND $this->prefix !== '') {
-			return $sql . " LIKE '" . $this->escapeLikeStringDirect($this->prefix) . "%'";
-		}
+        if ($prefixLimit !== false && $this->prefix !== '') {
+            return $sql . " LIKE '" . $this->escapeLikeStringDirect($this->prefix) . "%'";
+        }
 
-		return $sql;
-	}
+        return $sql;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function _listColumns(string $table = ''): string
-	{
-		return 'SHOW COLUMNS FROM ' . $this->protectIdentifiers($this->prefixTable($table), true, null, false);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected function _listColumns(string $table = ''): string
+    {
+        return 'SHOW COLUMNS FROM ' . $this->protectIdentifiers($this->prefixTable($table), true, null, false);
+    }
 
-	/**
-	 * Returns an array of objects with field data
-	 *
-	 * @return \stdClass[]
-	 * @throws DatabaseException
-	 */
-	protected function _fieldData(string $table): array
-	{
-		$table = $this->protectIdentifiers($this->prefixTable($table), true, null, false);
+    /**
+     * Returns an array of objects with field data
+     *
+     * @throws DatabaseException
+     *
+     * @return stdClass[]
+     */
+    protected function _fieldData(string $table): array
+    {
+        $table = $this->protectIdentifiers($this->prefixTable($table), true, null, false);
 
-		if (($query = $this->query('SHOW COLUMNS FROM ' . $table)) === false) {
-			throw new DatabaseException('No data fied found');
-		}
-		$query = $query->result(PDO::FETCH_OBJ);
+        if (($query = $this->query('SHOW COLUMNS FROM ' . $table)) === false) {
+            throw new DatabaseException('No data fied found');
+        }
+        $query = $query->result(PDO::FETCH_OBJ);
 
-		$retVal = [];
-		for ($i = 0, $c = count($query); $i < $c; $i++) {
-			$retVal[$i]       = new \stdClass();
-			$retVal[$i]->name = $query[$i]->field ?? $query[$i]->Field;
+        $retVal = [];
 
-			sscanf(($query[$i]->type ?? $query[$i]->Type), '%[a-z](%d)', $retVal[$i]->type, $retVal[$i]->max_length);
+        for ($i = 0, $c = count($query); $i < $c; $i++) {
+            $retVal[$i]       = new stdClass();
+            $retVal[$i]->name = $query[$i]->field ?? $query[$i]->Field;
 
-			$retVal[$i]->nullable    = ($query[$i]->null ?? $query[$i]->Null) === 'YES';
-			$retVal[$i]->default     = $query[$i]->default ?? $query[$i]->Default;
-			$retVal[$i]->primary_key = (int)(($query[$i]->key ?? $query[$i]->Key) === 'PRI');
-		}
+            sscanf(($query[$i]->type ?? $query[$i]->Type), '%[a-z](%d)', $retVal[$i]->type, $retVal[$i]->max_length);
 
-		return $retVal;
-	}
+            $retVal[$i]->nullable    = ($query[$i]->null ?? $query[$i]->Null) === 'YES';
+            $retVal[$i]->default     = $query[$i]->default ?? $query[$i]->Default;
+            $retVal[$i]->primary_key = (int) (($query[$i]->key ?? $query[$i]->Key) === 'PRI');
+        }
 
-   	/**
-	 * Returns an array of objects with index data
-	 *
-	 * @return \stdClass[]
-	 * @throws DatabaseException
-	 * @throws \LogicException
-	 */
-	public function _indexData(string $table): array
-	{
-		$table = $this->protectIdentifiers($this->prefixTable($table), true, null, false);
+        return $retVal;
+    }
 
-		if (($query = $this->query('SHOW INDEX FROM ' . $table)) === false) {
-			throw new DatabaseException('No index data found');
-		}
+    /**
+     * Returns an array of objects with index data
+     *
+     * @throws DatabaseException
+     * @throws LogicException
+     *
+     * @return stdClass[]
+     */
+    public function _indexData(string $table): array
+    {
+        $table = $this->protectIdentifiers($this->prefixTable($table), true, null, false);
 
-		if (! $indexes = $query->result(PDO::FETCH_ASSOC)) {
-			return [];
-		}
+        if (($query = $this->query('SHOW INDEX FROM ' . $table)) === false) {
+            throw new DatabaseException('No index data found');
+        }
 
-		$keys = [];
+        if (! $indexes = $query->result(PDO::FETCH_ASSOC)) {
+            return [];
+        }
 
-		foreach ($indexes as $index) {
-			if (empty($keys[$index['Key_name']])) {
-				$keys[$index['Key_name']]       = new \stdClass();
-				$keys[$index['Key_name']]->name = $index['Key_name'];
+        $keys = [];
 
-				if ($index['Key_name'] === 'PRIMARY') {
-					$type = 'PRIMARY';
-				}
-				elseif ($index['Index_type'] === 'FULLTEXT') {
-					$type = 'FULLTEXT';
-				}
-				elseif ($index['Non_unique']) {
-					if ($index['Index_type'] === 'SPATIAL') {
-						$type = 'SPATIAL';
-					}
-					else {
-						$type = 'INDEX';
-					}
-				}
-				else {
-					$type = 'UNIQUE';
-				}
+        foreach ($indexes as $index) {
+            if (empty($keys[$index['Key_name']])) {
+                $keys[$index['Key_name']]       = new stdClass();
+                $keys[$index['Key_name']]->name = $index['Key_name'];
 
-				$keys[$index['Key_name']]->type = $type;
-			}
+                if ($index['Key_name'] === 'PRIMARY') {
+                    $type = 'PRIMARY';
+                } elseif ($index['Index_type'] === 'FULLTEXT') {
+                    $type = 'FULLTEXT';
+                } elseif ($index['Non_unique']) {
+                    if ($index['Index_type'] === 'SPATIAL') {
+                        $type = 'SPATIAL';
+                    } else {
+                        $type = 'INDEX';
+                    }
+                } else {
+                    $type = 'UNIQUE';
+                }
 
-			$keys[$index['Key_name']]->fields[] = $index['Column_name'];
-		}
+                $keys[$index['Key_name']]->type = $type;
+            }
 
-		return $keys;
-	}
+            $keys[$index['Key_name']]->fields[] = $index['Column_name'];
+        }
 
-	/**
-	 * Returns an array of objects with Foreign key data
-	 *
-	 * @return \stdClass[]
-	 * @throws DatabaseException
-	 */
-	public function _foreignKeyData(string $table): array
-	{
-		$sql = '
+        return $keys;
+    }
+
+    /**
+     * Returns an array of objects with Foreign key data
+     *
+     * @throws DatabaseException
+     *
+     * @return stdClass[]
+     */
+    public function _foreignKeyData(string $table): array
+    {
+        $sql = '
 				SELECT
 					tc.CONSTRAINT_NAME,
 					tc.TABLE_NAME,
@@ -439,121 +447,123 @@ class Connection extends BaseConnection
 					tc.TABLE_SCHEMA = ' . $this->escape($this->database) . ' AND
 					tc.TABLE_NAME = ' . $this->escape($this->prefixTable($table));
 
-		if (($query = $this->query($sql)) === false) {
-			throw new DatabaseException('No foreign keys found for table '.$table);
-		}
+        if (($query = $this->query($sql)) === false) {
+            throw new DatabaseException('No foreign keys found for table ' . $table);
+        }
 
-		$query = $query->result(PDO::FETCH_OBJ);
+        $query = $query->result(PDO::FETCH_OBJ);
 
-		$retVal = [];
-		foreach ($query as $row) {
-			$obj                      = new \stdClass();
-			$obj->constraint_name     = $row->CONSTRAINT_NAME;
-			$obj->table_name          = $row->TABLE_NAME;
-			$obj->column_name         = $row->COLUMN_NAME;
-			$obj->foreign_table_name  = $row->REFERENCED_TABLE_NAME;
-			$obj->foreign_column_name = $row->REFERENCED_COLUMN_NAME;
+        $retVal = [];
 
-			$retVal[] = $obj;
-		}
+        foreach ($query as $row) {
+            $obj                      = new stdClass();
+            $obj->constraint_name     = $row->CONSTRAINT_NAME;
+            $obj->table_name          = $row->TABLE_NAME;
+            $obj->column_name         = $row->COLUMN_NAME;
+            $obj->foreign_table_name  = $row->REFERENCED_TABLE_NAME;
+            $obj->foreign_column_name = $row->REFERENCED_COLUMN_NAME;
 
-		return $retVal;
-	}
+            $retVal[] = $obj;
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function _disableForeignKeyChecks(): string
-	{
-		return 'SET FOREIGN_KEY_CHECKS=0';
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function _enableForeignKeyChecks(): string
-	{
-		return 'SET FOREIGN_KEY_CHECKS=1';
+        return $retVal;
     }
 
-	/**
-	 * Insert ID
-	 */
-	public function insertID(): int
-	{
-		if (! $this->isPdo()) {
-			return $this->conn->insert_id;
-		}
-		
-		return $this->conn->lastInsertId();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected function _disableForeignKeyChecks(): string
+    {
+        return 'SET FOREIGN_KEY_CHECKS=0';
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function affectedRows(): int
-	{
-		if (! $this->isPdo()) {
-			return $this->conn->affected_rows ?? 0;
-		}
+    /**
+     * {@inheritDoc}
+     */
+    protected function _enableForeignKeyChecks(): string
+    {
+        return 'SET FOREIGN_KEY_CHECKS=1';
+    }
 
-		return $this->queryResult->rowCount();
-	}
+    /**
+     * Insert ID
+     */
+    public function insertID(): int
+    {
+        if (! $this->isPdo()) {
+            return $this->conn->insert_id;
+        }
 
-	/**
+        return $this->conn->lastInsertId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function affectedRows(): int
+    {
+        if (! $this->isPdo()) {
+            return $this->conn->affected_rows ?? 0;
+        }
+
+        return $this->queryResult->rowCount();
+    }
+
+    /**
      * Renvoi le nombre de ligne retourné par la requete
-	 */
-	public function numRows(): int
-	{
-		if (! $this->isPdo()) {
-			return $this->queryResult->num_rows ?? 0;
-		}
-		
-		return $this->queryResult->rowCount();
-	}
+     */
+    public function numRows(): int
+    {
+        if (! $this->isPdo()) {
+            return $this->queryResult->num_rows ?? 0;
+        }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function _transBegin(): bool
-	{
+        return $this->queryResult->rowCount();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function _transBegin(): bool
+    {
         if (! $this->isPdo()) {
             $this->conn->autocommit(false);
+
             return $this->conn->begin_transaction();
         }
 
         return $this->conn->beginTransaction();
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function _transCommit(): bool
-	{
+    /**
+     * {@inheritDoc}
+     */
+    protected function _transCommit(): bool
+    {
         if ($this->conn->commit()) {
-			if (! $this->isPdo()) {
-				$this->conn->autocommit(true);
-			}
-            
-			return true;
-        }
-
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function _transRollback(): bool
-	{
-		if ($this->conn->rollback()) {
             if (! $this->isPdo()) {
                 $this->conn->autocommit(true);
             }
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function _transRollback(): bool
+    {
+        if ($this->conn->rollback()) {
+            if (! $this->isPdo()) {
+                $this->conn->autocommit(true);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }

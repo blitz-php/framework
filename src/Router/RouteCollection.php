@@ -54,7 +54,7 @@ class RouteCollection implements RouteCollectionInterface
      * @var string
      */
     protected $defaultPlaceholder = 'any';
-    
+
     /**
      * S'il faut convertir les tirets en traits de soulignement dans l'URI.
      *
@@ -386,8 +386,8 @@ class RouteCollection implements RouteCollectionInterface
         }
         $verb = strtolower($verb);
 
-        // Puisqu'il s'agit du point d'entrée du routeur, 
-        // prenez un moment pour faire toute découverte de route 
+        // Puisqu'il s'agit du point d'entrée du routeur,
+        // prenez un moment pour faire toute découverte de route
         // que nous pourrions avoir besoin de faire.
         $this->discoverRoutes();
 
@@ -395,7 +395,7 @@ class RouteCollection implements RouteCollectionInterface
         $collection = [];
 
         if (isset($this->routes[$verb])) {
-            // Conserve les itinéraires du verbe actuel au début afin qu'ils soient 
+            // Conserve les itinéraires du verbe actuel au début afin qu'ils soient
             // mis en correspondance avant l'un des itinéraires génériques "add".
             if (isset($this->routes['*'])) {
                 $extraRules = array_diff_key($this->routes['*'], $this->routes[$verb]);
@@ -901,7 +901,7 @@ class RouteCollection implements RouteCollectionInterface
      * Limite les itinéraires à un ENVIRONNEMENT spécifié ou ils ne fonctionneront pas.
      */
     public function environment(string $env, Closure $callback): self
-    {  
+    {
         if ($env === config('app.environment')) {
             $callback($this);
         }

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Loader;
 
 use BlitzPHP\Exceptions\LoadException;
@@ -18,7 +27,7 @@ class Filesystem
     /**
      * Déterminez si un fichier ou un répertoire existe.
      */
-    public static function exists(string $path) : bool
+    public static function exists(string $path): bool
     {
         return file_exists($path);
     }
@@ -26,7 +35,7 @@ class Filesystem
     /**
      * Obtenir le contenu d'un fichier.
      */
-    public static function get(string $path, bool $lock = false) : string
+    public static function get(string $path, bool $lock = false): string
     {
         if (self::isFile($path)) {
             return $lock ? self::sharedGet($path) : file_get_contents($path);
@@ -38,7 +47,7 @@ class Filesystem
     /**
      * Obtenir le contenu d'un fichier avec accès partagé.
      */
-    public static function sharedGet(string $path) : string
+    public static function sharedGet(string $path): string
     {
         $contents = '';
 
@@ -53,8 +62,7 @@ class Filesystem
 
                     flock($handle, LOCK_UN);
                 }
-            }
-            finally {
+            } finally {
                 fclose($handle);
             }
         }
@@ -64,12 +72,12 @@ class Filesystem
 
     /**
      * Obtenir la valeur renvoyée d'un fichier.
-     * 
+     *
      * @return mixed
      */
     public static function getRequire(string $path)
     {
-        if (self::isFile($path))  {
+        if (self::isFile($path)) {
             return require $path;
         }
 
@@ -96,8 +104,8 @@ class Filesystem
 
     /**
      * Écrire le contenu d'un fichier.
-     * 
-     * @return int|false
+     *
+     * @return false|int
      */
     public static function put(string $path, string $contents, bool $lock = false)
     {
@@ -131,8 +139,8 @@ class Filesystem
      */
     public static function prepend(string $path, string $data): int
     {
-        if (self::exists($path))  {
-            return self::put($path, $data.self::get($path));
+        if (self::exists($path)) {
+            return self::put($path, $data . self::get($path));
         }
 
         return self::put($path, $data);
@@ -148,7 +156,7 @@ class Filesystem
 
     /**
      * Get or set UNIX mode of a file or directory.
-     * 
+     *
      * @return mixed
      */
     public static function chmod(string $path, ?int $mode = null)
@@ -163,7 +171,7 @@ class Filesystem
     /**
      * Delete the file at a given path.
      *
-     * @param  string|array  $paths
+     * @param array|string $paths
      */
     public static function delete($paths): bool
     {
@@ -176,8 +184,7 @@ class Filesystem
                 if (! @unlink($path)) {
                     $success = false;
                 }
-            }
-            catch (ErrorException $e) {
+            } catch (ErrorException $e) {
                 $success = false;
             }
         }
@@ -193,9 +200,8 @@ class Filesystem
         if (! is_file($target) || ($overwrite && is_file($target))) {
             return rename($path, $target);
         }
-        
+
         return false;
-        
     }
 
     /**
@@ -206,13 +212,13 @@ class Filesystem
         if (! is_file($target) || ($overwrite && is_file($target))) {
             return copy($path, $target);
         }
-        
+
         return false;
     }
 
     /**
      * Create a hard link to the target file or directory.
-     * 
+     *
      * @return bool|void
      */
     public static function link(string $target, string $link)
@@ -223,12 +229,11 @@ class Filesystem
 
         $mode = self::isDirectory($target) ? 'J' : 'H';
 
-        exec("mklink /{$mode} ".escapeshellarg($link).' '.escapeshellarg($target));
+        exec("mklink /{$mode} " . escapeshellarg($link) . ' ' . escapeshellarg($target));
     }
 
     /**
      * Extract the file name from a file path.
-     * 
      */
     public static function name(string $path): string
     {
@@ -270,7 +275,7 @@ class Filesystem
     /**
      * Get the mime-type of a given file.
      *
-     * @return string|false
+     * @return false|string
      */
     public static function mimeType(string $path)
     {
@@ -279,7 +284,6 @@ class Filesystem
 
     /**
      * Get the file size of a given file.
-     * 
      */
     public static function size(string $path): int
     {
@@ -336,35 +340,39 @@ class Filesystem
 
     /**
      * Get an array of all files in a directory.
-     * 
+     *
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
     public static function files(string $directory, bool $hidden = false, string $sortBy = 'name'): array
     {
-		$files = Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0);
+        $files = Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0);
 
-		switch (strtolower($sortBy)) {
-			case 'type':
-				$files = $files->sortByType();
-				break;
-			case 'modifiedtime':
-			case 'modified':
-				$files = $files->sortByModifiedTime();
-				break;
-			case 'changedtime':
-			case 'changed':
-				$files = $files->sortByChangedTime();
-				break;
-			case 'accessedtime':
-			case 'accessed':
-				$files = $files->sortByAccessedTime();
-				break;
-			default:
-				$files = $files->sortByName();
-				break;
-		}
+        switch (strtolower($sortBy)) {
+            case 'type':
+                $files = $files->sortByType();
+                break;
 
-		return iterator_to_array($files, false);
+            case 'modifiedtime':
+            case 'modified':
+                $files = $files->sortByModifiedTime();
+                break;
+
+            case 'changedtime':
+            case 'changed':
+                $files = $files->sortByChangedTime();
+                break;
+
+            case 'accessedtime':
+            case 'accessed':
+                $files = $files->sortByAccessedTime();
+                break;
+
+            default:
+                $files = $files->sortByName();
+                break;
+        }
+
+        return iterator_to_array($files, false);
     }
 
     /**
@@ -374,28 +382,32 @@ class Filesystem
      */
     public static function allFiles(string $directory, bool $hidden = false, string $sortBy = 'name'): array
     {
-		$files = Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory);
+        $files = Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory);
 
-		switch (strtolower($sortBy)) {
-			case 'type':
-				$files = $files->sortByType();
-				break;
-			case 'modifiedtime':
-			case 'modified':
-				$files = $files->sortByModifiedTime();
-				break;
-			case 'changedtime':
-			case 'changed':
-				$files = $files->sortByChangedTime();
-				break;
-			case 'accessedtime':
-			case 'accessed':
-				$files = $files->sortByAccessedTime();
-				break;
-			default:
-				$files = $files->sortByName();
-				break;
-		}
+        switch (strtolower($sortBy)) {
+            case 'type':
+                $files = $files->sortByType();
+                break;
+
+            case 'modifiedtime':
+            case 'modified':
+                $files = $files->sortByModifiedTime();
+                break;
+
+            case 'changedtime':
+            case 'changed':
+                $files = $files->sortByChangedTime();
+                break;
+
+            case 'accessedtime':
+            case 'accessed':
+                $files = $files->sortByAccessedTime();
+                break;
+
+            default:
+                $files = $files->sortByName();
+                break;
+        }
 
         return iterator_to_array($files, false);
     }
@@ -443,7 +455,7 @@ class Filesystem
      */
     public static function copyDirectory(string $directory, string $destination, bool $overwrite = true, ?int $options = null): bool
     {
-        if (!self::isDirectory($directory)) {
+        if (! self::isDirectory($directory)) {
             return false;
         }
 
@@ -452,17 +464,17 @@ class Filesystem
         // If the destination directory does not actually exist, we will go ahead and
         // create it recursively, which just gets the destination prepared to copy
         // the files over. Once we make the directory we'll proceed the copying.
-        if (!self::isDirectory($destination)) {
+        if (! self::isDirectory($destination)) {
             self::makeDirectory($destination, 0777, true);
         }
 
         $items = new FilesystemIterator($directory, $options);
 
-        foreach ($items As $item) {
+        foreach ($items as $item) {
             // As we spin through items, we will check to see if the current file is actually
             // a directory or a file. When it is actually a directory we will need to call
             // back into this function recursively to keep copying these nested folders.
-            $target = $destination.'/'.$item->getBasename();
+            $target = $destination . '/' . $item->getBasename();
 
             if ($item->isDir()) {
                 $path = $item->getPathname();
@@ -529,7 +541,7 @@ class Filesystem
         $allDirectories = self::directories($directory);
 
         if (! empty($allDirectories)) {
-            foreach ($allDirectories As $directoryName) {
+            foreach ($allDirectories as $directoryName) {
                 self::deleteDirectory($directoryName);
             }
 

@@ -54,9 +54,8 @@ class Load
     /**
      * Charge un fichier d'aide
      *
-     * @param string|array $helpers
-     * @throws LoadException
      * @throws InvalidArgumentException
+     * @throws LoadException
      */
     public static function helper(string|array $helpers)
     {
@@ -65,8 +64,9 @@ class Load
         }
 
         $helpers = (array) $helpers;
-        foreach ($helpers As $helper) {
-           FileLocator::helper($helper);
+
+        foreach ($helpers as $helper) {
+            FileLocator::helper($helper);
         }
     }
 
@@ -76,12 +76,12 @@ class Load
     public static function lang(string $file, ?string $locale = null): array
     {
         $locale ??= config('app.language');
-        
-        if (! self::isLoaded('langs', $file.$locale)) {
-            self::loaded('langs', $file.$locale, FileLocator::lang($file, $locale));
+
+        if (! self::isLoaded('langs', $file . $locale)) {
+            self::loaded('langs', $file . $locale, FileLocator::lang($file, $locale));
         }
 
-        return self::getLoaded('langs', $file.$locale);
+        return self::getLoaded('langs', $file . $locale);
     }
 
     /**
@@ -110,6 +110,8 @@ class Load
 
     /**
      * Renvoie un element chargé
+     *
+     * @param mixed $element
      *
      * @return mixed
      */

@@ -70,7 +70,7 @@ class Router implements RouterInterface
      * @var string
      */
     protected $indexPage = 'index.php';
-     
+
     /**
      * Si les tirets dans les URI doivent être convertis
      * pour les traits de soulignement lors de la détermination des noms de méthode.
@@ -169,6 +169,7 @@ class Router implements RouterInterface
         // vouloir ceci, comme dans le cas des API.
         if (! $this->collection->shouldAutoRoute()) {
             $verb = strtolower($this->collection->getHTTPVerb());
+
             throw new PageNotFoundException("Can't find a route for '{$verb}: {$uri}'.");
         }
 
@@ -194,7 +195,7 @@ class Router implements RouterInterface
      */
     public function controllerName()
     {
-        if ( !is_string($this->controller)) {
+        if (! is_string($this->controller)) {
             return $this->controller;
         }
 
@@ -347,11 +348,11 @@ class Router implements RouterInterface
                 $routeKey = str_replace('{locale}', '[^/]+', $routeKey);
             }
 
-            // Est-ce que RegEx correspond ?
+            // Est-ce que RegEx correspond ?
             if (preg_match('#^' . $routeKey . '$#u', $uri, $matches)) {
-                // Cette route est-elle censée rediriger vers une autre ?
+                // Cette route est-elle censée rediriger vers une autre ?
                 if ($this->collection->isRedirect($routeKey)) {
-                    // remplacement des groupes de routes correspondants par des références : post/([0-9]+) -> post/$1
+                    // remplacement des groupes de routes correspondants par des références : post/([0-9]+) -> post/$1
                     $redirectTo = preg_replace_callback('/(\([^\(]+\))/', static function () {
                         static $i = 1;
 
@@ -375,7 +376,7 @@ class Router implements RouterInterface
                     unset($matched);
                 }
 
-                // Utilisons-nous Closures ? Si tel est le cas, nous devons collecter les paramètres dans un tableau 
+                // Utilisons-nous Closures ? Si tel est le cas, nous devons collecter les paramètres dans un tableau
                 // afin qu'ils puissent être transmis ultérieurement à la méthode du contrôleur.
                 if (! is_string($handler) && is_callable($handler)) {
                     $this->controller = $handler;
@@ -392,7 +393,7 @@ class Router implements RouterInterface
 
                 [$controller, ] = explode('::', $handler);
 
-               // Vérifie `/` dans le nom du contrôleur
+                // Vérifie `/` dans le nom du contrôleur
                 if (strpos($controller, '/') !== false) {
                     throw RouterException::invalidControllerName($handler);
                 }
