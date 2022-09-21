@@ -15,7 +15,7 @@
 Ce projet requiert [PHP] 7.4+. La méthode d'installation recommandée est via [Composer]. Exécutez simplement :
 
 ```bash
-$ composer require blitz*_*php/annotations
+$ composer require blitz-php/annotations
 ```
 
 Disons que vous travaillez sur quelques projets et que vous avez besoin d'un support d'annotations pour chacun. Avec cette bibliothèque, nous facilitons votre travail, tout ce dont vous avez besoin est une classe annotée et la classe `BlitzPHP\Annotations\AnnotationReader` pour trouver des annotations ou des attributs.
