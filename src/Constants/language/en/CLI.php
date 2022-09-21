@@ -44,5 +44,6 @@ return [
     'helpOptions'         => 'Options:',
     'helpUsage'           => 'Usage:',
     'invalidColor'        => 'Invalid {0} color: {1}.',
+    'invalidCommand'      => 'Invalid command: {0}.',
     'namespaceNotDefined' => 'Namespace "{0}" is not defined.',
 ];

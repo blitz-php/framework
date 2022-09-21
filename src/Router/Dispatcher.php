@@ -195,8 +195,6 @@ class Dispatcher
 
         $this->forceSecureAccess();
 
-        $this->spoofRequestMethod();
-
         /**
          * Init event manager
          */
@@ -584,29 +582,6 @@ class Dispatcher
     }
 
     /**
-     * Modifie l'objet de requête pour utiliser une méthode différente
-     * si une variable POST appelée _method est trouvée.
-     */
-    private function spoofRequestMethod()
-    {
-        // Ne fonctionne qu'avec les formulaires POST
-        if ($this->request->getMethod() !== 'post') {
-            return;
-        }
-
-        $post = $this->request->getParsedBody();
-
-        if (empty($post['_method'])) {
-            return;
-        }
-
-        // Accepte seulement PUT, PATCH, DELETE
-        if (in_array(strtoupper($post['_method']), ['PUT', 'PATCH', 'DELETE'], true)) {
-            $this->request = $this->request->withMethod($post['_method']);
-        }
-    }
-
-    /**
      * Maintenant que tout a été configuré, cette méthode tente d'exécuter le
      * méthode du contrôleur et lancez le script. S'il n'en est pas capable, le fera
      * afficher l'erreur Page introuvable appropriée.
@@ -852,6 +827,7 @@ class Dispatcher
     protected function initMiddlewareQueue(): void
     {
         $this->middleware = Services::injector()->make(Middleware::class, [$this->response]);
+        $this->middleware->prepend($this->spoofRequestMethod());
 
         $middlewaresFile = CONFIG_PATH . 'middlewares.php';
         if (file_exists($middlewaresFile) && ! in_array($middlewaresFile, get_included_files(), true)) {
@@ -863,5 +839,26 @@ class Dispatcher
                 }
             }
         }
+    }
+
+    /**
+     * Modifie l'objet de requête pour utiliser une méthode différente
+     * si une variable POST appelée _method est trouvée.
+     */
+    private function spoofRequestMethod(): callable
+    {
+        return function(ServerRequestInterface $request, ResponseInterface $response, callable $next) {
+            $post = $request->getParsedBody();
+
+            // Ne fonctionne qu'avec les formulaires POST
+            if (strtoupper($request->getMethod()) == 'POST' && ! empty($post['_method'])) {
+                // Accepte seulement PUT, PATCH, DELETE
+                if (in_array(strtoupper($post['_method']), ['PUT', 'PATCH', 'DELETE'], true)) {
+                    $request = $request->withMethod($post['_method']);
+                }
+            }
+            
+            return $next($request, $response);
+        };
     }
 }

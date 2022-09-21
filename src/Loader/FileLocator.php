@@ -41,8 +41,10 @@ class FileLocator
         $languages  = [];
 
         foreach ($paths as $path) {
-            if (file_exists($path) && ! in_array($path, get_included_files(), true)) {
-                $languages  = array_merge($languages, (array) require($path));
+            if (file_exists($path)) {
+                if (! in_array($path, get_included_files(), true)) {
+                    $languages  = array_merge($languages, (array) require($path));
+                }
                 $file_exist = true;
                 break;
             }

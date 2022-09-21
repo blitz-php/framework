@@ -41,14 +41,24 @@ defined('HELPER_PATH') || define('HELPER_PATH', APP_PATH . 'Helpers' . DS);
 defined('LIBRARY_PATH') || define('LIBRARY_PATH', APP_PATH . 'Libraries' . DS);
 
 /**
+ * Chemin  vers le dossier des middlewares
+ */
+defined('MIDDLEWARE_PATH') || define('MIDDLEWARE_PATH', APP_PATH . 'Middlewares' . DS);
+
+/**
+ * Chemin  vers le dossier des modeles
+ */
+defined('MODEL_PATH') || define('MODEL_PATH', APP_PATH . 'Models' . DS);
+
+/**
+ * Chemin  vers le dossier des ressources
+ */
+defined('RESOURCE_PATH') || define('RESOURCE_PATH', APP_PATH . 'Resources' . DS);
+
+/**
  * Chemin vers le dossier de stockage des fichiers temporaires
  */
 defined('TEMP_PATH') || define('TEMP_PATH', STORAGE_PATH . 'temp' . DS);
-
-/**
- * Chemin vers le dossier de cache des vues
- */
-defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', STORAGE_PATH . 'cache' . DS);
 
 /**
  * Chemin vers le dossier des vues
@@ -56,37 +66,24 @@ defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', STORAGE_PATH . 'cache' .
 defined('VIEW_PATH') || define('VIEW_PATH', APP_PATH . 'Views' . DS);
 
 /**
+ * Chemin vers le dossier de cache des vues
+ */
+defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', STORAGE_PATH . 'cache' . DS);
+
+/**
+ * Chemin vers le dossier des traductions
+ */
+defined('LANG_PATH') || define('LANG_PATH', RESOURCE_PATH . 'lang' . DS);
+
+/**
  * Chemin vers le dossier des layouts
  */
 defined('LAYOUT_PATH') || define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
 
-if (! defined('MIDDLEWARE_PATH')) {
-    /**
-     * Middlewares directory path
-     */
-    define('MIDDLEWARE_PATH', APP_PATH . 'middlewares' . DS);
-}
 
-if (! defined('MODEL_PATH')) {
-    /**
-     * Models directory path
-     */
-    define('MODEL_PATH', APP_PATH . 'models' . DS);
-}
 
-if (! defined('RESOURCE_PATH')) {
-    /**
-     * Resources directory path
-     */
-    define('RESOURCE_PATH', APP_PATH . 'resources' . DS);
-}
 
-if (! defined('LANG_PATH')) {
-    /**
-     * File translation directory path
-     */
-    define('LANG_PATH', RESOURCE_PATH . 'lang' . DS);
-}
+
 
 if (! defined('SERVICE_PATH')) {
     /**
@@ -137,59 +134,19 @@ if (! defined('DB_CACHE_PATH')) {
     define('DB_CACHE_PATH', DATABASE_PATH . 'cache' . DS);
 }
 
-if (! defined('SMARTY_CACHE_PATH')) {
-    /**
-     * Smarty views cache directory path
-     */
-    define('SMARTY_CACHE_PATH', STORAGE_PATH . 'smarty' . DS . 'cache' . DS);
-}
 
-if (! defined('SMARTY_COMPILES_PATH')) {
-    /**
-     * Smarty views compile directory path
-     */
-    define('SMARTY_COMPILES_PATH', STORAGE_PATH . 'smarty' . DS . 'compiles' . DS);
-}
-
-if (! defined('SMARTY_CONF_PATH')) {
-    /**
-     * Smarty views config directory path
-     */
-    define('SMARTY_CONF_PATH', STORAGE_PATH . 'smarty' . DS . 'conf' . DS);
-}
-
-/*
- | --------------------------------------------------------------------
- | App Namespace
- | --------------------------------------------------------------------
- |
- | This defines the default Namespace that is used throughout
- | CodeIgniter to refer to the Application directory. Change
- | this constant to change the namespace that all application
- | classes should use.
- |
- | NOTE: changing this will require manually modifying the
- | existing namespaces of App\* namespaced-classes.
+/**
+ * Cela définit l'espace de noms par défaut qui est utilisé dans BlitzPHP pour faire référence au répertoire de l'application. 
+ * Modifiez cette constante pour modifier l'espace de noms que toutes les classes d'application doivent utiliser.
+ * 
+ *  REMARQUE : changer cela nécessitera de modifier manuellement les espaces de noms existants des classes d'espaces de noms App\*.
  */
 defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
 
-/*
- | --------------------------------------------------------------------------
- | Composer Path
- | --------------------------------------------------------------------------
- |
- | The path that Composer's autoload file is expected to live. By default,
- | the vendor folder is in the Root directory, but you can customize that here.
- */
-defined('COMPOSER_PATH') || define('COMPOSER_PATH', ROOTPATH . 'vendor/autoload.php');
-
-/*
- |--------------------------------------------------------------------------
- | Timing Constants
- |--------------------------------------------------------------------------
- |
- | Provide simple ways to work with the myriad of PHP functions that
- | require information to be in seconds.
+/**
+ * Constantes de temps
+ * 
+ * Fournissez des moyens simples de travailler avec la myriade de fonctions PHP qui nécessitent des informations en quelques secondes.
  */
 defined('SECOND') || define('SECOND', 1);
 defined('MINUTE') || define('MINUTE', 60);
@@ -200,38 +157,31 @@ defined('MONTH')  || define('MONTH', 2592000);
 defined('YEAR')   || define('YEAR', 31536000);
 defined('DECADE') || define('DECADE', 315360000);
 
-/*
- | --------------------------------------------------------------------------
- | Exit Status Codes
- | --------------------------------------------------------------------------
- |
- | Used to indicate the conditions under which the script is exit()ing.
- | While there is no universal standard for error codes, there are some
- | broad conventions.  Three such conventions are mentioned below, for
- | those who wish to make use of them.  The CodeIgniter defaults were
- | chosen for the least overlap with these conventions, while still
- | leaving room for others to be defined in future versions and user
- | applications.
- |
- | The three main conventions used for determining exit status codes
- | are as follows:
- |
- |    Standard C/C++ Library (stdlibc):
- |       http://www.gnu.org/software/libc/manual/html_node/Exit-Status.html
- |       (This link also contains other GNU-specific conventions)
- |    BSD sysexits.h:
- |       http://www.gsp.com/cgi-bin/man.cgi?section=3&topic=sysexits
- |    Bash scripting:
- |       http://tldp.org/LDP/abs/html/exitcodes.html
- |
+/**
+ * --------------------------------------------------------------------------
+ * | Codes d'état de sortie
+ * --------------------------------------------------------------------------
+ * 
+ * Utilisé pour indiquer les conditions dans lesquelles le script sort().
+ * 
+ * Bien qu'il n'existe pas de norme universelle pour les codes d'erreur, il existe quelques conventions générales. 
+ * Trois de ces conventions sont mentionnées ci-dessous, pour ceux qui souhaitent en faire usage. 
+ * Les valeurs par défaut de BlitzPHP ont été choisies pour le moins de chevauchement avec ces conventions, 
+ * tout en laissant de la place pour que d'autres soient définies dans les futures versions et applications utilisateur.
+ * 
+ * Les trois principales conventions utilisées pour déterminer les codes d'état de sortie sont les suivantes :
+ * 
+ * - Librairie Standard C/C++ (stdlibc): http://www.gnu.org/software/libc/manual/html_node/Exit-Status.html
+ * - BSD sysexits.h: http://www.gsp.com/cgi-bin/man.cgi?section=3&topic=sysexits
+ * - Bash scripting: http://tldp.org/LDP/abs/html/exitcodes.html
  */
-defined('EXIT_SUCCESS')        || define('EXIT_SUCCESS', 0); // no errors
-defined('EXIT_ERROR')          || define('EXIT_ERROR', 1); // generic error
-defined('EXIT_CONFIG')         || define('EXIT_CONFIG', 3); // configuration error
-defined('EXIT_UNKNOWN_FILE')   || define('EXIT_UNKNOWN_FILE', 4); // file not found
-defined('EXIT_UNKNOWN_CLASS')  || define('EXIT_UNKNOWN_CLASS', 5); // unknown class
-defined('EXIT_UNKNOWN_METHOD') || define('EXIT_UNKNOWN_METHOD', 6); // unknown class member
-defined('EXIT_USER_INPUT')     || define('EXIT_USER_INPUT', 7); // invalid user input
-defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8); // database error
-defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
-defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
+defined('EXIT_SUCCESS')        || define('EXIT_SUCCESS', 0); // pas d'erreurs
+defined('EXIT_ERROR')          || define('EXIT_ERROR', 1); // erreur generique
+defined('EXIT_CONFIG')         || define('EXIT_CONFIG', 3); // erreur de configuration
+defined('EXIT_UNKNOWN_FILE')   || define('EXIT_UNKNOWN_FILE', 4); // fichier non trouvé
+defined('EXIT_UNKNOWN_CLASS')  || define('EXIT_UNKNOWN_CLASS', 5); // classe inconnue
+defined('EXIT_UNKNOWN_METHOD') || define('EXIT_UNKNOWN_METHOD', 6); // membre de classe inconnu
+defined('EXIT_USER_INPUT')     || define('EXIT_USER_INPUT', 7); // saisie utilisateur invalide
+defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8); // erreur de base de données
+defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9); // code d'erreur attribué automatiquement le plus bas
+defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // code d'erreur attribué automatiquement le plus élevé
