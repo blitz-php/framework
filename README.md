@@ -8,7 +8,7 @@
 [![PHPStan level](https://img.shields.io/badge/PHPStan-level%204-brightgreen)](phpstan.neon.dist)
 [![Total Downloads](http://poser.pugx.org/blitz-php/annotations/downloads)](https://packagist.org/packages/blitz-php/annotations)
 
-**blitz-php/annotations** est un lecteur d'annotations et d'attributs pour [PHP] 7.4+. Bien qu'étant principalement créé pour le framework [BlitzPHP][BlitzPHP], cette bibliothèque est conçu de façon à pouvoir s'intégrée aisement dans tout type de projet PHP. Basée sur [mindplay/annotations](mindplay), elle fournit un lecteur simple, rapide et léger des annotations pour votre projet.
+**blitz-php/annotations** est un lecteur d'annotations et d'attributs pour [PHP] 7.4+. Bien qu'étant principalement créé pour le framework [BlitzPHP][BlitzPHP], cette bibliothèque est conçu de façon à pouvoir s'intégrée aisement dans tout type de projet PHP. Basée sur [mindplay/annotations][mindplay], elle fournit un lecteur simple, rapide et léger des annotations pour votre projet.
 
 ## 📦 Installation & utilisation Basique
 
@@ -89,7 +89,7 @@ $annotations = AnnotationReader::fromMethod('FooController', 'index');
 
 ## 📓 Documentation
 
-Cette bibliothèque fournie juste des annotations prête à l'emploi compatibles avec les annotations [mindplay/annotations](mindplay).
+Cette bibliothèque fournie juste des annotations prête à l'emploi compatibles avec les annotations [mindplay/annotations][mindplay].
 Parcourez les tests pour voir les exemples d'utilisations des annotations mises à disposition par Blitz.
 
 ## ⏫ Mise à jour
