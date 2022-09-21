@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-# framework
-The Blitz framework core
-
-[![Coverage Status](https://coveralls.io/repos/github/blitz-php/framework/badge.svg?branch=main)](https://coveralls.io/github/blitz-php/framework?branch=main)
-=======
 # Blitz PHP / Annotations
 
 [![Latest Version](https://img.shields.io/packagist/v/blitz-php/annotations.svg?style=flat-square)](https://packagist.org/packages/blitz-php/annotations)
@@ -160,4 +154,3 @@ Vous êtes libre d'utiliser ce package comme vous le souhaitez. Découvrez les a
 [CONTRIBUTING]: https://github.com/blitz-php/framework/blob/main/.github/CONTRIBUTING.md
 [Tous les contributeurs]: https://github.com/blitz-php/annotations/contributors
 [Blitz PHP Lap]: https://github.com/orgs/blitz-php/people
->>>>>>> Annotations/main
