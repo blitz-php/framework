@@ -105,6 +105,10 @@ nb-configuration.xml
 /phpunit*.xml
 /.phpunit.*.cache
 
+<<<<<<< HEAD
 codeclimate.json
 coveralls.json
 clover.xml
+=======
+/.php-cs-fixer.php
+>>>>>>> Annotations/main
