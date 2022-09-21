@@ -3,6 +3,8 @@
 [![Latest Version](https://img.shields.io/packagist/v/blitz-php/annotations.svg?style=flat-square)](https://packagist.org/packages/blitz-php/annotations)
 [![Software License](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 [![Quality Score](https://img.shields.io/scrutinizer/g/blitz-php/annotations.svg?style=flat-square)](https://scrutinizer-ci.com/g/blitz-php/annotations)
+[![Build Status](https://scrutinizer-ci.com/g/blitz-php/annotations/badges/build.png?b=main)](https://scrutinizer-ci.com/g/blitz-php/annotations/build-status/main)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/blitz-php/annotations/badges/code-intelligence.svg?b=main)](https://scrutinizer-ci.com/code-intelligence)
 
 [![Coding Standards](https://github.com/blitz-php/annotations/actions/workflows/test-annotationss.yml/badge.svg)](https://github.com/blitz-php/annotations/actions/workflows/test-annotationss.yml)
 [![PHPStan Static Analysis](https://github.com/blitz-php/annotations/actions/workflows/test-phpstan.yml/badge.svg)](https://github.com/blitz-php/annotations/actions/workflows/test-phpstan.yml)
