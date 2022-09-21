@@ -11,8 +11,8 @@
     ],
     "require": {
         "php": ">=7.4 | ^8.0",
-		"blitz-php/contracts": "dev-main",
-		"blitz-php/utilities": "dev-main"
+		"blitz-php/contracts": "^1.0",
+		"blitz-php/utilities": "^1.0"
     },
     "autoload": {
         "psr-4": {
