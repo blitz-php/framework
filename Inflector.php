@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Utilities;
 
 /**
@@ -10,7 +19,7 @@ namespace BlitzPHP\Utilities;
  */
 class Inflector
 {
-/**
+    /**
      * Plural inflector rules
      *
      * @var array
@@ -408,23 +417,22 @@ class Inflector
     /**
      * Cache inflected values, and return if already available
      *
-     * @param string $type Inflection type
-     * @param string $key Original value
-     * @param string|bool $value Inflected value
-     * @return string|false Inflected value on cache hit or false on cache miss.
+     * @param string      $type  Inflection type
+     * @param string      $key   Original value
+     * @param bool|string $value Inflected value
+     *
+     * @return false|string Inflected value on cache hit or false on cache miss.
      */
     protected static function _cache(string $type, string $key, $value = false)
     {
-        $key = '_' . $key;
+        $key  = '_' . $key;
         $type = '_' . $type;
-        if ($value !== false)
-		{
+        if ($value !== false) {
             static::$_cache[$type][$key] = $value;
 
             return $value;
         }
-        if (!isset(static::$_cache[$type][$key]))
-		{
+        if (! isset(static::$_cache[$type][$key])) {
             return false;
         }
 
@@ -439,16 +447,14 @@ class Inflector
      */
     public static function reset()
     {
-        if (empty(static::$_initialState))
-		{
+        if (empty(static::$_initialState)) {
             static::$_initialState = get_class_vars(__CLASS__);
 
             return;
         }
-        foreach (static::$_initialState As $key => $val)
-		{
-            if ($key !== '_initialState')
-			{
+
+        foreach (static::$_initialState as $key => $val) {
+            if ($key !== '_initialState') {
                 static::${$key} = $val;
             }
         }
@@ -467,30 +473,26 @@ class Inflector
      * Inflector::rules('transliteration', ['/å/' => 'aa']);
      * ```
      *
-     * @param string $type The type of inflection, either 'plural', 'singular',
-     *   'uninflected' or 'transliteration'.
-     * @param array $rules Array of rules to be added.
-     * @param bool $reset If true, will unset default inflections for all
-     *        new rules that are being defined in $rules.
+     * @param string $type  The type of inflection, either 'plural', 'singular',
+     *                      'uninflected' or 'transliteration'.
+     * @param array  $rules Array of rules to be added.
+     * @param bool   $reset If true, will unset default inflections for all
+     *                      new rules that are being defined in $rules.
+     *
      * @return void
      */
     public static function rules(string $type, array $rules, bool $reset = false)
     {
         $var = '_' . $type;
 
-        if ($reset)
-		{
+        if ($reset) {
             static::${$var} = $rules;
-        }
-		elseif ($type === 'uninflected')
-		{
+        } elseif ($type === 'uninflected') {
             static::$_uninflected = array_merge(
                 $rules,
                 static::$_uninflected
             );
-        }
-		else
-		{
+        } else {
             static::${$var} = $rules + static::${$var};
         }
 
@@ -501,17 +503,16 @@ class Inflector
      * Return $word in plural form.
      *
      * @param string $word Word in singular
+     *
      * @return string Word in plural
      */
-    public static function pluralize(string $word) : string
+    public static function pluralize(string $word): string
     {
-        if (isset(static::$_cache['pluralize'][$word]))
-		{
+        if (isset(static::$_cache['pluralize'][$word])) {
             return static::$_cache['pluralize'][$word];
         }
 
-        if (!isset(static::$_cache['irregular']['pluralize']))
-		{
+        if (! isset(static::$_cache['irregular']['pluralize'])) {
             static::$_cache['irregular']['pluralize'] = '(?:' . implode('|', array_keys(static::$_irregular)) . ')';
         }
 
@@ -522,73 +523,63 @@ class Inflector
             return static::$_cache['pluralize'][$word];
         }
 
-        if (!isset(static::$_cache['uninflected']))
-		{
+        if (! isset(static::$_cache['uninflected'])) {
             static::$_cache['uninflected'] = '(?:' . implode('|', static::$_uninflected) . ')';
         }
 
-        if (preg_match('/^(' . static::$_cache['uninflected'] . ')$/i', $word, $regs))
-		{
+        if (preg_match('/^(' . static::$_cache['uninflected'] . ')$/i', $word, $regs)) {
             static::$_cache['pluralize'][$word] = $word;
 
             return $word;
         }
 
-        foreach (static::$_plural As $rule => $replacement)
-		{
-            if (preg_match($rule, $word))
-			{
+        foreach (static::$_plural as $rule => $replacement) {
+            if (preg_match($rule, $word)) {
                 static::$_cache['pluralize'][$word] = preg_replace($rule, $replacement, $word);
 
                 return static::$_cache['pluralize'][$word];
             }
         }
 
-		return $word;
+        return $word;
     }
 
     /**
      * Return $word in singular form.
      *
      * @param string $word Word in plural
+     *
      * @return string Word in singular
      */
-    public static function singularize (string $word) : string
+    public static function singularize(string $word): string
     {
-        if (isset(static::$_cache['singularize'][$word]))
-		{
+        if (isset(static::$_cache['singularize'][$word])) {
             return static::$_cache['singularize'][$word];
         }
 
-        if (!isset(static::$_cache['irregular']['singular']))
-		{
+        if (! isset(static::$_cache['irregular']['singular'])) {
             static::$_cache['irregular']['singular'] = '(?:' . implode('|', static::$_irregular) . ')';
         }
 
-        if (preg_match('/(.*?(?:\\b|_))(' . static::$_cache['irregular']['singular'] . ')$/i', $word, $regs))
-		{
+        if (preg_match('/(.*?(?:\\b|_))(' . static::$_cache['irregular']['singular'] . ')$/i', $word, $regs)) {
             static::$_cache['singularize'][$word] = $regs[1] . substr($regs[2], 0, 1) .
                 substr(array_search(strtolower($regs[2]), static::$_irregular, true), 1);
 
             return static::$_cache['singularize'][$word];
         }
 
-        if (!isset(static::$_cache['uninflected']))
-		{
+        if (! isset(static::$_cache['uninflected'])) {
             static::$_cache['uninflected'] = '(?:' . implode('|', static::$_uninflected) . ')';
         }
 
-        if (preg_match('/^(' . static::$_cache['uninflected'] . ')$/i', $word, $regs))
-		{
+        if (preg_match('/^(' . static::$_cache['uninflected'] . ')$/i', $word, $regs)) {
             static::$_cache['pluralize'][$word] = $word;
 
             return $word;
         }
 
-        foreach (static::$_singular As $rule => $replacement)
-		{
-            if (preg_match($rule, $word))
-			{
+        foreach (static::$_singular as $rule => $replacement) {
+            if (preg_match($rule, $word)) {
                 static::$_cache['singularize'][$word] = preg_replace($rule, $replacement, $word);
 
                 return static::$_cache['singularize'][$word];
@@ -602,18 +593,18 @@ class Inflector
     /**
      * Returns the input lower_case_delimited_string as a CamelCasedString.
      *
-     * @param string $string String to camelize
+     * @param string $string    String to camelize
      * @param string $delimiter the delimiter in the input string
+     *
      * @return string CamelizedStringLikeThis.
      */
-    public static function camelize(string $string, string $delimiter = '_') : string
+    public static function camelize(string $string, string $delimiter = '_'): string
     {
         $cacheKey = __FUNCTION__ . $delimiter;
 
         $result = static::_cache($cacheKey, $string);
 
-        if ($result === false)
-		{
+        if ($result === false) {
             $result = str_replace(' ', '', static::humanize($string, $delimiter));
             static::_cache($cacheKey, $string, $result);
         }
@@ -627,9 +618,10 @@ class Inflector
      * Also replaces dashes with underscores
      *
      * @param string $string CamelCasedString to be "underscorized"
+     *
      * @return string underscore_version of the input string
      */
-    public static function underscore(string $string) : string
+    public static function underscore(string $string): string
     {
         return static::delimit(str_replace('-', '_', $string), '_');
     }
@@ -640,9 +632,10 @@ class Inflector
      * Also replaces underscores with dashes
      *
      * @param string $string The string to dasherize.
+     *
      * @return string Dashed version of the input string
      */
-    public static function dasherize(string $string) : string
+    public static function dasherize(string $string): string
     {
         return static::delimit(str_replace('_', '-', $string), '-');
     }
@@ -651,21 +644,21 @@ class Inflector
      * Returns the input lower_case_delimited_string as 'A Human Readable String'.
      * (Underscores are replaced by spaces and capitalized following words.)
      *
-     * @param string $string String to be humanized
+     * @param string $string    String to be humanized
      * @param string $delimiter the character to replace with a space
+     *
      * @return string Human-readable string
      */
-    public static function humanize(string $string, string $delimiter = '_') : string
+    public static function humanize(string $string, string $delimiter = '_'): string
     {
         $cacheKey = __FUNCTION__ . $delimiter;
 
         $result = static::_cache($cacheKey, $string);
 
-        if ($result === false)
-		{
+        if ($result === false) {
             $result = explode(' ', str_replace($delimiter, ' ', $string));
-            foreach ($result As &$word)
-			{
+
+            foreach ($result as &$word) {
                 $word = mb_strtoupper(mb_substr($word, 0, 1)) . mb_substr($word, 1);
             }
             $result = implode(' ', $result);
@@ -678,18 +671,18 @@ class Inflector
     /**
      * Expects a CamelCasedInputString, and produces a lower_case_delimited_string
      *
-     * @param string $string String to delimit
+     * @param string $string    String to delimit
      * @param string $delimiter the character to use as a delimiter
+     *
      * @return string delimited string
      */
-    public static function delimit(string $string, string $delimiter = '_') : string
+    public static function delimit(string $string, string $delimiter = '_'): string
     {
         $cacheKey = __FUNCTION__ . $delimiter;
 
         $result = static::_cache($cacheKey, $string);
 
-        if ($result === false)
-		{
+        if ($result === false) {
             $result = mb_strtolower(preg_replace('/(?<=\\w)([A-Z])/', $delimiter . '\\1', $string));
             static::_cache($cacheKey, $string, $result);
         }
@@ -701,14 +694,14 @@ class Inflector
      * Returns corresponding table name for given model $className. ("people" for the model class "Person").
      *
      * @param string $className Name of class to get database table name for
+     *
      * @return string Name of the database table for given class
      */
-    public static function tableize(string $className) : string
+    public static function tableize(string $className): string
     {
         $result = static::_cache(__FUNCTION__, $className);
 
-        if ($result === false)
-		{
+        if ($result === false) {
             $result = static::pluralize(static::underscore($className));
             static::_cache(__FUNCTION__, $className, $result);
         }
@@ -720,14 +713,14 @@ class Inflector
      * Returns model class name ("Person" for the database table "people".) for given database table.
      *
      * @param string $tableName Name of database table to get class name for
+     *
      * @return string Class name
      */
-    public static function classify(string $tableName) : string
+    public static function classify(string $tableName): string
     {
         $result = static::_cache(__FUNCTION__, $tableName);
 
-        if ($result === false)
-		{
+        if ($result === false) {
             $result = static::camelize(static::singularize($tableName));
             static::_cache(__FUNCTION__, $tableName, $result);
         }
@@ -739,17 +732,17 @@ class Inflector
      * Returns camelBacked version of an underscored string.
      *
      * @param string $string String to convert.
+     *
      * @return string in variable form
      */
-    public static function variable(string $string) : string
+    public static function variable(string $string): string
     {
         $result = static::_cache(__FUNCTION__, $string);
 
-        if ($result === false)
-		{
+        if ($result === false) {
             $camelized = static::camelize(static::underscore($string));
-            $replace = strtolower(substr($camelized, 0, 1));
-            $result = $replace . substr($camelized, 1);
+            $replace   = strtolower(substr($camelized, 0, 1));
+            $result    = $replace . substr($camelized, 1);
             static::_cache(__FUNCTION__, $string, $result);
         }
 
