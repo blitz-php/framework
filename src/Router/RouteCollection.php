@@ -233,7 +233,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setDefaultNamespace(string $value): self
     {
-        $this->defaultNamespace = filter_var(strip_tags($value), FILTER_SANITIZE_STRING);
+        $this->defaultNamespace = esc(strip_tags($value));
         $this->defaultNamespace = rtrim($this->defaultNamespace, '\\') . '\\';
 
         return $this;
@@ -244,7 +244,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setDefaultController(string $value): self
     {
-        $this->defaultController = filter_var(strip_tags($value), FILTER_SANITIZE_STRING);
+        $this->defaultController = esc(strip_tags($value));
 
         return $this;
     }
@@ -254,7 +254,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setDefaultMethod(string $value): self
     {
-        $this->defaultMethod = filter_var(strip_tags($value), FILTER_SANITIZE_STRING);
+        $this->defaultMethod = esc(strip_tags($value));
 
         return $this;
     }

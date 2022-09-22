@@ -51,33 +51,25 @@ class Router implements RouterInterface
 
     /**
      * Le nom de la méthode à utiliser
-     *
-     * @var string
      */
-    protected $method;
+    protected string $method = '';
 
     /**
-     * An array of binds that were collected
-     * so they can be sent to closure routes.
-     *
-     * @var array
+     * Un tableau de liens qui ont été collectés afin 
+     * qu'ils puissent être envoyés aux routes de fermeture.
      */
-    protected $params = [];
+    protected array $params = [];
 
     /**
      * Le nom du du front-controller.
-     *
-     * @var string
      */
-    protected $indexPage = 'index.php';
+    protected string $indexPage = 'index.php';
 
     /**
      * Si les tirets dans les URI doivent être convertis
      * pour les traits de soulignement lors de la détermination des noms de méthode.
-     *
-     * @var bool
      */
-    protected $translateURIDashes = true;
+    protected bool $translateURIDashes = true;
 
     /**
      * Les routes trouvées pour la requête courrante
@@ -106,7 +98,7 @@ class Router implements RouterInterface
      *
      * @var string[]
      */
-    protected $middlewaresInfo = [];
+    protected array $middlewaresInfo = [];
 
     protected ?AutoRouterInterface $autoRouter = null;
 

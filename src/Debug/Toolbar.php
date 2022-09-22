@@ -510,7 +510,7 @@ class Toolbar
     /**
      * Formatte la sortie
      */
-    protected function format(int $debugbar_time, string $data, string $format = 'html'): string
+    protected function format(float $debugbar_time, string $data, string $format = 'html'): string
     {
         $data = json_decode($data, true);
 

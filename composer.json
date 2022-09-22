@@ -16,7 +16,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=7.4 | ^8.0",
+        "php": ">=8.0",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "adhocore/cli": "^1.0",
