@@ -361,39 +361,27 @@ class Helpers
      * informations sur l'environnement.
      *
      * @param string     $key     Nom de la variable d'environnement
-     * @param mixed|null $default
+     * @param mixed|null $default Spécifiez une valeur par défaut au cas où la variable d'environnement n'est pas définie.
      *
      * @return string Paramétrage des variables d'environnement.
-     * @credit CakePHP - http://book.cakephp.org/2.0/en/core-libraries/global-constants-and-functions.html#env
+     * @credit CakePHP - http://book.cakephp.org/4.0/en/core-libraries/global-constants-and-functions.html#env
      */
     public static function env(string $key, $default = null)
     {
         if ($key === 'HTTPS') {
             if (isset($_SERVER['HTTPS'])) {
-                return ! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-            }
-            if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-                return ! empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https';
-            }
-            if (isset($_SERVER['HTTP_FRONT_END_HTTPS'])) {
-                return ! empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off';
+                return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
             }
 
-            return strpos(self::env('SCRIPT_URI'), 'https://') === 0;
+            return strpos((string) self::env('SCRIPT_URI'), 'https://') === 0;
         }
 
-        if ($key === 'SCRIPT_NAME') {
-            if (self::env('CGI_MODE') && isset($_ENV['SCRIPT_URL'])) {
-                $key = 'SCRIPT_URL';
-            }
+        if ($key === 'SCRIPT_NAME' && self::env('CGI_MODE') && isset($_ENV['SCRIPT_URL'])) {
+            $key = 'SCRIPT_URL';
         }
 
-        $val = null;
-        if (isset($_SERVER[$key])) {
-            $val = $_SERVER[$key];
-        } elseif (isset($_ENV[$key])) {
-            $val = $_ENV[$key];
-        } elseif (getenv($key) !== false) {
+        $val = $_SERVER[$key] ?? $_ENV[$key] ?? null;
+        if ($val == null && getenv($key) !== false) {
             $val = getenv($key);
         }
 
@@ -410,63 +398,18 @@ class Helpers
 
         switch ($key) {
             case 'DOCUMENT_ROOT':
-                $name     = self::env('SCRIPT_NAME');
-                $filename = self::env('SCRIPT_FILENAME');
-                $offset   = 0;
-                if (! strpos($name, '.php')) {
+                $name = (string) self::env('SCRIPT_NAME');
+                $filename = (string) self::env('SCRIPT_FILENAME');
+                $offset = 0;
+                if (!strpos($name, '.php')) {
                     $offset = 4;
                 }
 
                 return substr($filename, 0, -(strlen($name) + $offset));
-
             case 'PHP_SELF':
-                return str_replace(self::env('DOCUMENT_ROOT'), '', self::env('SCRIPT_FILENAME'));
-
+                return str_replace((string) self::env('DOCUMENT_ROOT'), '', (string) self::env('SCRIPT_FILENAME'));
             case 'CGI_MODE':
                 return PHP_SAPI === 'cgi';
-
-            case 'HTTP_BASE':
-                $host  = self::env('HTTP_HOST');
-                $parts = explode('.', $host);
-                $count = count($parts);
-
-                if ($count === 1) {
-                    return '.' . $host;
-                }
-                if ($count === 2) {
-                    return '.' . $host;
-                }
-                if ($count === 3) {
-                    $gTLD = [
-                        'aero',
-                        'asia',
-                        'biz',
-                        'cat',
-                        'com',
-                        'coop',
-                        'edu',
-                        'gov',
-                        'info',
-                        'int',
-                        'jobs',
-                        'mil',
-                        'mobi',
-                        'museum',
-                        'name',
-                        'net',
-                        'org',
-                        'pro',
-                        'tel',
-                        'travel',
-                        'xxx',
-                    ];
-                    if (in_array($parts[1], $gTLD, true)) {
-                        return '.' . $host;
-                    }
-                }
-                array_shift($parts);
-
-                return '.' . implode('.', $parts);
         }
 
         return $default;
