@@ -297,8 +297,11 @@ if (! function_exists('is_localfile')) {
      */
     function is_localfile(string $name): bool
     {
-        return false;
-        // return Helpers::is_localfile($name);
+        if (preg_match('#^'.base_url().'#i', $name)) {
+            return true;
+        }
+
+        return !preg_match('#^(https?://)#i', $name);
     }
 }
 
@@ -415,8 +418,10 @@ if (! function_exists('dd')) {
      */
     function dd(...$vars)
     {
-        Kint::$aliases[] = 'dd';
-        Kint::dump(...$vars);
+        if (class_exists('\Kint\Kint')) {
+            Kint::$aliases[] = 'dd';
+            Kint::dump(...$vars);
+        }
 
         exit;
     }
@@ -432,8 +437,10 @@ if (! function_exists('dump')) {
      */
     function dump(...$vars)
     {
-        Kint::$aliases[] = 'dump';
-        Kint::dump(...$vars);
+        if (class_exists('\Kint\Kint')) {
+            Kint::$aliases[] = 'dump';
+            Kint::dump(...$vars);
+        }
     }
 }
 

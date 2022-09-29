@@ -73,6 +73,7 @@ abstract class AbstractAdapter implements RendererInterface
         $this->config   = $config;
         $this->debug    = $debug ?? BLITZ_DEBUG;
         $this->viewPath = rtrim($viewPath, '\\/ ') . DS;
+        helper('assets');
     }
 
     /**
