@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\HTTP;
+namespace BlitzPHP\Http;
 
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Loader\Services;

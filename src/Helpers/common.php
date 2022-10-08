@@ -10,7 +10,8 @@
  */
 
 use BlitzPHP\Config\Config;
-use BlitzPHP\HTTP\Redirection;
+use BlitzPHP\Exceptions\PageNotFoundException;
+use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Load;
@@ -92,7 +93,7 @@ if (! function_exists('show404')) {
      */
     function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = [])
     {
-        // return Errors::show404($message, $heading, $params);
+       throw PageNotFoundException::pageNotFound($message);
     }
 }
 

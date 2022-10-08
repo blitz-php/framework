@@ -56,7 +56,7 @@ class ApplicationController extends BaseController
             $object->addData($this->viewDatas);
         }
 
-        return $object->display($path . '/' . $view);
+        return $object->display($path . '/' . $view)->setVar('title', str_ireplace('Controller', '', Dispatcher::getController(false)) . ' - ' . Dispatcher::getMethod());
     }
 
     /**

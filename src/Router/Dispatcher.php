@@ -163,11 +163,17 @@ class Dispatcher
      *
      * @return Closure|string
      */
-    public static function getController()
+    public static function getController(bool $fullName = true)
     {
+        $routes = Services::routes();
+
         $controller = self::instance()->controller;
         if (empty($controller)) {
-            $controller = Services::routes()->getDefaultController();
+            $controller = $routes->getDefaultController();
+        }
+
+        if (! $fullName && is_string($controller)) {
+            $controller = str_replace($routes->getDefaultNamespace(), '', $controller);
         }
 
         return $controller;
