@@ -166,6 +166,9 @@ final class Console extends Application
             throw new CLIException("La classe `{$commandName}` n'existe pas");
         }
 
+        /**
+         * @var Command $instance
+         */
         $instance = new $commandName($this, Services::logger());
 
         if (! ($instance instanceof Command)) {
@@ -180,9 +183,7 @@ final class Console extends Application
         );
 
         // Defini le groupe auquel appartient la commande
-        if (method_exists($command, 'setGroup')) {
-            $command->setGroup($instance->group);
-        }
+        $command->inGroup($instance->group);
 
         // Defini l'usage et la version de la commande
         $command->usage($instance->usage)->version($instance->version);
