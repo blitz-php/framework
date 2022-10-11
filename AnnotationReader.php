@@ -33,8 +33,8 @@ class AnnotationReader
 
     /**
      * Vérifie, instancie et renvoie la seule instance de la classe appelée.
-	 *
-	 * @return static
+     *
+     * @return static
      */
     public static function instance()
     {
