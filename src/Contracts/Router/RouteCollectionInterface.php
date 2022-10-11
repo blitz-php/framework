@@ -44,8 +44,8 @@ interface RouteCollectionInterface
      * plusieurs espaces réservés ajoutés à la fois.
      *
      * @param array|string $placeholder
-	 *
-	 * @return mixed
+     *
+     * @return mixed
      */
     public function addPlaceholder($placeholder, ?string $pattern = null);
 
@@ -164,20 +164,20 @@ interface RouteCollectionInterface
      */
     public function getRedirectCode(string $from): int;
 
-	/**
+    /**
      * Renvoie la valeur actuelle du paramètre translateURIDashes.
      */
     public function shouldTranslateURIDashes(): bool;
 
-	/**
+    /**
      * Indique au système s'il faut convertir les tirets des chaînes URI en traits de soulignement.
-	 * Dans certains moteurs de recherche, y compris Google, les tirets créent plus de sens et permettent au moteur de recherche
-	 * de trouver plus facilement des mots et une signification dans l'URI pour un meilleur référencement.
-	 * Mais cela ne fonctionne pas bien avec les noms de méthodes PHP...
+     * Dans certains moteurs de recherche, y compris Google, les tirets créent plus de sens et permettent au moteur de recherche
+     * de trouver plus facilement des mots et une signification dans l'URI pour un meilleur référencement.
+     * Mais cela ne fonctionne pas bien avec les noms de méthodes PHP...
      */
     public function setTranslateURIDashes(bool $value): self;
 
-	/**
+    /**
      * Obtenez tous les contrôleurs dans Route Handlers
      *
      * @param string|null $verbe HTTP verbe. `'*'` renvoie tous les contrôleurs dans n'importe quel verbe.
