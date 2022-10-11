@@ -67,53 +67,52 @@ class Str
         'script',
     ];
 
-	public static function __callStatic($name, $arguments)
+    public static function __callStatic($name, $arguments)
     {
         /**
          * Conversion de casse d'ecriture
          */
-        if (\preg_match("#^to(.*)(Case)?$#", $name)) {
+        if (\preg_match('#^to(.*)(Case)?$#', $name)) {
             return self::convertTo($arguments[0], $name);
         }
 
-		throw new InvalidArgumentException('Unknown method ' . __CLASS__ . '::' . $name);
+        throw new InvalidArgumentException('Unknown method ' . __CLASS__ . '::' . $name);
     }
 
     /**
-     * Convertissez des chaînes entre 13 conventions de nommage :
+     * Convertissez des chaînes entre 13 conventions de nommage :
      * - Snake case, Camel case, Kebab case, Pascal case, Ada case, Train case, Cobol case, Macro case,
      * - majuscules, minuscules, Title case, Sentence Case et notation par points.
      *
-     * @param string $converter
      * @use \Jawira\CaseConverter\Convert
      */
-	public static function convertTo(string $str, string $converter): string
-	{
-		$available_case = [
-			'camel',
-			'pascal',
-			'snake',
-			'ada',
-			'macro',
-			'kebab',
-			'train',
-			'cobol',
-			'lower',
-			'upper',
-			'title',
-			'sentence',
-			'dot'
-		];
+    public static function convertTo(string $str, string $converter): string
+    {
+        $available_case = [
+            'camel',
+            'pascal',
+            'snake',
+            'ada',
+            'macro',
+            'kebab',
+            'train',
+            'cobol',
+            'lower',
+            'upper',
+            'title',
+            'sentence',
+            'dot',
+        ];
 
-		$converter = preg_replace("#Case$#i", '', $converter);
-		$converter = str_replace('to', '', strtolower($converter));
+        $converter = preg_replace('#Case$#i', '', $converter);
+        $converter = str_replace('to', '', strtolower($converter));
 
-		if (!in_array($converter, $available_case)) {
-			throw new InvalidArgumentException("Invalid converter type: `$converter`");
-		}
+        if (! in_array($converter, $available_case, true)) {
+            throw new InvalidArgumentException("Invalid converter type: `{$converter}`");
+        }
 
-		return call_user_func([new \Jawira\CaseConverter\Convert($str), 'to'.ucfirst($converter)]);
-	}
+        return call_user_func([new \Jawira\CaseConverter\Convert($str), 'to' . ucfirst($converter)]);
+    }
 
     /**
      * Return the remainder of a string after a given value.
