@@ -90,6 +90,7 @@ class Middleware implements RequestHandlerInterface
      * insert un middleware a une position donnee
      *
      * @param callable|object|string $middleware
+     *
      * @alias insertAt
      */
     public function insert(int $index, $middleware): self

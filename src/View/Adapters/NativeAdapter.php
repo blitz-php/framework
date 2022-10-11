@@ -301,6 +301,7 @@ class NativeAdapter extends AbstractAdapter
      * Capture la dernière section
      *
      * @throws RuntimeException
+     *
      * @alias self::stop()
      */
     public function endSection(): void
@@ -312,6 +313,7 @@ class NativeAdapter extends AbstractAdapter
      * Capture la dernière section
      *
      * @throws RuntimeException
+     *
      * @alias self::stop()
      */
     public function end(): void

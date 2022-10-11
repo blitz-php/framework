@@ -48,6 +48,7 @@ class App
      * @param string $type Type de la classe
      *
      * @return string|null Nom de classe avec le namespace, null si la classe est introuvable.
+     *
      * @psalm-return class-string|null
      */
     public static function className(string $class, string $type = '', string $suffix = ''): ?string

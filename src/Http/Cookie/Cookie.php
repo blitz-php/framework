@@ -43,6 +43,7 @@ use InvalidArgumentException;
  * @see https://en.wikipedia.org/wiki/HTTP_cookie
  * @see \BlitzPHP\Http\Cookie\CookieCollection for working with collections of cookies.
  * @see \BlitzPHP\Http\Response::getCookieCollection() for working with response cookies.
+ *
  * @credit <a href="https://api.cakephp.org/4.3/class-Cake.Http.Cookie.Cookie.html">CakePHP - \Cake\Http\Cookie\Cookie</a>
  */
 class Cookie implements CookieInterface

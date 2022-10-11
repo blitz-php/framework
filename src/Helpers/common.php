@@ -22,7 +22,6 @@ use Kint\Kint;
 // ================================= FONCTIONS D'ACCESSIBILITE ================================= //
 
 if (! function_exists('env')) {
-
     /**
      * Obtient une variable d'environnement à partir des sources disponibles et fournit une émulation
      * pour les variables d'environnement non prises en charge ou incohérentes
@@ -93,7 +92,7 @@ if (! function_exists('show404')) {
      */
     function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = [])
     {
-       throw PageNotFoundException::pageNotFound($message);
+        throw PageNotFoundException::pageNotFound($message);
     }
 }
 
@@ -298,11 +297,11 @@ if (! function_exists('is_localfile')) {
      */
     function is_localfile(string $name): bool
     {
-        if (preg_match('#^'.base_url().'#i', $name)) {
+        if (preg_match('#^' . base_url() . '#i', $name)) {
             return true;
         }
 
-        return !preg_match('#^(https?://)#i', $name);
+        return ! preg_match('#^(https?://)#i', $name);
     }
 }
 
@@ -612,9 +611,11 @@ if (! function_exists('force_https')) {
      *
      * @param int $duration Combien de temps l'en-tête SSL doit-il être défini ? (en secondes)
      *                      Par défaut à 1 an.
+     *
      * @credit CodeIgniter <a href="http://codeigniter.com/">helpers force_https() - /system/Common.php</a>
      *
      * Non testable, car il sortira !
+     *
      * @codeCoverageIgnore
      */
     function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?Redirection $response = null)

@@ -14,7 +14,6 @@ declare(strict_types=1);
 use BlitzPHP\CodingStandard\Blitz;
 use Nexus\CsConfig\Factory;
 use Nexus\CsConfig\Fixer\Comment\NoCodeSeparatorCommentFixer;
-use Nexus\CsConfig\Fixer\Comment\SpaceAfterCommentStartFixer;
 use Nexus\CsConfig\FixerGenerator;
 use PhpCsFixer\Finder;
 
@@ -44,7 +43,6 @@ $options = [
     'customFixers' => FixerGenerator::create('vendor/nexusphp/cs-config/src/Fixer', 'Nexus\\CsConfig\\Fixer'),
     'customRules'  => [
         NoCodeSeparatorCommentFixer::name() => true,
-        SpaceAfterCommentStartFixer::name() => true,
     ],
 ];
 
