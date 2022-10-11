@@ -17,8 +17,6 @@ use BlitzPHP\Debug\Toolbar\Collectors\Config;
 use BlitzPHP\Debug\Toolbar\Collectors\HistoryCollector;
 use BlitzPHP\Formatter\JsonFormatter;
 use BlitzPHP\Formatter\XmlFormatter;
-use BlitzPHP\Http\Response;
-use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\View\Parser;
 use Exception;
@@ -26,6 +24,7 @@ use GuzzleHttp\Psr7\Utils;
 use Kint\Kint;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use stdClass;
 
 /**
@@ -86,12 +85,12 @@ class Toolbar
      *
      * @return string Données encodées en JSON
      */
-    public function run(float $startTime, float $totalTime, ServerRequest $request, Response $response): string
+    public function run(float $startTime, float $totalTime, ServerRequestInterface $request, ResponseInterface $response): string
     {
         // Éléments de données utilisés dans la vue.
         $data['url']             = current_url();
         $data['method']          = strtoupper($request->getMethod());
-        $data['isAJAX']          = $request->isAJAX();
+        $data['isAJAX']          = Services::request()->isAJAX();
         $data['startTime']       = $startTime;
         $data['totalTime']       = $totalTime * 1000;
         $data['totalMemory']     = number_format((memory_get_peak_usage()) / 1024 / 1024, 3);
@@ -171,7 +170,7 @@ class Toolbar
             $data['vars']['cookies'][esc($name)] = esc($value);
         }
 
-        $data['vars']['request'] = ($request->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
+        $data['vars']['request'] = (Services::request()->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
 
         $data['vars']['response'] = [
             'statusCode'  => $response->getStatusCode(),
@@ -510,7 +509,7 @@ class Toolbar
     /**
      * Formatte la sortie
      */
-    protected function format(int $debugbar_time, string $data, string $format = 'html'): string
+    protected function format(float $debugbar_time, string $data, string $format = 'html'): string
     {
         $data = json_decode($data, true);
 

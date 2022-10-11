@@ -233,7 +233,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setDefaultNamespace(string $value): self
     {
-        $this->defaultNamespace = filter_var(strip_tags($value), FILTER_SANITIZE_STRING);
+        $this->defaultNamespace = esc(strip_tags($value));
         $this->defaultNamespace = rtrim($this->defaultNamespace, '\\') . '\\';
 
         return $this;
@@ -244,7 +244,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setDefaultController(string $value): self
     {
-        $this->defaultController = filter_var(strip_tags($value), FILTER_SANITIZE_STRING);
+        $this->defaultController = esc(strip_tags($value));
 
         return $this;
     }
@@ -254,7 +254,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setDefaultMethod(string $value): self
     {
-        $this->defaultMethod = filter_var(strip_tags($value), FILTER_SANITIZE_STRING);
+        $this->defaultMethod = esc(strip_tags($value));
 
         return $this;
     }
@@ -628,7 +628,7 @@ class RouteCollection implements RouteCollectionInterface
         // Si un nouveau contrôleur est spécifié, alors nous remplaçons le
         // valeur de $name avec le nom du nouveau contrôleur.
         if (isset($options['controller'])) {
-            $newName = ucfirst(filter_var(strip_tags($options['controller']), FILTER_SANITIZE_STRING));
+            $newName = ucfirst(esc(strip_tags($options['controller'])));
         }
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
@@ -722,7 +722,7 @@ class RouteCollection implements RouteCollectionInterface
         // Si un nouveau contrôleur est spécifié, alors nous remplaçons le
         // valeur de $name avec le nom du nouveau contrôleur.
         if (isset($options['controller'])) {
-            $newName = ucfirst(filter_var(strip_tags($options['controller']), FILTER_SANITIZE_STRING));
+            $newName = ucfirst(esc(strip_tags($options['controller'])));
         }
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
@@ -1038,7 +1038,7 @@ class RouteCollection implements RouteCollectionInterface
         $overwrite = false;
         $prefix    = $this->group === null ? '' : $this->group . '/';
 
-        $from = filter_var(strip_tags($prefix . $from), FILTER_SANITIZE_STRING);
+        $from = esc(strip_tags($prefix . $from));
 
         // Alors que nous voulons ajouter une route dans un groupe de '/',
         // ça ne marche pas avec la correspondance, alors supprimez-les...

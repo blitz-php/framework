@@ -12,6 +12,7 @@
 namespace BlitzPHP\Http;
 
 use GuzzleHttp\Psr7\LimitStream;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Émetteur de réponse
@@ -30,7 +31,7 @@ use GuzzleHttp\Psr7\LimitStream;
  */
 class ResponseEmitter
 {
-    public function emit(Response $response, int $maxBufferLength = 8192)
+    public function emit(ResponseInterface $response, int $maxBufferLength = 8192)
     {
         $file = $line = null;
         if (headers_sent($file, $line)) {
@@ -69,11 +70,11 @@ class ResponseEmitter
      *
      * @return void
      */
-    public function emitHeaders(Response $response)
+    public function emitHeaders(ResponseInterface $response)
     {
         $cookies = [];
         if (method_exists($response, 'getCookies')) {
-            $cookies = $response->getCookies();
+            $cookies = call_user_func([$response, 'getCookies']);
         }
 
         foreach ($response->getHeaders() as $name => $values) {
@@ -104,7 +105,7 @@ class ResponseEmitter
      *
      * @return void
      */
-    protected function emitBody(Response $response, int $maxBufferLength)
+    protected function emitBody(ResponseInterface $response, int $maxBufferLength)
     {
         if (in_array($response->getStatusCode(), [204, 304], true)) {
             return;
@@ -132,7 +133,7 @@ class ResponseEmitter
      *
      * @return void
      */
-    protected function emitBodyRange(array $range, Response $response, int $maxBufferLength)
+    protected function emitBodyRange(array $range, ResponseInterface $response, int $maxBufferLength)
     {
         [$unit, $first, $last, $length] = $range;
 
@@ -169,7 +170,7 @@ class ResponseEmitter
      *
      * @return void
      */
-    protected function emitStatusLine(Response $response)
+    protected function emitStatusLine(ResponseInterface $response)
     {
         $reasonPhrase = $response->getReasonPhrase();
         header(sprintf(

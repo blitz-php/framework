@@ -73,6 +73,7 @@ abstract class AbstractAdapter implements RendererInterface
         $this->config   = $config;
         $this->debug    = $debug ?? BLITZ_DEBUG;
         $this->viewPath = rtrim($viewPath, '\\/ ') . DS;
+        helper('assets');
     }
 
     /**
@@ -174,6 +175,38 @@ abstract class AbstractAdapter implements RendererInterface
             ];
         }
     }
+
+    /**
+	 * Recupère ou modifie le titre de la page
+     * 
+	 * @return string|self
+	 */
+	public function title(?string $title = null)
+	{
+		if (empty($title)) {
+			return $this->getData()['title'] ?? '';
+		}
+
+        return $this->setVar('title', $title);
+    }
+
+	/**
+	 * Recupère ou modifie les elements de balises "meta"
+	 *
+	 * @return string|self
+	 */
+	public function meta(string $key, ?string $value = null)
+	{
+        $meta = $this->getData()['meta'] ?? [];
+
+		if (empty($value)) {
+			return $meta[$key] ?? '';
+		}
+
+		$meta[$key] = esc($value);
+        
+        return $this->setVar('meta', $meta);
+	}
 
     /**
      * Construit la sortie en fonction d'un nom de fichier et de tout données déjà définies.

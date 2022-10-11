@@ -10,7 +10,8 @@
  */
 
 use BlitzPHP\Config\Config;
-use BlitzPHP\HTTP\Redirection;
+use BlitzPHP\Exceptions\PageNotFoundException;
+use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Load;
@@ -92,7 +93,7 @@ if (! function_exists('show404')) {
      */
     function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = [])
     {
-        // return Errors::show404($message, $heading, $params);
+       throw PageNotFoundException::pageNotFound($message);
     }
 }
 
@@ -297,8 +298,11 @@ if (! function_exists('is_localfile')) {
      */
     function is_localfile(string $name): bool
     {
-        return false;
-        // return Helpers::is_localfile($name);
+        if (preg_match('#^'.base_url().'#i', $name)) {
+            return true;
+        }
+
+        return !preg_match('#^(https?://)#i', $name);
     }
 }
 
@@ -415,8 +419,10 @@ if (! function_exists('dd')) {
      */
     function dd(...$vars)
     {
-        Kint::$aliases[] = 'dd';
-        Kint::dump(...$vars);
+        if (class_exists('\Kint\Kint')) {
+            Kint::$aliases[] = 'dd';
+            Kint::dump(...$vars);
+        }
 
         exit;
     }
@@ -432,8 +438,10 @@ if (! function_exists('dump')) {
      */
     function dump(...$vars)
     {
-        Kint::$aliases[] = 'dump';
-        Kint::dump(...$vars);
+        if (class_exists('\Kint\Kint')) {
+            Kint::$aliases[] = 'dump';
+            Kint::dump(...$vars);
+        }
     }
 }
 

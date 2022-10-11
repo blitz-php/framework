@@ -95,7 +95,7 @@ class NativeAdapter extends AbstractAdapter
             }
         }
 
-        $this->renderVars['file'] = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
+        $this->renderVars['file'] = str_replace('/', DS, rtrim($options['viewPath'] ?? $this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
 
         if (! is_file($this->renderVars['file'])) {
             throw ViewException::invalidFile($this->renderVars['view']);
@@ -126,7 +126,7 @@ class NativeAdapter extends AbstractAdapter
             $this->layout = null;
             // Enregistrer les variables actuelles
             $renderVars = $this->renderVars;
-            $output     = $this->render($layoutView, $options, $saveData);
+            $output     = $this->render($layoutView, array_merge($options ?? [], ['viewPath' => LAYOUT_PATH]), $saveData);
             // Récupère les variables actuelles
             $this->renderVars = $renderVars;
         }
