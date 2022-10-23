@@ -499,3 +499,41 @@ if (! function_exists('clean_url')) {
         return Helpers::cleanUrl($url);
     }
 }
+
+if (!function_exists('link_active'))
+{
+    /**
+     * ACTIVE LINK
+     *
+     * Determine si le chemin actuel correspond au path souhaité et renvoie la classe active correspondante
+     * Est censé fonctionnner un peu comme le 'router-active-link' de vuejs
+     *
+     * @param	string	$path Le chemin que l'on shouhaite verifier
+     * @param	bool	$exact_active L'url doit exactement correspondre
+     * @param	string	$active_class La classe active correspondante
+     * @return	string
+     */
+    function link_active(string $path, bool $exact_active = false, string $active_class = 'active'): string
+    {
+        $path = trim($path, '/');
+        $active_class .= ' blitz-active-link';
+
+        $current_url = current_url();
+        if ($current_url == link_to($path)) {
+           return $active_class . ' blitz-exact-active-link';
+        }
+        
+        $current_url = trim(str_replace(trim(site_url(), '/'), '', $current_url), '/');
+        if ($current_url == $path) {
+            return $active_class . ' blitz-exact-active-link';       
+        }
+        if ($exact_active) {
+            return '';
+        }
+        if (preg_match('#^'.$path.'/?#i', $current_url)) {
+            return $active_class;       
+        }
+
+        return '';
+    }
+}
