@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Database\Contracts\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Utilities\Helpers;
 
@@ -129,41 +130,34 @@ class FileLocator
     /**
      * Cree et renvoi un model donné
      *
-     * @return \dFramework\core\Model
+     * @template T of \BlitzPHP\Models\BaseModel
+     *
+     * @param class-string<T> $name
+     *
+     * @return T
      */
-    public static function model(string $model)
+    public static function model(string $model, array $options = [], ?ConnectionInterface $connection = null)
     {
-        $model = str_replace(DS, '/', $model);
-        $model = explode('/', $model);
+        $options = array_merge([
+            'preferApp' => true,
+        ], $options);
 
-        $mod                      = ucfirst(end($model));
-        $mod                      = (! preg_match('#Model$#', $mod)) ? $mod . 'Model' : $mod;
-        $model[count($model) - 1] = $mod;
-
-        foreach ($model as $key => &$value) {
-            if (preg_match('#^Models?$#i', $value)) {
-                unset($value, $model[$key]);
-            }
+        if (! preg_match('#Model$#', $model)) {
+            $model .= 'Model';
         }
 
-        $path = MODEL_PATH . Helpers::ensureExt(implode(DS, $model), 'php');
+        if ($options['preferApp'] === true) {
+            $model = self::getBasename($model);
 
-        if (! file_exists($path)) {
-            throw LoadException::modelNotFound($mod, $path);
+            $model = str_replace(APP_NAMESPACE . '\\Models\\', '', $model);
+            $model = APP_NAMESPACE . '\\Models\\' . $model;
         }
 
-        require_once $path;
-
-        $class_namespaced = implode('\\', $model);
-
-        if (class_exists($class_namespaced, false)) {
-            return Injector::make($class_namespaced);
-        }
-        if (! class_exists($mod, false)) {
-            throw LoadException::modelDontExist($mod, $path);
+        if (! class_exists($model)) {
+            throw LoadException::modelNotFound($model);
         }
 
-        return Injector::make($mod);
+        return Injector::make($model, [$connection]);
     }
 
     /**
@@ -204,5 +198,34 @@ class FileLocator
         }
 
         return Injector::make($con);
+    }
+
+    /**
+     * Recupere le nom de base a partir du nom de la classe, namespacé ou non.
+     */
+    public static function getBasename(string $name): string
+    {
+        // Determine le basename
+        if ($basename = strrchr($name, '\\')) {
+            return substr($basename, 1);
+        }
+
+        return $name;
+    }
+
+    /**
+     * Verifie si la classe satisfait l'option "preferApp"
+     *
+     * @param array  $options directives specifier pqr le composant
+     * @param string $name    Nom de la classe, namespace optionel
+     */
+    protected static function verifyPreferApp(array $options, string $name): bool
+    {
+        // Tout element sans restriction passe
+        if (! $options['preferApp']) {
+            return true;
+        }
+
+        return strpos($name, APP_NAMESPACE) === 0;
     }
 }

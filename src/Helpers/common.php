@@ -10,6 +10,7 @@
  */
 
 use BlitzPHP\Config\Config;
+use BlitzPHP\Database\Contracts\ConnectionInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
@@ -52,6 +53,22 @@ if (! function_exists('helper')) {
     function helper($filenames)
     {
         Load::helper($filenames);
+    }
+}
+
+if (! function_exists('model')) {
+    /**
+     * Simple maniere d'obtenir un modele.
+     *
+     * @template T of BlitzPHP\Models\BaseModel
+     *
+     * @param array<class-string<T>>|class-string<T> $name
+     *
+     * @return T
+     */
+    function model(string|array $name, array $options = [], ?ConnectionInterface &$conn = null)
+    {
+        return Load::model($name, $options, $conn);
     }
 }
 

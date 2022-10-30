@@ -11,11 +11,15 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Database\Contracts\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 
 class Load
 {
     /**
+     * Liste des elements deja chargés,
+     * Si un element est deja chargé, on le renvoie simplement sans avoir besoin de le construire à nouveau
+     *
      * @var array
      */
     private static $loads = [
@@ -68,6 +72,36 @@ class Load
         foreach ($helpers as $helper) {
             FileLocator::helper($helper);
         }
+    }
+
+    /**
+     * Charge un modele
+     *
+     * @throws LoadException
+     *
+     * @return object|object[]
+     */
+    public static function model(string|array $model, array $options = [], ?ConnectionInterface $connection = null)
+    {
+        if (empty($model)) {
+            throw new LoadException('Veuillez specifier le modele à charger');
+        }
+
+        if (is_array($model)) {
+            $models = [];
+
+            foreach ($model as $value) {
+                $models[] = self::model($value, $options, $connection);
+            }
+
+            return $models;
+        }
+
+        if (! self::isLoaded('models', $model)) {
+            self::loaded('models', $model, FileLocator::model($model, $options, $connection));
+        }
+
+        return self::getLoaded('models', $model);
     }
 
     /**
