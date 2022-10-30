@@ -41,4 +41,12 @@ class ArrayFormatter implements FormatterInterface
 
         return $array;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function parse(string $data): array
+    {
+        return [$data];
+    }
 }

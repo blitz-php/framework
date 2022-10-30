@@ -19,9 +19,7 @@ use BlitzPHP\Loader\Services;
 class JsonFormatter implements FormatterInterface
 {
     /**
-     * Prend les données fournies et les formate.
-     *
-     * @param mixed $data
+     *{@inheritDoc}
      *
      * @return false|string Représentation Json d'une valeur
      *                      false en cas d'erreur de formattage
@@ -46,5 +44,15 @@ class JsonFormatter implements FormatterInterface
         $data['warning'] = 'INVALID JSONP CALLBACK: ' . $callback;
 
         return json_encode($data, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param string $data Chaine JSON
+     */
+    public function parse(string $data): array
+    {
+        return $data ? json_decode(trim($data), true) : [];
     }
 }

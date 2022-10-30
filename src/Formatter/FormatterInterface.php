@@ -24,4 +24,11 @@ interface FormatterInterface
      * @return mixed
      */
     public function format($data);
+
+    /**
+     * Prend les données fournies et les decode
+     *
+     * @return array Resultat de la chaîne décodée ou tableau vide
+     */
+    public function parse(string $data): array;
 }

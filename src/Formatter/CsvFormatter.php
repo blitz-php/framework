@@ -33,9 +33,7 @@ class CsvFormatter implements FormatterInterface
     private $enclosure = '"';
 
     /**
-     * Prend les données fournies et les formate.
-     *
-     * @param mixed $data
+     * {@inheritDoc}
      *
      * @return string|null Une chaine formatée en CSV
      */
@@ -84,6 +82,19 @@ class CsvFormatter implements FormatterInterface
 
         // Convertit l'encodage UTF-8 en UTF-16LE qui est pris en charge par MS Excel
         return mb_convert_encoding($csv, 'UTF-16LE', 'UTF-8');
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param string $data Chaine CSV
+     *
+     * @return array A multi-dimensional array with the outer array being the number of rows
+     *               and the inner arrays the individual fields
+     */
+    public function parse(string $data): array
+    {
+        return str_getcsv($data, $this->delimiter, $this->enclosure);
     }
 
     /**
