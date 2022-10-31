@@ -1,8 +1,0 @@
-parameters:
-    level: 4
-    paths:
-        - src
-    ignoreErrors:
-        -
-            message: '#Constant [a-zA-Z0-9\\_]+ not found#'
-            path: *
