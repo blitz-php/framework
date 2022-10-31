@@ -791,7 +791,7 @@ class ServerRequest implements ServerRequestInterface
             return (array) $this->_environment[$name];
         }
 
-        return [];
+        return (array) $this->getEnv($name);
     }
 
     /**

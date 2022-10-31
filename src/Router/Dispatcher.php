@@ -137,7 +137,6 @@ class Dispatcher
         $this->startTime = microtime(true);
 
         $this->config = (object) config('app');
-        $this->initMiddlewareQueue();
     }
 
     public static function init(bool $returnResponse = false)
@@ -199,6 +198,8 @@ class Dispatcher
         $this->getRequestObject();
         $this->getResponseObject();
 
+        $this->initMiddlewareQueue();
+    
         $this->forceSecureAccess();
 
         /**
@@ -388,7 +389,7 @@ class Dispatcher
         // Assurez-vous que la version est au bon format
         $version = number_format((float) $version, 1);
 
-        $this->request = Services::request()->withProtocolVersion($version);
+        $this->request = Services::request()->withProtocolVersion($version)->withMethod($_SERVER['REQUEST_METHOD'] ?? 'GET');
     }
 
     /**
