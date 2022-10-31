@@ -28,6 +28,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Provides CSRF protection & validation.
  *
  * You can also add your own request body parsers usi *
+ *
  * @credit		CakePHP (Cake\Http\Middleware\BodyParserMiddleware - https://cakephp.org)
  */
 class BodyParser implements MiddlewareInterface

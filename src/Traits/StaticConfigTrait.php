@@ -305,6 +305,7 @@ trait StaticConfigTrait
      * Updates the DSN class map for this class.
      *
      * @param array<string, string> $map Additions/edits to the class map to apply.
+     *
      * @psalm-param array<string, class-string> $map
      */
     public static function setDsnClassMap(array $map): void
@@ -316,6 +317,7 @@ trait StaticConfigTrait
      * Returns the DSN class map for this class.
      *
      * @return array<string, string>
+     *
      * @psalm-return array<string, class-string>
      */
     public static function getDsnClassMap(): array

@@ -222,7 +222,7 @@ final class Console extends Application
 
         $console = $this;
 
-        $command->action(function () use ($instance, $command, $console) {
+        $command->action(static function () use ($instance, $command, $console) {
             if (! $console->suppress) {
                 $console->start($instance->service);
             }

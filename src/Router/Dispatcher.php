@@ -199,7 +199,7 @@ class Dispatcher
         $this->getResponseObject();
 
         $this->initMiddlewareQueue();
-    
+
         $this->forceSecureAccess();
 
         /**

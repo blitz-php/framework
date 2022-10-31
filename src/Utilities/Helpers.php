@@ -59,6 +59,7 @@ class Helpers
      * @see https://bugs.php.net/bug.php?id=54709
      *
      * @throws Exception
+     *
      * @codeCoverageIgnore Pas pratique à tester, car travis fonctionne sous linux
      */
     public static function isReallyWritable(string $file): bool
@@ -221,6 +222,7 @@ class Helpers
      * @param string|null $charset Jeu de caractères à utiliser lors de l'échappement. La valeur par défaut est la valeur de configuration dans `mb_internal_encoding()` ou 'UTF-8'.
      *
      * @return mixed Texte enveloppé.
+     *
      * @credit CackePHP (https://cakephp.org)
      */
     public static function h($text, bool $double = true, ?string $charset = null)
@@ -297,7 +299,6 @@ class Helpers
             }
         } else {
             switch ($config) {
-
                 case 'comment':
                     $config = HTMLPurifier_Config::createDefault();
                     $config->set('Core.Encoding', $charset);
@@ -364,13 +365,14 @@ class Helpers
      * @param mixed|null $default Spécifiez une valeur par défaut au cas où la variable d'environnement n'est pas définie.
      *
      * @return string Paramétrage des variables d'environnement.
+     *
      * @credit CakePHP - http://book.cakephp.org/4.0/en/core-libraries/global-constants-and-functions.html#env
      */
     public static function env(string $key, $default = null)
     {
         if ($key === 'HTTPS') {
             if (isset($_SERVER['HTTPS'])) {
-                return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+                return ! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
             }
 
             return strpos((string) self::env('SCRIPT_URI'), 'https://') === 0;
@@ -381,7 +383,7 @@ class Helpers
         }
 
         $val = $_SERVER[$key] ?? $_ENV[$key] ?? null;
-        if ($val == null && getenv($key) !== false) {
+        if ($val === null && getenv($key) !== false) {
             $val = getenv($key);
         }
 
@@ -398,16 +400,18 @@ class Helpers
 
         switch ($key) {
             case 'DOCUMENT_ROOT':
-                $name = (string) self::env('SCRIPT_NAME');
+                $name     = (string) self::env('SCRIPT_NAME');
                 $filename = (string) self::env('SCRIPT_FILENAME');
-                $offset = 0;
-                if (!strpos($name, '.php')) {
+                $offset   = 0;
+                if (! strpos($name, '.php')) {
                     $offset = 4;
                 }
 
                 return substr($filename, 0, -(strlen($name) + $offset));
+
             case 'PHP_SELF':
                 return str_replace((string) self::env('DOCUMENT_ROOT'), '', (string) self::env('SCRIPT_FILENAME'));
+
             case 'CGI_MODE':
                 return PHP_SAPI === 'cgi';
         }
@@ -534,7 +538,9 @@ class Helpers
      * @param string|null $plugin    Plugin optionnel par défaut à utiliser si aucun plugin n'est trouvé. La valeur par défaut est nulle.
      *
      * @return array Tableau avec 2 index. 0 => nom du plugin, 1 => nom de la classe.
+     *
      * @credit <a href="https://book.cakephp.org/4/en/core-libraries/global-constants-and-functions.html#pluginSplit">CakePHP</a>
+     *
      * @psalm-return array{string|null, string}
      */
     public static function pluginSplit(string $name, bool $dotAppend = false, ?string $plugin = null): array
