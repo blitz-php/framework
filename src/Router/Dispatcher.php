@@ -137,7 +137,6 @@ class Dispatcher
         $this->startTime = microtime(true);
 
         $this->config = (object) config('app');
-        $this->initMiddlewareQueue();
     }
 
     public static function init(bool $returnResponse = false)
@@ -199,6 +198,8 @@ class Dispatcher
         $this->getRequestObject();
         $this->getResponseObject();
 
+        $this->initMiddlewareQueue();
+    
         $this->forceSecureAccess();
 
         /**
@@ -377,7 +378,7 @@ class Dispatcher
         if (is_cli() && ! on_test()) {
             // @codeCoverageIgnoreStart
             // $this->request = Services::clirequest($this->config);
-        // @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreEnd
         }
 
         $version = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1';
@@ -388,7 +389,7 @@ class Dispatcher
         // Assurez-vous que la version est au bon format
         $version = number_format((float) $version, 1);
 
-        $this->request = Services::request()->withProtocolVersion($version);
+        $this->request = Services::request()->withProtocolVersion($version)->withMethod($_SERVER['REQUEST_METHOD'] ?? 'GET');
     }
 
     /**
@@ -710,7 +711,7 @@ class Dispatcher
             if (ob_get_level() > 0) {
                 ob_end_flush();
             }
-            // @codeCoverageIgnoreEnd
+        // @codeCoverageIgnoreEnd
         }
         // Lors des tests, l'un est pour phpunit, l'autre pour le cas de test.
         elseif (ob_get_level() > 2) {

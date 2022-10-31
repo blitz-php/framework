@@ -10,6 +10,7 @@
  */
 
 use BlitzPHP\Config\Config;
+use BlitzPHP\Database\Contracts\ConnectionInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
@@ -22,7 +23,6 @@ use Kint\Kint;
 // ================================= FONCTIONS D'ACCESSIBILITE ================================= //
 
 if (! function_exists('env')) {
-
     /**
      * Obtient une variable d'environnement à partir des sources disponibles et fournit une émulation
      * pour les variables d'environnement non prises en charge ou incohérentes
@@ -53,6 +53,22 @@ if (! function_exists('helper')) {
     function helper($filenames)
     {
         Load::helper($filenames);
+    }
+}
+
+if (! function_exists('model')) {
+    /**
+     * Simple maniere d'obtenir un modele.
+     *
+     * @template T of BlitzPHP\Models\BaseModel
+     *
+     * @param array<class-string<T>>|class-string<T> $name
+     *
+     * @return T
+     */
+    function model(string|array $name, array $options = [], ?ConnectionInterface &$conn = null)
+    {
+        return Load::model($name, $options, $conn);
     }
 }
 
@@ -93,7 +109,7 @@ if (! function_exists('show404')) {
      */
     function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = [])
     {
-       throw PageNotFoundException::pageNotFound($message);
+        throw PageNotFoundException::pageNotFound($message);
     }
 }
 
@@ -298,11 +314,11 @@ if (! function_exists('is_localfile')) {
      */
     function is_localfile(string $name): bool
     {
-        if (preg_match('#^'.base_url().'#i', $name)) {
+        if (preg_match('#^' . base_url() . '#i', $name)) {
             return true;
         }
 
-        return !preg_match('#^(https?://)#i', $name);
+        return ! preg_match('#^(https?://)#i', $name);
     }
 }
 
@@ -612,9 +628,11 @@ if (! function_exists('force_https')) {
      *
      * @param int $duration Combien de temps l'en-tête SSL doit-il être défini ? (en secondes)
      *                      Par défaut à 1 an.
+     *
      * @credit CodeIgniter <a href="http://codeigniter.com/">helpers force_https() - /system/Common.php</a>
      *
      * Non testable, car il sortira !
+     *
      * @codeCoverageIgnore
      */
     function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?Redirection $response = null)

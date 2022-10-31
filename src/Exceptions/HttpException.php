@@ -27,4 +27,9 @@ class HttpException extends FrameworkException
     {
         return new static(lang('HTTP.invalidRoute', [$route]));
     }
+
+    public static function badRequest(string $message = 'Bad Request')
+    {
+        return new static($message, 400);
+    }
 }

@@ -55,7 +55,7 @@ class Router implements RouterInterface
     protected string $method = '';
 
     /**
-     * Un tableau de liens qui ont été collectés afin 
+     * Un tableau de liens qui ont été collectés afin
      * qu'ils puissent être envoyés aux routes de fermeture.
      */
     protected array $params = [];
@@ -383,7 +383,7 @@ class Router implements RouterInterface
                     return true;
                 }
 
-                [$controller, ] = explode('::', $handler);
+                [$controller] = explode('::', $handler);
 
                 // Vérifie `/` dans le nom du contrôleur
                 if (strpos($controller, '/') !== false) {

@@ -44,9 +44,9 @@ class LoadException extends OutOfBoundsException implements ExceptionInterface
         return new static(self::lang('Loader.libraryDontExist', [$library]));
     }
 
-    public static function modelNotFound(string $model, string $path): self
+    public static function modelNotFound(string $model): self
     {
-        return new static(self::lang('Loader.modelNotFound', [$model, $path]));
+        return new static(self::lang('Loader.modelNotFound', [$model]));
     }
 
     public static function modelDontExist(string $model, string $path): self

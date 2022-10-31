@@ -18,7 +18,6 @@ use BlitzPHP\Router\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
 use ReflectionException;
 
 /**
@@ -111,7 +110,7 @@ abstract class BaseController
         }
 
         if (empty($this->model) && ! empty($this->modelName) && class_exists($this->modelName)) {
-            // $this->model = model($this->modelName);
+            $this->model = model($this->modelName);
         }
 
         if (! empty($this->model) && empty($this->modelName)) {
@@ -153,15 +152,12 @@ abstract class BaseController
     private function getModel()
     {
         if (! empty($this->modelName)) {
-            $this->setModel($this->modelName);
-
-            return;
+            $model = $this->modelName;
+        } else {
+            $model = str_replace('Controller', 'Model', static::class);
         }
 
-        $reflection = new ReflectionClass(static::class);
-        $model      = str_replace([CONTROLLER_PATH, 'Controller', '.php'], '', $reflection->getFileName()) . 'Model';
-
-        if (file_exists(MODEL_PATH . $model . '.php')) {
+        if (class_exists($model)) {
             $this->setModel($model);
         }
     }

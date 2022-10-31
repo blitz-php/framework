@@ -791,7 +791,7 @@ class ServerRequest implements ServerRequestInterface
             return (array) $this->_environment[$name];
         }
 
-        return [];
+        return (array) $this->getEnv($name);
     }
 
     /**
@@ -1725,6 +1725,7 @@ class ServerRequest implements ServerRequestInterface
      * @see https://tools.ietf.org/html/rfc7230#section-2.7 (pour les différentes formes de demande-cible autorisées dans les messages de demande)
      *
      * @param string $requestTarget La cible de la requête.
+     *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
     public function withRequestTarget($requestTarget): self

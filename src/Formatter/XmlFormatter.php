@@ -29,9 +29,7 @@ class XmlFormatter implements FormatterInterface
     protected $structure;
 
     /**
-     * Prend les données fournies et les formate.
-     *
-     * @param mixed $data
+     * {@inheritDoc}
      *
      * @return false|string Représentation XML d'une valeur
      *                      false en cas d'erreur de formattage
@@ -90,5 +88,15 @@ class XmlFormatter implements FormatterInterface
         }
 
         return $this->structure->asXML();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param string $data Chaine XML
+     */
+    public function parse(string $data): array
+    {
+        return $data ? (array) simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA) : [];
     }
 }
