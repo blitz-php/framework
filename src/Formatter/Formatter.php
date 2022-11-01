@@ -39,11 +39,15 @@ class Formatter
      */
     protected static $formatters = [
         'application/json' => JsonFormatter::class,
+        'json'             => JsonFormatter::class,
         'application/csv'  => CsvFormatter::class,
+        'csv'              => CsvFormatter::class,
         'application/xml'  => XmlFormatter::class,
         'text/xml'         => XmlFormatter::class,
+        'xml'              => XmlFormatter::class,
 
         'php/array' => ArrayFormatter::class,
+        'array'     => ArrayFormatter::class,
     ];
 
     /**
