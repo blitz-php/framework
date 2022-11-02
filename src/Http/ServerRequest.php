@@ -250,7 +250,7 @@ class ServerRequest implements ServerRequestInterface
         }
 
         if (empty($config['environment']['REQUEST_METHOD'])) {
-            $config['environment']['REQUEST_METHOD'] = 'GET';
+            $config['environment']['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         }
 
         $this->cookies = $config['cookies'];
