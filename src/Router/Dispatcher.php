@@ -12,6 +12,7 @@
 namespace BlitzPHP\Router;
 
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\PageNotFoundException;
@@ -570,9 +571,11 @@ class Dispatcher
             return $this->path;
         }
 
-        return method_exists($this->request, 'getPath')
+        $path = method_exists($this->request, 'getPath')
             ? $this->request->getPath()
             : $this->request->getUri()->getPath();
+            
+        return str_replace(App::getUri()->getPath(), '', $path);
     }
 
     /**
