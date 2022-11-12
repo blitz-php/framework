@@ -283,12 +283,11 @@ class ServerRequest implements ServerRequestInterface
         }
         $this->stream = $stream;
 
-        
-        $config['post']        = $this->_processPost($config['post']);
-        $this->data    = $this->_processFiles($config['post'], $config['files']);
-        $this->query   = $config['query'];
-        $this->params  = $config['params'];
-        $this->session = $config['session'];
+        $config['post'] = $this->_processPost($config['post']);
+        $this->data     = $this->_processFiles($config['post'], $config['files']);
+        $this->query    = $config['query'];
+        $this->params   = $config['params'];
+        $this->session  = $config['session'];
     }
 
     /**
@@ -1605,7 +1604,7 @@ class ServerRequest implements ServerRequestInterface
 
             return $file;
         }
-        
+
         if (! ($file instanceof UploadedFileInterface)) {
             return null;
         }
@@ -1855,25 +1854,24 @@ class ServerRequest implements ServerRequestInterface
      * Any additional parameters are applied to the callback in the order they are given.
      *
      * @param string|null $callback A decoding callback that will convert the string data to another
-     *     representation. Leave empty to access the raw input data. You can also
-     *     supply additional parameters for the decoding callback using var args, see above.
-     * @param array ...$args The additional arguments
+     *                              representation. Leave empty to access the raw input data. You can also
+     *                              supply additional parameters for the decoding callback using var args, see above.
+     * @param array       ...$args  The additional arguments
+     *
      * @return string The decoded/processed request data.
      */
     public function input($callback = null, ...$args): string
     {
         $this->stream->rewind();
         $input = $this->stream->getContents();
-        if ($callback)
-		{
+        if ($callback) {
             array_unshift($args, $input);
 
-            return call_user_func_array($callback, $args);
+            return $callback(...$args);
         }
 
         return $input;
     }
-
 
     /**
      * Sets the REQUEST_METHOD environment variable based on the simulated _method
@@ -1881,44 +1879,40 @@ class ServerRequest implements ServerRequestInterface
      * want the read the non-simulated HTTP method the client used.
      *
      * @param array $data Array of post data.
+     *
      * @return array
      */
     protected function _processPost(array $data)
     {
-        $method = $this->getEnv('REQUEST_METHOD');
+        $method   = $this->getEnv('REQUEST_METHOD');
         $override = false;
 
         if ($_POST) {
             $data = $_POST;
-        }
-        else if (
-            in_array($method, ['PUT', 'DELETE', 'PATCH'], true) &&
-            strpos($this->contentType(), 'application/x-www-form-urlencoded') === 0
+        } elseif (
+            in_array($method, ['PUT', 'DELETE', 'PATCH'], true)
+            && strpos($this->contentType() ?? '', 'application/x-www-form-urlencoded') === 0
         ) {
             $data = $this->input();
             parse_str($data, $data);
         }
-        if (ini_get('magic_quotes_gpc') === '1')
-        {
+        if (ini_get('magic_quotes_gpc') === '1') {
             $data = Helpers::stripslashesDeep($this->data);
         }
 
-        if ($this->hasHeader('X-Http-Method-Override'))
-		{
+        if ($this->hasHeader('X-Http-Method-Override')) {
             $data['_method'] = $this->getHeaderLine('X-Http-Method-Override');
-            $override = true;
+            $override        = true;
         }
         $this->_environment['ORIGINAL_REQUEST_METHOD'] = $method;
 
-        if (isset($data['_method']))
-		{
+        if (isset($data['_method'])) {
             $this->_environment['REQUEST_METHOD'] = $data['_method'];
             unset($data['_method']);
             $override = true;
         }
 
-        if ($override AND !in_array($this->_environment['REQUEST_METHOD'], ['PUT', 'POST', 'DELETE', 'PATCH'], true))
-		{
+        if ($override && ! in_array($this->_environment['REQUEST_METHOD'], ['PUT', 'POST', 'DELETE', 'PATCH'], true)) {
             $data = [];
         }
 
@@ -1928,18 +1922,16 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Process the GET parameters and move things into the object.
      *
-     * @param array $query The array to which the parsed keys/values are being added.
+     * @param array  $query       The array to which the parsed keys/values are being added.
      * @param string $queryString A query string from the URL if provided
+     *
      * @return array An array containing the parsed query string as keys/values.
      */
     protected function _processGet($query, $queryString = '')
     {
-        if (ini_get('magic_quotes_gpc') === '1')
-        {
+        if (ini_get('magic_quotes_gpc') === '1') {
             $q = Helpers::stripslashesDeep($_GET);
-        }
-        else
-        {
+        } else {
             $q = $_GET;
         }
         $query = array_merge($q, $query);
@@ -1947,14 +1939,12 @@ class ServerRequest implements ServerRequestInterface
         $unsetUrl = '/' . str_replace(['.', ' '], '_', urldecode($this->url));
         unset($query[$unsetUrl], $query[$this->base . $unsetUrl]);
 
-        if (strpos($this->url, '?') !== false)
-        {
-            list(, $querystr) = explode('?', $this->url);
+        if (strpos($this->url, '?') !== false) {
+            [, $querystr] = explode('?', $this->url);
             parse_str($querystr, $queryArgs);
             $query += $queryArgs;
         }
-        if (isset($this->params['url']))
-        {
+        if (isset($this->params['url'])) {
             $query = array_merge($this->params['url'], $query);
         }
 
@@ -1964,25 +1954,29 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Process uploaded files and move things onto the post data.
      *
-     * @param array $post Post data to merge files onto.
+     * @param array $post  Post data to merge files onto.
      * @param array $files Uploaded files to merge in.
+     *
      * @return array merged post + file data.
      */
     protected function _processFiles(array $post, array $files): array
     {
-        if (!is_array($files)) {
+        if (! is_array($files)) {
             return $post;
         }
 
         $fileData = [];
+
         foreach ($files as $key => $value) {
             if ($value instanceof UploadedFileInterface) {
                 $fileData[$key] = $value;
+
                 continue;
             }
 
-            if (is_array($value) AND isset($value['tmp_name'])) {
+            if (is_array($value) && isset($value['tmp_name'])) {
                 $fileData[$key] = $this->_createUploadedFile($value);
+
                 continue;
             }
 
@@ -1996,20 +1990,21 @@ class ServerRequest implements ServerRequestInterface
 
         // Make a flat map that can be inserted into $post for BC.
         $fileMap = Arr::flatten($fileData);
+
         foreach ($fileMap as $key => $file) {
-            $error = $file->getError();
+            $error   = $file->getError();
             $tmpName = '';
 
             if ($error === UPLOAD_ERR_OK) {
                 $tmpName = $file->getStream()->getMetadata('uri');
             }
-            
+
             $post = Arr::insert($post, $key, [
                 'tmp_name' => $tmpName,
-                'error' => $error,
-                'name' => $file->getClientFilename(),
-                'type' => $file->getClientMediaType(),
-                'size' => $file->getSize(),
+                'error'    => $error,
+                'name'     => $file->getClientFilename(),
+                'type'     => $file->getClientMediaType(),
+                'size'     => $file->getSize(),
             ]);
         }
 
@@ -2023,6 +2018,7 @@ class ServerRequest implements ServerRequestInterface
      * recursively process the data.
      *
      * @param array $value $_FILES struct
+     *
      * @return array|UploadedFileInterface
      */
     protected function _createUploadedFile(array $value)
@@ -2047,18 +2043,20 @@ class ServerRequest implements ServerRequestInterface
      * UploadedFileInterface instances.
      *
      * @param array $files The file data to normalize & convert.
+     *
      * @return array An array of UploadedFileInterface objects.
      */
     protected function _normalizeNestedFiles(array $files = []): array
     {
         $normalizedFiles = [];
+
         foreach (array_keys($files['tmp_name']) as $key) {
             $spec = [
                 'tmp_name' => $files['tmp_name'][$key],
-                'size' => $files['size'][$key],
-                'error' => $files['error'][$key],
-                'name' => $files['name'][$key],
-                'type' => $files['type'][$key],
+                'size'     => $files['size'][$key],
+                'error'    => $files['error'][$key],
+                'name'     => $files['name'][$key],
+                'type'     => $files['type'][$key],
             ];
 
             $normalizedFiles[$key] = $this->_createUploadedFile($spec);
