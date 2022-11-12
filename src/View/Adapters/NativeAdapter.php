@@ -53,6 +53,34 @@ class NativeAdapter extends AbstractAdapter
     protected $sectionStack = [];
 
     /**
+     * Contient les css charges a partie de la section actuelle en cours de rendu
+     *
+     * @var array
+     */
+    protected $_styles = [];
+
+    /**
+     * Contient les librairies css charges a partie de la section actuelle en cours de rendu
+     *
+     * @var array
+     */
+    protected $_lib_styles = [];
+
+    /**
+     * Contient les scripts js charges a partie de la section actuelle en cours de rendu
+     *
+     * @var array
+     */
+    protected $_scripts = [];
+
+    /**
+     * Contient les scripts js des librairies charges a partie de la section actuelle en cours de rendu
+     *
+     * @var array
+     */
+    protected $_lib_scripts = [];
+
+    /**
      * Constructor.
      */
     public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
@@ -190,7 +218,7 @@ class NativeAdapter extends AbstractAdapter
     public function setData(array $data = [], ?string $context = null): self
     {
         if ($context) {
-            // $data = \esc($data, $context);
+            $data = esc($data, $context);
         }
 
         $this->tempData = $data;
@@ -204,7 +232,7 @@ class NativeAdapter extends AbstractAdapter
     public function addData(array $data = [], ?string $context = null): self
     {
         if ($context) {
-            // $data = \esc($data, $context);
+            $data = esc($data, $context);
         }
 
         $this->tempData ??= $this->data;
@@ -219,7 +247,7 @@ class NativeAdapter extends AbstractAdapter
     public function setVar(string $name, $value = null, ?string $context = null): self
     {
         if ($context) {
-            // $value = esc($value, $context);
+            $value = esc($value, $context);
         }
 
         $this->tempData ??= $this->data;
@@ -348,6 +376,7 @@ class NativeAdapter extends AbstractAdapter
             echo $contents;
             unset($this->sections[$sectionName][$key]);
         }
+
         echo $end;
     }
 
@@ -397,6 +426,124 @@ class NativeAdapter extends AbstractAdapter
     public function include(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
     {
         return $this->insert($view, $data, $options, $saveData);
+    }
+
+    /**
+     * Ajoute un fichier css de librairie a la vue
+     */
+    public function addLibCss(string ...$src): self
+    {
+        foreach ($src as $var) {
+            if (! in_array($var, $this->_lib_styles, true)) {
+                $this->_lib_styles[] = $var;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Ajoute un fichier css a la vue
+     */
+    public function addCss(string ...$src): self
+    {
+        foreach ($src as $var) {
+            if (! in_array($var, $this->_styles, true)) {
+                $this->_styles[] = $var;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Compile les fichiers de style de l'instance et genere les link:href vers ceux-ci
+     */
+    public function stylesBundle(string ...$groups): void
+    {
+        $groups     = (array) (empty($groups) ? $this->layout ?? 'default' : $groups);
+        $lib_styles = $styles = [];
+
+        foreach ($groups as $group) {
+            $lib_styles = array_merge(
+                $lib_styles,
+                // (array) config('layout.'.$group.'.lib_styles'),
+                $this->_lib_styles ?? []
+            );
+            $styles = array_merge(
+                $styles,
+                // (array) config('layout.'.$group.'.styles'),
+                $this->_styles ?? []
+            );
+        }
+
+        if (! empty($lib_styles)) {
+            lib_styles(array_unique($lib_styles));
+        }
+        if (! empty($styles)) {
+            styles(array_unique($styles));
+        }
+
+        $this->show('css');
+    }
+
+    /**
+     * Ajoute un fichier js de librairie a la vue
+     */
+    public function addLibJs(string ...$src): self
+    {
+        foreach ($src as $var) {
+            if (! in_array($var, $this->_lib_scripts, true)) {
+                $this->_lib_scripts[] = $var;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Ajoute un fichier js a la vue
+     */
+    public function addJs(string ...$src): self
+    {
+        foreach ($src as $var) {
+            if (! in_array($var, $this->_scripts, true)) {
+                $this->_scripts[] = $var;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Compile les fichiers de script de l'instance et genere les link:href vers ceux-ci
+     */
+    public function scriptsBundle(string ...$groups): void
+    {
+        $groups      = (array) (empty($groups) ? $this->layout ?? 'default' : $groups);
+        $lib_scripts = $scripts = [];
+
+        foreach ($groups as $group) {
+            $lib_scripts = array_merge(
+                $lib_scripts,
+                // (array) config('layout.'.$group.'.lib_scripts'),
+                $this->_lib_scripts ?? []
+            );
+            $scripts = array_merge(
+                $scripts,
+                // (array) config('layout.'.$group.'.scripts'),
+                $this->_scripts ?? []
+            );
+        }
+
+        if (! empty($lib_scripts)) {
+            lib_scripts(array_unique($lib_scripts));
+        }
+        if (! empty($scripts)) {
+            scripts(array_unique($scripts));
+        }
+
+        $this->show('js');
     }
 
     protected function prepareTemplateData(bool $saveData): void
