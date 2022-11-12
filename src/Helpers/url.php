@@ -493,6 +493,33 @@ if (! function_exists('url_is')) {
     }
 }
 
+if (! function_exists('link_active')) {
+    /**
+     * Lien actif dans la navbar
+     * Un peut comme le router-active-link de vuejs
+     */
+    function link_active(string $path, string $active_class = 'active', bool $exact = false): string
+    {
+        $current_url = trim(current_url(false), '/');
+        $current_section = trim(str_replace(trim(site_url(), '/'), '', $current_url), '/');
+        
+        if ($current_section == $path) {
+            return $active_class;
+        }
+    
+        if (! $exact && preg_match('#^' . $path . '/?#i', $current_section)) {
+            return $active_class;
+        }
+        
+        $link_to = trim(link_to($path), '/');
+        if ($link_to == $current_url) {
+            return $active_class;
+        }
+
+        return '';
+    }
+}
+
 if (! function_exists('clean_url')) {
     function clean_url(string $url): string
     {
