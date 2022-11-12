@@ -31,94 +31,88 @@ class Cors implements MiddlewareInterface
         'MaxAge'           => 86400,                                       // 1 day
     ];
 
-	/**
-	 * Constructor
-	 */
+    /**
+     * Constructor
+     */
     public function __construct(array $config = [])
     {
         $this->config = array_merge($this->config, $config);
     }
 
+    /**
+     * Modifie le MaxAge
+     *
+     * @param float|int $maxAge
+     */
+    public function setMaxAge($maxAge): self
+    {
+        $this->config['MaxAge'] = $maxAge;
 
-	/**
-	 * Modifie le MaxAge
-     * 
-     * @param int|float $maxAge
-	 */
-	public function setMaxAge($maxAge): self
-	{
-		$this->config['MaxAge'] = $maxAge;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Modifie les entetes exposes
+     *
+     * @param bool|string|string[] $exposeHeaders
+     */
+    public function setExposeHeaders($exposeHeaders): self
+    {
+        $this->config['ExposeHeaders'] = $exposeHeaders;
 
-	/**
-	 * Modifie les entetes exposes
-	 *
-	 * @param bool|string|string[] $exposeHeaders
-	 */
-	public function setExposeHeaders($exposeHeaders): self
-	{
-		$this->config['ExposeHeaders'] = $exposeHeaders;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Modifie les entetes autorises
+     *
+     * @param bool|string|string[] $headers
+     */
+    public function setHeaders($headers): self
+    {
+        $this->config['AllowHeaders'] = $headers;
 
-	/**
-	 * Modifie les entetes autorises
-	 *
-	 * @param bool|string|string[] $headers
-	 */
-	public function setHeaders($headers) : self
-	{
-		$this->config['AllowHeaders'] = $headers;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Modifie les methodes autorisees
+     *
+     * @param string|string[] $methods
+     */
+    public function setMethods($methods): self
+    {
+        $this->config['AlloMethods'] = $methods;
 
-	/**
-	 * Modifie les methodes autorisees
-	 *
-	 * @param string|string[] $methods
-	 */
-	public function setMethods($methods): self
-	{
-		$this->config['AlloMethods'] = $methods;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Defini si on doit utiliser les informations d'identifications ou pas
+     */
+    public function setCredentials(bool $credentials): self
+    {
+        $this->config['AllowCredentials'] = $credentials;
 
-	/**
-	 * Defini si on doit utiliser les informations d'identifications ou pas
-	 */
-	public function setCredentials(bool $credentials) : self
-	{
-		$this->config['AllowCredentials'] = $credentials;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Modifie les origines autorisees
+     *
+     * @param bool|string|string[] $origin
+     */
+    public function setOrigin($origin): self
+    {
+        $this->config['AllowOrigin'] = $origin;
 
-	/**
-	 * Modifie les origines autorisees
-	 *
-	 * @param bool|string|string[] $origin
-	 */
-	public function setOrigin($origin) : self
-	{
-		$this->config['AllowOrigin'] = $origin;
-
-		return $this;
-	}
-
+        return $this;
+    }
 
     /**
      * Execution du middleware
-	 *
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $response = $handler->handle($request);
 
@@ -127,8 +121,7 @@ class Cors implements MiddlewareInterface
                 ->withHeader('Access-Control-Allow-Origin', $this->_allowOrigin($request))
                 ->withHeader('Access-Control-Allow-Credentials', $this->_allowCredentials())
                 ->withHeader('Access-Control-Max-Age', $this->_maxAge())
-                ->withHeader('Access-Control-Expose-Headers', $this->_exposeHeaders())
-            ;
+                ->withHeader('Access-Control-Expose-Headers', $this->_exposeHeaders());
 
             if (strtoupper($request->getMethod()) === 'OPTIONS') {
                 $response = $response
@@ -147,21 +140,17 @@ class Cors implements MiddlewareInterface
     private function _allowOrigin(ServerRequestInterface $request)
     {
         $allowOrigin = $this->config['AllowOrigin'];
-        $origin = $request->getHeaderLine('Origin');
+        $origin      = $request->getHeaderLine('Origin');
 
-        if ($allowOrigin === true OR $allowOrigin === '*')
-        {
+        if ($allowOrigin === true || $allowOrigin === '*') {
             return $origin;
         }
 
-        if (is_array($allowOrigin))
-        {
+        if (is_array($allowOrigin)) {
             $origin = (array) $origin;
 
-            foreach ($origin as $o)
-            {
-                if (in_array($o, $allowOrigin))
-                {
+            foreach ($origin as $o) {
+                if (in_array($o, $allowOrigin, true)) {
                     return $origin;
                 }
             }
@@ -183,7 +172,7 @@ class Cors implements MiddlewareInterface
     /**
      * Recupere les methodes autorisees
      */
-    private function _allowMethods() : string
+    private function _allowMethods(): string
     {
         return implode(', ', (array) $this->config['AllowMethods']);
     }
@@ -191,12 +180,11 @@ class Cors implements MiddlewareInterface
     /**
      * Recupere les entetes autorises
      */
-    private function _allowHeaders(ServerRequestInterface $request) : string
+    private function _allowHeaders(ServerRequestInterface $request): string
     {
         $allowHeaders = $this->config['AllowHeaders'];
 
-        if ($allowHeaders === true)
-        {
+        if ($allowHeaders === true) {
             return $request->getHeaderLine('Access-Control-Request-Headers');
         }
 
@@ -210,8 +198,7 @@ class Cors implements MiddlewareInterface
     {
         $exposeHeaders = $this->config['ExposeHeaders'];
 
-        if (is_string($exposeHeaders) || is_array($exposeHeaders))
-        {
+        if (is_string($exposeHeaders) || is_array($exposeHeaders)) {
             return implode(', ', (array) $exposeHeaders);
         }
 
@@ -221,7 +208,7 @@ class Cors implements MiddlewareInterface
     /**
      * Recupere la duree de mise en cache des donnees
      */
-    private function _maxAge() : string
+    private function _maxAge(): string
     {
         $maxAge = (string) $this->config['MaxAge'];
 
