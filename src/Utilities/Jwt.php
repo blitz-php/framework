@@ -13,6 +13,7 @@ namespace BlitzPHP\Utilities;
 
 use Exception;
 use Firebase\JWT\JWT as Firebase;
+use Firebase\JWT\Key;
 use Throwable;
 
 /**
@@ -33,11 +34,11 @@ class Jwt
     public function __construct(array $config = [])
     {
         $this->config = array_merge([
-            'key'      => 'blitz-php-jwt-key',
-            'exp_time' => 5, // 5 minutes
-            'distinct' => false,
-            'algo'     => 'HS256',
-            'base_url' => Helpers::findBaseUrl(),
+            'key'       => 'blitz-php-jwt-key',
+            'exp_time'  => 5,                        // 5 minutes
+            'merge'     => false,
+            'algorithm' => 'HS256',
+            'base_url'  => Helpers::findBaseUrl(),
         ], $config);
 
         $this->config['public_key'] ??= $this->config['key'];
@@ -78,14 +79,14 @@ class Jwt
             'exp' => time() + (60 * $config->exp_time),
         ];
 
-        if ($config->distinct === true) {
+        if ($config->merge !== true) {
             $payload['data'] = $data;
         } else {
             $payload = array_merge($payload, $data);
         }
 
         try {
-            return Firebase::encode($payload, $config->key, $config->algo);
+            return Firebase::encode($payload, $config->key, $config->algorithm);
         } catch (Throwable $e) {
             throw new Exception('JWT Exception : ' . $e->getMessage(), 0, $e);
         }
@@ -110,7 +111,7 @@ class Jwt
         $payload = self::decode($token, (array) $config);
 
         $returned = $payload;
-        if ($config->distinct === true) {
+        if ($config->merge !== true) {
             $returned = $payload->data ?? $payload;
         }
 
@@ -131,7 +132,10 @@ class Jwt
         $config = self::config($config);
 
         try {
-            return Firebase::decode($token, $config->public_key, (array) $config->algo);
+            return Firebase::decode(
+                $token,
+                new Key($config->public_key, $config->algorithm)
+            );
         } catch (Throwable $e) {
             throw new Exception('JWT Exception : ' . $e->getMessage(), 0, $e);
         }
