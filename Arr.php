@@ -58,6 +58,7 @@ class Arr
      * @param string $path Le chemin à vérifier.
      *
      * @see self::extract()
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::check
      */
     public static function check(array $data, string $path): bool
@@ -102,6 +103,7 @@ class Arr
      * @param string $groupPath A dot-separated string.
      *
      * @return array Combined array
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::combine
      */
     public static function combine(array $data, string $keyPath, ?string $valuePath = null, ?string $groupPath = null): array
@@ -166,6 +168,7 @@ class Arr
      * @param array $needle The values to file in $data
      *
      * @return bool true if $data contains $needle, false otherwise
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::contains
      */
     public static function contains(array $data, array $needle): bool
@@ -233,6 +236,7 @@ class Arr
      * @param array $data Array to count dimensions on
      *
      * @return int The number of dimensions in $data
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::dimensions
      */
     public static function dimensions(array $data): int
@@ -351,6 +355,7 @@ class Arr
      *
      * @return array An array of the extracted values. Returns an empty array
      *               if there are no matches.
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::extract
      */
     public static function extract(array $data, string $path): array
@@ -413,6 +418,7 @@ class Arr
      *
      * @param array  $data      Flattened array
      * @param string $separator The delimiter used
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::expand
      */
     public static function expand(array $data, string $separator = '.'): array
@@ -442,6 +448,7 @@ class Arr
      *                           `self::_filter()` Which strips out all non-zero empty values.
      *
      * @return array Filtered array
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::filter
      */
     public static function filter(array $data, $callback = ['self', '_filter']): array
@@ -490,6 +497,7 @@ class Arr
      *
      * @param array  $data      Array to flatten
      * @param string $separator String used to separate array key elements in a path, defaults to '.'
+     *
      * @credit http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::flatten
      */
     public static function flatten(array $data, string $separator = '.'): array
@@ -590,6 +598,7 @@ class Arr
      * @see http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::format
      * @see sprintf()
      * @see Tableau::extract()
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::format
      */
     public static function format(array $data, array $paths, string $format)
@@ -635,6 +644,7 @@ class Arr
      * @param mixed             $default The return value when the path does not exist
      *
      * @return mixed The value fetched from the array, or null.
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::get
      */
     public static function get($data, $path, $default = null)
@@ -729,6 +739,7 @@ class Arr
      * @param array  $values The values to insert.
      *
      * @return array The data with $values inserted.
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::insert
      */
     public static function insert(array $data, $path, $values = null)
@@ -798,6 +809,7 @@ class Arr
      * @param array $data Array to count dimensions on
      *
      * @return int The maximum number of dimensions in $data
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::maxDimensions
      */
     public static function maxDimensions(array $data): int
@@ -825,6 +837,7 @@ class Arr
      * @param mixed $merge Array to merge with. The argument and all trailing arguments will be array cast when merged
      *
      * @return array Merged array
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::merge
      */
     public static function merge(array $data, $merge)
@@ -853,6 +866,7 @@ class Arr
      * @param array $data The array to check.
      *
      * @return bool true if values are numeric, false otherwise
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::numeric
      */
     public static function numeric(array $data): bool
@@ -962,6 +976,7 @@ class Arr
      * @param string $path A path expression to use to remove.
      *
      * @return array The modified array.
+     *
      * @credit CakePHP - http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::remove
      */
     public static function remove(array $data, $path)

@@ -133,7 +133,7 @@ class Jwt
 
         try {
             return Firebase::decode(
-                $token, 
+                $token,
                 new Key($config->public_key, $config->algorithm)
             );
         } catch (Throwable $e) {

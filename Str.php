@@ -734,7 +734,7 @@ class Str
         }
         $quotedReplacement = preg_quote($options['replacement'], '/');
         $map               = [
-            '/[' . $regex . ']/mu' => $options['replacement'],
+            '/[' . $regex . ']/mu'                                             => $options['replacement'],
             sprintf('/^[%s]+|[%s]+$/', $quotedReplacement, $quotedReplacement) => '',
         ];
         if (is_string($options['replacement']) && $options['replacement'] !== '') {
