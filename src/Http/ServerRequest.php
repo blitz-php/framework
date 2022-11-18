@@ -1363,7 +1363,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function withProtocolVersion($version): self
     {
-        if (! preg_match('/^(1\.[01]|2)$/', $version)) {
+        if (! preg_match('/^(1\.[01]|2(\.[0])?)$/', $version)) {
             throw new InvalidArgumentException("Unsupported protocol version '{$version}' provided");
         }
         $new           = clone $this;
