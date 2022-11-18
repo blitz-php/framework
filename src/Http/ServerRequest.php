@@ -1897,7 +1897,7 @@ class ServerRequest implements ServerRequestInterface
             parse_str($data, $data);
         }
         if (ini_get('magic_quotes_gpc') === '1') {
-            $data = Helpers::stripslashesDeep($this->data);
+            $data = Helpers::stripslashesDeep((array) $this->data);
         }
 
         if ($this->hasHeader('X-Http-Method-Override')) {
