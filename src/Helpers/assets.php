@@ -343,8 +343,7 @@ if (!function_exists('less_url'))
         $name = explode('?', $name)[0];
 		$name = str_replace(site_url() . 'less/', '', htmlspecialchars($name));
 
-        if (is_localfile($name))
-        {
+        if (is_localfile($name)) {
             $name .=  (!preg_match('#\.less$#i', $name) ? '.less' : '');
             $filename = WEBROOT.'less'.DS.$name;
 
@@ -416,18 +415,20 @@ if (!function_exists('img_url'))
      * Renvoie l'url d'une image
      *
      * @param	string	$name nom du fichier dont on veut avoir l'url
-     * @return	string
      */
-    function img_url(string $name) : string
+    function img_url(?string $name, bool $add_version = true) : string
     {
+        if (empty($name)) {
+            return '';
+        }
+
         $name = explode('?', $name)[0];
 		$name = str_replace(site_url() . 'img/', '', htmlspecialchars($name));
 
-        if (is_localfile($name))
-        {
+        if (is_localfile($name)) {
             $filename = WEBROOT.'img'.DS.$name;
 
-			return site_url() . 'img/' . $name.((file_exists($filename)) ? '?v='.filemtime($filename) : '');
+			return site_url() . 'img/' . $name.((file_exists($filename) && $add_version) ? '?v='.filemtime($filename) : '');
         }
 
         return $name;
@@ -480,18 +481,20 @@ if (!function_exists('docs_url'))
      * Renvoie l'url d'un document
      *
      * @param	string	$name nom du fichier dont on veut avoir l'url
-     * @return	string
      */
-    function docs_url(string $name) : string
+    function docs_url(?string $name, bool $add_version = true) : string
     {
+        if (empty($name)) {
+            return '';
+        }
+
         $name = explode('?', $name)[0];
 		$name = str_replace(site_url() . 'docs/', '', htmlspecialchars($name));
 
-        if (is_localfile($name))
-        {
+        if (is_localfile($name)) {
             $filename = WEBROOT.'docs'.DS.$name;
 
-			return site_url() . 'docs/' . $name.((file_exists($filename)) ? '?v='.filemtime($filename) : '');
+			return site_url() . 'docs/' . $name.((file_exists($filename && $add_version)) ? '?v='.filemtime($filename) : '');
         }
 
         return $name;
@@ -508,18 +511,20 @@ if (!function_exists('videos_url'))
      * Renvoie l'url d'une vidéo
      *
      * @param	string	$name nom du fichier dont on veut avoir l'url
-     * @return	string
      */
-    function videos_url(string $name) : string
+    function videos_url(?string $name, bool $add_version = true) : string
     {
+        if (empty($name)) {
+            return '';
+        }
+
         $name = explode('?', $name)[0];
 		$name = str_replace(site_url() . 'videos/', '', htmlspecialchars($name));
 
-        if (is_localfile($name))
-        {
+        if (is_localfile($name)) {
             $filename = WEBROOT.'videos'.DS.$name;
 
-			return site_url() . 'videos/' . $name.((file_exists($filename)) ? '?v='.filemtime($filename) : '');
+            return site_url() . 'videos/' . $name.((file_exists($filename) && $add_version) ? '?v='.filemtime($filename) : '');
         }
 
         return $name;

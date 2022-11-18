@@ -574,8 +574,8 @@ class Dispatcher
         $path = method_exists($this->request, 'getPath')
             ? $this->request->getPath()
             : $this->request->getUri()->getPath();
-            
-        return str_replace(App::getUri()->getPath(), '', $path);
+   
+        return preg_replace('#^'.App::getUri()->getPath().'#i', '', $path);
     }
 
     /**
