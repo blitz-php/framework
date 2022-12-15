@@ -99,7 +99,13 @@ class RestController extends BaseController
 
             $instance->payload = $this->payload;
 
-            return Services::injector()->call([$instance, $method], (array) $params);
+            $response = Services::injector()->call([$instance, $method], (array) $params);
+
+            if ($response instanceof ResponseInterface) {
+                return $response;
+            }       
+
+            return $this->respondOk($response); 
         } catch (Throwable $ex) {
             if (! on_dev()) {
                 $url = explode('?', $this->request->getRequestTarget())[0];
