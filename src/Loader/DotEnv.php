@@ -76,7 +76,45 @@ class DotEnv
     }
 
     /**
-     * Parse the .env file into an array of key => value
+	 * Modifie les valeurs dans le fichiers .env
+	 */
+	public function update(array $data = []): bool
+    {
+        foreach ($data as $key => $value) {
+            if (env($key) === $value) {
+                unset($data[$key]);
+            }
+        }
+
+        if (!count($data)) {
+            return false;
+        }
+
+        // ecrit seulement si il y'a des changements dans le contenu
+
+        $env = file_get_contents($this->path);
+        $env = explode("\n", $env);
+       
+        foreach ((array) $data as $key => $value) {
+            foreach ($env as $env_key => $env_value) {
+                $entry = explode("=", $env_value, 2);
+                if ($entry[0] === $key) {
+                    $env[$env_key] = $key . "=" . (is_string($value) ? '"' . $value . '"' : $value);
+                }
+				else {
+                    $env[$env_key] = $env_value;
+                }
+            }
+        }
+
+        $env = implode("\n", $env);
+        file_put_contents($this->path, $env);
+
+        return $this->load();
+    }
+
+    /**
+     * Parse le fichier .env file dans un tableau de cle => valeur
      */
     public function parse(): ?array
     {
