@@ -51,6 +51,7 @@ class Cache implements CacheInterface
      * Un tableau mappant les schémas d'URL aux noms de classe de moteur de mise en cache complets.
      *
      * @var array<string, string>
+     *
      * @psalm-var array<string, class-string>
      */
     protected static $validHandlers = [
