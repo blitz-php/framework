@@ -103,9 +103,9 @@ class RestController extends BaseController
 
             if ($response instanceof ResponseInterface) {
                 return $response;
-            }       
+            }
 
-            return $this->respondOk($response); 
+            return $this->respondOk($response);
         } catch (Throwable $ex) {
             if (! on_dev()) {
                 $url = explode('?', $this->request->getRequestTarget())[0];

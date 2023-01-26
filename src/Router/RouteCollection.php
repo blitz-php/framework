@@ -62,7 +62,7 @@ class RouteCollection implements RouteCollectionInterface
      *
      * @var bool
      */
-    protected $translateURIDashes = false;
+    protected $translateURIDashes = true;
 
     /**
      * S'il faut faire correspondre l'URI aux contrôleurs

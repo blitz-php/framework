@@ -76,9 +76,9 @@ class DotEnv
     }
 
     /**
-	 * Modifie les valeurs dans le fichiers .env
-	 */
-	public function update(array $data = []): bool
+     * Modifie les valeurs dans le fichiers .env
+     */
+    public function update(array $data = []): bool
     {
         foreach ($data as $key => $value) {
             if (env($key) === $value) {
@@ -86,7 +86,7 @@ class DotEnv
             }
         }
 
-        if (!count($data)) {
+        if (! count($data)) {
             return false;
         }
 
@@ -94,14 +94,13 @@ class DotEnv
 
         $env = file_get_contents($this->path);
         $env = explode("\n", $env);
-       
+
         foreach ((array) $data as $key => $value) {
             foreach ($env as $env_key => $env_value) {
-                $entry = explode("=", $env_value, 2);
+                $entry = explode('=', $env_value, 2);
                 if ($entry[0] === $key) {
-                    $env[$env_key] = $key . "=" . (is_string($value) ? '"' . $value . '"' : $value);
-                }
-				else {
+                    $env[$env_key] = $key . '=' . (is_string($value) ? '"' . $value . '"' : $value);
+                } else {
                     $env[$env_key] = $env_value;
                 }
             }
