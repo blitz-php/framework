@@ -450,11 +450,7 @@ class Helpers
         if (isset($_SERVER['SERVER_ADDR'])) {
             $server_addr = $_SERVER['HTTP_HOST'] ?? ((strpos($_SERVER['SERVER_ADDR'], ':') !== false) ? '[' . $_SERVER['SERVER_ADDR'] . ']' : $_SERVER['SERVER_ADDR']);
 
-            if (isset($_SERVER['SERVER_PORT'])) {
-                $server_addr .= ':' . ((! preg_match('#:' . $_SERVER['SERVER_PORT'] . '$#', $server_addr)) ? $_SERVER['SERVER_PORT'] : '80');
-            }
-
-            if (
+           if (
                 (! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
                 || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
                 || (! empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off')
