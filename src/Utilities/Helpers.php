@@ -33,6 +33,29 @@ class Helpers
     }
 
     /**
+     * Verifie si la requete est executee en ajax
+     */
+    public static function isAjaxRequest(): bool
+    {
+        return ! empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+
+    /**
+     * Verifie si l'utilisateur a une connexion internet active.
+     */
+    public static function isConnected(): bool
+    {
+        $connected = @fsockopen('www.google.com', 80);
+        if ($connected) {
+            fclose($connected);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Tester si une application s'exécute en local ou en ligne
      */
     public static function isOnline(): bool
