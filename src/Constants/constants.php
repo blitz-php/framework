@@ -9,11 +9,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+
 define('BASEPATH', dirname(COMPOSER_PATH) . DS);
 
 define('ROOTPATH', dirname(WEBROOT) . DS);
-
-defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 /**
  * Chemin  vers le dossier des configurations

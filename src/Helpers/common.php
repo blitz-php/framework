@@ -332,6 +332,16 @@ if (! function_exists('is_online')) {
     }
 }
 
+if (! function_exists('is_connected')) {
+    /**
+     * Verifie si l'utilisateur a une connexion internet active.
+     */
+    function is_connected(): bool
+    {
+        return Helpers::isConnected();
+    }
+}
+
 if (! function_exists('is_ajax_request')) {
     /**
      * Testez pour voir si une requête contient l'en-tête HTTP_X_REQUESTED_WITH.

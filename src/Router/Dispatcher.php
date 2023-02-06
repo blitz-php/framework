@@ -379,7 +379,7 @@ class Dispatcher
         if (is_cli() && ! on_test()) {
             // @codeCoverageIgnoreStart
             // $this->request = Services::clirequest($this->config);
-        // @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreEnd
         }
 
         $version = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1';
@@ -574,8 +574,8 @@ class Dispatcher
         $path = method_exists($this->request, 'getPath')
             ? $this->request->getPath()
             : $this->request->getUri()->getPath();
-   
-        return preg_replace('#^'.App::getUri()->getPath().'#i', '', $path);
+
+        return preg_replace('#^' . App::getUri()->getPath() . '#i', '', $path);
     }
 
     /**
@@ -714,7 +714,7 @@ class Dispatcher
             if (ob_get_level() > 0) {
                 ob_end_flush();
             }
-            // @codeCoverageIgnoreEnd
+        // @codeCoverageIgnoreEnd
         }
         // Lors des tests, l'un est pour phpunit, l'autre pour le cas de test.
         elseif (ob_get_level() > 2) {

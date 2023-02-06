@@ -139,7 +139,7 @@ class FileLocator
     public static function model(string $model, array $options = [], ?ConnectionInterface $connection = null)
     {
         $options = array_merge([
-            'preferApp' => true
+            'preferApp' => true,
         ], $options);
 
         if (! preg_match('#Model$#', $model)) {
@@ -147,12 +147,12 @@ class FileLocator
         }
 
         if ($options['preferApp'] === true) {
-           // $model = self::getBasename($model);
-            
+            // $model = self::getBasename($model);
+
             $model = str_replace(APP_NAMESPACE . '\\Models\\', '', $model);
             $model = APP_NAMESPACE . '\\Models\\' . $model;
         }
-        
+
         if (! class_exists($model)) {
             throw LoadException::modelNotFound($model);
         }
@@ -212,7 +212,7 @@ class FileLocator
 
         return $name;
     }
-    
+
     /**
      * Verifie si la classe satisfait l'option "preferApp"
      *

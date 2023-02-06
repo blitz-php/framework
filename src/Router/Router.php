@@ -204,7 +204,7 @@ class Router implements RouterInterface
     {
         return $this->translateURIDashes
             ? str_replace('-', '_', $this->method)
-            : Str::toCamelCase($this->method);
+            : $this->method;
     }
 
     /**
