@@ -17,8 +17,6 @@ use BlitzPHP\Loader\DotEnv;
 use BlitzPHP\Loader\FileLocator;
 use BlitzPHP\Loader\Injector;
 use BlitzPHP\Router\Dispatcher;
-use Kint\Renderer\Renderer;
-use Kint\Renderer\RichRenderer;
 use MirazMac\Requirements\Checker;
 use ReflectionException;
 
@@ -97,11 +95,6 @@ class Application
          * Autocharge les elements specifiés par le dev a travers le fichier /app/config/autoload
          */
         // Load::init();
-
-        /**
-         * Initalise l'outil de debug Kint
-         */
-        self::initializeKint();
 
         return $this;
     }
@@ -185,14 +178,5 @@ class Application
         }
 
         define('UTF8_ENABLED', defined('PREG_BAD_UTF8_ERROR') && (ICONV_ENABLED === true || MB_ENABLED === true) && $charset === 'UTF-8');
-    }
-
-    /**
-     * Initializes Kint
-     */
-    private static function initializeKint()
-    {
-        RichRenderer::$folder = false;
-        RichRenderer::$sort   = Renderer::SORT_FULL;
     }
 }
