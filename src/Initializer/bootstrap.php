@@ -1,7 +1,6 @@
 <?php
 
 use BlitzPHP\Core\Application;
-use BlitzPHP\Utilities\Helpers;
 
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
@@ -69,11 +68,8 @@ return function(array $paths, string $paths_config_file, bool $is_cli)
     /**
      * Initialisation de Kint
      */
-    if (! Helpers::isOnline() && class_exists('\Kint\Renderer\RichRenderer')) {
-        \Kint\Renderer\RichRenderer::$folder = false;
-        \Kint\Renderer\RichRenderer::$sort   = \Kint\Renderer\AbstractRenderer::SORT_FULL;
-    }
-
+    require_once __DIR__ . DS . 'kint.php';
+    
     if (! $is_cli) {
         $app->run();
     }
