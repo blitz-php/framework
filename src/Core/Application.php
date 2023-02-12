@@ -12,6 +12,7 @@
 namespace BlitzPHP\Core;
 
 use BlitzPHP\Config\Config;
+use BlitzPHP\Debug\Whoops;
 use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Loader\DotEnv;
 use BlitzPHP\Loader\FileLocator;
@@ -84,7 +85,7 @@ class Application
         /**
          * Lance la capture des exceptions et erreurs
          */
-        // Exception::init();
+        Whoops::init();
 
         /**
          * Demarre la session
