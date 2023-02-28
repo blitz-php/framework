@@ -12,7 +12,6 @@
 namespace BlitzPHP\Models;
 
 use BadMethodCallException;
-use BlitzPHP\Core\Database;
 use BlitzPHP\Database\BaseBuilder;
 use BlitzPHP\Database\Contracts\ConnectionInterface;
 
