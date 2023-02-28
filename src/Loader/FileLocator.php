@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Loader;
 
-use BlitzPHP\Database\Contracts\ConnectionInterface;
+use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Utilities\Helpers;
 
@@ -22,34 +22,22 @@ class FileLocator
      */
     public static function lang(string $lang, string $locale): array
     {
-        $file  = Helpers::ensureExt($lang, 'php');
-        $paths = [
-            // Chemin d'accès aux langues de l'application
-            LANG_PATH . $locale . DS . $file,
+		$languages  = [];
+		$file_exist = false;
 
-            // Chemin vers les langues du système
-            SYST_PATH . 'Constants' . DS . 'language' . DS . $locale . DS . $file,
+        $path = self::findLangFile($lang, $locale, 'json');
+		if (null !== $path AND false !== ($lang = file_get_contents($path))) {
+			$file_exist = true;
+			$languages  = array_merge($languages, json_decode($lang, true));
+		}
 
-            // Chemin d'accès aux langues de l'application
-            LANG_PATH . config('app.language') . DS . $file,
-
-            // Chemin vers les langues du système
-            SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
-        ];
-        $paths = array_unique($paths);
-
-        $file_exist = false;
-        $languages  = [];
-
-        foreach ($paths as $path) {
-            if (file_exists($path)) {
-                if (! in_array($path, get_included_files(), true)) {
-                    $languages = array_merge($languages, (array) require($path));
-                }
-                $file_exist = true;
-                break;
+		$path = self::findLangFile($lang, $locale, 'php');
+		if (null !== $path) {
+			$file_exist = true;
+			if (! in_array($path, get_included_files())) {
+                $languages = array_merge($languages, require($path));
             }
-        }
+		}
 
         if (true !== $file_exist) {
             throw LoadException::langNotFound($lang);
@@ -228,4 +216,34 @@ class FileLocator
 
         return strpos($name, APP_NAMESPACE) === 0;
     }
+
+    /**
+	 * Trouve le premier chemin correspondant a une locale
+	 */
+    private static function findLangFile(string $lang, string $locale, string $ext): ?string
+	{
+        $file  = Helpers::ensureExt($lang, $ext);
+        $paths = [
+            // Chemin d'accès aux langues de l'application
+            LANG_PATH . $locale . DS . $file,
+
+            // Chemin d'accès aux langues de l'application
+            LANG_PATH . config('app.language') . DS . $file,
+
+            // Chemin vers les langues du système
+            SYST_PATH . 'Constants' . DS . 'language' . DS . $locale . DS . $file,
+            
+            // Chemin vers les langues du système
+            SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
+        ];
+        $paths = array_unique($paths);
+
+        foreach ($paths as $path) {
+            if (is_readable($path)) {
+                return $path;
+            }
+        }
+
+		return null;
+	}
 }
