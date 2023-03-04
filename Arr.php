@@ -12,14 +12,11 @@
 namespace BlitzPHP\Utilities;
 
 use ArrayAccess;
-use BlitzPHP\Traits\Macroable;
 use Exception;
 use InvalidArgumentException;
 
 class Arr
 {
-    use Macroable;
-
     public const SORT_ASC  = 1;
     public const SORT_DESC = 2;
 
