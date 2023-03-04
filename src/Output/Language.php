@@ -93,15 +93,16 @@ class Language
     public function getLine(string $line, ?array $args = [])
     {
         // Si on ne specifie pas le fichiers a utiliser, on cherche
-        // le premier fichier dans lequel sera trouvee la traduction 
+        // le premier fichier dans lequel sera trouvee la traduction
         // demandee et on l'utilise, au cas contraire on ignore la
         // demande de traduction et on renvoie le texte tel qu'il a ete envoyer
         if (! strpos($line, '.')) {
             $languages = $this->language[$this->locale] ?? [];
-            
+
             $found = false;
+
             foreach ($languages as $key => $value) {
-                if (in_array($line, $value)) {
+                if (in_array($line, $value, true)) {
                     $line  = $key . '.' . $line;
                     $found = true;
                     break;
@@ -112,7 +113,7 @@ class Language
                 return $line;
             }
         }
-        
+
         if (empty($args)) {
             $args = [];
         }
@@ -210,7 +211,7 @@ class Language
      * les lignes linguistiques existantes.
      *
      * @param string|string[] $file
-     * 
+     *
      * @return array|void
      */
     public function load($file, ?string $locale = null, bool $return = false)
@@ -223,7 +224,7 @@ class Language
             foreach ($file as $value) {
                 $this->load($value, $locale, false);
             }
-            
+
             return [];
         }
 

@@ -11,8 +11,7 @@
 
 namespace BlitzPHP\Models;
 
-use BlitzPHP\Database\BaseUtils;
-use BlitzPHP\Database\Contracts\ConnectionInterface;
+use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Database\Database as Db;
 use BlitzPHP\Loader\Services;
 use InvalidArgumentException;
@@ -40,8 +39,8 @@ class Database
     /**
      * Ouvre une connexion
      *
-     * @param array|string|ConnectionInterface|null $group  Nom du groupe de connexion à utiliser, ou un tableau de paramètres de configuration.
-     * @param bool         $shared Doit-on retourner une instance partagée
+     * @param array|ConnectionInterface|string|null $group  Nom du groupe de connexion à utiliser, ou un tableau de paramètres de configuration.
+     * @param bool                                  $shared Doit-on retourner une instance partagée
      */
     public static function connect($group = null, bool $shared = true): ConnectionInterface
     {
@@ -84,7 +83,8 @@ class Database
         }
 
         $connection = static::$factory->load(
-            $config, $group, 
+            $config,
+            $group,
             Services::logger(),
             Services::event()
         );
@@ -103,18 +103,18 @@ class Database
     }
 
     /**
-     * Charge et retourne une instance du Forge specifique au groupe de la base de donnees
+     * Charge et retourne une instance du Creator specifique au groupe de la base de donnees
      * et charge le groupe s'il n'est pas encore chargé.
      *
      * @param array|ConnectionInterface|string|null $group
      *
-     * @return Forge
+     * @return \BlitzPHP\Database\Creator\BaseCreator
      */
-    public static function forge($group = null)
+    public static function creator($group = null)
     {
         $db = static::connect($group);
 
-        return static::$factory->loadForge($db);
+        return static::$factory->loadCreator($db);
     }
 
     /**
@@ -122,7 +122,7 @@ class Database
      *
      * @param array|string|null $group
      *
-     * @return BaseUtils
+     * @return \Blitzphp\Database\BaseUtils
      */
     public static function utils($group = null)
     {

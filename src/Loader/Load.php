@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Loader;
 
-use BlitzPHP\Database\Contracts\ConnectionInterface;
+use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 
 class Load

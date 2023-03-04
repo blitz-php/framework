@@ -22,22 +22,22 @@ class FileLocator
      */
     public static function lang(string $lang, string $locale): array
     {
-		$languages  = [];
-		$file_exist = false;
+        $languages  = [];
+        $file_exist = false;
 
         $path = self::findLangFile($lang, $locale, 'json');
-		if (null !== $path AND false !== ($lang = file_get_contents($path))) {
-			$file_exist = true;
-			$languages  = array_merge($languages, json_decode($lang, true));
-		}
+        if (null !== $path && false !== ($lang = file_get_contents($path))) {
+            $file_exist = true;
+            $languages  = array_merge($languages, json_decode($lang, true));
+        }
 
-		$path = self::findLangFile($lang, $locale, 'php');
-		if (null !== $path) {
-			$file_exist = true;
-			if (! in_array($path, get_included_files())) {
+        $path = self::findLangFile($lang, $locale, 'php');
+        if (null !== $path) {
+            $file_exist = true;
+            if (! in_array($path, get_included_files(), true)) {
                 $languages = array_merge($languages, require($path));
             }
-		}
+        }
 
         if (true !== $file_exist) {
             throw LoadException::langNotFound($lang);
@@ -218,10 +218,10 @@ class FileLocator
     }
 
     /**
-	 * Trouve le premier chemin correspondant a une locale
-	 */
+     * Trouve le premier chemin correspondant a une locale
+     */
     private static function findLangFile(string $lang, string $locale, string $ext): ?string
-	{
+    {
         $file  = Helpers::ensureExt($lang, $ext);
         $paths = [
             // Chemin d'accès aux langues de l'application
@@ -232,7 +232,7 @@ class FileLocator
 
             // Chemin vers les langues du système
             SYST_PATH . 'Constants' . DS . 'language' . DS . $locale . DS . $file,
-            
+
             // Chemin vers les langues du système
             SYST_PATH . 'Constants' . DS . 'language' . DS . config('app.language') . DS . $file,
         ];
@@ -244,6 +244,6 @@ class FileLocator
             }
         }
 
-		return null;
-	}
+        return null;
+    }
 }

@@ -86,6 +86,8 @@
     },
     "prefer-stable": true,
     "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
         "sort-packages": true
     }
 }

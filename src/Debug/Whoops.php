@@ -24,8 +24,8 @@ use Whoops\Util\Misc;
 
 /**
  * Capture et affiche les erreurs et exceptions via whoops
- * 
- * Necessite l'instalation de flip/whoops 
+ *
+ * Necessite l'instalation de flip/whoops
  */
 class Whoops
 {
@@ -37,34 +37,32 @@ class Whoops
     public static function init()
     {
         if (! class_exists('Whoops\Run')) {
-            return ;
+            return;
         }
 
-        $whoops  =  new Run();
+        $whoops = new Run();
 
-        if (! is_online()) {       
+        if (! is_online()) {
             if (Misc::isCommandLine()) {
-                $whoops->pushHandler(new PlainTextHandler);
-            }
-            else if (Misc::isAjaxRequest()) {
-                $whoops->pushHandler(new JsonResponseHandler);
-            }
-            else {
-                $whoops->pushHandler(new PrettyPageHandler);
+                $whoops->pushHandler(new PlainTextHandler());
+            } elseif (Misc::isAjaxRequest()) {
+                $whoops->pushHandler(new JsonResponseHandler());
+            } else {
+                $whoops->pushHandler(new PrettyPageHandler());
             }
         }
 
         /**
          * On log toutes les erreurs
          */
-        $whoops->pushHandler(function(Throwable $exception, Inspector $inspector, RunInterface $run) {
+        $whoops->pushHandler(static function (Throwable $exception, Inspector $inspector, RunInterface $run) {
             /**
              * @var Logger
              */
             $logger = Services::logger();
             $logger->error($exception);
-         
-            return Handler::DONE;       
+
+            return Handler::DONE;
         });
 
         $whoops->register();
