@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Traits\SingletonTrait;
 use InvalidArgumentException;
 
 /**
@@ -18,6 +19,8 @@ use InvalidArgumentException;
  */
 class DotEnv
 {
+    use SingletonTrait;
+
     /**
      * Le répertoire où se trouve le fichier .env.
      *
@@ -26,28 +29,11 @@ class DotEnv
     protected $path;
 
     /**
-     * @var self
-     */
-    private static $_instance;
-
-    /**
      * Construit le chemin vers notre fichier.
      */
     private function __construct(string $path, string $file = '.env')
     {
         $this->path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
-    }
-
-    /**
-     * Singleton
-     */
-    private static function instance(string $path, string $file = '.env'): self
-    {
-        if (self::$_instance === null) {
-            self::$_instance = new self($path, $file);
-        }
-
-        return self::$_instance;
     }
 
     public static function init(string $path, string $file = '.env')
