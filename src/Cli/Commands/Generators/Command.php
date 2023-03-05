@@ -69,7 +69,7 @@ class Command extends ConsoleCommand
         $this->template  = 'command.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.command';
-        $this->run($params);
+        $this->runGeneration($params);
     }
 
     /**

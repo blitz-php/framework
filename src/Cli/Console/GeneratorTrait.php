@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Cli\Console;
 
+use BlitzPHP\Loader\Services;
 use BlitzPHP\View\Adapters\NativeAdapter;
 
 /**
@@ -86,13 +87,32 @@ trait GeneratorTrait
     /**
      * Exécute la commande.
      */
-    protected function run(array $params): void
+    protected function runGeneration(array $params): void
     {
         $this->params = $params;
 
+        // Recupere le FQCN.
+        $class = $this->qualifyClassName();
+
+        // Recupere le chemin du fichier a partir du nom de la classe.
+        $target = $this->buildPath($class);
+
+        if (empty($target)) {
+            return;
+        }
+        
+        $this->generateFile($target, $this->buildContent($class));
+    }
+
+    
+    /**
+     * Handles writing the file to disk, and all of the safety checks around that.
+     */
+    private function generateFile(string $target, string $content): void
+    {
         if ($this->getOption('namespace') === 'BlitzPHP') {
             // @codeCoverageIgnoreStart
-            $this->colorize(lang('CLI.generator.usingCINamespace'), 'yellow');
+            $this->colorize(lang('CLI.generator.usingBlitzNamespace'), 'yellow');
 
             if (! $this->confirm('Are you sure you want to continue?')) {
                 $this->eol();
@@ -105,29 +125,18 @@ trait GeneratorTrait
             // @codeCoverageIgnoreEnd
         }
 
-        // Obtenez le nom de classe complet à partir de l'entrée.
-        $class = $this->qualifyClassName();
-
-        // Obtenez le chemin du fichier à partir du nom de la classe.
-        $path = $this->buildPath($class);
-
-        // Vérifiez si le chemin est vide.
-        if (empty($path)) {
-            return;
-        }
-
-        $isFile = is_file($path);
+        $isFile = is_file($target);
 
         // Écraser des fichiers sans le savoir est une gêne sérieuse, nous allons donc vérifier si nous dupliquons des choses,
         // si l'option "forcer" n'est pas fournie, nous renvoyons.
         if (! $this->getOption('force') && $isFile) {
-            $this->io->error(lang('CLI.generator.fileExist', [clean_path($path)]), true);
+            $this->io->error(lang('CLI.generator.fileExist', [clean_path($target)]), true);
 
             return;
         }
 
         // Vérifie si le répertoire pour enregistrer le fichier existe.
-        $dir = dirname($path);
+        $dir = dirname($target);
 
         if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
@@ -138,23 +147,23 @@ trait GeneratorTrait
         // Construisez la classe en fonction des détails dont nous disposons.
         // Nous obtiendrons le contenu de notre fichier à partir du modèle,
         // puis nous effectuerons les remplacements nécessaires.
-        if (! write_file($path, $this->buildContent($class))) {
+        if (! write_file($target, $content)) {
             // @codeCoverageIgnoreStart
-            $this->io->error(lang('CLI.generator.fileError', [clean_path($path)]), true);
+            $this->io->error(lang('CLI.generator.fileError', [clean_path($target)]), true);
 
             return;
             // @codeCoverageIgnoreEnd
         }
 
         if ($this->getOption('force') && $isFile) {
-            $this->colorize(lang('CLI.generator.fileOverwrite', [clean_path($path)]), 'yellow');
+            $this->colorize(lang('CLI.generator.fileOverwrite', [clean_path($target)]), 'yellow');
 
             return;
         }
 
-        $this->colorize(lang('CLI.generator.fileCreate', [clean_path($path)]), 'green');
+        $this->colorize(lang('CLI.generator.fileCreate', [clean_path($target)]), 'green');
     }
-
+    
     /**
      * Préparez les options et effectuez les remplacements nécessaires.
      */
@@ -210,7 +219,7 @@ trait GeneratorTrait
         $class = ltrim(implode('\\', array_map('pascalize', explode('\\', str_replace('/', '\\', trim($class))))), '\\/');
 
         // Obtient l'espace de noms à partir de l'entrée. N'oubliez pas la barre oblique inverse finale !
-        $namespace = trim(str_replace('/', '\\', $this->getOption('namespace') ?? APP_NAMESPACE), '\\') . '\\';
+        $namespace = trim(str_replace('/', '\\', $this->getOption('namespace', APP_NAMESPACE)), '\\') . '\\';
 
         if (strncmp($class, $namespace, strlen($namespace)) === 0) {
             return $class; // @codeCoverageIgnore
@@ -269,9 +278,17 @@ trait GeneratorTrait
      */
     protected function buildPath(string $class): string
     {
-        $namespace = trim(str_replace('/', '\\', $this->getOption('namespace') ?? APP_NAMESPACE), '\\');
+        $namespace = trim(str_replace('/', '\\', $this->getOption('namespace', APP_NAMESPACE)), '\\');
 
-        $base = APP_PATH;
+        $base = Services::autoloader()->getNamespace($namespace);
+        
+        if (! $base = reset($base)) {
+            $this->io->error(lang('CLI.namespaceNotDefined', [$namespace]), true);
+
+            return '';
+        }
+
+        $base = realpath($base) ?: $base;
         $file = $base . DS . str_replace('\\', DS, trim(str_replace($namespace . '\\', '', $class), '\\')) . '.php';
 
         return implode(DS, array_slice(explode(DS, $file), 0, -1)) . DS . $this->basename($file);
@@ -313,8 +330,8 @@ trait GeneratorTrait
      *
      * @return mixed
      */
-    protected function getOption(string $name)
+    protected function getOption(string $name, $default = null)
     {
-        return $this->params[$name] ?? true;
+        return $this->params[$name] ?? $default;
     }
 }
