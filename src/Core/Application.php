@@ -15,7 +15,6 @@ use BlitzPHP\Config\Config;
 use BlitzPHP\Debug\Whoops;
 use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Loader\DotEnv;
-use BlitzPHP\Loader\FileLocator;
 use BlitzPHP\Loader\Injector;
 use BlitzPHP\Router\Dispatcher;
 use MirazMac\Requirements\Checker;
@@ -55,12 +54,6 @@ class Application
          * Verifie les exigences systeme
          */
         self::checkRequirements();
-
-        /**
-         * On charge les helpers `common` et `url` qui sont utilisés par le framework et presque toutes les applications
-         */
-        FileLocator::helper('common');
-        FileLocator::helper('url');
 
         /**
          * On initialise le parsing du fichier .env

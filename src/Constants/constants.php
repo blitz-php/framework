@@ -11,7 +11,9 @@
 
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
-define('BASEPATH', dirname(COMPOSER_PATH) . DS);
+define('COMPOSER_PATH', VENDOR_PATH . 'autoload.php');
+
+define('BASEPATH', dirname(VENDOR_PATH) . DS);
 
 define('ROOTPATH', dirname(WEBROOT) . DS);
 
