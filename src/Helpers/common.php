@@ -421,8 +421,8 @@ if (! function_exists('clean_path')) {
             case strpos($path, SYST_PATH) === 0:
                 return 'SYST_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(SYST_PATH));
 
-            case defined('COMPOSER_PATH') && strpos($path, COMPOSER_PATH) === 0:
-                return 'COMPOSER_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(COMPOSER_PATH));
+            case defined('VENDOR_PATH') && strpos($path, VENDOR_PATH) === 0:
+                return 'VENDOR_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(VENDOR_PATH));
 
             case strpos($path, ROOTPATH) === 0:
                 return 'ROOTPATH' . DIRECTORY_SEPARATOR . substr($path, strlen(ROOTPATH));
