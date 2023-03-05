@@ -323,15 +323,4 @@ trait GeneratorTrait
 
         return $this;
     }
-
-    /**
-     * Obtient une seule option de ligne de commande.
-     * Renvoie VRAI si l'option existe, mais n'a pas de valeur et agit simplement comme un indicateur.
-     *
-     * @return mixed
-     */
-    protected function getOption(string $name, $default = null)
-    {
-        return $this->params[$name] ?? $default;
-    }
 }

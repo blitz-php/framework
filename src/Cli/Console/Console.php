@@ -13,6 +13,7 @@ namespace BlitzPHP\Cli\Console;
 
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
+use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\CLIException;
 use BlitzPHP\Loader\Services;
 use ReflectionClass;
@@ -173,7 +174,7 @@ final class Console extends Application
      *
      * @return void
      */
-    private function addCommand(string $className)
+    private function addCommand(string $className, Logger $logger)
     {
         $class = new ReflectionClass($className);
 
@@ -184,7 +185,7 @@ final class Console extends Application
         /**
          * @var Command $instance
          */
-        $instance = new $className($this, Services::logger());
+        $instance = new $className($this, $logger);
 
         $command = new AhcCommand(
             $instance->name,
@@ -237,7 +238,11 @@ final class Console extends Application
                 $console->start($instance->service);
             }
 
-            $result = $instance->execute($command->values(false));
+            $parameters = $command->values(false);
+            $arguments  = $command->args();
+            $options    = array_diff_key($parameters, $arguments);
+            
+            $result = $instance->setOptions($options)->setArguments($arguments)->execute($parameters);
 
             if (! $console->suppress) {
                 $console->end();

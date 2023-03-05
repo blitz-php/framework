@@ -140,6 +140,17 @@ abstract class Command
      */
     protected $color;
 
+    /**
+     * Arguments recus apres executions
+     */
+    private array $_arguments = [];
+
+    /**
+     * Options recus apres executions
+     */
+    private array $_options = [];
+
+
     public function __construct(Console $app, LoggerInterface $logger)
     {
         $this->app    = $app;
@@ -163,6 +174,65 @@ abstract class Command
     abstract public function execute(array $params);
 
     /**
+     * Definit les options recues par la commande a l'execution
+     * 
+     * @internal Utiliser seulement par le framework pour fournir les options a la commande
+     */
+    final public function setOptions(array $options = []): self 
+    {
+        $this->_options = $options;
+
+        return $this;
+    }  
+
+    /**
+     * Definit les arguments recus par la commande a l'execution
+     * 
+     * @internal Utiliser seulement par le framework pour fournir les arguments a la commande
+     */
+    final public function setArguments(array $arguments = []): self 
+    {
+        $this->_arguments = $arguments;
+
+        return $this;
+    }   
+
+    /**
+     * Recupere la valeur d'un argument lors de l'execution de la commande
+     *
+     * @param mixed $default
+     * @return mixed
+     */
+    final protected function getArg(string $name, $default = null)
+    {
+        return $this->_arguments[$name] ?? $default;
+    }
+
+    /**
+     * Recupere la valeur d'une option lors de l'execution de la commande
+     *
+     * @param mixed $default
+     * @return mixed
+     */
+    final protected function getOption(string $name, $default = null)
+    {
+        return $this->_options[$name] ?? $default;
+    }
+
+    /**
+     * Recupere la valeur d'un parametre (option ou argument) lors de l'execution de la commande
+     *
+     * @param mixed $default
+     * @return mixed
+     */
+    final protected function getParam(string $name, $default = null)
+    {
+        $params = array_merge($this->_arguments, $this->_options);
+
+        return $params[$name] ?? $default;
+    }
+
+    /**
      * Ecrit un message dans une couleur spécifique
      */
     final protected function colorize(string $message, string $color): self
@@ -170,6 +240,42 @@ abstract class Command
         $this->writer->colors('<' . $color . '>' . $message . '</end><eol>');
 
         return $this;
+    }
+    
+    /**
+     * Ecrit un message de reussite
+     */
+    final protected function ok(string $message, bool $eol = false): self
+    {
+        $this->writer->ok($message, $eol);
+
+        return $this;
+    }
+
+    /**
+     * Ecrit un message de succes
+     */
+    final protected function success(string $message): self
+    {
+        return $this->ok($message, true);
+    }
+
+    /**
+     * Ecrit un message d'erreur
+     */
+    final protected function error(string $message, bool $eol = false): self
+    {
+        $this->writer->error($message, $eol);
+
+        return $this;
+    }
+
+    /**
+     * Ecrit un message d'echec
+     */
+    final protected function fail(string $message): self
+    {
+        return $this->error($message, true);
     }
 
     /**
@@ -189,6 +295,14 @@ abstract class Command
 
         return $this;
     }
+    
+    /**
+     * Écrit une nouvelle ligne vide (saut de ligne).
+     */
+    final protected function newLine(): self
+    {
+        return $this->eol(1);
+    }
 
     /**
      * Générer une table pour la console. Les clés de la première ligne sont prises comme en-tête.
@@ -196,7 +310,7 @@ abstract class Command
      * @param array[] $rows   Tableau de tableaux associés.
      * @param array   $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
      */
-    public function table(array $rows, array $styles = []): self
+    final protected function table(array $rows, array $styles = []): self
     {
         $this->writer->table($rows, $styles);
 
@@ -248,7 +362,7 @@ abstract class Command
      *
      * @param string $default `y|n`
      */
-    public function confirm(string $text, string $default = 'y'): bool
+    final protected function confirm(string $text, string $default = 'y'): bool
     {
         return $this->io->confirm($text, $default);
     }
@@ -261,7 +375,7 @@ abstract class Command
      * @param int           $retry   Combien de fois encore pour réessayer en cas d'échec.
      * @param mixed|null    $default
      */
-    public function prompt(string $text, $default = null, ?callable $fn = null, int $retry = 3): mixed
+    final protected function prompt(string $text, $default = null, ?callable $fn = null, int $retry = 3): mixed
     {
         return $this->io->prompt($text, $default, $fn, $retry);
     }
@@ -273,7 +387,7 @@ abstract class Command
      *                             Tout message d'exception est imprimé en tant qu'erreur.
      * @param int           $retry Combien de fois encore pour réessayer en cas d'échec.
      */
-    public function promptHidden(string $text, ?callable $fn = null, int $retry = 3): mixed
+    final protected function promptHidden(string $text, ?callable $fn = null, int $retry = 3): mixed
     {
         return $this->io->promptHidden($text, $fn, $retry);
     }
@@ -285,7 +399,7 @@ abstract class Command
      *
      * @return mixed
      */
-    protected function call(string $command, array $params = [])
+    final protected function call(string $command, array $params = [])
     {
         // return $this->commands->run($command, $params);
     }
