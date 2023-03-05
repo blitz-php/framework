@@ -64,9 +64,9 @@ class DotEnv
     /**
      * Modifie les valeurs dans le fichiers .env
      */
-    public function update(array $data = []): bool
+    public function update(array $data = [], bool $reload = true): bool
     {
-        foreach ($data as $key => $value) {
+       foreach ($data as $key => $value) {
             if (env($key) === $value) {
                 unset($data[$key]);
             }
@@ -84,6 +84,7 @@ class DotEnv
         foreach ((array) $data as $key => $value) {
             foreach ($env as $env_key => $env_value) {
                 $entry = explode('=', $env_value, 2);
+                $entry = array_map('trim', $entry);
                 if ($entry[0] === $key) {
                     $env[$env_key] = $key . '=' . (is_string($value) ? '"' . $value . '"' : $value);
                 } else {
@@ -95,7 +96,11 @@ class DotEnv
         $env = implode("\n", $env);
         file_put_contents($this->path, $env);
 
-        return $this->load();
+        if ($reload) {
+            return $this->load();
+        }
+
+        return true;
     }
 
     /**
