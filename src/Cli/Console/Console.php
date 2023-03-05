@@ -14,9 +14,9 @@ namespace BlitzPHP\Cli\Console;
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
 use BlitzPHP\Exceptions\CLIException;
-use BlitzPHP\Loader\Filesystem;
 use BlitzPHP\Loader\Services;
-use BlitzPHP\Utilities\Str;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Classe abstraite pour le fonctionnement de la console
@@ -123,34 +123,47 @@ final class Console extends Application
 
         $this->suppress = $suppress;
 
-        $this->registerCommands();
+        $this->discoverCommands();
     }
 
     /**
-     * Enregistre les commandes executables
-     *
-     * @return void
+     * Recherche toutes les commandes dans le framework et dans le code de l'utilisateur
+     * et collecte leurs instances pour fonctionner avec eux.
      */
-    private function registerCommands()
+    public function discoverCommands()
     {
-        // Collection des commandes système
-        $path = SYST_PATH . 'Cli' . DS . 'Commands' . DS;
-        if (Filesystem::isDirectory($path)) {
-            foreach (Filesystem::allFiles($path) as $file) {
-                $name = str_replace([$path, '.' . $file->getExtension(), DS], ['', '', '\\'], $file->getPathname());
-
-                if (! Str::contains($name, 'Generators' . DS . 'Views')) {
-                    $this->addCommand('\BlitzPHP\Cli\Commands\\' . $name);
-                }
-            }
+        if (count($this->commands) > 1) {
+            return;
         }
 
-        // Collection des commandes definies par l'utilisateur
-        $path = APP_PATH . 'Commands' . DS;
-        if (Filesystem::isDirectory($path)) {
-            foreach (Filesystem::allFiles($path) as $file) {
-                $name = str_replace([$path, '.' . $file->getExtension(), DS], ['', '', '\\'], $file->getPathname());
-                $this->addCommand('\\' . trim(APP_NAMESPACE, '/\\') . '\Commands\\' . $name);
+        $locator = Services::locator();
+        $files   = array_merge(
+            $locator->listFiles('Commands/'), // Commandes de l'application ou des fournisseurs
+            $locator->listFiles('Cli/Commands/') // Commandes internes du framework
+        );
+
+        if ($files === []) {
+            return; // @codeCoverageIgnore
+        }
+
+        $logger = Services::logger();
+
+        foreach ($files as $file) {
+            $className = $locator->getClassname($file);
+
+            if ($className === '' || ! class_exists($className)) {
+                continue;
+            }
+
+            try {
+                $this->addCommand($className, $logger);
+            }
+            catch(CLIException $e) {
+                continue;
+            }
+            catch(ReflectionException $e) {
+                $logger->error($e->getMessage());
+                continue;
             }
         }
     }
@@ -160,20 +173,18 @@ final class Console extends Application
      *
      * @return void
      */
-    private function addCommand(string $commandName)
+    private function addCommand(string $className)
     {
-        if (! class_exists($commandName)) {
-            throw new CLIException("La classe `{$commandName}` n'existe pas");
+        $class = new ReflectionClass($className);
+
+        if (! $class->isInstantiable() || ! $class->isSubclassOf(Command::class)) {
+            throw CLIException::invalidCommand($className);
         }
 
         /**
          * @var Command $instance
          */
-        $instance = new $commandName($this, Services::logger());
-
-        if (! ($instance instanceof Command)) {
-            throw CLIException::invalidCommand($commandName);
-        }
+        $instance = new $className($this, Services::logger());
 
         $command = new AhcCommand(
             $instance->name,
@@ -221,8 +232,7 @@ final class Console extends Application
         }
 
         $console = $this;
-
-        $command->action(static function () use ($instance, $command, $console) {
+        $action = function () use ($instance, $command, $console) {
             if (! $console->suppress) {
                 $console->start($instance->service);
             }
@@ -234,7 +244,9 @@ final class Console extends Application
             }
 
             return $result;
-        });
+        };
+
+        $command->action($action);
 
         $this->add($command, $instance->alias, false);
     }
