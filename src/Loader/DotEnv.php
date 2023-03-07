@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Traits\SingletonTrait;
 use InvalidArgumentException;
 
 /**
@@ -18,6 +19,8 @@ use InvalidArgumentException;
  */
 class DotEnv
 {
+    use SingletonTrait;
+
     /**
      * Le répertoire où se trouve le fichier .env.
      *
@@ -26,28 +29,11 @@ class DotEnv
     protected $path;
 
     /**
-     * @var self
-     */
-    private static $_instance;
-
-    /**
      * Construit le chemin vers notre fichier.
      */
     private function __construct(string $path, string $file = '.env')
     {
         $this->path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
-    }
-
-    /**
-     * Singleton
-     */
-    private static function instance(string $path, string $file = '.env'): self
-    {
-        if (self::$_instance === null) {
-            self::$_instance = new self($path, $file);
-        }
-
-        return self::$_instance;
     }
 
     public static function init(string $path, string $file = '.env')
@@ -78,9 +64,9 @@ class DotEnv
     /**
      * Modifie les valeurs dans le fichiers .env
      */
-    public function update(array $data = []): bool
+    public function update(array $data = [], bool $reload = true): bool
     {
-        foreach ($data as $key => $value) {
+       foreach ($data as $key => $value) {
             if (env($key) === $value) {
                 unset($data[$key]);
             }
@@ -98,6 +84,7 @@ class DotEnv
         foreach ((array) $data as $key => $value) {
             foreach ($env as $env_key => $env_value) {
                 $entry = explode('=', $env_value, 2);
+                $entry = array_map('trim', $entry);
                 if ($entry[0] === $key) {
                     $env[$env_key] = $key . '=' . (is_string($value) ? '"' . $value . '"' : $value);
                 } else {
@@ -109,7 +96,11 @@ class DotEnv
         $env = implode("\n", $env);
         file_put_contents($this->path, $env);
 
-        return $this->load();
+        if ($reload) {
+            return $this->load();
+        }
+
+        return true;
     }
 
     /**

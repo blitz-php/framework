@@ -194,7 +194,7 @@ class Router implements RouterInterface
 
         return $this->translateURIDashes
             ? str_replace('-', '_', trim($this->controller, '/\\'))
-            : Str::toPascalCase($this->controller); 
+            : Str::toPascalCase($this->controller);
     }
 
     /**

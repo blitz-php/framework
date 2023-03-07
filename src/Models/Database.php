@@ -9,11 +9,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Core;
+namespace BlitzPHP\Models;
 
-use BlitzPHP\Database\BaseUtils;
-use BlitzPHP\Database\Contracts\ConnectionInterface;
+use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Database\Database as Db;
+use BlitzPHP\Loader\Services;
 use InvalidArgumentException;
 
 /**
@@ -25,7 +25,7 @@ class Database
      * Cache pour les instances de toutes les connections
      * qui ont été requetées en tant que instance partagées
      *
-     * @var ConnectionInterface[]
+     * @var array<string, ConnectionInterface>
      */
     protected static $instances = [];
 
@@ -39,8 +39,8 @@ class Database
     /**
      * Ouvre une connexion
      *
-     * @param array|string $group  Nom du groupe de connexion à utiliser, ou un tableau de paramètres de configuration.
-     * @param bool         $shared Doit-on retourner une instance partagée
+     * @param array|ConnectionInterface|string|null $group  Nom du groupe de connexion à utiliser, ou un tableau de paramètres de configuration.
+     * @param bool                                  $shared Doit-on retourner une instance partagée
      */
     public static function connect($group = null, bool $shared = true): ConnectionInterface
     {
@@ -82,7 +82,12 @@ class Database
             $config = $config[$group];
         }
 
-        $connection = static::$factory->load($config, $group);
+        $connection = static::$factory->load(
+            $config,
+            $group,
+            Services::logger(),
+            Services::event()
+        );
 
         static::$instances[$group] = &$connection;
 
@@ -98,18 +103,18 @@ class Database
     }
 
     /**
-     * Charge et retourne une instance du Forge specifique au groupe de la base de donnees
+     * Charge et retourne une instance du Creator specifique au groupe de la base de donnees
      * et charge le groupe s'il n'est pas encore chargé.
      *
      * @param array|ConnectionInterface|string|null $group
      *
-     * @return Forge
+     * @return \BlitzPHP\Database\Creator\BaseCreator
      */
-    public static function forge($group = null)
+    public static function creator($group = null)
     {
         $db = static::connect($group);
 
-        return static::$factory->loadForge($db);
+        return static::$factory->loadCreator($db);
     }
 
     /**
@@ -117,7 +122,7 @@ class Database
      *
      * @param array|string|null $group
      *
-     * @return BaseUtils
+     * @return \Blitzphp\Database\BaseUtils
      */
     public static function utils($group = null)
     {

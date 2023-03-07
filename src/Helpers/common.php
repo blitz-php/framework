@@ -10,7 +10,7 @@
  */
 
 use BlitzPHP\Config\Config;
-use BlitzPHP\Database\Contracts\ConnectionInterface;
+use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
@@ -421,8 +421,8 @@ if (! function_exists('clean_path')) {
             case strpos($path, SYST_PATH) === 0:
                 return 'SYST_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(SYST_PATH));
 
-            case defined('COMPOSER_PATH') && strpos($path, COMPOSER_PATH) === 0:
-                return 'COMPOSER_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(COMPOSER_PATH));
+            case defined('VENDOR_PATH') && strpos($path, VENDOR_PATH) === 0:
+                return 'VENDOR_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(VENDOR_PATH));
 
             case strpos($path, ROOTPATH) === 0:
                 return 'ROOTPATH' . DIRECTORY_SEPARATOR . substr($path, strlen(ROOTPATH));
@@ -715,8 +715,7 @@ if (! function_exists('is_really_writable')) {
      */
     function is_really_writable(string $file): bool
     {
-        return true;
-        // return Helpers::is_really_writable($file);
+        return Helpers::isReallyWritable($file);
     }
 }
 
@@ -736,7 +735,7 @@ if (! function_exists('lang')) {
     }
 }
 
-if (! function_exists('namespaceSplit')) {
+if (! function_exists('namespace_split')) {
     /**
      * Séparez l'espace de noms du nom de classe.
      *

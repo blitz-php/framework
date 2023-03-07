@@ -12,9 +12,8 @@
 namespace BlitzPHP\Models;
 
 use BadMethodCallException;
-use BlitzPHP\Core\Database;
-use BlitzPHP\Database\BaseBuilder;
-use BlitzPHP\Database\Contracts\ConnectionInterface;
+use BlitzPHP\Contracts\Database\ConnectionInterface;
+use BlitzPHP\Database\Builder\BaseBuilder;
 
 /**
  * The Model class extends BaseModel and provides additional

@@ -46,15 +46,21 @@ class FilesCollector extends BaseCollector
      */
     public function display(): array
     {
-        $rawFiles  = get_included_files();
-        $coreFiles = [];
-        $userFiles = [];
+        $rawFiles    = get_included_files();
+        $coreFiles   = [];
+        $userFiles   = [];
+        $vendorFiles = [];
 
         foreach ($rawFiles as $file) {
             $path = clean_path($file);
 
             if (strpos($path, 'SYST_PATH') !== false) {
                 $coreFiles[] = [
+                    'name' => basename($file),
+                    'path' => $path,
+                ];
+            } else if (strpos($path, 'VENDOR_PATH') !== false) {
+                $vendorFiles[] = [
                     'name' => basename($file),
                     'path' => $path,
                 ];
@@ -68,10 +74,15 @@ class FilesCollector extends BaseCollector
 
         sort($userFiles);
         sort($coreFiles);
+        sort($vendorFiles);
 
         return [
-            'coreFiles' => $coreFiles,
-            'userFiles' => $userFiles,
+            'coreFiles'        => $coreFiles,
+            'countCoreFiles'   => count($coreFiles),
+            'userFiles'        => $userFiles,
+            'countUserFiles'   => count($userFiles),
+            'vendorFiles'      => $vendorFiles,
+            'countVendorFiles' => count($vendorFiles),
         ];
     }
 

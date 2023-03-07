@@ -51,7 +51,7 @@ class Command extends ConsoleCommand
      * @var array Options
      */
     protected $options = [
-        '--command'   => 'Le nom de la commande. Par défault: "command:name"',
+        '--command'   => 'Le nom de la commande. Par défaut: "command:name"',
         '--type'      => ['Le type de commande. Options [basic, generator]. Par défault: "basic".', 'basic'],
         '--group'     => 'Le groupe de la commande. Par défaut: [basic -> "BlitzPHP", generator -> "Generators"].',
         '--namespace' => ['Définissez l\'espace de noms racine. Par défaut: "APP_NAMESPACE".', APP_NAMESPACE],
@@ -69,7 +69,7 @@ class Command extends ConsoleCommand
         $this->template  = 'command.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.command';
-        $this->run($params);
+        $this->runGeneration($params);
     }
 
     /**

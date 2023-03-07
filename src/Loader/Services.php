@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Autoloader\Autoloader;
+use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Cache\Cache;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Debug\Logger;
@@ -48,6 +50,17 @@ use stdClass;
 class Services
 {
     /**
+     * Cache des instances des services demander comme instance "partagee".
+     * La cle est le FQCN du service.
+     */
+    protected static array $instances = [];
+
+    /**
+     * Cache d'autres classe de que nous avons trouver via la methode discoverService.
+     */
+    protected static array $services = [];
+
+    /**
      * @return Injector
      */
     public static function injector()
@@ -61,6 +74,18 @@ class Services
     public static function container()
     {
         return Injector::container();
+    }
+
+    /**
+     * La classe Autoloader permet de charger les fichiers simplement.
+     */
+    public static function autoloader(bool $shared = true): Autoloader
+    {
+        if (true === $shared) {
+            return self::singleton(Autoloader::class);
+        }
+
+        return self::factory(Autoloader::class);
     }
 
     /**
@@ -112,6 +137,20 @@ class Services
         }
 
         return self::factory(Language::class)->setLocale($locale);
+    }
+
+    /**
+     * Le file locator fournit des methodes utilitaire pour chercher les fichiers non-classes
+     * dans les dossiers de namespace. C'est une excelente methode pour charger les 'vues', 'helpers', et 'libraries'.
+     */
+    public static function locator(bool $shared = true): Locator
+    {
+        $autoloader = static::autoloader();
+        if ($shared) {
+            return self::singleton(Locator::class)->setAutoloader($autoloader);
+        }
+
+        return self::factory(Locator::class, [$autoloader]);
     }
 
     /**
@@ -310,7 +349,7 @@ class Services
             return self::discoverServiceFactory($name, $arguments);
         }
 
-        return self::discoverServiceSingleton($name);
+        return self::discoverServiceSingleton($name, ...$arguments);
     }
 
     /**
@@ -338,11 +377,14 @@ class Services
      */
     private static function discoverServiceSingleton(string $name)
     {
+        $arguments = func_get_args();
+        $name  = array_shift($arguments);
+
         try {
-            return self::singleton($name);
+            return self::singleton($name, ...$arguments);
         } catch (NotFoundException $e) {
             try {
-                return self::singleton($name . 'Service');
+                return self::singleton($name . 'Service', ...$arguments);
             } catch (NotFoundException $ex) {
                 throw $e;
             }
@@ -356,7 +398,19 @@ class Services
      */
     public static function singleton(string $name)
     {
-        return self::injector()->get($name);
+        $arguments = func_get_args();
+        $name      = array_shift($arguments);
+
+        if (empty(static::$instances[$name])) {
+            if (!empty($arguments)) {
+                static::$instances[$name] = self::injector()->make($name, $arguments);
+            }
+            else {
+                static::$instances[$name] = self::injector()->get($name);
+            }
+        }
+
+        return static::$instances[$name];
     }
 
     /**
