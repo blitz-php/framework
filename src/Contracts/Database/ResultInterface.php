@@ -21,9 +21,9 @@ interface ResultInterface
      * des lignes de données individuelles, qui peuvent être soit un "tableau", soit un
      * 'object', ou un nom de classe personnalisé.
      *
-     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string|null $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      */
-    public function result($type = 'object'): array;
+    public function result(int|string|null $type = 'object'): array;
 
     /**
      * Renvoie les résultats sous la forme d'un tableau de tableaux.
@@ -45,57 +45,57 @@ interface ResultInterface
      *
      * Si la ligne n'existe pas, renvoie null.
      *
-     * @param mixed      $index L'index des résultats à retourner
-     * @param int|string $type  Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param mixed           $index L'index des résultats à retourner
+     * @param int|string|null $type  Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
-    public function row(int $index, $type = 'object');
+    public function row(int $index, int|string|null $type = 'object');
 
     /**
      * Renvoie la "première" ligne des résultats actuels.
      *
-     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string|null $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
-    public function first($type = 'object');
+    public function first(int|string|null $type = 'object');
 
     /**
      * Returns the "last" row of the current results.
      *
-     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string|null $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
-    public function last($type = 'object');
+    public function last(int|string|null $type = 'object');
 
     /**
      * Renvoie la ligne "suivante" des résultats actuels.
      *
-     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string|null $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
-    public function next($type = 'object');
+    public function next(int|string|null $type = 'object');
 
     /**
      * Renvoie la ligne "précédente" des résultats actuels.
      *
-     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string|null $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
-    public function previous($type = 'object');
+    public function previous(int|string|null $type = 'object');
 
     /**
      * Renvoie une ligne non tamponnée et déplace le pointeur vers la ligne suivante.
      *
-     * @param int|string $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
+     * @param int|string|null $type Le type d'objet de résultat. 'tableau', 'objet', nom de classe ou constante d'extraction PDO.
      *
      * @return mixed
      */
-    public function unbufferedRow($type = 'object');
+    public function unbufferedRow(int|string|null $type = 'object');
 
     /**
      * Obtient le nombre de champs dans le jeu de résultats.

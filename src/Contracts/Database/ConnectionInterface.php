@@ -111,7 +111,7 @@ interface ConnectionInterface
      *
      * @param array|string $tableName
      *
-     * @return BaseBuilder Builder.
+     * @return BuilderInterface Builder.
      */
     public function table($tableName);
 
