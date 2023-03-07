@@ -1,0 +1,70 @@
+name: Kahlan Test Unit
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  pull_request:
+    paths:
+      - '**.php'
+      - '**.neon.dist'
+      - '.github/workflows/**'
+      - composer.json
+      - phpunit.xml.dist
+  push:
+    paths:
+      - '**.php'
+      - '**.neon.dist'
+      - '.github/workflows/**'
+      - composer.json
+      - phpunit.xml.dist
+
+jobs:
+  unit-tests:
+    name: Unit Tests with Kahlan [PHP ${{ matrix.php-version }}]
+    runs-on: ubuntu-latest
+		continue-on-error: ${{ !matrix.stable }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+				stable: [true]
+        coverage: xdebug
+        composer-flags: ['']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+				with:
+              fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: curl
+          coverage: pcov
+					tools: composer:v2
+
+      - run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+			- name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Setup Composer's GitHub OAuth access
+        run: composer config --global github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: composer update --ansi --no-progress ${{ matrix.composer-flags }}
+
+      - name: Run Kahlan
+        run: "vendor/bin/kahlan --clover=clover.xml"
+
+			- name: Run ocular for test coverage
+			- run: php vendor/bin/ocular code-coverage:upload --format=php-clover clover.xml
+            if: ${{ matrix.coverage }}
+              continue-on-error: true
