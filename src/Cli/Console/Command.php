@@ -14,6 +14,8 @@ namespace BlitzPHP\Cli\Console;
 use Ahc\Cli\Input\Reader;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Cli\Output\Color;
+use Ahc\Cli\Output\Cursor;
+use Ahc\Cli\Output\ProgressBar;
 use Ahc\Cli\Output\Writer;
 use BlitzPHP\Exceptions\CLIException;
 use Psr\Log\LoggerInterface;
@@ -140,6 +142,13 @@ abstract class Command
      * @var Color
      */
     protected $color;
+
+    /**
+     * @var Cursor
+     */
+    protected $cursor;
+
+    protected ?ProgressBar $progressBar = null;
 
     /**
      * Arguments recus apres executions
@@ -327,6 +336,68 @@ abstract class Command
 
         return $this;
     }
+    
+    /**
+     * Écrit le texte de maniere commentée.
+     */
+    final protected function comment(string $text, bool $eol = false): self
+    {
+        $this->writer->comment($text, $eol);
+
+        return $this;
+    }
+    
+    /**
+     * Efface la console
+     */
+    final protected function clear(): self 
+    {
+        $this->cursor->clear();
+
+        return $this;
+    }
+    
+    /**
+     * Affiche une bordure en pointillés
+     */
+    final protected function border(?int $length = null, string $char = '-'): self 
+    {
+        if ($length === null) {
+            /*
+            attend la validation de la PR de php-cli pour pouvoir utiliser Terminal
+            $terminal = new Terminal;
+            $length = $terminal->width() ?: 100;
+            */
+            $length = 100;
+        }
+
+        $str    = str_repeat($char, $length);
+        $str    = substr($str, 0, $length);
+
+        $this->comment($str, true);
+
+        return $this;
+    }
+
+    /**
+     * Affiche les donnees formatees en json
+     */
+    final protected function json($data): self 
+    {
+        $this->write(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), true);
+
+        return $this;
+    }
+
+    /**
+     * Effectue des tabulations
+     */
+    final protected function tab(int $repeat = 1): self
+    {        
+        $this->write(str_repeat("\t", $repeat));
+
+        return $this;
+    }
 
     /**
      * Laissez l'utilisateur faire un choix parmi les choix disponibles.
@@ -406,6 +477,22 @@ abstract class Command
     }
 
     /**
+     * Initialise une bar de progression
+     */
+    final protected function progress(int $total = null): ProgressBar
+    {
+        if ($this->progressBar === null) {
+            $this->progressBar = new ProgressBar($total, $this->writer);
+        }
+
+        if ($total !== null) {
+            $this->progressBar->total($total);
+        }
+        
+        return $this->progressBar;
+    }
+
+    /**
      * Facilite l'accès à nos propriétés protégées.
      *
      * @return mixed
@@ -434,5 +521,6 @@ abstract class Command
         $this->writer = $this->io->writer();
         $this->reader = $this->io->reader();
         $this->color  = $this->writer->colorizer();
+        //$this->cursor = $this->writer->cursor();
     }
 }
