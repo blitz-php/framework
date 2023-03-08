@@ -15,6 +15,7 @@ use Ahc\Cli\Input\Reader;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Cli\Output\Color;
 use Ahc\Cli\Output\Writer;
+use BlitzPHP\Exceptions\CLIException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -393,15 +394,15 @@ abstract class Command
     }
 
     /**
-     * Can be used by a command to run other commands.
+     * Peut etre utiliser par la commande pour executer d'autres commandes.
      *
-     * @throws ReflectionException
+     * @throws CLIException
      *
      * @return mixed
      */
-    final protected function call(string $command, array $params = [])
+    final protected function call(string $command, array $arguments = [], array $options = [])
     {
-        // return $this->commands->run($command, $params);
+        return $this->app->call($command, $arguments, $options);
     }
 
     /**

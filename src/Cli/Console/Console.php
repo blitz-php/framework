@@ -16,6 +16,7 @@ use Ahc\Cli\Input\Command as AhcCommand;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\CLIException;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\Traits\SingletonTrait;
 use ReflectionClass;
 use ReflectionException;
 
@@ -24,6 +25,8 @@ use ReflectionException;
  */
 final class Console extends Application
 {
+    use SingletonTrait;
+
     /**
      * Defini si on doit suppriemer les information du header (nom/version du framework) ou pas
      */
@@ -116,6 +119,13 @@ final class Console extends Application
         ',
     ];
 
+    /**
+     * Liste des commandes
+     * 
+     * @var array<string, callable>
+     */
+    private array $_commands = [];
+
     public function __construct(bool $suppress = false)
     {
         parent::__construct('BlitzPHP', \BlitzPHP\Core\Application::VERSION);
@@ -128,10 +138,25 @@ final class Console extends Application
     }
 
     /**
+     * Appelle une commande deja enregistree
+     * Utile pour executer une commande dans une autre commande ou dans un controleur 
+     */
+    public static function call(string $commandName, array $arguments = [], array $options = [])
+    {
+        $action = self::instance()->_commands[$commandName] ?? null;  
+        
+        if ($action === null) {
+            throw CLIException::commandNotFound($commandName);
+        }
+
+        return $action($arguments, $options, true);
+    }
+    
+    /**
      * Recherche toutes les commandes dans le framework et dans le code de l'utilisateur
      * et collecte leurs instances pour fonctionner avec eux.
      */
-    public function discoverCommands()
+    private function discoverCommands()
     {
         if (count($this->commands) > 1) {
             return;
@@ -172,11 +197,12 @@ final class Console extends Application
     /**
      * Ajoute une commande à la console
      *
-     * @return void
+     * @param string $commandName FQCN de la commande
      */
-    private function addCommand(string $className, Logger $logger)
+    private function addCommand(string $className, ?Logger $logger = null)
     {
-        $class = new ReflectionClass($className);
+        $class  = new ReflectionClass($className);
+        $logger = $logger ?: Services::logger();
 
         if (! $class->isInstantiable() || ! $class->isSubclassOf(Command::class)) {
             throw CLIException::invalidCommand($className);
@@ -233,18 +259,24 @@ final class Console extends Application
         }
 
         $console = $this;
-        $action = function () use ($instance, $command, $console) {
-            if (! $console->suppress) {
+        $action = function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
+            $suppress = $suppress ?: $console->suppress;
+            if (! $suppress) {
                 $console->start($instance->service);
             }
 
             $parameters = $command->values(false);
-            $arguments  = $command->args();
-            $options    = array_diff_key($parameters, $arguments);
+            if (empty($arguments)) {
+                $arguments  = $command->args();
+            }
+            if (empty($options)) {
+                $options    = array_diff_key($parameters, $arguments);
+            }  
+            $parameters = array_merge($options, $arguments);
             
             $result = $instance->setOptions($options)->setArguments($arguments)->execute($parameters);
 
-            if (! $console->suppress) {
+            if (! $suppress) {
                 $console->end();
             }
 
@@ -252,6 +284,7 @@ final class Console extends Application
         };
 
         $command->action($action);
+        $this->_commands[$instance->name] = $action;
 
         $this->add($command, $instance->alias, false);
     }
