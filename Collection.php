@@ -2054,43 +2054,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Get a base Support collection instance from this collection.
-     *
-     * @return self
      */
-    public function toBase()
+    public function toBase(): self
     {
         return new self($this);
     }
 
     /**
      * Détermine si un élément existe à un décalage.
-     *
-     * @param mixed $key
      */
-    public function offsetExists($key): bool
+    public function offsetExists(mixed $key): bool
     {
         return array_key_exists($key, $this->items);
     }
 
     /**
      * Obtenir un élément à un décalage donné.
-     *
-     * @param mixed $key
-     *
-     * @return mixed
      */
-    public function offsetGet($key)
+    public function offsetGet(mixed $key): mixed
     {
         return $this->items[$key];
     }
 
     /**
      * Définir l'élément à un décalage donné.
-     *
-     * @param mixed $key
-     * @param mixed $value
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet(mixed $key, mixed $value): void
     {
         if (null === $key) {
             $this->items[] = $value;
@@ -2101,10 +2090,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
     /**
      * Supprime l'élément à un décalage donné.
-     *
-     * @param string $key
      */
-    public function offsetUnset($key): void
+    public function offsetUnset(mixed $key): void
     {
         unset($this->items[$key]);
     }
@@ -2144,31 +2131,5 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return (array) $items;
-    }
-
-    /**
-     * Ajoutez une méthode à la liste des méthodes proxy.
-     */
-    public static function proxy(string $method): void
-    {
-        static::$proxies[] = $method;
-    }
-
-    /**
-     * Accédez dynamiquement aux proxys de collecte.
-     *
-     * @param string $key
-     *
-     * @throws Exception
-     *
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        if (! in_array($key, static::$proxies, true)) {
-            throw new Exception("Property [{$key}] does not exist on this collection instance.");
-        }
-
-        return new HigherOrderCollectionProxy($this, $key);
     }
 }
