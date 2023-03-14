@@ -36,4 +36,12 @@ class CLIException extends RuntimeException
     {
         return new static(lang('CLI.invalidCommand', [$commandName]));
     }
+
+    /**
+     * Lévée que on essaie d'utiliser une commande qui n'est pas enregistree
+     */
+    public static function commandNotFound(string $commandName)
+    {
+        return new static(lang('CLI.commandNotFound', [$commandName]));
+    }
 }

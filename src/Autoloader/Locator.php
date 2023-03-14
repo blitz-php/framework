@@ -71,6 +71,40 @@ class Locator
     }
 
     /**
+     * Scans the provided namespace, returning a list of all files
+     * that are contained within the sub path specified by $path.
+     *
+     * @return string[] Liste des chemins des fichiers
+     */
+    public function listNamespaceFiles(string $prefix, string $path): array
+    {
+        if (empty($path) || empty($prefix)) {
+            return [];
+        }
+
+        $files = [];
+        helper('filesystem');
+
+        // autoloader->getNamespace($prefix) returns an array of paths for that namespace
+        foreach ($this->autoloader->getNamespace($prefix) as $namespacePath) {
+            $fullPath = rtrim($namespacePath, '/') . '/' . $path;
+            $fullPath = realpath($fullPath) ?: $fullPath;
+
+            if (! is_dir($fullPath)) {
+                continue;
+            }
+
+            $tempFiles = get_filenames($fullPath, true, false, false);
+
+            if (! empty($tempFiles)) {
+                $files = array_merge($files, $tempFiles);
+            }
+        }
+
+        return $files;
+    }
+
+    /**
      * Retourne les namespace mappees qu'on connait
      *
      * @return array<int, array<string, string>>

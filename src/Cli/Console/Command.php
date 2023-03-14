@@ -14,7 +14,10 @@ namespace BlitzPHP\Cli\Console;
 use Ahc\Cli\Input\Reader;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Cli\Output\Color;
+use Ahc\Cli\Output\Cursor;
+use Ahc\Cli\Output\ProgressBar;
 use Ahc\Cli\Output\Writer;
+use BlitzPHP\Exceptions\CLIException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -141,6 +144,13 @@ abstract class Command
     protected $color;
 
     /**
+     * @var Cursor
+     */
+    protected $cursor;
+
+    protected ?ProgressBar $progressBar = null;
+
+    /**
      * Arguments recus apres executions
      */
     private array $_arguments = [];
@@ -199,13 +209,17 @@ abstract class Command
 
     /**
      * Recupere la valeur d'un argument lors de l'execution de la commande
-     *
-     * @param mixed $default
-     * @return mixed
      */
-    final protected function getArg(string $name, $default = null)
+    final protected function argument(string $name, mixed $default = null): mixed
     {
         return $this->_arguments[$name] ?? $default;
+    }
+    /**
+     * @deprecated 1.1 Utilisez argument() a la place
+     */
+    final protected function getArg(string $name, mixed $default = null)
+    {
+        return $this->argument($name, $default);
     }
 
     /**
@@ -214,22 +228,33 @@ abstract class Command
      * @param mixed $default
      * @return mixed
      */
-    final protected function getOption(string $name, $default = null)
+    final protected function option(string $name, mixed $default = null): mixed
     {
         return $this->_options[$name] ?? $default;
     }
+    /**
+     * @deprecated 1.1 Utilisez option() a la place
+     */
+    final protected function getOption(string $name, mixed $default = null)
+    {
+        return $this->option($name, $default);
+    }
 
     /**
-     * Recupere la valeur d'un parametre (option ou argument) lors de l'execution de la commande
-     *
-     * @param mixed $default
-     * @return mixed
+     * Recupere la valeur d'un parametre (option ou argument) lors de l'execution de la commande.
      */
-    final protected function getParam(string $name, $default = null)
+    final protected function param(string $name, mixed $default = null): mixed
     {
         $params = array_merge($this->_arguments, $this->_options);
 
         return $params[$name] ?? $default;
+    }
+    /**
+     * @deprecated 1.1 Utilisez param() a la place
+     */
+    final protected function getParam(string $name, mixed $default = null)
+    {
+        return $this->param($name, $default);
     }
 
     /**
@@ -253,17 +278,9 @@ abstract class Command
     }
 
     /**
-     * Ecrit un message de succes
+     * Ecrit un message d'echec
      */
-    final protected function success(string $message): self
-    {
-        return $this->ok($message, true);
-    }
-
-    /**
-     * Ecrit un message d'erreur
-     */
-    final protected function error(string $message, bool $eol = false): self
+    final protected function fail(string $message, bool $eol = false): self
     {
         $this->writer->error($message, $eol);
 
@@ -271,11 +288,63 @@ abstract class Command
     }
 
     /**
-     * Ecrit un message d'echec
+     * Ecrit un message de succes
      */
-    final protected function fail(string $message): self
+    final protected function success(string $message, bool $badge = true): self
     {
-        return $this->error($message, true);
+        if (! $badge) {
+            $this->writer->okBold('SUCCESS');
+        }
+        else {
+            $this->writer->boldWhiteBgGreen(' SUCCESS ');
+        }
+
+        return $this->write(" " . $message, true);
+    }
+    
+    /**
+     * Ecrit un message d'avertissement
+     */
+    final protected function warning(string $message, bool $badge = true): self
+    {
+        if (! $badge) {
+            $this->writer->warnBold('WARNING');
+        }
+        else {
+            $this->writer->boldWhiteBgYellow(' WARNING ');
+        }
+
+        return $this->write(" " . $message, true);
+    }
+    
+    /**
+     * Ecrit un message d'information
+     */
+    final protected function info(string $message, bool $badge = true): self
+    {
+        if (! $badge) {
+            $this->writer->infoBold('INFO');
+        }
+        else {
+            $this->writer->boldWhiteBgCyan(' INFO ');
+        }
+
+        return $this->write(" " . $message, true);
+    }
+
+    /**
+     * Ecrit un message d'erreur
+     */
+    final protected function error(string $message, bool $badge = true): self
+    {
+        if (! $badge) {
+            $this->writer->errorBold('ERROR');
+        }
+        else {
+            $this->writer->boldWhiteBgRed(' ERROR ');
+        }
+
+        return $this->write(" " . $message, true);
     }
 
     /**
@@ -323,6 +392,68 @@ abstract class Command
     final protected function write(string $texte, bool $eol = false): self
     {
         $this->writer->write($texte, $eol);
+
+        return $this;
+    }
+    
+    /**
+     * Écrit le texte de maniere commentée.
+     */
+    final protected function comment(string $text, bool $eol = false): self
+    {
+        $this->writer->comment($text, $eol);
+
+        return $this;
+    }
+    
+    /**
+     * Efface la console
+     */
+    final protected function clear(): self 
+    {
+        $this->cursor->clear();
+
+        return $this;
+    }
+    
+    /**
+     * Affiche une bordure en pointillés
+     */
+    final protected function border(?int $length = null, string $char = '-'): self 
+    {
+        if ($length === null) {
+            /*
+            attend la validation de la PR de php-cli pour pouvoir utiliser Terminal
+            $terminal = new Terminal;
+            $length = $terminal->width() ?: 100;
+            */
+            $length = 100;
+        }
+
+        $str    = str_repeat($char, $length);
+        $str    = substr($str, 0, $length);
+
+        $this->comment($str, true);
+
+        return $this;
+    }
+
+    /**
+     * Affiche les donnees formatees en json
+     */
+    final protected function json($data): self 
+    {
+        $this->write(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), true);
+
+        return $this;
+    }
+
+    /**
+     * Effectue des tabulations
+     */
+    final protected function tab(int $repeat = 1): self
+    {        
+        $this->write(str_repeat("\t", $repeat));
 
         return $this;
     }
@@ -393,15 +524,31 @@ abstract class Command
     }
 
     /**
-     * Can be used by a command to run other commands.
+     * Peut etre utiliser par la commande pour executer d'autres commandes.
      *
-     * @throws ReflectionException
+     * @throws CLIException
      *
      * @return mixed
      */
-    final protected function call(string $command, array $params = [])
+    final protected function call(string $command, array $arguments = [], array $options = [])
     {
-        // return $this->commands->run($command, $params);
+        return $this->app->call($command, $arguments, $options);
+    }
+
+    /**
+     * Initialise une bar de progression
+     */
+    final protected function progress(int $total = null): ProgressBar
+    {
+        if ($this->progressBar === null) {
+            $this->progressBar = new ProgressBar($total, $this->writer);
+        }
+
+        if ($total !== null) {
+            $this->progressBar->total($total);
+        }
+        
+        return $this->progressBar;
     }
 
     /**
@@ -433,5 +580,6 @@ abstract class Command
         $this->writer = $this->io->writer();
         $this->reader = $this->io->reader();
         $this->color  = $this->writer->colorizer();
+        //$this->cursor = $this->writer->cursor();
     }
 }
