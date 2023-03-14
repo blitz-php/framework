@@ -11,10 +11,8 @@
 
 namespace BlitzPHP\Cli\Commands\Database\Migration;
 
+use BlitzPHP\Cli\Commands\Database\Helper;
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Database\Migration\Runner;
-use BlitzPHP\Loader\Services;
-use InvalidArgumentException;
 
 /**
  * Execute toutes les nouvelles migrations.
@@ -57,47 +55,14 @@ class Migrate extends Command
     {
         $this->colorize(lang('Migrations.latest'), 'yellow');
 
-        $namespace = $this->getOption('namespace');
-        $group     = $this->getOption('group');
-        $config    = config('database');
+        $namespace = $this->option('namespace');
+        $group     = $this->option('group');
         
-        if (empty($group)) {
-            $group = $config['group'] ?? 'auto';
-
-            if ($group === 'auto') {
-                $group = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
-            }
-
-            if (! isset($config[$group])) {
-                $group = 'default';
-            }
-        }
-        
-        if (is_string($group) && ! isset($config[$group]) && strpos($group, 'custom-') !== 0) {
-            throw new InvalidArgumentException($group . ' is not a valid database connection group.');
-        }
-
-        $runner = Runner::instance(config('migrations'), $config[$group]);
+        $runner = Helper::runner($group);
 
         $runner->clearMessages();
-
-        if ($this->getOption('all')) {
-            $namespaces = array_keys(Services::autoloader()->getNamespace());
-        } elseif ($namespace) {
-            $namespaces = [$namespace];
-        } else {
-            $namespaces = [APP_NAMESPACE];
-        }
-
-        $locator = Services::locator();
-
-        $files = [];
-        foreach ($namespaces as $namespace) {
-            $files[$namespace] = $locator->listNamespaceFiles($namespace, '/Database/Migrations/');
-        }
-
-        $runner->setFiles($files);
-
+        $runner->setFiles(Helper::getMigrationFiles($this->option('all') == true, $namespace));
+        
         if (! $runner->latest($group)) {
             $this->fail(lang('Migrations.generalFault')); // @codeCoverageIgnore
         }
@@ -108,6 +73,6 @@ class Migrate extends Command
             $this->colorize($message['message'], $message['color']);
         }
 
-        $this->success(lang('Migrations.migrated'));
+        $this->newLine()->success(lang('Migrations.migrated'));
     }
 }
