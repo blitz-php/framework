@@ -53,6 +53,8 @@ class CreateDatabase extends Command
                 if (empty($val)) {
                     throw new InvalidArgumentException('Veuillez entrer le nom de la base de données.');
                 }
+
+                return $val;
             });
         }
 
