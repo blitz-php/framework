@@ -17,6 +17,7 @@ use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\CLIException;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\SingletonTrait;
+use Composer\InstalledVersions;
 use ReflectionClass;
 use ReflectionException;
 
@@ -260,6 +261,28 @@ final class Console extends Application
 
         $console = $this;
         $action = function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
+            foreach ($instance->required as $package) {
+                $package = explode(':', $package);
+                $version = $package[1] ?? null;
+                $package = $package[0];
+
+                if (! InstalledVersions::isInstalled($package)) {
+                    $console->io()->info('Cette commande nécessite le package "' . $package . '" mais vous ne l\'avez pas', true);
+                    if (! $console->io()->confirm('Voulez-vous l\'installer maintenant ?')) {
+                        return;
+                    }
+
+                    $package .=  ($version != null ? ":$version" : '');
+                    $console->io()->write('>> Installation de "' . $package . '" en cours', true);
+                    $console->io()->eol();
+                    
+                    chdir(ROOTPATH);
+                    passthru('composer require ' . $package, $status);
+                    
+                    $console->io()->eol();
+                }
+            }
+           
             $suppress = $suppress ?: $console->suppress;
             if (! $suppress) {
                 $console->start($instance->service);

@@ -32,6 +32,7 @@ use Psr\Log\LoggerInterface;
  * @property array           $options
  * @property string          $service
  * @property string          $usage
+ * @property array           $required
  */
 abstract class Command
 {
@@ -115,6 +116,19 @@ abstract class Command
      * @var string
      */
     protected $service = '';
+
+    /**
+     * Liste des packets requis pour le fonctionnement d'une commande
+     * Par exemple, toutes le commande du groupe Database ont besoin de blitz/database 
+     * 
+     * @var array
+     *
+     * @example
+     * `[
+     *      'vendor/package', 'vendor/package:version'
+     * ]`
+     */
+    protected $required = [];
 
     /**
      * Application Console
