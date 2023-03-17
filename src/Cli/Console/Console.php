@@ -122,7 +122,7 @@ final class Console extends Application
 
     /**
      * Liste des commandes
-     * 
+     *
      * @var array<string, callable>
      */
     private array $_commands = [];
@@ -140,19 +140,19 @@ final class Console extends Application
 
     /**
      * Appelle une commande deja enregistree
-     * Utile pour executer une commande dans une autre commande ou dans un controleur 
+     * Utile pour executer une commande dans une autre commande ou dans un controleur
      */
     public static function call(string $commandName, array $arguments = [], array $options = [])
     {
-        $action = self::instance()->_commands[$commandName] ?? null;  
-        
+        $action = self::instance()->_commands[$commandName] ?? null;
+
         if ($action === null) {
             throw CLIException::commandNotFound($commandName);
         }
 
         return $action($arguments, $options, true);
     }
-    
+
     /**
      * Recherche toutes les commandes dans le framework et dans le code de l'utilisateur
      * et collecte leurs instances pour fonctionner avec eux.
@@ -184,12 +184,11 @@ final class Console extends Application
 
             try {
                 $this->addCommand($className, $logger);
-            }
-            catch(CLIException $e) {
+            } catch (CLIException $e) {
                 continue;
-            }
-            catch(ReflectionException $e) {
+            } catch (ReflectionException $e) {
                 $logger->error($e->getMessage());
+
                 continue;
             }
         }
@@ -260,7 +259,7 @@ final class Console extends Application
         }
 
         $console = $this;
-        $action = function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
+        $action  = static function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
             foreach ($instance->required as $package) {
                 $package = explode(':', $package);
                 $version = $package[1] ?? null;
@@ -272,17 +271,17 @@ final class Console extends Application
                         return;
                     }
 
-                    $package .=  ($version != null ? ":$version" : '');
+                    $package .= ($version !== null ? ":{$version}" : '');
                     $console->io()->write('>> Installation de "' . $package . '" en cours', true);
                     $console->io()->eol();
-                    
+
                     chdir(ROOTPATH);
                     passthru('composer require ' . $package, $status);
-                    
+
                     $console->io()->eol();
                 }
             }
-           
+
             $suppress = $suppress ?: $console->suppress;
             if (! $suppress) {
                 $console->start($instance->service);
@@ -290,13 +289,13 @@ final class Console extends Application
 
             $parameters = $command->values(false);
             if (empty($arguments)) {
-                $arguments  = $command->args();
+                $arguments = $command->args();
             }
             if (empty($options)) {
-                $options    = array_diff_key($parameters, $arguments);
-            }  
+                $options = array_diff_key($parameters, $arguments);
+            }
             $parameters = array_merge($options, $arguments);
-            
+
             $result = $instance->setOptions($options)->setArguments($arguments)->execute($parameters);
 
             if (! $suppress) {

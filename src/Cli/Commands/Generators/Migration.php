@@ -13,6 +13,7 @@ namespace BlitzPHP\Cli\Commands\Generators;
 
 use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Cli\Console\GeneratorTrait;
+use InvalidArgumentException;
 
 /**
  * Genere un skelette de fichier de migration.
@@ -37,7 +38,7 @@ class Migration extends Command
      * @var string
      */
     protected $usage = 'make:migration <name> [options]';
-    
+
     /**
      * @var string Description
      */
@@ -49,7 +50,7 @@ class Migration extends Command
     protected $service = 'Service de génération de code';
 
     /**
-     * @var array Arguments 
+     * @var array Arguments
      */
     protected $arguments = [
         'name' => 'Le nom de la classe de migration.',
@@ -94,47 +95,42 @@ class Migration extends Command
         $modify = $this->getOption('modify', false);
 
         if ($create && $modify) {
-            throw new \InvalidArgumentException('Impossible d\'utiliser "create" et "modify" au même moment pour la génération des migrations.');
+            throw new InvalidArgumentException('Impossible d\'utiliser "create" et "modify" au même moment pour la génération des migrations.');
         }
 
-        if (!$create && !$modify) { 
+        if (! $create && ! $modify) {
             $data['action'] = null;
-        }
-        else {
+        } else {
             $data['action'] = $create ? 'create' : 'modify';
         }
 
         $table = $this->getOption('table');
         $group = $this->getOption('group');
-    
-        $data['group']   = is_string($group) ? $group : 'default';
-        $data['driver']  = config('database.'.$data['group'].'.driver');
-        
-        if (true == $this->getOption('session', false)) {
+
+        $data['group']  = is_string($group) ? $group : 'default';
+        $data['driver'] = config('database.' . $data['group'] . '.driver');
+
+        if (true === $this->getOption('session', false)) {
             $data['session'] = true;
-            if ($data['action'] == null) {
+            if ($data['action'] === null) {
                 $data['action'] = 'create';
             }
         }
 
-        if (!is_string($table) || $table === '') {
-            
+        if (! is_string($table) || $table === '') {
             if ($data['session']) {
-                $table = 'blitz_sessions'; 
-            }
-            else if (is_string($create)) {
+                $table = 'blitz_sessions';
+            } elseif (is_string($create)) {
                 $table = $create;
-            }
-            else if (is_string($modify)) {
+            } elseif (is_string($modify)) {
                 $table = $modify;
-            }
-            else {
+            } else {
                 $table = null;
             }
         }
-        
+
         $data['table'] = $table;
-    
+
         return $this->parseTemplate($class, [], [], $data);
     }
 }

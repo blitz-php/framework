@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Autoloader;
 
 use BlitzPHP\Config\Config;
@@ -34,6 +43,7 @@ class Autoloader
      * Sauvegarde la liste des fichiers.
      *
      * @var string[]
+     *
      * @phpstan-var list<string>
      */
     protected array $files = [];
@@ -43,6 +53,7 @@ class Autoloader
      * Toujours charger le helper URL car il est utilisee par plusieurs applications.
      *
      * @var string[]
+     *
      * @phpstan-var list<string>
      */
     protected array $helpers = ['url'];
@@ -58,7 +69,7 @@ class Autoloader
 
         $config = (object) Config::get('autoload');
 
-        // Nous devons avoir au moins un, au cas contraire, 
+        // Nous devons avoir au moins un, au cas contraire,
         // on leve une exception pour forcer le programmeur a renseigner.
         if ($config->psr4 === [] && $config->classmap === []) {
             throw new InvalidArgumentException('Config array must contain either the \'psr4\' key or the \'classmap\' key.');
@@ -98,7 +109,7 @@ class Autoloader
 
         // @phpstan-ignore-next-line
         $this->loadComposerNamespaces($composer);
-    
+
         unset($composer);
     }
 
@@ -123,6 +134,7 @@ class Autoloader
      * Enregistre les namespaces avec l'autoloader.
      *
      * @param array<string, array<int, string>|string>|string $namespace
+     *
      * @phpstan-param array<string, list<string>|string>|string $namespa
      */
     public function addNamespace($namespace, ?string $path = null): self
@@ -144,7 +156,7 @@ class Autoloader
         } else {
             $this->prefixes[trim($namespace, '\\')][] = rtrim($path, '\\/') . DIRECTORY_SEPARATOR;
         }
-        
+
         return $this;
     }
 
@@ -302,7 +314,7 @@ class Autoloader
     private function loadComposerNamespaces(ClassLoader $composer): void
     {
         $namespacePaths = $composer->getPrefixesPsr4();
-        
+
         if (! method_exists(InstalledVersions::class, 'getAllRawData')) {
             throw new RuntimeException(
                 'Your Composer version is too old.'
@@ -358,7 +370,7 @@ class Autoloader
                 $newPaths[rtrim($namespace, '\\ ')] = $srcPaths;
             }
         }
-       
+
         $this->addNamespace($newPaths);
     }
 

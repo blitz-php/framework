@@ -37,7 +37,7 @@ class Refresh extends Command
      * {@inheritDoc}
      */
     protected $service = 'Service de gestion de base de données';
-    
+
     /**
      * {@inheritDoc}
      */

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Cli\Commands\Database;
 
 use BlitzPHP\Cli\Console\Command;
@@ -31,12 +40,12 @@ class TableInfo extends Command
      * {@inheritDoc}
      */
     protected $usage = <<<'EOL'
-        db:table --show
-        db:table --metadata
-        db:table my_table --metadata
-        db:table my_table
-        db:table my_table --limit-rows 5 --limit-field-value 10 --desc
-    EOL;
+            db:table --show
+            db:table --metadata
+            db:table my_table --metadata
+            db:table my_table
+            db:table my_table --limit-rows 5 --limit-field-value 10 --desc
+        EOL;
 
     /**
      * {@inheritDoc}
@@ -98,14 +107,15 @@ class TableInfo extends Command
         $limitFieldValue = (int) $this->option('limit-field-value', 15);
 
         if (! in_array($tableName, $tables, true)) {
-            $tabs = $tables;
+            $tabs   = $tables;
             $tables = [];
+
             foreach ($tabs as $key => $tab) {
                 $tables[$key + 1] = $tab;
             }
 
             $tableNameNo = $this->choice("Voici les tables disponible dans votre base de données. \n Quelle table souhaitez-vous afficher?", $tables);
-            $tableName = $tables[$tableNameNo];
+            $tableName   = $tables[$tableNameNo];
         }
 
         if (true === $this->option('metadata')) {
@@ -130,7 +140,7 @@ class TableInfo extends Command
     private function showDataOfTable(string $tableName, int $limitRows, int $limitFieldValue)
     {
         $this->newLine()->io->blackBgYellow("Données de la table \"{$tableName}\":", true);
-       
+
         $this->removeDBPrefix();
         $thead = $this->db->getFieldNames($tableName);
         $this->restoreDBPrefix();
@@ -142,13 +152,13 @@ class TableInfo extends Command
         }
 
         $this->tbody = $this->makeTableRows($tableName, $limitRows, $limitFieldValue, $sortField);
-       
+
         $this->table($this->tbody);
     }
 
     private function showAllTables(array $tables)
     {
-        $this->newLine()->io->blackBgYellow('Voici une liste des noms de toutes les tables de base de données :', true);
+        $this->newLine()->io->blackBgYellow("Voici une liste des noms de toutes les tables de base de données\u{a0}:", true);
 
         $this->tbody = $this->makeTbodyForShowAllTables($tables);
 
@@ -162,7 +172,7 @@ class TableInfo extends Command
         foreach ($tables  as $id => $tableName) {
             $table = $this->db->protectIdentifiers($tableName);
             /** @var \BlitzPHP\Database\Result\BaseResult $db */
-            $db    = $this->db->query("SELECT * FROM {$table}");
+            $db = $this->db->query("SELECT * FROM {$table}");
 
             $this->tbody[] = [
                 'ID'                       => $id + 1,
@@ -217,7 +227,7 @@ class TableInfo extends Command
 
     private function showFieldMetaData(string $tableName): void
     {
-        $this->newLine()->io->blackBgYellow("Liste des informations de métadonnées dans la table \"{$tableName}\" :", true);
+        $this->newLine()->io->blackBgYellow("Liste des informations de métadonnées dans la table \"{$tableName}\"\u{a0}:", true);
 
         $this->removeDBPrefix();
         $fields = $this->db->getFieldData($tableName);

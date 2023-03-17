@@ -38,12 +38,12 @@ class Status extends Command
      * {@inheritDoc}
      */
     protected $service = 'Service de gestion de base de données';
-    
+
     /**
      * {@inheritDoc}
      */
     protected $options = [
-        '-g, --group'     => 'Défini le groupe de la base de données',
+        '-g, --group' => 'Défini le groupe de la base de données',
     ];
 
     /**
@@ -65,7 +65,7 @@ class Status extends Command
      */
     public function execute(array $params)
     {
-        $group     = $this->option('group');
+        $group = $this->option('group');
 
         $runner = Helper::runner($group);
 
@@ -127,12 +127,12 @@ class Status extends Command
 
         if (! $status) {
             // @codeCoverageIgnoreStart
-           $this->error(lang('Migrations.noneFound'))->newLine();
+            $this->error(lang('Migrations.noneFound'))->newLine();
 
             return;
             // @codeCoverageIgnoreEnd
         }
 
-        $this->table($status, ['head' => 'boldYellow']);        
+        $this->table($status, ['head' => 'boldYellow']);
     }
 }

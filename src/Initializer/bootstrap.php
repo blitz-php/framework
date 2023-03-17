@@ -55,7 +55,7 @@ return function (array $paths, string $paths_config_file, bool $is_cli) {
      * Chemin vers le framework
      */
     defined('SYST_PATH') || define('SYST_PATH', dirname(__DIR__) . DS);
-    
+
     /**
      * Chemin d'acces du dossier "vendor"
      */
@@ -76,16 +76,15 @@ return function (array $paths, string $paths_config_file, bool $is_cli) {
     }
     require_once SYST_PATH . 'Constants' . DS . 'constants.php';
 
-    
     /**
      * On charge le helper `common` qui est utilisé par le framework et presque toutes les applications
      */
     FileLocator::helper('common');
-    
+
     // Initialise et enregistre le loader avec la pile SPL autoloader.
     Services::autoloader()->initialize()->register();
     Services::autoloader()->loadHelpers();
-    
+
     $app = new Application();
     $app->init();
 

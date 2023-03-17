@@ -3,7 +3,7 @@
 namespace {namespace};
 
 use BlitzPHP\Database\Migration\Migration;
-<?php if (!empty($table) && !empty($action)): ?>
+<?php if (! empty($table) && ! empty($action)): ?>
 use BlitzPHP\Database\Migration\Structure;
 <?php endif; ?>
 
@@ -16,7 +16,7 @@ class {class} extends Migration
     public function up()
     {
 <?php if (empty($table) || empty($action)): ?>
-        // 
+        //
 <?php else: ?>
         $this-><?= $action ?>('<?= $table ?>', function(Structure $structure) {
 <?php if ($session): ?>
@@ -43,7 +43,7 @@ class {class} extends Migration
     public function down()
     {
 <?php if (empty($table) || empty($action)): ?>
-        // 
+        //
 <?php elseif ($action === 'create') : ?>
         $this->dropIfExists('<?= $table ?>');
 <?php else: ?>

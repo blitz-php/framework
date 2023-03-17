@@ -36,7 +36,6 @@ class Database
      */
     protected static $factory;
 
-
     /**
      * Recupere les informations a utiliser pour la connexion a la base de données
      *

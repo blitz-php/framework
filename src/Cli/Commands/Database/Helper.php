@@ -1,4 +1,13 @@
-<?php 
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
 
 namespace BlitzPHP\Cli\Commands\Database;
 
@@ -9,7 +18,7 @@ use BlitzPHP\Loader\Services;
 /**
  * Aide a l'initialisation de la bd
  */
-class Helper 
+class Helper
 {
     /**
      * Recupere une instance de l'executeur de migration
@@ -37,6 +46,7 @@ class Helper
         $locator = Services::locator();
 
         $files = [];
+
         foreach ($namespaces as $namespace) {
             $files[$namespace] = $locator->listNamespaceFiles($namespace, '/Database/Migrations/');
         }

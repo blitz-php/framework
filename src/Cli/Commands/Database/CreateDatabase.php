@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Cli\Commands\Database;
 
 use BlitzPHP\Cli\Console\Command;
@@ -27,7 +36,7 @@ class CreateDatabase extends Command
      * {@inheritDoc}
      */
     protected $service = 'Service de gestion de base de données';
-    
+
     /**
      * {@inheritDoc}
      */
@@ -49,7 +58,7 @@ class CreateDatabase extends Command
     {
         $name = $this->argument('name');
         if (empty($name)) {
-            $name = $this->prompt('Nom de la base de données', null, function($val) {
+            $name = $this->prompt('Nom de la base de données', null, static function ($val) {
                 if (empty($val)) {
                     throw new InvalidArgumentException('Veuillez entrer le nom de la base de données.');
                 }
@@ -104,7 +113,7 @@ class CreateDatabase extends Command
                 return;
                 // @codeCoverageIgnoreEnd
             }
-        } else */ 
+        } else */
         if (! Database::creator($db)->createDatabase($name)) {
             // @codeCoverageIgnoreStart
             $this->error('Echec de la création de la base de données');
@@ -113,6 +122,6 @@ class CreateDatabase extends Command
             // @codeCoverageIgnoreEnd
         }
 
-        $this->success("Base de données \"{$name}\" créée avec succès.");    
+        $this->success("Base de données \"{$name}\" créée avec succès.");
     }
 }

@@ -100,11 +100,10 @@ trait GeneratorTrait
         if (empty($target)) {
             return;
         }
-        
+
         $this->generateFile($target, $this->buildContent($class));
     }
 
-    
     /**
      * Handles writing the file to disk, and all of the safety checks around that.
      */
@@ -163,7 +162,7 @@ trait GeneratorTrait
 
         $this->colorize(lang('CLI.generator.fileCreate', [clean_path($target)]), 'green');
     }
-    
+
     /**
      * Préparez les options et effectuez les remplacements nécessaires.
      */
@@ -281,7 +280,7 @@ trait GeneratorTrait
         $namespace = trim(str_replace('/', '\\', $this->getOption('namespace', APP_NAMESPACE)), '\\');
 
         $base = Services::autoloader()->getNamespace($namespace);
-        
+
         if (! $base = reset($base)) {
             $this->io->error(lang('CLI.namespaceNotDefined', [$namespace]), true);
 
