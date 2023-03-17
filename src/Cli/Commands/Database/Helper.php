@@ -2,9 +2,9 @@
 
 namespace BlitzPHP\Cli\Commands\Database;
 
+use BlitzPHP\Config\Database;
 use BlitzPHP\Database\Migration\Runner;
 use BlitzPHP\Loader\Services;
-use InvalidArgumentException;
 
 /**
  * Aide a l'initialisation de la bd
@@ -16,25 +16,9 @@ class Helper
      */
     public static function runner(?string $group): Runner
     {
-        $config = config('database');
-        
-        if (empty($group)) {
-            $group = $config['group'] ?? 'auto';
+        [$group, $config] = Database::connectionInfo($group);
 
-            if ($group === 'auto') {
-                $group = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
-            }
-
-            if (! isset($config[$group])) {
-                $group = 'default';
-            }
-        }
-        
-        if (is_string($group) && ! isset($config[$group]) && strpos($group, 'custom-') !== 0) {
-            throw new InvalidArgumentException($group . ' is not a valid database connection group.');
-        }
-
-        return Runner::instance(config('migrations'), $config[$group]);
+        return Runner::instance(config('migrations'), $config);
     }
 
     /**
