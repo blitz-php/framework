@@ -189,10 +189,10 @@ abstract class BaseHandler implements CacheInterface
      * @param iterable $keys    Une liste de clés pouvant être obtenues en une seule opération.
      * @param mixed    $default Valeur par défaut à renvoyer pour les clés qui n'existent pas.
      *
+     * @return iterable Une liste de paires clé-valeur. Les clés de cache qui n'existent pas ou qui sont obsolètes auront $default comme valeur.
+     *
      * @throws InvalidArgumentException Si $keys n'est ni un tableau ni un Traversable,
      *                                  ou si l'une des clés n'a pas de valeur légale.
-     *
-     * @return iterable Une liste de paires clé-valeur. Les clés de cache qui n'existent pas ou qui sont obsolètes auront $default comme valeur.
      */
     public function getMultiple($keys, $default = null): iterable
     {
@@ -215,10 +215,10 @@ abstract class BaseHandler implements CacheInterface
      *                                      le pilote prend en charge TTL, la bibliothèque peut définir une valeur par défaut
      *                                      pour cela ou laissez le conducteur s'en occuper.
      *
+     * @return bool Vrai en cas de succès et faux en cas d'échec.
+     *
      * @throws InvalidArgumentException Si $values n'est ni un tableau ni un Traversable,
      *                                  ou si l'une des valeurs $ n'est pas une valeur légale.
-     *
-     * @return bool Vrai en cas de succès et faux en cas d'échec.
      */
     public function setMultiple($values, $ttl = null): bool
     {
@@ -254,10 +254,10 @@ abstract class BaseHandler implements CacheInterface
      *
      * @param iterable $keys Une liste de clés basées sur des chaînes à supprimer.
      *
+     * @return bool Vrai si les éléments ont été supprimés avec succès. Faux s'il y a eu une erreur.
+     *
      * @throws InvalidArgumentException Si $keys n'est ni un tableau ni un Traversable,
      *                                  ou si l'une des clés $ n'a pas de valeur légale.
-     *
-     * @return bool Vrai si les éléments ont été supprimés avec succès. Faux s'il y a eu une erreur.
      */
     public function deleteMultiple($keys): bool
     {
@@ -370,9 +370,9 @@ abstract class BaseHandler implements CacheInterface
      *
      * @param string $key la clé transmise
      *
-     * @throws InvalidArgumentException Si la valeur de la clé n'est pas valide.
-     *
      * @return string Clé préfixée avec des caractères potentiellement dangereux remplacés.
+     *
+     * @throws InvalidArgumentException Si la valeur de la clé n'est pas valide.
      */
     protected function _key($key): string
     {
