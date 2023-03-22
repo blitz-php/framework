@@ -1504,9 +1504,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param int|null $number
      *
-     * @throws InvalidArgumentException
-     *
      * @return mixed|static
+     *
+     * @throws InvalidArgumentException
      */
     public function random($number = null)
     {

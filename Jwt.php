@@ -95,9 +95,9 @@ class Jwt
     /**
      * Recupere le payload du token entrant
      *
-     * @throws Exception
-     *
      * @return mixed
+     *
+     * @throws Exception
      */
     public static function payload(bool $full = false, array $config = [])
     {
