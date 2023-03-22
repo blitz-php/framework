@@ -113,7 +113,7 @@ class CreateDatabase extends Command
                 return;
                 // @codeCoverageIgnoreEnd
             }
-        } else if (! Database::creator($db)->createDatabase($name)) {
+        } elseif (! Database::creator($db)->createDatabase($name)) {
             // @codeCoverageIgnoreStart
             $this->error('Echec de la création de la base de données');
 

@@ -95,7 +95,7 @@ defined('LANG_PATH') || define('LANG_PATH', RESOURCE_PATH . 'lang' . DS);
 /**
  * Chemin vers le dossier des logs
  */
-defined('LOG_PATH') ||define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
+defined('LOG_PATH') || define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
 
 /**
  * Chemin vers le dossier des layouts
@@ -115,7 +115,6 @@ if (! defined('DATABASE_PATH')) {
      */
     define('DATABASE_PATH', STORAGE_PATH . 'database' . DS);
 }
-
 
 if (! defined('DB_SEED_PATH')) {
     /**
