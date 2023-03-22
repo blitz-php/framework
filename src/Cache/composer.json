@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4",
         "blitz-php/traits": "^1.0",
         "psr/simple-cache": "^1.0 || ^2.0"
     },

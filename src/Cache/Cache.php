@@ -219,9 +219,9 @@ class Cache implements CacheInterface
      *                                    le pilote prend en charge TTL, la bibliothèque peut définir une valeur par défaut
      *                                    pour cela ou laissez le conducteur s'en occuper.
      *
-     * @throws InvalidArgumentException
-     *
      * @return bool Vrai en cas de succès, faux en cas d'échec
+     *
+     * @throws InvalidArgumentException
      */
     public function writeMany(iterable $data, $ttl = null): bool
     {
@@ -291,10 +291,10 @@ class Cache implements CacheInterface
      *
      * @param int $offset Combien ajouter
      *
-     * @throws InvalidArgumentException Lorsque décalage < 0
-     *
      * @return false|int Nouvelle valeur, ou false si la donnée n'existe pas, n'est pas un entier,
      *                   ou si une erreur s'est produite lors de sa récupération.
+     *
+     * @throws InvalidArgumentException Lorsque décalage < 0
      */
     public function increment(string $key, int $offset = 1)
     {
@@ -310,10 +310,10 @@ class Cache implements CacheInterface
      *
      * @param int $offset Combien soustraire
      *
-     * @throws InvalidArgumentException lorsque décalage < 0
-     *
      * @return false|int Nouvelle valeur, ou false si la donnée n'existe pas, n'est pas un entier,
      *                   ou s'il y a eu une erreur lors de sa récupération
+     *
+     * @throws InvalidArgumentException lorsque décalage < 0
      */
     public function decrement(string $key, int $offset = 1)
     {
@@ -482,9 +482,9 @@ class Cache implements CacheInterface
      *
      * @param string $key La clé de l'élément de cache.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException DOIT être lancé si la chaîne $key n'est pas une valeur légale.
-     *
      * @return bool
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException DOIT être lancé si la chaîne $key n'est pas une valeur légale.
      */
     public function has($key)
     {
