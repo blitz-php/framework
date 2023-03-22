@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=7.4",
-	"blitz-php/utilities": "^1.0"
+	    "blitz-php/utilities": "^1.0"
     },
     "autoload": {
         "psr-4": {

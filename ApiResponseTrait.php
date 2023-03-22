@@ -343,7 +343,7 @@ trait ApiResponseTrait
      *
      * @param mixed $message
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return \Psr\Http\Message\ResponseInterface|void
      */
     final protected function respondTooManyRequests($message, int|string|null|array $code = null, array $errors = [])
     {
