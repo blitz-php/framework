@@ -43,7 +43,6 @@ class Autoloader
      * Sauvegarde la liste des fichiers.
      *
      * @var string[]
-     *
      * @phpstan-var list<string>
      */
     protected array $files = [];
@@ -53,7 +52,6 @@ class Autoloader
      * Toujours charger le helper URL car il est utilisee par plusieurs applications.
      *
      * @var string[]
-     *
      * @phpstan-var list<string>
      */
     protected array $helpers = ['url'];
@@ -134,7 +132,6 @@ class Autoloader
      * Enregistre les namespaces avec l'autoloader.
      *
      * @param array<string, array<int, string>|string>|string $namespace
-     *
      * @phpstan-param array<string, list<string>|string>|string $namespa
      */
     public function addNamespace($namespace, ?string $path = null): self

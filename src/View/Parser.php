@@ -140,7 +140,7 @@ class Parser extends NativeAdapter
     {
         $start = microtime(true);
         if ($saveData === null) {
-            //$saveData = $this->config->saveData;
+            // $saveData = $this->config->saveData;
         }
 
         if ($this->tempData === null) {
@@ -264,7 +264,7 @@ class Parser extends NativeAdapter
         // have something to loop over.
         preg_match_all(
             '#' . $this->leftDelimiter . '\s*' . preg_quote($variable, '#') . '\s*' . $this->rightDelimiter . '(.+?)' .
-            $this->leftDelimiter . '\s*' . '/' . preg_quote($variable, '#') . '\s*' . $this->rightDelimiter . '#s',
+            $this->leftDelimiter . '\s*/' . preg_quote($variable, '#') . '\s*' . $this->rightDelimiter . '#s',
             $template,
             $matches,
             PREG_SET_ORDER

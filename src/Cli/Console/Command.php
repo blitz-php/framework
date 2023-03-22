@@ -539,9 +539,9 @@ abstract class Command
     /**
      * Peut etre utiliser par la commande pour executer d'autres commandes.
      *
-     * @throws CLIException
-     *
      * @return mixed
+     *
+     * @throws CLIException
      */
     final protected function call(string $command, array $arguments = [], array $options = [])
     {
@@ -593,6 +593,6 @@ abstract class Command
         $this->writer = $this->io->writer();
         $this->reader = $this->io->reader();
         $this->color  = $this->writer->colorizer();
-        //$this->cursor = $this->writer->cursor();
+        // $this->cursor = $this->writer->cursor();
     }
 }

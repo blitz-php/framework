@@ -740,9 +740,9 @@ class Response implements ResponseInterface
      *
      * @param string $contentType Type de contenu ou alias de type.
      *
-     * @throws InvalidArgumentException Lorsqu'un type de contenu ou un alias non valide est utilisé.
-     *
      * @return string Le type de contenu résolu
+     *
+     * @throws InvalidArgumentException Lorsqu'un type de contenu ou un alias non valide est utilisé.
      */
     protected function resolveType(string $contentType): string
     {

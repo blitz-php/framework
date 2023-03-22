@@ -143,7 +143,7 @@ class Language
             $this->parseLine($line, 'en');
 
             $output = Arr::getRecursive($this->language[$this->locale][$file], $parsedLine);
-            //$output = $this->language['en'][$file][$parsedLine] ?? null;
+            // $output = $this->language['en'][$file][$parsedLine] ?? null;
         }
 
         $output ??= $line;

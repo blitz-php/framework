@@ -187,10 +187,10 @@ class Dispatcher
      * essaie d'acheminer la réponse, charge le contrôleur et généralement
      * fait fonctionner toutes les pièces ensemble.
      *
+     * @return bool|mixed|ResponseInterface|ServerRequestInterface
+     *
      * @throws Exception
      * @throws RedirectException
-     *
-     * @return bool|mixed|ResponseInterface|ServerRequestInterface
      */
     public function run(?RouteCollectionInterface $routes = null, bool $returnResponse = false)
     {
@@ -259,10 +259,10 @@ class Dispatcher
     /**
      * Handles the main request logic and fires the controller.
      *
+     * @return mixed|RequestInterface|ResponseInterface
+     *
      * @throws PageNotFoundException
      * @throws RedirectException
-     *
-     * @return mixed|RequestInterface|ResponseInterface
      */
     protected function handleRequest(?RouteCollectionInterface $routes = null, bool $returnResponse = false)
     {
@@ -430,9 +430,9 @@ class Dispatcher
     /**
      * Détermine si une réponse a été mise en cache pour l'URI donné.
      *
-     * @throws FrameworkException
-     *
      * @return bool|ResponseInterface
+     *
+     * @throws FrameworkException
      */
     public function displayCache()
     {
@@ -533,9 +533,9 @@ class Dispatcher
      * @param RouteCollectionInterface|null $routes Une interface de collecte à utiliser à la place
      *                                              du fichier de configuration.
      *
-     * @throws RedirectException
-     *
      * @return string|string[]|null
+     *
+     * @throws RedirectException
      */
     protected function dispatchRoutes(RouteCollectionInterface $routes)
     {

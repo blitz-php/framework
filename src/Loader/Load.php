@@ -77,9 +77,9 @@ class Load
     /**
      * Charge un modele
      *
-     * @throws LoadException
-     *
      * @return object|object[]
+     *
+     * @throws LoadException
      */
     public static function model(string|array $model, array $options = [], ?ConnectionInterface $connection = null)
     {
@@ -120,8 +120,6 @@ class Load
 
     /**
      * Verifie si un element est chargé dans la liste des modules
-     *
-     * @param $element
      */
     private static function isLoaded(string $module, $element): bool
     {
