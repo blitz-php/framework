@@ -13,6 +13,7 @@ namespace BlitzPHP\Cli\Commands\Database;
 
 use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Config\Database;
+use BlitzPHP\Database\Connection\SQLite;
 use InvalidArgumentException;
 
 class CreateDatabase extends Command
@@ -75,8 +76,7 @@ class CreateDatabase extends Command
         $db = Database::connect($config);
 
         // Specialement pour SQLite3
-        /*
-        if ($db instanceof Connection) {
+        if ($db instanceof SQLite) {
             $ext = $this->option('ext', 'db');
 
             if (! in_array($ext, ['db', 'sqlite'], true)) {
@@ -87,11 +87,11 @@ class CreateDatabase extends Command
                 $name = str_replace(['.db', '.sqlite'], '', $name) . ".{$ext}";
             }
 
-            $config['driver']   = 'SQLite3';
+            $config['driver']   = 'pdosqlite';
             $config['database'] = $name;
 
             if ($name !== ':memory:') {
-                $dbName = strpos($name, DIRECTORY_SEPARATOR) === false ? RESOURCE_PATH . $name : $name;
+                $dbName = strpos($name, DIRECTORY_SEPARATOR) === false ? STORAGE_PATH . 'app' . DS . $name : $name;
 
                 if (is_file($dbName)) {
                     $this->error("La base de données \"{$dbName}\" existe déjà.");
@@ -113,8 +113,7 @@ class CreateDatabase extends Command
                 return;
                 // @codeCoverageIgnoreEnd
             }
-        } else */
-        if (! Database::creator($db)->createDatabase($name)) {
+        } else if (! Database::creator($db)->createDatabase($name)) {
             // @codeCoverageIgnoreStart
             $this->error('Echec de la création de la base de données');
 
