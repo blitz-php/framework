@@ -929,9 +929,9 @@ class Arr
     /**
      * Get one or a specified number of random values from an array.
      *
-     * @throws InvalidArgumentException
-     *
      * @return mixed
+     *
+     * @throws InvalidArgumentException
      */
     public static function random(array $array, ?int $number = null)
     {

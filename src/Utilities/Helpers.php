@@ -187,9 +187,9 @@ class Helpers
      *
      * @param array|string $data
      *
-     * @throws InvalidArgumentException
-     *
      * @return array|string
+     *
+     * @throws InvalidArgumentException
      */
     public static function esc($data, ?string $context = 'html', ?string $encoding = null)
     {
@@ -511,7 +511,7 @@ class Helpers
             $frame += ['file' => '[internal]', 'line' => '??'];
 
             $message = sprintf(
-                '%s - %s, line: %s' . "\n" .
+                "%s - %s, line: %s\n" .
                 ' You can disable deprecation warnings by setting `Error.errorLevel` to' .
                 ' `E_ALL & ~E_USER_DEPRECATED` in your config/app.php.',
                 $message,
