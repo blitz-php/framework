@@ -19,7 +19,6 @@ use BlitzPHP\Traits\Macroable;
 use CachingIterator;
 use Closure;
 use Countable;
-use Exception;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
