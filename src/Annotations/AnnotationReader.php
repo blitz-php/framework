@@ -66,9 +66,9 @@ class AnnotationReader
      * @param string                        $type  Un nom de classe/interface d'annotation facultatif - si spécifié, seules les annotations du type donné sont renvoyées.
      *                                             Alternativement, le préfixe avec "@" invoque la résolution de nom (vous permettant d'interroger par nom d'annotation.)
      *
-     * @throws AnnotationException si un nom de classe donné n'est pas défini
-     *
      * @return Annotation[] Instances d'annotation
+     *
+     * @throws AnnotationException si un nom de classe donné n'est pas défini
      */
     public static function fromClass($class, ?string $type = null)
     {
@@ -83,9 +83,9 @@ class AnnotationReader
      * @param string                                         $type   Un nom facultatif de classe/d'interface d'annotation - si spécifié, seules les annotations du type donné sont renvoyées.
      *                                                               Alternativement, le préfixe avec "@" invoque la résolution de nom (vous permettant d'interroger par nom d'annotation.)
      *
-     * @throws AnnotationException pour une méthode ou un nom de classe non défini
-     *
      * @return IAnnotation[] liste des objets Annotation
+     *
+     * @throws AnnotationException pour une méthode ou un nom de classe non défini
      */
     public static function fromMethod($class, ?string $method, ?string $type = null)
     {
@@ -100,9 +100,9 @@ class AnnotationReader
      * @param string                                           $type     Un nom de classe/interface d'annotation facultatif - si spécifié, seules les annotations du type donné sont renvoyées.
      *                                                                   Alternativement, le préfixe avec "@" invoque la résolution de nom (vous permettant d'interroger par nom d'annotation.)
      *
-     * @throws AnnotationException pour un nom de classe non défini
-     *
      * @return IAnnotation[] liste des objets Annotation
+     *
+     * @throws AnnotationException pour un nom de classe non défini
      */
     public static function formProperty($class, ?string $property, ?string $type = null)
     {
