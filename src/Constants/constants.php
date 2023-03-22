@@ -28,6 +28,11 @@ defined('CONFIG_PATH') || define('CONFIG_PATH', APP_PATH . 'Config' . DS);
 defined('CONTROLLER_PATH') || define('CONTROLLER_PATH', APP_PATH . 'Controllers' . DS);
 
 /**
+ * Chemin  vers le dossier des migrations de la base de donnees
+ */
+defined('DB_MIGRATION_PATH') || define('DB_MIGRATION_PATH', APP_PATH . 'Database' . DS . 'Migrations' . DS);
+
+/**
  * Chemin  vers le dossier des entités
  */
 defined('ENTITY_PATH') || define('ENTITY_PATH', APP_PATH . 'Entities' . DS);
@@ -58,24 +63,39 @@ defined('MODEL_PATH') || define('MODEL_PATH', APP_PATH . 'Models' . DS);
 defined('RESOURCE_PATH') || define('RESOURCE_PATH', APP_PATH . 'Resources' . DS);
 
 /**
- * Chemin vers le dossier de stockage des fichiers temporaires
- */
-defined('TEMP_PATH') || define('TEMP_PATH', STORAGE_PATH . 'temp' . DS);
-
-/**
  * Chemin vers le dossier des vues
  */
 defined('VIEW_PATH') || define('VIEW_PATH', APP_PATH . 'Views' . DS);
 
 /**
+ * Chemin vers le dossier de stockage des fichiers du framework
+ */
+defined('FRAMEWORK_STORAGE_PATH') || define('FRAMEWORK_STORAGE_PATH', STORAGE_PATH . 'framework' . DS);
+
+/**
+ * Chemin vers le dossier de stockage des fichiers de l'application
+ */
+defined('APP_STORAGE_PATH') || define('APP_STORAGE_PATH', STORAGE_PATH . 'app' . DS);
+
+/**
+ * Chemin vers le dossier de stockage des fichiers temporaires
+ */
+defined('TEMP_PATH') || define('TEMP_PATH', FRAMEWORK_STORAGE_PATH . 'temp' . DS);
+
+/**
  * Chemin vers le dossier de cache des vues
  */
-defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', STORAGE_PATH . 'cache' . DS);
+defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', FRAMEWORK_STORAGE_PATH . 'cache' . DS);
 
 /**
  * Chemin vers le dossier des traductions
  */
 defined('LANG_PATH') || define('LANG_PATH', RESOURCE_PATH . 'lang' . DS);
+
+/**
+ * Chemin vers le dossier des logs
+ */
+defined('LOG_PATH') ||define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
 
 /**
  * Chemin vers le dossier des layouts
@@ -89,13 +109,6 @@ if (! defined('SERVICE_PATH')) {
     define('SERVICE_PATH', APP_PATH . 'services' . DS);
 }
 
-if (! defined('LOG_PATH')) {
-    /**
-     * Application logs files storage path
-     */
-    define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
-}
-
 if (! defined('DATABASE_PATH')) {
     /**
      * Database storage directory path
@@ -103,12 +116,6 @@ if (! defined('DATABASE_PATH')) {
     define('DATABASE_PATH', STORAGE_PATH . 'database' . DS);
 }
 
-if (! defined('DB_MIGRATION_PATH')) {
-    /**
-     * Database migrations storage path
-     */
-    define('DB_MIGRATION_PATH', RESOURCE_PATH . 'database' . DS . 'migrations' . DS);
-}
 
 if (! defined('DB_SEED_PATH')) {
     /**

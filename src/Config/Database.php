@@ -73,7 +73,7 @@ class Database
         $config = $config[$group];
 
         if (str_contains($config['driver'], 'sqlite') && $config['database'] !== ':memory:' && ! str_contains($config['database'], DS)) {
-            $config['database'] = STORAGE_PATH . 'app' . DS . $config['database'];
+            $config['database'] = APP_STORAGE_PATH . $config['database'];
         }
 
         return [$group, $config];
