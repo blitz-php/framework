@@ -124,9 +124,9 @@ trait StaticConfigTrait
      *
      * @param string $key The name of the configuration.
      *
-     * @throws InvalidArgumentException If value does not exist.
-     *
      * @return mixed Configuration data at the named key.
+     *
+     * @throws InvalidArgumentException If value does not exist.
      */
     public static function getConfigOrFail(string $key)
     {
@@ -206,9 +206,9 @@ trait StaticConfigTrait
      *
      * @param string $dsn The DSN string to convert to a configuration array
      *
-     * @throws InvalidArgumentException If not passed a string, or passed an invalid string
-     *
      * @return array<string, mixed> The configuration array to be stored after parsing the DSN
+     *
+     * @throws InvalidArgumentException If not passed a string, or passed an invalid string
      */
     public static function parseDsn(string $dsn): array
     {
