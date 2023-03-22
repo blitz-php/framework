@@ -35,7 +35,9 @@ $finder = Finder::create()
         // __DIR__ . '/user_guide_src/renumerate.php',
     ]);
 
-$overrides = [];
+$overrides = [
+    'static_lambda' => false,
+];
 
 $options = [
     'cacheFile'    => 'build/.php-cs-fixer.cache',

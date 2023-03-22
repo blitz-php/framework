@@ -259,7 +259,7 @@ final class Console extends Application
         }
 
         $console = $this;
-        $action  = static function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
+        $action  = function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
             foreach ($instance->required as $package) {
                 $package = explode(':', $package);
                 $version = $package[1] ?? null;
