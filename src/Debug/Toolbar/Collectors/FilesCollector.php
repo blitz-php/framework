@@ -59,7 +59,7 @@ class FilesCollector extends BaseCollector
                     'name' => basename($file),
                     'path' => $path,
                 ];
-            } else if (strpos($path, 'VENDOR_PATH') !== false) {
+            } elseif (strpos($path, 'VENDOR_PATH') !== false) {
                 $vendorFiles[] = [
                     'name' => basename($file),
                     'path' => $path,

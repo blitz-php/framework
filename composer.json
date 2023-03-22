@@ -34,7 +34,7 @@
         "symfony/finder": "^6.0"
     },
     "require-dev": {
-        "blitz-php/coding-standard": "^1.0",
+        "blitz-php/coding-standard": "^1.1",
         "fakerphp/faker": "^1.9.2",
         "phpstan/phpstan": "^1.4.7",
         "scrutinizer/ocular": "^1.8.1",

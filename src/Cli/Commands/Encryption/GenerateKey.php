@@ -74,13 +74,13 @@ class GenerateKey extends Command
 
         if ($this->getOption('show')) {
             $this->writer->warn($encodedKey, true);
-            
+
             return;
         }
 
         if (! $this->setNewEncryptionKey($encodedKey)) {
             $this->writer->error('Erreur dans la configuration d\'une nouvelle cle d\'encryption dans le fichier `.env`.', true);
-            
+
             return;
         }
 
@@ -147,19 +147,18 @@ class GenerateKey extends Command
         $replacementKey  = "\nencryption.key = {$key}";
 
         $dotenv = DotEnv::instance();
-        
+
         $append = true;
         if (strpos($oldFileContents, 'encryption.key') === false) {
             $append = file_put_contents($envFile, $replacementKey, FILE_APPEND) !== false;
-        }
-        else {
+        } else {
             $dotenv->update(['encryption.key' => $key], false);
         }
 
         if (! $append) {
             return false;
         }
-        
+
         return $dotenv->load();
     }
 }

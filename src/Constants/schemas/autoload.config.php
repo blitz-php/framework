@@ -15,5 +15,5 @@ return Expect::structure([
     'psr4'     => Expect::arrayOf('string', 'string')->default([APP_NAMESPACE => APP_PATH]),
     'classmap' => Expect::arrayOf('string', 'string'),
     'files'    => Expect::listOf('string'),
-    'helpers'  => Expect::listOf('string')
+    'helpers'  => Expect::listOf('string'),
 ]);

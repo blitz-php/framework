@@ -146,9 +146,9 @@ if (! function_exists('esc')) {
      *
      * @param array|string $data
      *
-     * @throws InvalidArgumentException
-     *
      * @return array|string
+     *
+     * @throws InvalidArgumentException
      */
     function esc($data, ?string $context = 'html', ?string $encoding = null)
     {
@@ -841,9 +841,9 @@ if (! function_exists('to_stream')) {
      *
      * @uses GuzzleHttp\Psr7\stream_for
      *
-     * @throws \InvalidArgumentException si l'argument $resource n'est pas valide.
-     *
      * @return \Psr\Http\Message\StreamInterface
+     *
+     * @throws \InvalidArgumentException si l'argument $resource n'est pas valide.
      */
     function to_stream($resource = '', array $options = []): Psr\Http\Message\StreamInterface
     {

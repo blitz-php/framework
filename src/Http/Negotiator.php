@@ -109,9 +109,9 @@ class Negotiator
         return $this->getBestMatch($supported, $this->request->getHeaderLine('accept-language'));
     }
 
-    //--------------------------------------------------------------------
+    // --------------------------------------------------------------------
     // Utility Methods
-    //--------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
     /**
      * Does the grunt work of comparing any of the app-supported values

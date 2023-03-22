@@ -378,7 +378,7 @@ class Services
     private static function discoverServiceSingleton(string $name)
     {
         $arguments = func_get_args();
-        $name  = array_shift($arguments);
+        $name      = array_shift($arguments);
 
         try {
             return self::singleton($name, ...$arguments);
@@ -402,10 +402,9 @@ class Services
         $name      = array_shift($arguments);
 
         if (empty(static::$instances[$name])) {
-            if (!empty($arguments)) {
+            if (! empty($arguments)) {
                 static::$instances[$name] = self::injector()->make($name, $arguments);
-            }
-            else {
+            } else {
                 static::$instances[$name] = self::injector()->get($name);
             }
         }

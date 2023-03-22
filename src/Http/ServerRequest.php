@@ -396,7 +396,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $ref = $this->getEnv('HTTP_REFERER');
 
-        $base = /* Configure::read('App.fullBaseUrl') .  */ $this->webroot;
+        $base = /* Configure::read('App.fullBaseUrl') . */ $this->webroot;
         if (! empty($ref) && ! empty($base)) {
             if ($local && strpos($ref, $base) === 0) {
                 $ref = substr($ref, strlen($base));
@@ -420,9 +420,9 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Gestionnaire de méthodes manquant, les poignées enveloppent les anciennes méthodes de type isAjax()
      *
-     * @throws BadMethodCallException lorsqu'une méthode invalide est appelée.
-     *
      * @return bool
+     *
+     * @throws BadMethodCallException lorsqu'une méthode invalide est appelée.
      */
     public function __call(string $name, array $params)
     {

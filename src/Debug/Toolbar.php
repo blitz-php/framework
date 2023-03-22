@@ -55,7 +55,7 @@ class Toolbar
      *
      * @var string
      */
-    private $debugPath = STORAGE_PATH . 'debugbar';
+    private $debugPath = FRAMEWORK_STORAGE_PATH . 'debugbar';
 
     /**
      * Constructeur

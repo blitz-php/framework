@@ -132,10 +132,10 @@ class Router implements RouterInterface
     }
 
     /**
+     * @return Closure|string Controller classname or Closure
+     *
      * @throws PageNotFoundException
      * @throws RedirectException
-     *
-     * @return Closure|string Controller classname or Closure
      */
     public function handle(?string $uri = null)
     {
@@ -311,9 +311,9 @@ class Router implements RouterInterface
      *
      * @param string $uri Le chemin URI à comparer aux routes
      *
-     * @throws RedirectException
-     *
      * @return bool Si la route a été mis en correspondance ou non.
+     *
+     * @throws RedirectException
      */
     protected function checkRoutes(string $uri): bool
     {

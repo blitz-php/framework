@@ -1,40 +1,33 @@
-<?php 
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
 
 namespace BlitzPHP\Cli\Commands\Database;
 
+use BlitzPHP\Config\Database;
 use BlitzPHP\Database\Migration\Runner;
 use BlitzPHP\Loader\Services;
-use InvalidArgumentException;
 
 /**
  * Aide a l'initialisation de la bd
  */
-class Helper 
+class Helper
 {
     /**
      * Recupere une instance de l'executeur de migration
      */
     public static function runner(?string $group): Runner
     {
-        $config = config('database');
-        
-        if (empty($group)) {
-            $group = $config['group'] ?? 'auto';
+        [$group, $config] = Database::connectionInfo($group);
 
-            if ($group === 'auto') {
-                $group = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
-            }
-
-            if (! isset($config[$group])) {
-                $group = 'default';
-            }
-        }
-        
-        if (is_string($group) && ! isset($config[$group]) && strpos($group, 'custom-') !== 0) {
-            throw new InvalidArgumentException($group . ' is not a valid database connection group.');
-        }
-
-        return Runner::instance(config('migrations'), $config[$group]);
+        return Runner::instance(config('migrations'), $config);
     }
 
     /**
@@ -53,6 +46,7 @@ class Helper
         $locator = Services::locator();
 
         $files = [];
+
         foreach ($namespaces as $namespace) {
             $files[$namespace] = $locator->listNamespaceFiles($namespace, '/Database/Migrations/');
         }

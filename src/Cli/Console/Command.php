@@ -30,6 +30,7 @@ use Psr\Log\LoggerInterface;
  * @property LoggerInterface $logger
  * @property string          $name
  * @property array           $options
+ * @property array           $required
  * @property string          $service
  * @property string          $usage
  */
@@ -117,6 +118,19 @@ abstract class Command
     protected $service = '';
 
     /**
+     * Liste des packets requis pour le fonctionnement d'une commande
+     * Par exemple, toutes le commande du groupe Database ont besoin de blitz/database
+     *
+     * @var array
+     *
+     * @example
+     * `[
+     *      'vendor/package', 'vendor/package:version'
+     * ]`
+     */
+    protected $required = [];
+
+    /**
      * Application Console
      *
      * @var Console
@@ -160,7 +174,6 @@ abstract class Command
      */
     private array $_options = [];
 
-
     public function __construct(Console $app, LoggerInterface $logger)
     {
         $this->app    = $app;
@@ -185,27 +198,27 @@ abstract class Command
 
     /**
      * Definit les options recues par la commande a l'execution
-     * 
+     *
      * @internal Utiliser seulement par le framework pour fournir les options a la commande
      */
-    final public function setOptions(array $options = []): self 
+    final public function setOptions(array $options = []): self
     {
         $this->_options = $options;
 
         return $this;
-    }  
+    }
 
     /**
      * Definit les arguments recus par la commande a l'execution
-     * 
+     *
      * @internal Utiliser seulement par le framework pour fournir les arguments a la commande
      */
-    final public function setArguments(array $arguments = []): self 
+    final public function setArguments(array $arguments = []): self
     {
         $this->_arguments = $arguments;
 
         return $this;
-    }   
+    }
 
     /**
      * Recupere la valeur d'un argument lors de l'execution de la commande
@@ -214,6 +227,7 @@ abstract class Command
     {
         return $this->_arguments[$name] ?? $default;
     }
+
     /**
      * @deprecated 1.1 Utilisez argument() a la place
      */
@@ -226,12 +240,12 @@ abstract class Command
      * Recupere la valeur d'une option lors de l'execution de la commande
      *
      * @param mixed $default
-     * @return mixed
      */
     final protected function option(string $name, mixed $default = null): mixed
     {
         return $this->_options[$name] ?? $default;
     }
+
     /**
      * @deprecated 1.1 Utilisez option() a la place
      */
@@ -249,6 +263,7 @@ abstract class Command
 
         return $params[$name] ?? $default;
     }
+
     /**
      * @deprecated 1.1 Utilisez param() a la place
      */
@@ -266,7 +281,7 @@ abstract class Command
 
         return $this;
     }
-    
+
     /**
      * Ecrit un message de reussite
      */
@@ -294,14 +309,13 @@ abstract class Command
     {
         if (! $badge) {
             $this->writer->okBold('SUCCESS');
-        }
-        else {
+        } else {
             $this->writer->boldWhiteBgGreen(' SUCCESS ');
         }
 
-        return $this->write(" " . $message, true);
+        return $this->write(' ' . $message, true);
     }
-    
+
     /**
      * Ecrit un message d'avertissement
      */
@@ -309,14 +323,13 @@ abstract class Command
     {
         if (! $badge) {
             $this->writer->warnBold('WARNING');
-        }
-        else {
+        } else {
             $this->writer->boldWhiteBgYellow(' WARNING ');
         }
 
-        return $this->write(" " . $message, true);
+        return $this->write(' ' . $message, true);
     }
-    
+
     /**
      * Ecrit un message d'information
      */
@@ -324,12 +337,11 @@ abstract class Command
     {
         if (! $badge) {
             $this->writer->infoBold('INFO');
-        }
-        else {
+        } else {
             $this->writer->boldWhiteBgCyan(' INFO ');
         }
 
-        return $this->write(" " . $message, true);
+        return $this->write(' ' . $message, true);
     }
 
     /**
@@ -339,12 +351,11 @@ abstract class Command
     {
         if (! $badge) {
             $this->writer->errorBold('ERROR');
-        }
-        else {
+        } else {
             $this->writer->boldWhiteBgRed(' ERROR ');
         }
 
-        return $this->write(" " . $message, true);
+        return $this->write(' ' . $message, true);
     }
 
     /**
@@ -364,7 +375,7 @@ abstract class Command
 
         return $this;
     }
-    
+
     /**
      * Écrit une nouvelle ligne vide (saut de ligne).
      */
@@ -395,7 +406,7 @@ abstract class Command
 
         return $this;
     }
-    
+
     /**
      * Écrit le texte de maniere commentée.
      */
@@ -405,21 +416,21 @@ abstract class Command
 
         return $this;
     }
-    
+
     /**
      * Efface la console
      */
-    final protected function clear(): self 
+    final protected function clear(): self
     {
         $this->cursor->clear();
 
         return $this;
     }
-    
+
     /**
      * Affiche une bordure en pointillés
      */
-    final protected function border(?int $length = null, string $char = '-'): self 
+    final protected function border(?int $length = null, string $char = '-'): self
     {
         if ($length === null) {
             /*
@@ -430,8 +441,8 @@ abstract class Command
             $length = 100;
         }
 
-        $str    = str_repeat($char, $length);
-        $str    = substr($str, 0, $length);
+        $str = str_repeat($char, $length);
+        $str = substr($str, 0, $length);
 
         $this->comment($str, true);
 
@@ -440,8 +451,10 @@ abstract class Command
 
     /**
      * Affiche les donnees formatees en json
+     *
+     * @param mixed $data
      */
-    final protected function json($data): self 
+    final protected function json($data): self
     {
         $this->write(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), true);
 
@@ -452,7 +465,7 @@ abstract class Command
      * Effectue des tabulations
      */
     final protected function tab(int $repeat = 1): self
-    {        
+    {
         $this->write(str_repeat("\t", $repeat));
 
         return $this;
@@ -526,9 +539,9 @@ abstract class Command
     /**
      * Peut etre utiliser par la commande pour executer d'autres commandes.
      *
-     * @throws CLIException
-     *
      * @return mixed
+     *
+     * @throws CLIException
      */
     final protected function call(string $command, array $arguments = [], array $options = [])
     {
@@ -538,7 +551,7 @@ abstract class Command
     /**
      * Initialise une bar de progression
      */
-    final protected function progress(int $total = null): ProgressBar
+    final protected function progress(?int $total = null): ProgressBar
     {
         if ($this->progressBar === null) {
             $this->progressBar = new ProgressBar($total, $this->writer);
@@ -547,7 +560,7 @@ abstract class Command
         if ($total !== null) {
             $this->progressBar->total($total);
         }
-        
+
         return $this->progressBar;
     }
 
@@ -580,6 +593,6 @@ abstract class Command
         $this->writer = $this->io->writer();
         $this->reader = $this->io->reader();
         $this->color  = $this->writer->colorizer();
-        //$this->cursor = $this->writer->cursor();
+        // $this->cursor = $this->writer->cursor();
     }
 }

@@ -38,12 +38,12 @@ class Rollback extends Command
      * {@inheritDoc}
      */
     protected $service = 'Service de gestion de base de données';
-    
+
     /**
      * {@inheritDoc}
      */
     protected $options = [
-        '-b, --batch' => 'Spécifiez un lot à restaurer ; par exemple. "3" pour revenir au lot #3 ou "-2" pour revenir en arrière deux fois',
+        '-b, --batch' => "Spécifiez un lot à restaurer\u{a0}; par exemple. \"3\" pour revenir au lot #3 ou \"-2\" pour revenir en arrière deux fois",
         '-g, --group' => 'Défini le groupe de la base de données',
         '-f, --force' => 'Forcer la commande - cette option vous permet de contourner la question de confirmation lors de l\'exécution de cette commande dans un environnement de production',
     ];
@@ -62,13 +62,13 @@ class Rollback extends Command
             }
             // @codeCoverageIgnoreEnd
         }
-        
-        $group  = $this->option('group');
+
+        $group = $this->option('group');
 
         $runner = Helper::runner($group);
 
         $batch = $this->option('batch') ?? ($runner->getLastBatch() - 1);
-        
+
         $this->colorize(lang('Migrations.rollingBack') . ' ' . $batch, 'yellow');
 
         $runner->setFiles(Helper::getMigrationFiles(true));

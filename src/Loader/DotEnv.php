@@ -66,7 +66,7 @@ class DotEnv
      */
     public function update(array $data = [], bool $reload = true): bool
     {
-       foreach ($data as $key => $value) {
+        foreach ($data as $key => $value) {
             if (env($key) === $value) {
                 unset($data[$key]);
             }

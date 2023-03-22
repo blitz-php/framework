@@ -38,7 +38,7 @@ class Migrate extends Command
      * {@inheritDoc}
      */
     protected $service = 'Service de gestion de base de données';
-    
+
     /**
      * {@inheritDoc}
      */
@@ -57,12 +57,12 @@ class Migrate extends Command
 
         $namespace = $this->option('namespace');
         $group     = $this->option('group');
-        
+
         $runner = Helper::runner($group);
 
         $runner->clearMessages();
-        $runner->setFiles(Helper::getMigrationFiles($this->option('all') == true, $namespace));
-        
+        $runner->setFiles(Helper::getMigrationFiles($this->option('all') === true, $namespace));
+
         if (! $runner->latest($group)) {
             $this->fail(lang('Migrations.generalFault')); // @codeCoverageIgnore
         }

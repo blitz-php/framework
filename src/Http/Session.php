@@ -318,9 +318,9 @@ class Session
     /**
      * Démarre la session.
      *
-     * @throws RuntimeException si la session a déjà commencé
-     *
      * @return bool Vrai si la session a été démarrée
+     *
+     * @throws RuntimeException si la session a déjà commencé
      */
     public function start(): bool
     {
@@ -441,9 +441,9 @@ class Session
      *
      * @param string $name Le nom de la variable de session (ou un chemin tel qu'envoyé à Arr.extract)
      *
-     * @throws RuntimeException
-     *
      * @return mixed|null
+     *
+     * @throws RuntimeException
      */
     public function readOrFail(string $name)
     {

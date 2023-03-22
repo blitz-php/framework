@@ -14,10 +14,9 @@ namespace BlitzPHP\Autoloader;
 /**
  * Fourni un chargeur pour les fichiers qui ne sont pas des classes dans un namespace.
  * Fonctionne avec les Helpers, Views, etc.
- * 
+ *
  * @credit 		<a href="https://codeigniter.com">CodeIgniter4 - CodeIgniter\Autoloader\FileLocator</a>
  */
-
 class Locator
 {
     /**
@@ -29,7 +28,7 @@ class Locator
     {
         $this->setAutoloader($autoloader);
     }
-    
+
     public function setAutoloader(Autoloader $autoloader): self
     {
         $this->autoloader = $autoloader;

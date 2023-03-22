@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Models;
+namespace BlitzPHP\Config;
 
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Database\Database as Db;
@@ -37,18 +37,12 @@ class Database
     protected static $factory;
 
     /**
-     * Ouvre une connexion
+     * Recupere les informations a utiliser pour la connexion a la base de données
      *
-     * @param array|ConnectionInterface|string|null $group  Nom du groupe de connexion à utiliser, ou un tableau de paramètres de configuration.
-     * @param bool                                  $shared Doit-on retourner une instance partagée
+     * @return array [group, configuration]
      */
-    public static function connect($group = null, bool $shared = true): ConnectionInterface
+    public static function connectionInfo(array|string|null $group = null): array
     {
-        // Si on a deja passer une connection, pas la peine de continuer
-        if ($group instanceof ConnectionInterface) {
-            return $group;
-        }
-
         if (is_array($group)) {
             $config = $group;
             $group  = 'custom-' . md5(json_encode($config));
@@ -57,7 +51,7 @@ class Database
         $config ??= config('database');
 
         if (empty($group)) {
-            $group = $config['group'] ?? 'auto';
+            $group = $config['connection'] ?? 'auto';
 
             if ($group === 'auto') {
                 $group = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
@@ -72,15 +66,39 @@ class Database
             throw new InvalidArgumentException($group . ' is not a valid database connection group.');
         }
 
+        if (strpos($group, 'custom-') !== false) {
+            $config = [$group => $config];
+        }
+
+        $config = $config[$group];
+
+        if (str_contains($config['driver'], 'sqlite') && $config['database'] !== ':memory:' && ! str_contains($config['database'], DS)) {
+            $config['database'] = APP_STORAGE_PATH . $config['database'];
+        }
+
+        return [$group, $config];
+    }
+
+    /**
+     * Ouvre une connexion
+     *
+     * @param array|ConnectionInterface|string|null $group  Nom du groupe de connexion à utiliser, ou un tableau de paramètres de configuration.
+     * @param bool                                  $shared Doit-on retourner une instance partagée
+     */
+    public static function connect($group = null, bool $shared = true): ConnectionInterface
+    {
+        // Si on a deja passer une connection, pas la peine de continuer
+        if ($group instanceof ConnectionInterface) {
+            return $group;
+        }
+
+        [$group, $config] = static::connectionInfo($group);
+
         if ($shared && isset(static::$instances[$group])) {
             return static::$instances[$group];
         }
 
         static::ensureFactory();
-
-        if (isset($config[$group])) {
-            $config = $config[$group];
-        }
 
         $connection = static::$factory->load(
             $config,
@@ -110,9 +128,9 @@ class Database
      *
      * @return \BlitzPHP\Database\Creator\BaseCreator
      */
-    public static function creator($group = null)
+    public static function creator($group = null, bool $shared = true)
     {
-        $db = static::connect($group);
+        $db = static::connect($group, $shared);
 
         return static::$factory->loadCreator($db);
     }
