@@ -36,18 +36,14 @@ abstract class BaseHandler implements CacheInterface
     /**
      * Caractères réservés qui ne peuvent pas être utilisés dans une clé ou une étiquette. Peut être remplacé par le fichier config.
      * From https://github.com/symfony/cache-contracts/blob/c0446463729b89dd4fa62e9aeecc80287323615d/ItemInterface.php#L43
-     *
-     * @var string
      */
-    protected static $reservedCharacters = '{}()/\@:';
+    protected static string $reservedCharacters = '{}()/\@:';
 
     /**
      * Préfixe à appliquer aux clés de cache.
      * Ne peut pas être utilisé par tous les gestionnaires.
-     *
-     * @var string
      */
-    protected $prefix;
+    protected string $prefix;
 
     /**
      * La configuration de cache par défaut est remplacée dans la plupart des adaptateurs de cache. Ceux-ci sont
@@ -62,7 +58,7 @@ abstract class BaseHandler implements CacheInterface
      *
      * @var array<string, mixed>
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'duration'            => 3600,
         'groups'              => [],
         'prefix'              => 'blitz_',
@@ -72,10 +68,8 @@ abstract class BaseHandler implements CacheInterface
     /**
      * Contient la chaîne compilée avec tous les groupes
      * préfixes à ajouter à chaque clé dans ce moteur de cache
-     *
-     * @var string
      */
-    protected $_groupPrefix = '';
+    protected string $_groupPrefix = '';
 
     /**
      * Initialiser le moteur de cache
@@ -118,12 +112,12 @@ abstract class BaseHandler implements CacheInterface
     public function ensureValidKey(string $key): void
     {
         if (! is_string($key) || $key === '') {
-            throw new InvalidArgumentException('A cache key must be a non-empty string.');
+            throw new InvalidArgumentException('Une clé de cache doit être une chaîne non vide.');
         }
 
         $reserved = self::$reservedCharacters;
         if ($reserved && strpbrk($key, $reserved) !== false) {
-            throw new InvalidArgumentException('Cache key contains reserved characters ' . $reserved);
+            throw new InvalidArgumentException('La clé de cache contient des caractères réservés ' . $reserved);
         }
     }
 
@@ -139,7 +133,7 @@ abstract class BaseHandler implements CacheInterface
     {
         if (! is_iterable($iterable)) {
             throw new InvalidArgumentException(sprintf(
-                'A cache %s must be either an array or a Traversable.',
+                'Un cache %s doit être soit un tableau soit un Traversable.',
                 $check === self::CHECK_VALUE ? 'key set' : 'set'
             ));
         }
@@ -158,7 +152,7 @@ abstract class BaseHandler implements CacheInterface
      *
      * @param Closure $callback Valeur de retour du rappel
      */
-    public function remember(string $key, int $ttl, Closure $callback)
+    public function remember(string $key, int $ttl, Closure $callback): mixed
     {
         $value = $this->get($key);
 
@@ -180,7 +174,7 @@ abstract class BaseHandler implements CacheInterface
      */
     public function deleteMatching(string $pattern)
     {
-        throw new Exception('The deleteMatching method is not implemented.');
+        throw new Exception('La méthode deleteMatching n\'est pas implémentée.');
     }
 
     /**
@@ -194,7 +188,7 @@ abstract class BaseHandler implements CacheInterface
      * @throws InvalidArgumentException Si $keys n'est ni un tableau ni un Traversable,
      *                                  ou si l'une des clés n'a pas de valeur légale.
      */
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         $this->ensureValidType($keys);
 
@@ -220,7 +214,7 @@ abstract class BaseHandler implements CacheInterface
      * @throws InvalidArgumentException Si $values n'est ni un tableau ni un Traversable,
      *                                  ou si l'une des valeurs $ n'est pas une valeur légale.
      */
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, DateInterval|int|null $ttl = null): bool
     {
         $this->ensureValidType($values, self::CHECK_KEY);
 
@@ -259,7 +253,7 @@ abstract class BaseHandler implements CacheInterface
      * @throws InvalidArgumentException Si $keys n'est ni un tableau ni un Traversable,
      *                                  ou si l'une des clés $ n'a pas de valeur légale.
      */
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         $this->ensureValidType($keys);
 
@@ -286,7 +280,7 @@ abstract class BaseHandler implements CacheInterface
      *
      * @throws InvalidArgumentException Si la chaîne $key n'est pas une valeur légale.
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return $this->get($key) !== null;
     }
@@ -297,7 +291,7 @@ abstract class BaseHandler implements CacheInterface
      * @param mixed      $key
      * @param mixed|null $default
      */
-    abstract public function get($key, $default = null);
+    abstract public function get(string $key, mixed $default = null): mixed;
 
     /**
      * Persiste les données dans le cache, référencées de manière unique par la clé donnée avec un temps TTL d'expiration facultatif.
@@ -310,7 +304,7 @@ abstract class BaseHandler implements CacheInterface
      *
      * @return bool Vrai en cas de succès et faux en cas d'échec.
      */
-    abstract public function set($key, $value, $ttl = null): bool;
+    abstract public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool;
 
     /**
      * {@inheritDoc}
@@ -325,7 +319,7 @@ abstract class BaseHandler implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    abstract public function delete($key): bool;
+    abstract public function delete(string $key): bool;
 
     /**
      * {@inheritDoc}
@@ -335,7 +329,7 @@ abstract class BaseHandler implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function add(string $key, $value): bool
+    public function add(string $key, mixed $value): bool
     {
         $cachedValue = $this->get($key);
         if ($cachedValue === null) {
@@ -406,18 +400,16 @@ abstract class BaseHandler implements CacheInterface
      * @param DateInterval|int|null $ttl La valeur TTL de cet élément. Si null est envoyé,
      *                                   La durée par défaut du conducteur sera utilisée.
      */
-    protected function duration($ttl): int
+    protected function duration(DateInterval|int|null $ttl): int
     {
         if ($ttl === null) {
             return $this->_config['duration'];
         }
+
         if (is_int($ttl)) {
             return $ttl;
         }
-        if ($ttl instanceof DateInterval) {
-            return (int) $ttl->format('%s');
-        }
 
-        throw new InvalidArgumentException('TTL values must be one of null, int, \DateInterval');
+		return (int) $ttl->format('%s');
     }
 }

@@ -53,29 +53,25 @@ class Cache implements CacheInterface
      * @var array<string, string>
      * @psalm-var array<string, class-string>
      */
-    protected static $validHandlers = [
+    protected static array $validHandlers = [
         'dummy' => Handlers\Dummy::class,
         'file'  => Handlers\File::class,
     ];
 
     /**
-     * Flag for tracking whether caching is enabled.
-     *
-     * @var bool
+     * Drapeau pour verifier si la mise en cache est activr ou pas.
      */
-    protected static $_enabled = true;
+    protected static bool $_enabled = true;
 
     /**
      * Configuration des caches
-     *
-     * @var array
      */
-    protected $config = [];
+    protected array $config = [];
 
     /**
-     * @var ?CacheInterface
+     * Adapter a utiliser pour la mise en cache
      */
-    private $adapter;
+    private ?CacheInterface $adapter;
 
     /**
      * Constructeur
@@ -111,18 +107,18 @@ class Cache implements CacheInterface
         $validHandlers = $this->config['valid_handlers'] ?? self::$validHandlers;
 
         if (empty($validHandlers) || ! is_array($validHandlers)) {
-            throw new InvalidArgumentException('Cache config must have an array of $valid_handlers.');
+            throw new InvalidArgumentException('La configuration du cache doit avoir un tableau de $valid_handlers.');
         }
 
         $handler  = $this->config['handler'] ?? null;
         $fallback = $this->config['fallback_handler'] ?? null;
 
         if (empty($handler)) {
-            throw new InvalidArgumentException('Cache config must have a handler set.');
+            throw new InvalidArgumentException('La configuration du cache doit avoir un ensemble de gestionnaires.');
         }
 
         if (! array_key_exists($handler, $validHandlers)) {
-            throw new InvalidArgumentException('Cache config has an invalid handler specified.');
+            throw new InvalidArgumentException('La configuration du cache a un gestionnaire non valide spécifié.');
         }
 
         $adapter = new $validHandlers[$handler]();
@@ -130,22 +126,20 @@ class Cache implements CacheInterface
             if (empty($fallback)) {
                 $adapter = new Dummy();
             } elseif (! array_key_exists($fallback, $validHandlers)) {
-                throw new InvalidArgumentException('Cache config has an invalid fallback handler specified.');
+                throw new InvalidArgumentException('La configuration du cache a un gestionnaire de secours non valide spécifié.');
             } else {
                 $adapter = new $validHandlers[$fallback]();
             }
         }
 
         if (! ($adapter instanceof BaseHandler)) {
-            throw new InvalidArgumentException(
-                'Cache handler must use BlitzPHP\Cache\Handlers\BaseHandler as a base class.'
-            );
+            throw new InvalidArgumentException('Le gestionnaire de cache doit utiliser BlitzPHP\Cache\Handlers\BaseHandler comme classe de base.');
         }
 
         if (! $adapter->init($this->config)) {
             throw new RuntimeException(
                 sprintf(
-                    'Cache engine %s is not properly configured. Check error log for additional information.',
+                    'Le moteur de cache %s n\'est pas correctement configuré. Consultez le journal des erreurs pour plus d\'informations.',
                     get_class($adapter)
                 )
             );
@@ -172,7 +166,7 @@ class Cache implements CacheInterface
      *
      * @return bool Vrai si les données ont été mises en cache avec succès, faux en cas d'échec
      */
-    public function write(string $key, $value, $ttl = null): bool
+    public function write(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
         if (is_resource($value)) {
             return false;
@@ -197,7 +191,7 @@ class Cache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
         return $this->write($key, $value, $ttl);
     }
@@ -222,7 +216,7 @@ class Cache implements CacheInterface
      *
      * @throws InvalidArgumentException
      */
-    public function writeMany(iterable $data, $ttl = null): bool
+    public function writeMany(iterable $data, DateInterval|int|null $ttl = null): bool
     {
         return $this->factory()->setMultiple($data, $ttl);
     }
@@ -230,7 +224,7 @@ class Cache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple(iterable $values, DateInterval|int|null $ttl = null): bool
     {
         return $this->writeMany($values, $ttl);
     }
@@ -244,10 +238,8 @@ class Cache implements CacheInterface
      *
      * ```
      * $cache->read('my_data');
-     *
-     * @param mixed|null $default
      */
-    public function read(string $key, $default = null)
+    public function read(string $key, mixed $default = null): mixed
     {
         return $this->factory()->get($key, $default);
     }
@@ -255,7 +247,7 @@ class Cache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return $this->read($key, $default);
     }
@@ -269,10 +261,8 @@ class Cache implements CacheInterface
      *
      * ```
      * $cache->readMany(['my_data_1', 'my_data_2]);
-     *
-     * @param mixed|null $default
      */
-    public function readMany(iterable $keys, $default = null): iterable
+    public function readMany(iterable $keys, mixed $default = null): iterable
     {
         return $this->factory()->getMultiple($keys, $default);
     }
@@ -280,7 +270,7 @@ class Cache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         return $this->readMany($keys, $default);
     }
@@ -298,7 +288,7 @@ class Cache implements CacheInterface
     public function increment(string $key, int $offset = 1)
     {
         if ($offset < 0) {
-            throw new InvalidArgumentException('Offset cannot be less than 0.');
+            throw new InvalidArgumentException('Le décalage ne peut pas être inférieur à 0.');
         }
 
         return $this->factory()->increment($key, $offset);
@@ -317,7 +307,7 @@ class Cache implements CacheInterface
     public function decrement(string $key, int $offset = 1)
     {
         if ($offset < 0) {
-            throw new InvalidArgumentException('Offset cannot be less than 0.');
+            throw new InvalidArgumentException('Le décalage ne peut pas être inférieur à 0.');
         }
 
         return $this->factory()->decrement($key, $offset);
@@ -333,10 +323,8 @@ class Cache implements CacheInterface
      * ```
      * $cache->delete('my_data');
      * ```
-     *
-     * @param mixed $key
      */
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         return $this->factory()->delete($key);
     }
@@ -364,7 +352,7 @@ class Cache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple(iterable $keys): bool
     {
         return $this->deleteMany($keys);
     }
@@ -437,7 +425,7 @@ class Cache implements CacheInterface
      * @return mixed Si la clé est trouvée : les données en cache.
      *               Si la clé n'est pas trouvée, la valeur renvoyée par le callable.
      */
-    public function remember(string $key, callable $callable)
+    public function remember(string $key, callable $callable): mixed
     {
         $existing = $this->read($key);
         if ($existing !== null) {
@@ -462,7 +450,7 @@ class Cache implements CacheInterface
      *
      * @param mixed $value Données à mettre en cache - tout sauf une ressource.
      */
-    public function add(string $key, $value): bool
+    public function add(string $key, mixed $value): bool
     {
         if (is_resource($value)) {
             return false;
@@ -479,13 +467,9 @@ class Cache implements CacheInterface
      * est soumis à une condition de concurrence où votre has() renverra vrai et immédiatement après,
      * un autre script peut le supprimer, rendant l'état de votre application obsolète.
      *
-     * @param string $key La clé de l'élément de cache.
-     *
-     * @return bool
-     *
-     * @throws \Psr\SimpleCache\InvalidArgumentException DOIT être lancé si la chaîne $key n'est pas une valeur légale.
+     * @throws InvalidArgumentException DOIT être lancé si la chaîne $key n'est pas une valeur légale.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return $this->factory()->has($key);
     }

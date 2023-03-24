@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Cache\Handlers;
 
+use DateInterval;
+
 /**
  * Moteur de cache nul, toutes les opérations semblent fonctionner, mais ne font rien.
  *
@@ -37,7 +39,7 @@ class Dummy extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
         return true;
     }
@@ -45,7 +47,7 @@ class Dummy extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function setMultiple($values, $ttl = null): bool
+    public function setMultiple(iterable $values, DateInterval|int|null $ttl = null): bool
     {
         return true;
     }
@@ -53,7 +55,7 @@ class Dummy extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return $default;
     }
@@ -61,7 +63,7 @@ class Dummy extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function getMultiple($keys, $default = null): iterable
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         return [];
     }
@@ -85,7 +87,7 @@ class Dummy extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         return true;
     }
@@ -93,7 +95,7 @@ class Dummy extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function deleteMultiple($keys): bool
+    public function deleteMultiple(iterable $keys): bool
     {
         return true;
     }
