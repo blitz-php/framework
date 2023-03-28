@@ -92,9 +92,11 @@ class Services
      * La classe de cache fournit un moyen simple de stocker et de récupérer
      * données complexes pour plus tard
      */
-    public static function cache(bool $shared = true): Cache
+    public static function cache(?array $config = null, bool $shared = true): Cache
     {
-        $config = Config::get('cache');
+        if (empty($config)) {
+            $config = Config::get('cache');
+        }
 
         if (true === $shared) {
             return self::singleton(Cache::class)->setConfig($config);
