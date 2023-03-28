@@ -115,12 +115,12 @@ class Status extends Command
                 }
 
                 $status[] = [
-                    'namespace'   => $namespace,
-                    'version'     => $migration->version,
-                    'name'        => $migration->name,
-                    'group'       => $group,
-                    'migrated on' => $date,
-                    'batch'       => $batch,
+                    'namespace' => $namespace,
+                    'version'   => $migration->version,
+                    'nom'       => $migration->name,
+                    'groupe'    => $group,
+                    'migré le'  => $date,
+                    'batch'     => $batch,
                 ];
             }
         }
