@@ -54,8 +54,13 @@ class Cache implements CacheInterface
      * @psalm-var array<string, class-string>
      */
     protected static array $validHandlers = [
-        'dummy' => Handlers\Dummy::class,
-        'file'  => Handlers\File::class,
+        'apcu'      => Handlers\Apcu::class,
+        'array'     => Handlers\ArrayHandler::class,
+        'dummy'     => Handlers\Dummy::class,
+        'file'      => Handlers\File::class,
+        'memcached' => Handlers\Memcached::class,
+        'redis'     => Handlers\RedisHandler::class,
+        'wincache'  => Handlers\Wincache::class,
     ];
 
     /**

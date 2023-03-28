@@ -287,20 +287,15 @@ abstract class BaseHandler implements CacheInterface
 
     /**
      * Récupère la valeur d'une clé donnée dans le cache.
-     *
-     * @param mixed      $key
-     * @param mixed|null $default
      */
     abstract public function get(string $key, mixed $default = null): mixed;
 
     /**
      * Persiste les données dans le cache, référencées de manière unique par la clé donnée avec un temps TTL d'expiration facultatif.
      *
-     * @param DateInterval|int|null $ttl   Facultatif. La valeur TTL de cet élément. Si aucune valeur n'est envoyée et
-     *                                     le pilote prend en charge TTL, la bibliothèque peut définir une valeur par défaut
-     *                                     pour cela ou laissez le conducteur s'en occuper.
-     * @param mixed                 $key
-     * @param mixed                 $value
+     * @param DateInterval|int|null $ttl Facultatif. La valeur TTL de cet élément. Si aucune valeur n'est envoyée et
+     *                                   le pilote prend en charge TTL, la bibliothèque peut définir une valeur par défaut
+     *                                   pour cela ou laissez le conducteur s'en occuper.
      *
      * @return bool Vrai en cas de succès et faux en cas d'échec.
      */
@@ -410,6 +405,6 @@ abstract class BaseHandler implements CacheInterface
             return $ttl;
         }
 
-		return (int) $ttl->format('%s');
+        return (int) $ttl->format('%s');
     }
 }

@@ -451,7 +451,7 @@ class File extends BaseHandler
 
         // la désactivation des itérateurs permet de libérer d'éventuels verrous dans certains environnements,
         // qui pourrait autrement faire échouer `rmdir()`
-		 unset($directoryIterator, $contents, $filtered);
+        unset($directoryIterator, $contents, $filtered);
 
         return true;
     }
