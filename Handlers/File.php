@@ -310,6 +310,14 @@ class File extends BaseHandler
         throw new LogicException('Les fichiers ne peuvent pas être incrémentés de manière atomique.');
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public function info()
+	{
+        return $this->getDirFileInfo($this->_config['path']);
+	}
+
     /**
      * Définit la clé de cache actuelle que cette classe gère et crée un SplFileObject inscriptible
      * pour le fichier cache auquel la clé fait référence.
@@ -454,5 +462,110 @@ class File extends BaseHandler
         unset($directoryIterator, $contents, $filtered);
 
         return true;
+    }
+
+
+
+    /**
+     * Lit le répertoire spécifié et construit un tableau contenant les noms de fichiers,
+     * taille de fichier, dates et autorisations
+     *
+     * Tous les sous-dossiers contenus dans le chemin spécifié sont également lus.
+     *
+     * @param string $sourceDir Chemin d'accès à la source
+     * @param bool $topLevelOnly Ne regarder que le répertoire de niveau supérieur spécifié ?
+     * @param bool $_recursion Variable interne pour déterminer l'état de la récursivité - ne pas utiliser dans les appels
+     *
+     * @return array|false
+     */
+    protected function getDirFileInfo(string $sourceDir, bool $topLevelOnly = true, bool $_recursion = false)
+    {
+        static $_filedata = [];
+        $relativePath     = $sourceDir;
+
+        if ($fp = @opendir($sourceDir)) {
+            // réinitialise le tableau et s'assure que $source_dir a une barre oblique à la fin de l'appel initial
+			if ($_recursion === false) {
+                $_filedata = [];
+                $sourceDir = rtrim(realpath($sourceDir) ?: $sourceDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            }
+
+            // Utilisé pour être foreach (scandir($source_dir, 1) comme $file), mais scandir() n'est tout simplement pas aussi rapide
+			while (false !== ($file = readdir($fp))) {
+                if (is_dir($sourceDir . $file) && $file[0] !== '.' && $topLevelOnly === false) {
+                    $this->getDirFileInfo($sourceDir . $file . DIRECTORY_SEPARATOR, $topLevelOnly, true);
+                } elseif (! is_dir($sourceDir . $file) && $file[0] !== '.') {
+                    $_filedata[$file]                  = $this->getFileInfo($sourceDir . $file);
+                    $_filedata[$file]['relative_path'] = $relativePath;
+                }
+            }
+
+            closedir($fp);
+
+            return $_filedata;
+        }
+
+        return false;
+    }
+
+    /**
+     * Étant donné un fichier et un chemin, renvoie le nom, le chemin, la taille, la date de modification
+     * Le deuxième paramètre vous permet de déclarer explicitement les informations que vous souhaitez renvoyer
+     * Les options sont : nom, chemin_serveur, taille, date, lisible, inscriptible, exécutable, fileperms
+     * Renvoie FALSE si le fichier est introuvable.
+     *
+     * @param array|string $returnedValues Tableau ou chaîne d'informations séparées par des virgules renvoyée
+     *
+     * @return array|false
+     */
+    protected function getFileInfo(string $file, $returnedValues = ['name', 'server_path', 'size', 'date'])
+    {
+        if (! is_file($file)) {
+            return false;
+        }
+
+        if (is_string($returnedValues)) {
+            $returnedValues = explode(',', $returnedValues);
+        }
+
+        $fileInfo = [];
+
+        foreach ($returnedValues as $key) {
+            switch ($key) {
+                case 'name':
+                    $fileInfo['name'] = basename($file);
+                    break;
+
+                case 'server_path':
+                    $fileInfo['server_path'] = $file;
+                    break;
+
+                case 'size':
+                    $fileInfo['size'] = filesize($file);
+                    break;
+
+                case 'date':
+                    $fileInfo['date'] = filemtime($file);
+                    break;
+
+                case 'readable':
+                    $fileInfo['readable'] = is_readable($file);
+                    break;
+
+                case 'writable':
+                    $fileInfo['writable'] = is_writable($file);
+                    break;
+
+                case 'executable':
+                    $fileInfo['executable'] = is_executable($file);
+                    break;
+
+                case 'fileperms':
+                    $fileInfo['fileperms'] = fileperms($file);
+                    break;
+            }
+        }
+
+        return $fileInfo;
     }
 }

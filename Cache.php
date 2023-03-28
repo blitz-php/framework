@@ -379,6 +379,19 @@ class Cache implements CacheInterface
     }
 
     /**
+     * Renvoie des informations sur l'ensemble du cache.
+     *
+     * Les informations retournées et la structure des données
+     * varie selon le gestionnaire.
+     *
+     * @return array|false|object|null
+     */
+    public function info()
+    {
+        return $this->factory()->info();
+    }
+
+    /**
      * Réactivez la mise en cache.
      *
      * Si la mise en cache a été désactivée avec Cache::disable() cette méthode inversera cet effet.

@@ -113,6 +113,14 @@ class Wincache extends BaseHandler
         return true;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public function info()
+	{
+		return wincache_ucache_info(true);
+	}
+
     /**
      * {@inheritDoc}
      */
