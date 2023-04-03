@@ -14,7 +14,6 @@
  *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.2 - number_helper</a>
  */
-
 if (! function_exists('number_to_size')) {
     /**
      * Formats a numbers as bytes, based on size, and adds the appropriate suffix

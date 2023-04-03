@@ -34,7 +34,7 @@ class Info extends Command
      */
     protected $description = 'Affiche les informations du cache de fichiers dans le système actuel.';
 
-     /**
+    /**
      * {@inheritDoc}
      */
     protected $service = 'Service de mise en cache';
@@ -46,7 +46,6 @@ class Info extends Command
         'driver' => 'Le pilote de cache à utiliser',
     ];
 
-    
     /**
      * {@inheritDoc}
      */

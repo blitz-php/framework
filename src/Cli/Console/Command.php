@@ -361,9 +361,11 @@ abstract class Command
     /**
      * Ecrit la tâche actuellement en cours d'execution
      */
-    final protected function task(string $task)
+    final protected function task(string $task): self
     {
         $this->write('>> ' . $task, true);
+
+        return $this;
     }
 
     /**

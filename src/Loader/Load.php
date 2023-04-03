@@ -120,6 +120,8 @@ class Load
 
     /**
      * Verifie si un element est chargé dans la liste des modules
+     *
+     * @param mixed $element
      */
     private static function isLoaded(string $module, $element): bool
     {

@@ -34,7 +34,7 @@ class Clear extends Command
      */
     protected $description = 'Efface les caches système actuels.';
 
-     /**
+    /**
      * {@inheritDoc}
      */
     protected $service = 'Service de mise en cache';
@@ -46,7 +46,6 @@ class Clear extends Command
         'driver' => 'Le pilote de cache à utiliser',
     ];
 
-    
     /**
      * {@inheritDoc}
      */
