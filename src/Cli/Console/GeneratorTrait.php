@@ -109,13 +109,12 @@ trait GeneratorTrait
      */
     private function generateFile(string $target, string $content): void
     {
-        if ($this->getOption('namespace') === 'BlitzPHP') {
+        if ($this->option('namespace') === 'BlitzPHP') {
             // @codeCoverageIgnoreStart
             $this->colorize(lang('CLI.generator.usingBlitzNamespace'), 'yellow');
 
             if (! $this->confirm('Are you sure you want to continue?')) {
-                $this->eol();
-                $this->colorize(lang('CLI.generator.cancelOperation'), 'yellow');
+                $this->eol()->colorize(lang('CLI.generator.cancelOperation'), 'yellow');
 
                 return;
             }
@@ -128,7 +127,7 @@ trait GeneratorTrait
 
         // Écraser des fichiers sans le savoir est une gêne sérieuse, nous allons donc vérifier si nous dupliquons des choses,
         // si l'option "forcer" n'est pas fournie, nous renvoyons.
-        if (! $this->getOption('force') && $isFile) {
+        if (! $this->option('force') && $isFile) {
             $this->io->error(lang('CLI.generator.fileExist', [clean_path($target)]), true);
 
             return;
@@ -154,7 +153,7 @@ trait GeneratorTrait
             // @codeCoverageIgnoreEnd
         }
 
-        if ($this->getOption('force') && $isFile) {
+        if ($this->option('force') && $isFile) {
             $this->colorize(lang('CLI.generator.fileOverwrite', [clean_path($target)]), 'yellow');
 
             return;
@@ -277,7 +276,7 @@ trait GeneratorTrait
      */
     protected function buildPath(string $class): string
     {
-        $namespace = trim(str_replace('/', '\\', $this->getOption('namespace', APP_NAMESPACE)), '\\');
+        $namespace = trim(str_replace('/', '\\', $this->option('namespace', APP_NAMESPACE)), '\\');
 
         $base = Services::autoloader()->getNamespace($namespace);
 
