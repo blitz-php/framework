@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Cli\Console;
 
+use Ahc\Cli\Helper\Terminal;
 use Ahc\Cli\Input\Reader;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Cli\Output\Color;
@@ -161,8 +162,6 @@ abstract class Command
      * @var Cursor
      */
     protected $cursor;
-
-    protected ?ProgressBar $progressBar = null;
 
     /**
      * Arguments recus apres executions
@@ -361,9 +360,11 @@ abstract class Command
     /**
      * Ecrit la tâche actuellement en cours d'execution
      */
-    final protected function task(string $task)
+    final protected function task(string $task): self
     {
         $this->write('>> ' . $task, true);
+
+        return $this;
     }
 
     /**
@@ -433,12 +434,8 @@ abstract class Command
     final protected function border(?int $length = null, string $char = '-'): self
     {
         if ($length === null) {
-            /*
-            attend la validation de la PR de php-cli pour pouvoir utiliser Terminal
             $terminal = new Terminal;
-            $length = $terminal->width() ?: 100;
-            */
-            $length = 100;
+            $length   = $terminal->width() ?: 100;
         }
 
         $str = str_repeat($char, $length);
@@ -553,15 +550,7 @@ abstract class Command
      */
     final protected function progress(?int $total = null): ProgressBar
     {
-        if ($this->progressBar === null) {
-            $this->progressBar = new ProgressBar($total, $this->writer);
-        }
-
-        if ($total !== null) {
-            $this->progressBar->total($total);
-        }
-
-        return $this->progressBar;
+        return new ProgressBar($total, $this->writer);
     }
 
     /**
@@ -593,6 +582,6 @@ abstract class Command
         $this->writer = $this->io->writer();
         $this->reader = $this->io->reader();
         $this->color  = $this->writer->colorizer();
-        // $this->cursor = $this->writer->cursor();
+        $this->cursor = $this->writer->cursor();
     }
 }

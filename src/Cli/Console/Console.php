@@ -20,6 +20,7 @@ use BlitzPHP\Traits\SingletonTrait;
 use Composer\InstalledVersions;
 use ReflectionClass;
 use ReflectionException;
+use Throwable;
 
 /**
  * Classe abstraite pour le fonctionnement de la console
@@ -32,6 +33,8 @@ final class Console extends Application
      * Defini si on doit suppriemer les information du header (nom/version du framework) ou pas
      */
     private bool $suppress = false;
+
+    private Logger $logger;
 
     /**
      * Differents logos
@@ -136,6 +139,8 @@ final class Console extends Application
         $this->suppress = $suppress;
 
         $this->discoverCommands();
+
+        $this->registerException($this->logger = Services::logger());
     }
 
     /**
@@ -173,8 +178,6 @@ final class Console extends Application
             return; // @codeCoverageIgnore
         }
 
-        $logger = Services::logger();
-
         foreach ($files as $file) {
             $className = $locator->getClassname($file);
 
@@ -183,11 +186,11 @@ final class Console extends Application
             }
 
             try {
-                $this->addCommand($className, $logger);
+                $this->addCommand($className, $this->logger);
             } catch (CLIException $e) {
                 continue;
             } catch (ReflectionException $e) {
-                $logger->error($e->getMessage());
+                $this->logger->error($e->getMessage());
 
                 continue;
             }
@@ -309,6 +312,15 @@ final class Console extends Application
         $this->_commands[$instance->name] = $action;
 
         $this->add($command, $instance->alias, false);
+    }
+
+    private function registerException(Logger $logger)
+    {
+        $this->onException(function (Throwable $e, int $exitCode) use ($logger) {
+            $logger->error((string) $e, ['exitCode' => $exitCode, 'klinge' => true]);
+        
+            throw new CLIException($e->getMessage(), $exitCode, $e);
+        });
     }
 
     /**

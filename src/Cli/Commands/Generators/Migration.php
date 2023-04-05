@@ -91,8 +91,8 @@ class Migration extends Command
         $data['session'] = false;
         $data['matchIP'] = true; // @todo a recuperer via les fichiers de configurations
 
-        $create = $this->getOption('create', false);
-        $modify = $this->getOption('modify', false);
+        $create = $this->option('create', false);
+        $modify = $this->option('modify', false);
 
         if ($create && $modify) {
             throw new InvalidArgumentException('Impossible d\'utiliser "create" et "modify" au même moment pour la génération des migrations.');
@@ -104,13 +104,13 @@ class Migration extends Command
             $data['action'] = $create ? 'create' : 'modify';
         }
 
-        $table = $this->getOption('table');
-        $group = $this->getOption('group');
+        $table = $this->option('table');
+        $group = $this->option('group');
 
         $data['group']  = is_string($group) ? $group : 'default';
         $data['driver'] = config('database.' . $data['group'] . '.driver');
 
-        if (true === $this->getOption('session', false)) {
+        if (true === $this->option('session')) {
             $data['session'] = true;
             if ($data['action'] === null) {
                 $data['action'] = 'create';
@@ -132,5 +132,13 @@ class Migration extends Command
         $data['table'] = $table;
 
         return $this->parseTemplate($class, [], [], $data);
+    }
+
+    /**
+     * Modifiez le nom de base du fichier avant de l'enregistrer.
+     */
+    protected function basename(string $filename): string
+    {
+        return gmdate(config('migrations.timestampFormat')) . basename($filename);
     }
 }

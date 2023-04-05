@@ -10,7 +10,7 @@ use BlitzPHP\Database\Migration\Structure;
 class {class} extends Migration
 {
 <?php if ($group): ?>
-    protected ?string $group = '<?= $group ?>';
+    protected string $group = '<?= $group ?>';
 <?php endif; ?>
 
     public function up()
@@ -18,24 +18,24 @@ class {class} extends Migration
 <?php if (empty($table) || empty($action)): ?>
         //
 <?php else: ?>
-        $this-><?= $action ?>('<?= $table ?>', function(Structure $structure) {
+        $this-><?= $action ?>('<?= $table ?>', function(Structure $table) {
 <?php if ($session): ?>
-            $structure->string('id', 128);
-            $structure->ipAddress('ip_address');
-            $structure->timestamp('timestamp');
-            $structure->binary('data');
+            $table->string('id', 128);
+            $table->ipAddress();
+            $table->timestamp('timestamp');
+            $table->binary('data');
 <?php if ($matchIP): ?>
-            $structure->primary(['id', 'ip_address']);
+            $table->primary(['id', 'ip_address']);
 <?php else: ?>
-            $structure->primary('id');
+            $table->primary('id');
 <?php endif; ?>
-            $structure->index('timestamp');
+            $table->index('timestamp');
 <?php else: ?>
-            $structure->increments('id');
-            $structure->timestamps();
+            $table->id();
+            $table->timestamps();
 <?php endif; ?>
 
-            return $structure;
+            return $table;
         });
 <?php endif; ?>
     }
@@ -47,7 +47,7 @@ class {class} extends Migration
 <?php elseif ($action === 'create') : ?>
         $this->dropIfExists('<?= $table ?>');
 <?php else: ?>
-        $this->modify('<?= $table ?>', function(Structure $structure) {
+        $this->modify('<?= $table ?>', function(Structure $table) {
             //
         });
 <?php endif; ?>
