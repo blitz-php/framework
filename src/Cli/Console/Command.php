@@ -434,7 +434,7 @@ abstract class Command
     final protected function border(?int $length = null, string $char = '-'): self
     {
         if ($length === null) {
-            $terminal = new Terminal;
+            $terminal = new Terminal();
             $length   = $terminal->width() ?: 100;
         }
 
