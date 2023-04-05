@@ -13,6 +13,7 @@ namespace BlitzPHP\Cache\Handlers;
 
 use BlitzPHP\Cache\InvalidArgumentException;
 use CallbackFilterIterator;
+use DateInterval;
 use Exception;
 use FilesystemIterator;
 use LogicException;
@@ -45,7 +46,7 @@ class File extends BaseHandler
      *
      * @var array<string, mixed>
      */
-    protected $_defaultConfig = [
+    protected array $_defaultConfig = [
         'duration'  => 3600,
         'groups'    => [],
         'lock'      => true,
@@ -57,10 +58,8 @@ class File extends BaseHandler
 
     /**
      * Vrai sauf si FileEngine :: __active(); échoue
-     *
-     * @var bool
      */
-    protected $_init = true;
+    protected bool $_init = true;
 
     /**
      * {@inheritDoc}
@@ -85,7 +84,7 @@ class File extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function set($key, $value, $ttl = null): bool
+    public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
         if ($value === '' || ! $this->_init) {
             return false;
@@ -126,7 +125,7 @@ class File extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         $key = $this->_key($key);
 
@@ -177,7 +176,7 @@ class File extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function delete($key): bool
+    public function delete(string $key): bool
     {
         $key = $this->_key($key);
 
@@ -298,7 +297,7 @@ class File extends BaseHandler
      */
     public function decrement(string $key, int $offset = 1)
     {
-        throw new LogicException('Files cannot be atomically decremented.');
+        throw new LogicException('Les fichiers ne peuvent pas être décrémentés de manière atomique.');
     }
 
     /**
@@ -308,7 +307,15 @@ class File extends BaseHandler
      */
     public function increment(string $key, int $offset = 1)
     {
-        throw new LogicException('Files cannot be atomically incremented.');
+        throw new LogicException('Les fichiers ne peuvent pas être incrémentés de manière atomique.');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function info()
+    {
+        return $this->getDirFileInfo($this->_config['path']);
     }
 
     /**
@@ -354,7 +361,7 @@ class File extends BaseHandler
 
             if (! $exists && ! chmod($this->_File->getPathname(), (int) $this->_config['mask'])) {
                 trigger_error(sprintf(
-                    'Could not apply permission mask "%s" on cache file "%s"',
+                    'Impossible d\'appliquer le masque d\'autorisation "%s" sur le fichier cache "%s"',
                     $this->_File->getPathname(),
                     $this->_config['mask']
                 ), E_USER_WARNING);
@@ -399,8 +406,8 @@ class File extends BaseHandler
 
         if (preg_match('/[\/\\<>?:|*"]/', $key)) {
             throw new InvalidArgumentException(
-                "Cache key `{$key}` contains invalid characters. " .
-                'You cannot use /, \\, <, >, ?, :, |, *, or " in cache keys.'
+                "La clé de cache `{$key}` contient des caractères non valides. " .
+                'Vous ne pouvez pas utiliser /, \\, <, >, ?, :, |, * ou " dans les clés de cache.'
             );
         }
 
@@ -450,10 +457,113 @@ class File extends BaseHandler
             @unlink($path);
         }
 
-        // unsetting iterators helps releasing possible locks in certain environments,
-        // which could otherwise make `rmdir()` fail
+        // la désactivation des itérateurs permet de libérer d'éventuels verrous dans certains environnements,
+        // qui pourrait autrement faire échouer `rmdir()`
         unset($directoryIterator, $contents, $filtered);
 
         return true;
+    }
+
+    /**
+     * Lit le répertoire spécifié et construit un tableau contenant les noms de fichiers,
+     * taille de fichier, dates et autorisations
+     *
+     * Tous les sous-dossiers contenus dans le chemin spécifié sont également lus.
+     *
+     * @param string $sourceDir    Chemin d'accès à la source
+     * @param bool   $topLevelOnly Ne regarder que le répertoire de niveau supérieur spécifié ?
+     * @param bool   $_recursion   Variable interne pour déterminer l'état de la récursivité - ne pas utiliser dans les appels
+     *
+     * @return array|false
+     */
+    protected function getDirFileInfo(string $sourceDir, bool $topLevelOnly = true, bool $_recursion = false)
+    {
+        static $_filedata = [];
+        $relativePath     = $sourceDir;
+
+        if ($fp = @opendir($sourceDir)) {
+            // réinitialise le tableau et s'assure que $source_dir a une barre oblique à la fin de l'appel initial
+            if ($_recursion === false) {
+                $_filedata = [];
+                $sourceDir = rtrim(realpath($sourceDir) ?: $sourceDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            }
+
+            // Utilisé pour être foreach (scandir($source_dir, 1) comme $file), mais scandir() n'est tout simplement pas aussi rapide
+            while (false !== ($file = readdir($fp))) {
+                if (is_dir($sourceDir . $file) && $file[0] !== '.' && $topLevelOnly === false) {
+                    $this->getDirFileInfo($sourceDir . $file . DIRECTORY_SEPARATOR, $topLevelOnly, true);
+                } elseif (! is_dir($sourceDir . $file) && $file[0] !== '.') {
+                    $_filedata[$file]                  = $this->getFileInfo($sourceDir . $file);
+                    $_filedata[$file]['relative_path'] = $relativePath;
+                }
+            }
+
+            closedir($fp);
+
+            return $_filedata;
+        }
+
+        return false;
+    }
+
+    /**
+     * Étant donné un fichier et un chemin, renvoie le nom, le chemin, la taille, la date de modification
+     * Le deuxième paramètre vous permet de déclarer explicitement les informations que vous souhaitez renvoyer
+     * Les options sont : nom, chemin_serveur, taille, date, lisible, inscriptible, exécutable, fileperms
+     * Renvoie FALSE si le fichier est introuvable.
+     *
+     * @param array|string $returnedValues Tableau ou chaîne d'informations séparées par des virgules renvoyée
+     *
+     * @return array|false
+     */
+    protected function getFileInfo(string $file, $returnedValues = ['name', 'server_path', 'size', 'date'])
+    {
+        if (! is_file($file)) {
+            return false;
+        }
+
+        if (is_string($returnedValues)) {
+            $returnedValues = explode(',', $returnedValues);
+        }
+
+        $fileInfo = [];
+
+        foreach ($returnedValues as $key) {
+            switch ($key) {
+                case 'name':
+                    $fileInfo['name'] = basename($file);
+                    break;
+
+                case 'server_path':
+                    $fileInfo['server_path'] = $file;
+                    break;
+
+                case 'size':
+                    $fileInfo['size'] = filesize($file);
+                    break;
+
+                case 'date':
+                    $fileInfo['date'] = filemtime($file);
+                    break;
+
+                case 'readable':
+                    $fileInfo['readable'] = is_readable($file);
+                    break;
+
+                case 'writable':
+                    $fileInfo['writable'] = is_writable($file);
+                    break;
+
+                case 'executable':
+                    $fileInfo['executable'] = is_executable($file);
+                    break;
+
+                case 'fileperms':
+                    $fileInfo['fileperms'] = fileperms($file);
+                    break;
+            }
+        }
+
+        return $fileInfo;
     }
 }

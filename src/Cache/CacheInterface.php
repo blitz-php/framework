@@ -24,7 +24,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * @return bool Vrai si les données ont été mises en cache avec succès, faux en cas d'échec.
      *              Ou si la clé existait déjà.
      */
-    public function add(string $key, $value): bool;
+    public function add(string $key, mixed $value): bool;
 
     /**
      * Incrémenter un nombre sous la clé et renvoyer la valeur incrémentée
@@ -52,4 +52,14 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      * pour obtenir le même résultat.
      */
     public function clearGroup(string $group): bool;
+
+    /**
+     * Renvoie des informations sur l'ensemble du cache.
+     *
+     * Les informations retournées et la structure des données
+     * varie selon le gestionnaire.
+     *
+     * @return array|false|object|null
+     */
+    public function info();
 }
