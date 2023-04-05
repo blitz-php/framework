@@ -310,13 +310,13 @@ class File extends BaseHandler
         throw new LogicException('Les fichiers ne peuvent pas être incrémentés de manière atomique.');
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function info()
-	{
+    /**
+     * {@inheritDoc}
+     */
+    public function info()
+    {
         return $this->getDirFileInfo($this->_config['path']);
-	}
+    }
 
     /**
      * Définit la clé de cache actuelle que cette classe gère et crée un SplFileObject inscriptible
@@ -464,17 +464,15 @@ class File extends BaseHandler
         return true;
     }
 
-
-
     /**
      * Lit le répertoire spécifié et construit un tableau contenant les noms de fichiers,
      * taille de fichier, dates et autorisations
      *
      * Tous les sous-dossiers contenus dans le chemin spécifié sont également lus.
      *
-     * @param string $sourceDir Chemin d'accès à la source
-     * @param bool $topLevelOnly Ne regarder que le répertoire de niveau supérieur spécifié ?
-     * @param bool $_recursion Variable interne pour déterminer l'état de la récursivité - ne pas utiliser dans les appels
+     * @param string $sourceDir    Chemin d'accès à la source
+     * @param bool   $topLevelOnly Ne regarder que le répertoire de niveau supérieur spécifié ?
+     * @param bool   $_recursion   Variable interne pour déterminer l'état de la récursivité - ne pas utiliser dans les appels
      *
      * @return array|false
      */
@@ -485,13 +483,13 @@ class File extends BaseHandler
 
         if ($fp = @opendir($sourceDir)) {
             // réinitialise le tableau et s'assure que $source_dir a une barre oblique à la fin de l'appel initial
-			if ($_recursion === false) {
+            if ($_recursion === false) {
                 $_filedata = [];
                 $sourceDir = rtrim(realpath($sourceDir) ?: $sourceDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
             }
 
             // Utilisé pour être foreach (scandir($source_dir, 1) comme $file), mais scandir() n'est tout simplement pas aussi rapide
-			while (false !== ($file = readdir($fp))) {
+            while (false !== ($file = readdir($fp))) {
                 if (is_dir($sourceDir . $file) && $file[0] !== '.' && $topLevelOnly === false) {
                     $this->getDirFileInfo($sourceDir . $file . DIRECTORY_SEPARATOR, $topLevelOnly, true);
                 } elseif (! is_dir($sourceDir . $file) && $file[0] !== '.') {
@@ -511,7 +509,7 @@ class File extends BaseHandler
     /**
      * Étant donné un fichier et un chemin, renvoie le nom, le chemin, la taille, la date de modification
      * Le deuxième paramètre vous permet de déclarer explicitement les informations que vous souhaitez renvoyer
-     * Les options sont : nom, chemin_serveur, taille, date, lisible, inscriptible, exécutable, fileperms
+     * Les options sont : nom, chemin_serveur, taille, date, lisible, inscriptible, exécutable, fileperms
      * Renvoie FALSE si le fichier est introuvable.
      *
      * @param array|string $returnedValues Tableau ou chaîne d'informations séparées par des virgules renvoyée

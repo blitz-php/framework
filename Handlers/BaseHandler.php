@@ -339,13 +339,13 @@ abstract class BaseHandler implements CacheInterface
      */
     abstract public function clearGroup(string $group): bool;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function info()
-	{
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function info()
+    {
+        return null;
+    }
 
     /**
      * Effectue toute initialisation pour chaque groupe est nécessaire

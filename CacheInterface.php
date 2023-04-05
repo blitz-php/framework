@@ -53,7 +53,7 @@ interface CacheInterface extends \Psr\SimpleCache\CacheInterface
      */
     public function clearGroup(string $group): bool;
 
-	/**
+    /**
      * Renvoie des informations sur l'ensemble du cache.
      *
      * Les informations retournées et la structure des données

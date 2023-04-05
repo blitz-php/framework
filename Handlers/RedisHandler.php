@@ -234,13 +234,13 @@ class RedisHandler extends BaseHandler
         return (bool) ($this->_Redis->set($key, $value, ['nx', 'ex' => $duration]));
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function info()
-	{
-		return $this->_Redis->info();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function info()
+    {
+        return $this->_Redis->info();
+    }
 
     /**
      * {@inheritDoc}

@@ -407,13 +407,13 @@ class Memcached extends BaseHandler
         return $this->_Memcached->add($key, $value, $duration);
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function info()
-	{
-		return $this->_Memcached->getStats();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function info()
+    {
+        return $this->_Memcached->getStats();
+    }
 
     /**
      * {@inheritDoc}
