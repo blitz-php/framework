@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Traits;
 
-use BlitzPHP\Utilities\Arr;
+use BlitzPHP\Utilities\Iterable\Arr;
 use Exception;
 use InvalidArgumentException;
 
