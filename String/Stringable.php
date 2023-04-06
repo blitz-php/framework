@@ -9,8 +9,9 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Utilities;
+namespace BlitzPHP\Utilities\String;
 
+use BlitzPHP\Utilities\Iterable\Collection;
 use Closure;
 use Countable;
 use Exception;

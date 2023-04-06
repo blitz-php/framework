@@ -9,8 +9,9 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Utilities;
+namespace BlitzPHP\Utilities\String;
 
+use BlitzPHP\Utilities\Iterable\Collection;
 use Countable;
 use InvalidArgumentException;
 use JsonException;
@@ -152,26 +153,16 @@ class Str
 
     /**
      * Return the remainder of a string after the first occurrence of a given value.
-     *
-     * @param string $subject
-     * @param string $search
-     *
-     * @return string
      */
-    public static function after($subject, $search)
+    public static function after(string $subject, string $search): string
     {
         return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
 
     /**
      * Return the remainder of a string after the last occurrence of a given value.
-     *
-     * @param string $subject
-     * @param string $search
-     *
-     * @return string
      */
-    public static function afterLast($subject, $search)
+    public static function afterLast(string $subject, string $search): string
     {
         if ($search === '') {
             return $subject;
@@ -229,13 +220,8 @@ class Str
 
     /**
      * Get the portion of a string before the last occurrence of a given value.
-     *
-     * @param string $subject
-     * @param string $search
-     *
-     * @return string
      */
-    public static function beforeLast($subject, $search)
+    public static function beforeLast(string $subject, string $search): string
     {
         if ($search === '') {
             return $subject;
@@ -252,14 +238,8 @@ class Str
 
     /**
      * Get the portion of a string between two given values.
-     *
-     * @param string $subject
-     * @param string $from
-     * @param string $to
-     *
-     * @return string
      */
-    public static function between($subject, $from, $to)
+    public static function between(string $subject, string $from, string $to): string
     {
         if ($from === '' || $to === '') {
             return $subject;
@@ -270,14 +250,8 @@ class Str
 
     /**
      * Get the smallest possible portion of a string between two given values.
-     *
-     * @param string $subject
-     * @param string $from
-     * @param string $to
-     *
-     * @return string
      */
-    public static function betweenFirst($subject, $from, $to)
+    public static function betweenFirst(string $subject, string $from, string $to): string
     {
         if ($from === '' || $to === '') {
             return $subject;
@@ -288,12 +262,8 @@ class Str
 
     /**
      * Convert a value to camel case.
-     *
-     * @param string $value
-     *
-     * @return string
      */
-    public static function camel($value)
+    public static function camel(string $value): string
     {
         if (isset(static::$camelCache[$value])) {
             return static::$camelCache[$value];
@@ -305,13 +275,9 @@ class Str
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param string                  $haystack
      * @param iterable<string>|string $needles
-     * @param bool                    $ignoreCase
-     *
-     * @return bool
      */
-    public static function contains($haystack, $needles, $ignoreCase = false)
+    public static function contains(string $haystack, $needles, bool $ignoreCase = false): bool
     {
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);

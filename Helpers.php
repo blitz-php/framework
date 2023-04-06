@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Utilities;
 
+use Closure;
 use Exception;
 use HTMLPurifier;
 use HTMLPurifier_Config;
@@ -616,5 +617,13 @@ class Helpers
         }
 
         return $values;
+    }
+
+    /**
+     * Renvoie la valeur par défaut de la valeur donnée.
+     */
+    public static function value(mixed $value, ...$args): mixed
+    {
+        return $value instanceof Closure ? $value(...$args) : $value;
     }
 }
