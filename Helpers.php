@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Utilities;
 
+use BlitzPHP\Utilities\Iterable\Collection;
 use Closure;
 use Exception;
 use HTMLPurifier;
@@ -625,5 +626,21 @@ class Helpers
     public static function value(mixed $value, ...$args): mixed
     {
         return $value instanceof Closure ? $value(...$args) : $value;
+    }
+
+	/**
+	 * Créez une collection à partir de la valeur donnée.
+	 */
+	public static function collect(mixed $value = null): Collection
+	{
+		return new Collection($value);
+	}
+
+	/**
+     * Renvoie la valeur donnée, éventuellement transmise via le rappel donné.
+     */
+    public static function with($value, callable $callback = null): mixed
+    {
+        return null === $callback ? $value : $callback($value);
     }
 }
