@@ -507,30 +507,47 @@ class Arr
     }
 
    /**
-    * Flatten a multi-dimensional array into a single level.
-    */
-   public static function flatten(iterable $array, int $depth = INF): array
-   {
-       $result = [];
+     * Collapses a multi-dimensional array into a single dimension, using a delimited array path for
+     * each array element's key, i.e. array(array('Foo' => array('Bar' => 'Far'))) becomes
+     * array('0.Foo.Bar' => 'Far').)
+     *
+     * @param array  $data      Array to flatten
+     * @param string $separator String used to separate array key elements in a path, defaults to '.'
+     *
+     * @credit http://book.cakephp.org/2.0/en/core-utility-libraries/hash.html#Hash::flatten
+     */
+    public static function flatten(array $data, string $separator = '.'): array
+    {
+        $result = [];
+        $stack  = [];
+        $path   = null;
 
-       foreach ($array as $item) {
-           $item = $item instanceof Collection ? $item->all() : $item;
+        reset($data);
 
-           if (! is_array($item)) {
-               $result[] = $item;
-           } else {
-               $values = $depth === 1
-                   ? array_values($item)
-                   : static::flatten($item, $depth - 1);
+        while (! empty($data)) {
+            $key     = key($data);
+            $element = $data[$key];
+            unset($data[$key]);
 
-               foreach ($values as $value) {
-                   $result[] = $value;
-               }
-           }
-       }
+            if (is_array($element) && ! empty($element)) {
+                if (! empty($data)) {
+                    $stack[] = [$data, $path];
+                }
+                $data = $element;
+                reset($data);
+                $path .= $key . $separator;
+            } else {
+                $result[$path . $key] = $element;
+            }
 
-       return $result;
-   }
+            if (empty($data) && ! empty($stack)) {
+                [$data, $path] = array_pop($stack);
+                reset($data);
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * Remove one or many array items from a given array using "dot" notation.
