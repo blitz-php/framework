@@ -13,7 +13,7 @@ namespace BlitzPHP\Router;
 
 use BlitzPHP\Contracts\Router\AutoRouterInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
-use BlitzPHP\Utilities\Str;
+use BlitzPHP\Utilities\String\Str;
 
 /**
  * Routeur sécurisé pour le routage automatique

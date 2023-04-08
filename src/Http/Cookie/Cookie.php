@@ -12,7 +12,7 @@
 namespace BlitzPHP\Http\Cookie;
 
 use BlitzPHP\Contracts\Http\CookieInterface;
-use BlitzPHP\Utilities\Arr;
+use BlitzPHP\Utilities\Iterable\Arr;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;

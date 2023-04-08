@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Utilities\Inflector;
+use BlitzPHP\Utilities\String\Inflector;
 
 if (! function_exists('camelize')) {
     /**

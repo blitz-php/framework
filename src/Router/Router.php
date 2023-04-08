@@ -17,7 +17,7 @@ use BlitzPHP\Contracts\Router\RouterInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\RouterException;
-use BlitzPHP\Utilities\Str;
+use BlitzPHP\Utilities\String\Str;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

@@ -12,7 +12,7 @@
 namespace BlitzPHP\Http;
 
 use BlitzPHP\Core\App;
-use BlitzPHP\Utilities\Arr;
+use BlitzPHP\Utilities\Iterable\Arr;
 use InvalidArgumentException;
 use RuntimeException;
 use SessionHandlerInterface;

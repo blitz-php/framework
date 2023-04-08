@@ -16,7 +16,7 @@ use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Http\Cookie\CookieCollection;
 use BlitzPHP\Loader\Services;
-use BlitzPHP\Utilities\Arr;
+use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\Helpers;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
 use GuzzleHttp\Psr7\Stream;
