@@ -64,14 +64,50 @@ class Date extends DateTime
 	 */
 	protected int $weekStartDay = 0;
 
+	/**
+	* Used to check time string to determine if it is relative time or not....
+	*/
+   protected static string $relativePattern = '/this|next|last|tomorrow|yesterday|midnight|today|[+-]|first|last|ago/i';
+
+
     protected ?DateTimeZone $timezone = null;
+
+    /**
+     * @var DateTimeInterface|static|null
+     */
+    protected static $testNow;
 
 	/**
 	 * Create a new Date instance.
 	 */
-	public function __construct(string $time = 'now', string|DateTimeZone|null $timezone = null, protected ?string $locale = null)
+	public function __construct(?string $time = '', string|DateTimeZone|null $timezone = self::DEFAULT_TIMEZONE, protected ?string $locale = null)
 	{
-		parent::__construct($time, $this->timezone = $this->parseSuppliedTimezone($timezone));
+        $time ??= '';
+
+        // If a test instance has been provided, use it instead.
+        if ($time === '' && static::$testNow instanceof self) {
+            if ($timezone !== null) {
+                $testNow = static::$testNow->setTimezone($timezone);
+                $time    = $testNow->format('Y-m-d H:i:s');
+            } else {
+                $timezone = static::$testNow->getTimezone();
+                $time     = static::$testNow->format('Y-m-d H:i:s');
+            }
+        }
+
+        $timezone       = $timezone ?: date_default_timezone_get();
+        $this->timezone = $this->parseSuppliedTimezone($timezone);
+
+        // If the time string was a relative string (i.e. 'next Tuesday')
+        // then we need to adjust the time going in so that we have a current
+        // timezone to work with.
+        if ($time !== '' && static::hasRelativeKeywords($time)) {
+            $instance = new DateTime('now', $this->timezone);
+            $instance->modify($time);
+            $time = $instance->format('Y-m-d H:i:s');
+        }
+
+        parent::__construct($time, $this->timezone);
 	}
 
 	/**
@@ -250,7 +286,7 @@ class Date extends DateTime
 	 */
 	public static function now(?string $format = null, DateTimeZone|string $timezone = null)
 	{
-		$date = new static('now', $timezone);
+		$date = new static(null, $timezone);
 		$date->setTimestamp(time());
 
 		if (null !== $format) {
@@ -437,6 +473,41 @@ class Date extends DateTime
         $format ??= $this->defaultDateFormat;
 
         return IntlDateFormatter::formatObject($this->toDateTime(), $format, $this->locale);
+    }
+
+    // --------------------------------------------------------------------
+    // For Testing
+    // --------------------------------------------------------------------
+
+    /**
+     * Creates an instance of Date that will be returned during testing
+     * when calling 'Date::now()' instead of the current time.
+     */
+    public static function setTestNow(DateTimeInterface|string|null $datetime = null, DateTimeZone|string|null $timezone = null, string $locale = null)
+    {
+        // Reset the test instance
+        if ($datetime === null) {
+            static::$testNow = null;
+
+            return;
+        }
+
+        // Convert to a Time instance
+        if (is_string($datetime)) {
+            $datetime = new self($datetime, $timezone, $locale);
+        } elseif ($datetime instanceof DateTimeInterface && ! $datetime instanceof self) {
+            $datetime = new self($datetime->format('Y-m-d H:i:s'), $timezone);
+        }
+
+        static::$testNow = $datetime;
+    }
+
+    /**
+     * Returns whether we have a testNow instance saved.
+     */
+    public static function hasTestNow(): bool
+    {
+        return static::$testNow !== null;
     }
 
 	// --------------------------------------------------------------------
@@ -774,7 +845,7 @@ class Date extends DateTime
 	{
 		$this->timezone = $this->parseSuppliedTimezone($timezone);
 
-		return static::createFromInstance($this->toDateTime()->setTimezone($timezone));
+		return static::createFromInstance($this->toDateTime()->setTimezone($this->timezone));
 	}
 
     /**
@@ -1495,6 +1566,21 @@ class Date extends DateTime
 		return $this->subDays($this->getDayOfWeekAsNumeric())->startOfDay();
 	}
 
+
+
+
+    /**
+     * Check a time string to see if it includes a relative date (like 'next Tuesday').
+     */
+    protected static function hasRelativeKeywords(string $time): bool
+    {
+        // skip common format with a '-' in it
+        if (preg_match('/\d{4}-\d{1,2}-\d{1,2}/', $time) !== 1) {
+            return preg_match(static::$relativePattern, $time) > 0;
+        }
+
+        return false;
+    }
 
 	/**
 	 * Modify by an amount of days.
