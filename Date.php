@@ -24,31 +24,26 @@ use IntlDateFormatter;
 /**
  * Date class encapsulates various date and time functionality.
  *
- * @method int getDay() Get day of month.
- * @method int getMonth() Get the month.
- * @method int getYear() Get the year.
- * @method int getHour() Get the hour.
- * @method int getMinute() Get the minutes.
- * @method int getSecond() Get the seconds.
- * @method string getDayOfWeek() Get the day of the week, e.g., Monday.
  * @method int getDayOfWeekAsNumeric() Get the numeric day of week.
  * @method int getDaysInMonth() Get the number of days in the month.
- * @method int getDayOfYear() Get the day of the year.
  * @method string getDaySuffix() Get the suffix of the day, e.g., st.
  * @method bool isLeapYear() Determines if is leap year.
  * @method string isAmOrPm() Determines if time is AM or PM.
  * @method bool isDaylightSavings() Determines if observing daylight savings.
  * @method int getGmtDifference() Get difference in GMT.
  * @method int getSecondsSinceEpoch() Get the number of seconds since epoch.
- * @method string getTimezoneName() Get the timezone name.
- * @method setDay(int $day) Set the day of month.
- * @method setMonth(int $month) Set the month.
- * @method setYear(int $year) Set the year.
- * @method setHour(int $hour) Set the hour.
- * @method setMinute(int $minute) Set the minutes.
- * @method setSecond(int $second) Set the seconds.
+ * @method bool equals(string|DateTimeInterface $date, string $timezone = null) Determine if date is equal to another  Date instance.
+ * @method bool ne(string|DateTimeInterface $date, string $timezone = null) Determine if date is not equal to another  Date instance.
+ * @method bool notEquals(string|DateTimeInterface $date, string $timezone = null) Determine if date is not equal to another  Date instance.
+ * @method bool isAfter(string|DateTimeInterface $date, string $timezone = null) Determine if date is greater than another  Date instance.
+ * @method bool gt(string|DateTimeInterface $date, string $timezone = null) Determine if date is greater than another  Date instance.
+ * @method bool isBefore(string|DateTimeInterface $date, string $timezone = null) Determine if date is less than another  Date instance.
+ * @method bool lt(string|DateTimeInterface $date, string $timezone = null) Determine if date is less than another  Date instance.
+ * @method bool gte(string|DateTimeInterface $date, string $timezone = null) Determine if date is greater than or equal to another  Date instance.
+ * @method bool lte(string|DateTimeInterface $date, string $timezone = null) Determine if date is less than or equal to another  Date instance.
  *
- * @credit
+ * @credit <a href="https://github.com/jasonlewis/expressive-date">Expressive Date</a>
+ * @credit <a href="http://www.codeigniter.com">CodeIgniter 4.2 - CodeIgniter\I18n\TimeTrait</a>
  */
 class Date extends DateTime
 {
@@ -76,6 +71,21 @@ class Date extends DateTime
      * @var DateTimeInterface|static|null
      */
     protected static $testNow;
+
+	/**
+	 * Methodes non existantes mais disponibles via la methode magique __call
+	 */
+	private array $facadesMethodsMapping =  [
+		'equals'    => 'equalTo',
+		'notEquals' => 'notEqualTo',
+		'ne'        => 'notEqualTo',
+		'isAfter'   => 'greaterThan',
+		'gt'        => 'greaterThan',
+		'isBefore'  => 'lessThan',
+		'lt'        => 'lessThan',
+		'lte'       => 'lessOrEqualTo',
+		'gte'       => 'greaterOrEqualTo'
+	 ];
 
 	/**
 	 * Create a new Date instance.
@@ -115,25 +125,29 @@ class Date extends DateTime
 	 */
 	public function __call(string $method, array $parameters = []): mixed
 	{
-		if (substr($method, 0, 3) == 'get' or substr($method, 0, 3) == 'set') {
-			$attribute = substr($method, 3);
-		}
-		elseif (substr($method, 0, 2) == 'is') {
-			$attribute = substr($method, 2);
-
-			return $this->isDateAttribute($attribute);
-		}
-
-		if ( ! isset($attribute)) {
-			throw new InvalidArgumentException('Could not dynamically handle method call ['.$method.']');
-		}
-
 		if (substr($method, 0, 3) == 'set') {
-			return $this->setDateAttribute($attribute, $parameters[0]);
+			return $this->setDateAttribute(substr($method, 3), $parameters[0]);
+		}
+		if (substr($method, 0, 3) == 'get') {
+			return $this->getDateAttribute(substr($method, 3));
+		}
+		if (substr($method, 0, 2) == 'is') {
+			return $this->isDateAttribute(substr($method, 2));
 		}
 
-		// If not setting an attribute then we'll default to getting an attribute.
-		return $this->getDateAttribute($attribute);
+		if (isset($this->facadesMethodsMapping[$method])) {
+			return call_user_func_array([$this, $this->facadesMethodsMapping[$method]], $parameters);
+		}
+
+		if (method_exists($this, $m = 'get' . ucfirst($method)) && $parameters === []) {
+			return call_user_func([$this, $m]);
+		}
+
+		if (method_exists($this, $m = 'set' . ucfirst($method))) {
+			return call_user_func_array([$this, $m], $parameters);
+		}
+
+		throw new InvalidArgumentException('Could not dynamically handle method call ['.$method.']');
 	}
 
     /**
@@ -284,7 +298,7 @@ class Date extends DateTime
 	 *
 	 * @return static|string The DateTime object or a formatted string
 	 */
-	public static function now(?string $format = null, DateTimeZone|string $timezone = null)
+	public static function now(DateTimeZone|string|null $timezone = null, string $format = null)
 	{
 		$date = new static(null, $timezone);
 		$date->setTimestamp(time());
@@ -318,7 +332,7 @@ class Date extends DateTime
 	 *
 	 * @return static|string The DateTime object or a formatted string
 	 */
-	public static function today(?string $format = null, string|DateTimeZone $timezone = null)
+	public static function today(string|DateTimeZone|null $timezone = null, string $format = null)
 	{
 		$date = new static(date('Y-m-d 00:00:00'), $timezone);
 
@@ -338,7 +352,7 @@ class Date extends DateTime
 	 *
 	 * @return static|string The DateTime object or a formatted string
 	 */
-	public static function tomorrow(?string $format = null, DateTimeZone|string $timezone = null)
+	public static function tomorrow(string|DateTimeZone|null $timezone = null, string $format = null)
 	{
 		$date = new static(date('Y-m-d 00:00:00', strtotime('+1 day')), $timezone);
 
@@ -358,7 +372,7 @@ class Date extends DateTime
 	 *
 	 * @return static|string The DateTime object or a formatted string
 	 */
-	public static function yesterday(?string $format = null, DateTimeZone|string $timezone = null)
+	public static function yesterday(string|DateTimeZone|null $timezone = null, string $format = null)
 	{
 		$date = new static(date('Y-m-d 00:00:00', strtotime('-1 day')), $timezone);
 
@@ -676,6 +690,14 @@ class Date extends DateTime
     }
 
 	/**
+	 * Returns the locale of the current Date Instance.
+	 */
+	public function getLocale(): string
+	{
+		return $this->locale;
+	}
+
+	/**
 	 * Get the starting day of the week, where 0 is Sunday and 1 is Monday
 	 */
 	public function getWeekStartDay(): int
@@ -834,6 +856,16 @@ class Date extends DateTime
 	public function setDefaultDateFormat(string $format): self
 	{
 		$this->defaultDateFormat = $format;
+
+		return $this;
+	}
+
+	/**
+	 * Set the locale of the current Date Instance.
+	 */
+	public function setLocale(string $locale): self
+	{
+		$this->locale = $locale;
 
 		return $this;
 	}
