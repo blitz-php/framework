@@ -875,8 +875,10 @@ if (! function_exists('collect')) {
 if (! function_exists('with')) {
     /**
      * Renvoie la valeur donnée, éventuellement transmise via le rappel donné.
+     *
+     * @param mixed $value
      */
-    function with($value, callable $callback = null): mixed
+    function with($value, ?callable $callback = null): mixed
     {
         Helpers::with($value, $callback);
     }

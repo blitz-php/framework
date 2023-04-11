@@ -16,14 +16,13 @@ use BlitzPHP\Utilities\Date;
  *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.2 - date_helper</a>
  */
-
 if (! function_exists('now')) {
     /**
      * Get "now" time
      *
      * Returns Date::now()->getTimestamp() based on the timezone parameter or on the
      * app.timezone setting
-     * 
+     *
      * @return Date|int
      */
     function now(?string $timezone = null, bool $returnObject = true)
