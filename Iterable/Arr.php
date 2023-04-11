@@ -16,7 +16,7 @@ use ArrayAccess;
 use BlitzPHP\Contracts\Support\Enumerable;
 use BlitzPHP\Traits\Macroable;
 use BlitzPHP\Utilities\Helpers;
-use BlitzPHP\Utilities\String\Str;
+use BlitzPHP\Utilities\String\Text;
 use Exception;
 use InvalidArgumentException;
 
@@ -392,7 +392,7 @@ class Arr
         if (strpos($path, '[') === false) {
             $tokens = explode('.', $path);
         } else {
-            $tokens = Str::tokenize($path, '.', '[', ']');
+            $tokens = Text::tokenize($path, '.', '[', ']');
         }
 
         $_key = '__set_item__';
@@ -789,7 +789,7 @@ class Arr
         if (strpos($path, '[') === false) {
             $tokens = explode('.', $path);
         } else {
-            $tokens = Str::tokenize($path, '.', '[', ']');
+            $tokens = Text::tokenize($path, '.', '[', ']');
         }
         if (strpos($path, '{') === false && strpos($path, '[') === false) {
             return self::_simpleOp('insert', $data, $tokens, $values);
@@ -1121,7 +1121,7 @@ class Arr
         if (strpos($path, '[') === false) {
             $tokens = explode('.', $path);
         } else {
-            $tokens = Str::tokenize($path, '.', '[', ']');
+            $tokens = Text::tokenize($path, '.', '[', ']');
         }
 
         if (strpos($path, '{') === false && strpos($path, '[') === false) {
@@ -1357,9 +1357,9 @@ class Arr
 
         foreach ($styleList as $class => $constraint) {
             if (is_numeric($class)) {
-                $styles[] = Str::finish($constraint, ';');
+                $styles[] = Text::finish($constraint, ';');
             } elseif ($constraint) {
-                $styles[] = Str::finish($class, ';');
+                $styles[] = Text::finish($class, ';');
             }
         }
 

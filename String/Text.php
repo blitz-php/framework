@@ -46,7 +46,7 @@ if (! defined('ICONV_ENABLED')) {
  * @credit      CakePHP (Cake\Utility\Text - https://cakephp.org)
  * @credit      Laravel (Illuminate\Support\Str - https://laravel.com)
  */
-class Str
+class Text
 {
     /**
      * Default transliterator.
@@ -552,7 +552,7 @@ class Str
      * corresponds to a variable placeholder name in $str.
      * Example:
      * ```
-     * Str::insert(':name is :age years old.', ['name' => 'Bob', 'age' => '65']);
+     * Text::insert(':name is :age years old.', ['name' => 'Bob', 'age' => '65']);
      * ```
      * Returns: Bob is 65 years old.
      *
@@ -1315,12 +1315,14 @@ class Str
      */
     public static function substr(string $text, int $start, ?int $length = null, array $options = []): string
     {
-        if (empty($options['trimWidth']))
-		{
+		if (empty($options['encoding'])) {
+			$options['encoding'] = 'UTF-8';
+		}
+
+        if (empty($options['trimWidth'])) {
             $substr = 'mb_substr';
         }
-		else
-		{
+		else {
             $substr = 'mb_strimwidth';
         }
 
@@ -1388,7 +1390,7 @@ class Str
 			{
                 if (
                     strpos($part, '&') === 0 AND preg_match($pattern, $part)
-					AND $part !== html_entity_decode($part, ENT_HTML5 | ENT_QUOTES, 'UTF-8')
+					AND $part !== html_entity_decode($part, ENT_HTML5 | ENT_QUOTES, $options['encoding'])
                 )
 				{
                     // Entities cannot be passed substr.
