@@ -17,7 +17,7 @@ use BlitzPHP\Contracts\Router\RouterInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\RouterException;
-use BlitzPHP\Utilities\String\Str;
+use BlitzPHP\Utilities\String\Text;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -194,7 +194,7 @@ class Router implements RouterInterface
 
         return $this->translateURIDashes
             ? str_replace('-', '_', trim($this->controller, '/\\'))
-            : Str::toPascalCase($this->controller);
+            : Text::toPascalCase($this->controller);
     }
 
     /**
