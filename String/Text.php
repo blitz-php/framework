@@ -268,34 +268,33 @@ class Text
     }
 
     /**
-	 * Clean UTF-8 strings
-	 *
-	 * Ensures strings contain only valid UTF-8 characters.
-	 */
-	public static function clean(string $str): string
-	{
-		if (static::isAscii($str) === FALSE) {
-			if (MB_ENABLED) {
-				$str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
-			}
-			else if (ICONV_ENABLED) {
-				$str = @iconv('UTF-8', 'UTF-8//IGNORE', $str);
-			}
-		}
+     * Clean UTF-8 strings
+     *
+     * Ensures strings contain only valid UTF-8 characters.
+     */
+    public static function clean(string $str): string
+    {
+        if (static::isAscii($str) === false) {
+            if (MB_ENABLED) {
+                $str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
+            } elseif (ICONV_ENABLED) {
+                $str = @iconv('UTF-8', 'UTF-8//IGNORE', $str);
+            }
+        }
 
-		return $str;
+        return $str;
     }
 
-	/**
+    /**
      * Cleans up a static::insert() formatted string with given $options depending on the 'clean' key in
      * $options. The default method used is text but html is also available. The goal of this function
      * is to replace all whitespace and unneeded markup around placeholders that did not get replaced
      * by static::insert().
      */
-    public static function cleanInsert(string $str, array $options) : string
+    public static function cleanInsert(string $str, array $options): string
     {
         $clean = $options['clean'];
-        if (!$clean) {
+        if (! $clean) {
             return $str;
         }
 
@@ -303,15 +302,15 @@ class Text
             $clean = ['method' => 'text'];
         }
 
-        if (!is_array($clean)) {
+        if (! is_array($clean)) {
             $clean = ['method' => $options['clean']];
         }
 
         switch ($clean['method']) {
             case 'html':
                 $clean += [
-                    'word' => '[\w,.]+',
-                    'andText' => true,
+                    'word'        => '[\w,.]+',
+                    'andText'     => true,
                     'replacement' => '',
                 ];
                 $kleenex = sprintf(
@@ -321,16 +320,16 @@ class Text
                     preg_quote($options['after'], '/')
                 );
                 $str = preg_replace($kleenex, $clean['replacement'], $str);
-                if ($clean['andText'])
-				{
+                if ($clean['andText']) {
                     $options['clean'] = ['method' => 'text'];
-                    $str = static::cleanInsert($str, $options);
+                    $str              = static::cleanInsert($str, $options);
                 }
                 break;
+
             case 'text':
                 $clean += [
-                    'word' => '[\w,.]+',
-                    'gap' => '[\s]*(?:(?:and|or)[\s]*)?',
+                    'word'        => '[\w,.]+',
+                    'gap'         => '[\s]*(?:(?:and|or)[\s]*)?',
                     'replacement' => '',
                 ];
 
@@ -382,7 +381,7 @@ class Text
 
     /**
      * Determine if a given string contains all array values.
-	 *
+     *
      * @param iterable<string> $needles
      */
     public static function containsAll(string $haystack, iterable $needles, bool $ignoreCase = false): bool
@@ -483,9 +482,9 @@ class Text
      * - `regex` A custom regex rule that is used to match words, default is '|$tag|iu'
      * - `limit` A limit, optional, defaults to -1 (none)
      *
-     * @param string $text Text to search the phrase in.
-     * @param string|array $phrase The phrase or phrases that will be searched.
-     * @param array $options An array of HTML attributes and options.
+     * @param string       $text    Text to search the phrase in.
+     * @param array|string $phrase  The phrase or phrases that will be searched.
+     * @param array        $options An array of HTML attributes and options.
      */
     public static function highlight(string $text, array|string $phrase, array $options = []): string
     {
@@ -495,35 +494,32 @@ class Text
 
         $defaults = [
             'format' => '<span class="highlight">\1</span>',
-            'html' => false,
-            'regex' => '|%s|iu',
-            'limit' => -1,
+            'html'   => false,
+            'regex'  => '|%s|iu',
+            'limit'  => -1,
         ];
         $options += $defaults;
 
         $html = $format = $limit = null;
 
         /**
-         * @var bool $html
-         * @var string|array $format
-         * @var int $limit
+         * @var bool         $html
+         * @var array|string $format
+         * @var int          $limit
          */
         extract($options);
 
-        if (is_array($phrase))
-		{
+        if (is_array($phrase)) {
             $replace = [];
-            $with = [];
+            $with    = [];
 
-            foreach ($phrase As $key => $segment)
-			{
+            foreach ($phrase as $key => $segment) {
                 $segment = '(' . preg_quote($segment, '|') . ')';
-                if ($html)
-				{
-                    $segment = "(?![^<]+>)$segment(?![^<]+>)";
+                if ($html) {
+                    $segment = "(?![^<]+>){$segment}(?![^<]+>)";
                 }
 
-                $with[] = is_array($format) ? $format[$key] : $format;
+                $with[]    = is_array($format) ? $format[$key] : $format;
                 $replace[] = sprintf($options['regex'], $segment);
             }
 
@@ -531,9 +527,8 @@ class Text
         }
 
         $phrase = '(' . preg_quote($phrase, '|') . ')';
-        if ($html)
-		{
-            $phrase = "(?![^<]+>)$phrase(?![^<]+>)";
+        if ($html) {
+            $phrase = "(?![^<]+>){$phrase}(?![^<]+>)";
         }
 
         return preg_replace(sprintf($options['regex'], $phrase), $format, $text, $limit);
@@ -542,7 +537,7 @@ class Text
     /**
      * Wrap the string with the given strings.
      */
-    public static function wrap(string $value, string $before, string $after = null): string
+    public static function wrap(string $value, string $before, ?string $after = null): string
     {
         return $before . $value . ($after ??= $before);
     }
@@ -565,26 +560,24 @@ class Text
      *   (Overwrites before, after, breaks escape / clean)
      * - clean: A boolean or array with instructions for Text::cleanInsert
      *
-     * @param string $str A string containing variable placeholders
-     * @param array $data A key => val array where each key stands for a placeholder variable name
-     *     to be replaced with val
-     * @param array $options An array of options, see description above
+     * @param string $str     A string containing variable placeholders
+     * @param array  $data    A key => val array where each key stands for a placeholder variable name
+     *                        to be replaced with val
+     * @param array  $options An array of options, see description above
      */
-    public static function insert(string $str, $data, array $options = []) : string
+    public static function insert(string $str, $data, array $options = []): string
     {
         $defaults = [
             'before' => ':', 'after' => null, 'escape' => '\\', 'format' => null, 'clean' => false,
         ];
         $options += $defaults;
         $format = $options['format'];
-        $data = (array)$data;
-        if (empty($data))
-		{
+        $data   = (array) $data;
+        if (empty($data)) {
             return $options['clean'] ? static::cleanInsert($str, $options) : $str;
         }
 
-        if (!isset($format))
-		{
+        if (! isset($format)) {
             $format = sprintf(
                 '/(?<!%s)%s%%s%s/',
                 preg_quote($options['escape'], '/'),
@@ -593,14 +586,13 @@ class Text
             );
         }
 
-        if (strpos($str, '?') !== false && is_numeric(key($data)))
-		{
+        if (strpos($str, '?') !== false && is_numeric(key($data))) {
             $offset = 0;
-            while (($pos = strpos($str, '?', $offset)) !== false)
-			{
-                $val = array_shift($data);
+
+            while (($pos = strpos($str, '?', $offset)) !== false) {
+                $val    = array_shift($data);
                 $offset = $pos + strlen($val);
-                $str = substr_replace($str, $val, $pos, 1);
+                $str    = substr_replace($str, $val, $pos, 1);
             }
 
             return $options['clean'] ? static::cleanInsert($str, $options) : $str;
@@ -611,21 +603,18 @@ class Text
         $tempData = array_combine($dataKeys, $hashKeys);
         krsort($tempData);
 
-        foreach ($tempData As $key => $hashVal)
-		{
+        foreach ($tempData as $key => $hashVal) {
             $key = sprintf($format, preg_quote($key, '/'));
             $str = preg_replace($key, $hashVal, $str);
         }
         $dataReplacements = array_combine($hashKeys, array_values($data));
 
-		foreach ($dataReplacements As $tmpHash => $tmpValue)
-		{
+        foreach ($dataReplacements as $tmpHash => $tmpValue) {
             $tmpValue = is_array($tmpValue) ? '' : $tmpValue;
-            $str = str_replace($tmpHash, $tmpValue, $str);
+            $str      = str_replace($tmpHash, $tmpValue, $str);
         }
 
-        if (!isset($options['format']) AND isset($options['before']))
-		{
+        if (! isset($options['format']) && isset($options['before'])) {
             $str = str_replace($options['escape'] . $options['before'], $options['before'], $str);
         }
 
@@ -881,9 +870,9 @@ class Text
     /**
      * Parse a Class[@]method style callback into class and method.
      *
-	 * @return array<int, string|null>
+     * @return array<int, string|null>
      */
-    public static function parseCallback(string $callback, string $default = null): array
+    public static function parseCallback(string $callback, ?string $default = null): array
     {
         return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
     }
@@ -987,10 +976,10 @@ class Text
         static::$randomStringFactory = null;
     }
 
-	/**
+    /**
      * Removes the last word from the input text.
      */
-    public static function removeLastWord(string $text) : string
+    public static function removeLastWord(string $text): string
     {
         $spacepos = mb_strrpos($text, ' ');
 
@@ -999,8 +988,7 @@ class Text
 
             // Some languages are written without word separation.
             // We recognize a string as a word if it doesn't contain any full-width characters.
-            if (mb_strwidth($lastWord) === mb_strlen($lastWord))
-			{
+            if (mb_strwidth($lastWord) === mb_strlen($lastWord)) {
                 $text = mb_substr($text, 0, $spacepos);
             }
 
@@ -1252,7 +1240,7 @@ class Text
         return false;
     }
 
-	/**
+    /**
      * Get string length.
      *
      * ### Options:
@@ -1264,8 +1252,7 @@ class Text
     {
         if (empty($options['trimWidth'])) {
             $strlen = 'mb_strlen';
-        }
-		else {
+        } else {
             $strlen = 'mb_strwidth';
         }
 
@@ -1307,7 +1294,7 @@ class Text
 
     /**
      * Returns the portion of string specified by the start and length parameters.
-	 *
+     *
      * ### Options:
      *
      * - `html` If true, HTML entities will be handled as decoded characters.
@@ -1315,97 +1302,85 @@ class Text
      */
     public static function substr(string $text, int $start, ?int $length = null, array $options = []): string
     {
-		if (empty($options['encoding'])) {
-			$options['encoding'] = 'UTF-8';
-		}
+        if (empty($options['encoding'])) {
+            $options['encoding'] = 'UTF-8';
+        }
 
         if (empty($options['trimWidth'])) {
             $substr = 'mb_substr';
-        }
-		else {
+        } else {
             $substr = 'mb_strimwidth';
         }
 
         $maxPosition = static::strlen($text, ['trimWidth' => false] + $options);
-        if ($start < 0)
-		{
+        if ($start < 0) {
             $start += $maxPosition;
-            if ($start < 0)
-			{
+            if ($start < 0) {
                 $start = 0;
             }
         }
-        if ($start >= $maxPosition)
-		{
+        if ($start >= $maxPosition) {
             return '';
         }
 
-        if ($length === null)
-		{
+        if ($length === null) {
             $length = static::strlen($text, $options);
         }
 
-        if ($length < 0)
-		{
-            $text = static::substr($text, $start, null, $options);
+        if ($length < 0) {
+            $text  = static::substr($text, $start, null, $options);
             $start = 0;
             $length += static::strlen($text, $options);
         }
 
-        if ($length <= 0)
-		{
+        if ($length <= 0) {
             return '';
         }
 
-        if (empty($options['html']))
-		{
+        if (empty($options['html'])) {
             return (string) $substr($text, $start, $length);
         }
 
         $totalOffset = 0;
         $totalLength = 0;
-        $result = '';
+        $result      = '';
 
         $pattern = '/(&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};)/i';
-        $parts = preg_split($pattern, $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-        foreach ($parts As $part)
-		{
+        $parts   = preg_split($pattern, $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        foreach ($parts as $part) {
             $offset = 0;
 
-            if ($totalOffset < $start)
-			{
+            if ($totalOffset < $start) {
                 $len = static::strlen($part, ['trimWidth' => false] + $options);
-                if ($totalOffset + $len <= $start)
-				{
+                if ($totalOffset + $len <= $start) {
                     $totalOffset += $len;
+
                     continue;
                 }
 
-                $offset = $start - $totalOffset;
+                $offset      = $start - $totalOffset;
                 $totalOffset = $start;
             }
 
             $len = static::strlen($part, $options);
-            if ($offset !== 0 OR $totalLength + $len > $length)
-			{
+            if ($offset !== 0 || $totalLength + $len > $length) {
                 if (
-                    strpos($part, '&') === 0 AND preg_match($pattern, $part)
-					AND $part !== html_entity_decode($part, ENT_HTML5 | ENT_QUOTES, $options['encoding'])
-                )
-				{
+                    strpos($part, '&') === 0 && preg_match($pattern, $part)
+                    && $part !== html_entity_decode($part, ENT_HTML5 | ENT_QUOTES, $options['encoding'])
+                ) {
                     // Entities cannot be passed substr.
                     continue;
                 }
 
                 $part = $substr($part, $offset, $length - $totalLength);
-                $len = static::strlen($part, $options);
+                $len  = static::strlen($part, $options);
             }
 
             $result .= $part;
             $totalLength += $len;
-            if ($totalLength >= $length)
-			{
-				break;
+            if ($totalLength >= $length) {
+                break;
             }
         }
 
@@ -1477,7 +1452,7 @@ class Text
         return preg_split('/(?=\p{Lu})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
     }
 
-	/**
+    /**
      * Truncates text starting from the end.
      *
      * Cuts a string to the length of $length and replaces the first characters
@@ -1497,18 +1472,16 @@ class Text
         $exact = $ellipsis = null;
         /**
          * @var string $ellipsis
-         * @var bool $exact
+         * @var bool   $exact
          */
         extract($options);
 
-        if (mb_strlen($text) <= $length)
-		{
+        if (mb_strlen($text) <= $length) {
             return $text;
         }
 
         $truncate = mb_substr($text, mb_strlen($text) - $length + mb_strlen($ellipsis));
-        if (!$exact)
-		{
+        if (! $exact) {
             $spacepos = mb_strpos($truncate, ' ');
             $truncate = $spacepos === false ? '' : trim(mb_substr($truncate, $spacepos));
         }
@@ -1516,7 +1489,7 @@ class Text
         return $ellipsis . $truncate;
     }
 
-	/**
+    /**
      * Tokenizes a string using $separator, ignoring any instance of $separator that appears between
      * $leftBound and $rightBound.
      */
@@ -1526,80 +1499,62 @@ class Text
             return [];
         }
 
-        $depth = 0;
-        $offset = 0;
-        $buffer = '';
+        $depth   = 0;
+        $offset  = 0;
+        $buffer  = '';
         $results = [];
-        $length = strlen($data);
-        $open = false;
+        $length  = strlen($data);
+        $open    = false;
 
-        while ($offset <= $length)
-		{
+        while ($offset <= $length) {
             $tmpOffset = -1;
-            $offsets = [
+            $offsets   = [
                 strpos($data, $separator, $offset),
                 strpos($data, $leftBound, $offset),
-                strpos($data, $rightBound, $offset)
-			];
-            for ($i = 0; $i < 3; $i++)
-			{
-                if ($offsets[$i] !== false AND ($offsets[$i] < $tmpOffset OR $tmpOffset == -1))
-				{
+                strpos($data, $rightBound, $offset),
+            ];
+
+            for ($i = 0; $i < 3; $i++) {
+                if ($offsets[$i] !== false && ($offsets[$i] < $tmpOffset || $tmpOffset === -1)) {
                     $tmpOffset = $offsets[$i];
                 }
             }
-            if ($tmpOffset !== -1)
-			{
+            if ($tmpOffset !== -1) {
                 $buffer .= substr($data, $offset, ($tmpOffset - $offset));
-                if (!$depth AND $data[$tmpOffset] == $separator)
-				{
+                if (! $depth && $data[$tmpOffset] === $separator) {
                     $results[] = $buffer;
-                    $buffer = '';
-                }
-				else
-				{
+                    $buffer    = '';
+                } else {
                     $buffer .= $data[$tmpOffset];
                 }
-                if ($leftBound != $rightBound)
-				{
-                    if ($data[$tmpOffset] == $leftBound)
-					{
+                if ($leftBound !== $rightBound) {
+                    if ($data[$tmpOffset] === $leftBound) {
                         $depth++;
                     }
-                    if ($data[$tmpOffset] == $rightBound)
-					{
+                    if ($data[$tmpOffset] === $rightBound) {
                         $depth--;
                     }
-                }
-				else
-				{
-                    if ($data[$tmpOffset] == $leftBound)
-					{
-                        if (!$open)
-						{
+                } else {
+                    if ($data[$tmpOffset] === $leftBound) {
+                        if (! $open) {
                             $depth++;
                             $open = true;
-                        }
-						else
-						{
+                        } else {
                             $depth--;
                         }
                     }
                 }
                 $offset = ++$tmpOffset;
-            }
-			else
-			{
+            } else {
                 $results[] = $buffer . substr($data, $offset);
-                $offset = $length + 1;
+                $offset    = $length + 1;
             }
         }
-        if (empty($results) AND !empty($buffer))
-		{
+        if (empty($results) && ! empty($buffer)) {
             $results[] = $buffer;
         }
 
-		return array_map('trim', $results);
+        return array_map('trim', $results);
     }
 
     /**
@@ -1607,7 +1562,7 @@ class Text
      *
      * @param string[] $list The list to be joined.
      *
-	 * @return string The glued together string.
+     * @return string The glued together string.
      */
     public static function toList(array $list, string $separator = ', ', string $and = 'and')
     {
@@ -1617,41 +1572,42 @@ class Text
 
         return array_pop($list);
     }
-	/**
-	 * Convert to UTF-8
-	 *
-	 * Attempts to convert a string to UTF-8.
-	 *
-	 * @return	string|false	$str encoded in UTF-8 or FALSE on failure
-	 */
-	public static function toUtf8(string $str, string $encoding)
-	{
-		if (MB_ENABLED) {
-			return mb_convert_encoding($str, 'UTF-8', $encoding);
-		}
 
-		if (ICONV_ENABLED) {
-			return @iconv($encoding, 'UTF-8', $str);
-		}
+    /**
+     * Convert to UTF-8
+     *
+     * Attempts to convert a string to UTF-8.
+     *
+     * @return false|string $str encoded in UTF-8 or FALSE on failure
+     */
+    public static function toUtf8(string $str, string $encoding)
+    {
+        if (MB_ENABLED) {
+            return mb_convert_encoding($str, 'UTF-8', $encoding);
+        }
 
-		return false;
-	}
+        if (ICONV_ENABLED) {
+            return @iconv($encoding, 'UTF-8', $str);
+        }
+
+        return false;
+    }
 
     /**
      * Transliterate string.
      *
-     * @param Transliterator|string|null $transliterator Either a Transliterator
-     *   instance, or a transliterator identifier string. If `null`, the default
-     *   transliterator (identifier) set via `setTransliteratorId()` or
-     *   `setTransliterator()` will be used.
-	 *
-	 * @return string|false
+     * @param string|Transliterator|null $transliterator Either a Transliterator
+     *                                                   instance, or a transliterator identifier string. If `null`, the default
+     *                                                   transliterator (identifier) set via `setTransliteratorId()` or
+     *                                                   `setTransliterator()` will be used.
+     *
+     * @return false|string
      *
      * @see https://secure.php.net/manual/en/transliterator.transliterate.php
      */
     public static function transliterate(string $string, $transliterator = null)
     {
-        if (!$transliterator) {
+        if (! $transliterator) {
             $transliterator = static::$_defaultTransliterator ?: static::$_defaultTransliteratorId;
         }
 
@@ -1676,8 +1632,7 @@ class Text
         $default = [
             'ellipsis' => '...', 'exact' => true, 'html' => false, 'trimWidth' => false,
         ];
-        if (!empty($options['html']) AND strtolower(mb_internal_encoding()) === 'utf-8')
-		{
+        if (! empty($options['html']) && strtolower(mb_internal_encoding()) === 'utf-8') {
             $default['ellipsis'] = "\xe2\x80\xa6";
         }
         $options += $default;
@@ -1685,37 +1640,29 @@ class Text
         $prefix = '';
         $suffix = $options['ellipsis'];
 
-        if ($options['html'])
-		{
+        if ($options['html']) {
             $ellipsisLength = self::strlen(strip_tags($options['ellipsis']), $options);
 
             $truncateLength = 0;
-            $totalLength = 0;
-            $openTags = [];
-            $truncate = '';
+            $totalLength    = 0;
+            $openTags       = [];
+            $truncate       = '';
 
             preg_match_all('/(<\/?([\w+]+)[^>]*>)?([^<>]*)/', $text, $tags, PREG_SET_ORDER);
-            foreach ($tags As $tag)
-			{
+
+            foreach ($tags as $tag) {
                 $contentLength = 0;
-                if (!in_array($tag[2], static::$_defaultHtmlNoCount, true))
-				{
+                if (! in_array($tag[2], static::$_defaultHtmlNoCount, true)) {
                     $contentLength = self::strlen($tag[3], $options);
                 }
 
-                if ($truncate === '')
-				{
-                    if (!preg_match('/img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param/i', $tag[2]))
-					{
-                        if (preg_match('/<[\w]+[^>]*>/', $tag[0]))
-						{
+                if ($truncate === '') {
+                    if (! preg_match('/img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param/i', $tag[2])) {
+                        if (preg_match('/<[\w]+[^>]*>/', $tag[0])) {
                             array_unshift($openTags, $tag[2]);
-                        }
-						elseif (preg_match('/<\/([\w]+)[^>]*>/', $tag[0], $closeTag))
-						{
+                        } elseif (preg_match('/<\/([\w]+)[^>]*>/', $tag[0], $closeTag)) {
                             $pos = array_search($closeTag[1], $openTags, true);
-                            if ($pos !== false)
-							{
+                            if ($pos !== false) {
                                 array_splice($openTags, $pos, 1);
                             }
                         }
@@ -1723,41 +1670,32 @@ class Text
 
                     $prefix .= $tag[1];
 
-                    if ($totalLength + $contentLength + $ellipsisLength > $length)
-					{
-                        $truncate = $tag[3];
+                    if ($totalLength + $contentLength + $ellipsisLength > $length) {
+                        $truncate       = $tag[3];
                         $truncateLength = $length - $totalLength;
-                    }
-					else
-					{
+                    } else {
                         $prefix .= $tag[3];
                     }
                 }
 
                 $totalLength += $contentLength;
-                if ($totalLength > $length)
-				{
+                if ($totalLength > $length) {
                     break;
                 }
             }
 
-            if ($totalLength <= $length)
-			{
+            if ($totalLength <= $length) {
                 return $text;
             }
 
-            $text = $truncate;
+            $text   = $truncate;
             $length = $truncateLength;
 
-            foreach ($openTags as $tag)
-			{
+            foreach ($openTags as $tag) {
                 $suffix .= '</' . $tag . '>';
             }
-        }
-		else
-		{
-            if (self::strlen($text, $options) <= $length)
-			{
+        } else {
+            if (self::strlen($text, $options) <= $length) {
                 return $text;
             }
             $ellipsisLength = self::strlen($options['ellipsis'], $options);
@@ -1765,16 +1703,13 @@ class Text
 
         $result = self::substr($text, 0, $length - $ellipsisLength, $options);
 
-        if (!$options['exact'])
-		{
-            if (self::substr($text, $length - $ellipsisLength, 1, $options) !== ' ')
-			{
+        if (! $options['exact']) {
+            if (self::substr($text, $length - $ellipsisLength, 1, $options) !== ' ') {
                 $result = self::removeLastWord($result);
             }
 
             // If result is empty, then we don't need to count ellipsis in the cut.
-            if (!strlen($result))
-			{
+            if (! strlen($result)) {
                 $result = self::substr($text, 0, $length, $options);
             }
         }
@@ -1802,7 +1737,7 @@ class Text
         static::$studlyCache = [];
     }
 
-	/**
+    /**
      * Get the default transliterator.
      */
     public static function getTransliterator(): ?Transliterator
@@ -1821,7 +1756,7 @@ class Text
     /**
      * Get default transliterator identifier string.
      */
-    public static function getTransliteratorId() : string
+    public static function getTransliteratorId(): string
     {
         return static::$_defaultTransliteratorId;
     }
@@ -1835,7 +1770,7 @@ class Text
         static::$_defaultTransliteratorId = $transliteratorId;
     }
 
-	/**
+    /**
      * Returns the replacements for the ascii method.
      *
      * Note: Adapted from Stringy\Stringy.
@@ -1989,7 +1924,7 @@ class Text
                     ['ae', 'oe', 'aa', 'Ae', 'Oe', 'Aa'],
                 ],
                 'de' => [
-                    ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
+                    ['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü'],
                     ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
                 ],
                 'he' => [

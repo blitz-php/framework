@@ -506,7 +506,7 @@ class Arr
         return Helpers::value($default);
     }
 
-   /**
+    /**
      * Collapses a multi-dimensional array into a single dimension, using a delimited array path for
      * each array element's key, i.e. array(array('Foo' => array('Bar' => 'Far'))) becomes
      * array('0.Foo.Bar' => 'Far').)

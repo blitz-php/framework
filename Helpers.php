@@ -628,18 +628,20 @@ class Helpers
         return $value instanceof Closure ? $value(...$args) : $value;
     }
 
-	/**
-	 * Créez une collection à partir de la valeur donnée.
-	 */
-	public static function collect(mixed $value = null): Collection
-	{
-		return new Collection($value);
-	}
-
-	/**
-     * Renvoie la valeur donnée, éventuellement transmise via le rappel donné.
+    /**
+     * Créez une collection à partir de la valeur donnée.
      */
-    public static function with($value, callable $callback = null): mixed
+    public static function collect(mixed $value = null): Collection
+    {
+        return new Collection($value);
+    }
+
+    /**
+     * Renvoie la valeur donnée, éventuellement transmise via le rappel donné.
+     *
+     * @param mixed $value
+     */
+    public static function with($value, ?callable $callback = null): mixed
     {
         return null === $callback ? $value : $callback($value);
     }

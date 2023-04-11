@@ -26,7 +26,7 @@ class DateException extends Exception
      */
     public static function invalidFormat(string $format)
     {
-        return new static('"'.$format.'" is not a valid datetime format');
+        return new static('"' . $format . '" is not a valid datetime format');
     }
 
     /**
