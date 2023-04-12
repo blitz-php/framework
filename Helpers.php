@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Utilities;
 
+use BlitzPHP\Traits\Mixins\HigherOrderTapProxy;
 use BlitzPHP\Utilities\Iterable\Collection;
 use Closure;
 use Exception;
@@ -644,5 +645,73 @@ class Helpers
     public static function with($value, ?callable $callback = null): mixed
     {
         return null === $callback ? $value : $callback($value);
+    }
+
+	/**
+	 * Appelez la Closure donnée avec cette instance puis renvoyez l'instance.
+	 *
+	 */
+	public static function tap(mixed $value, ?callable $callback = null): mixed
+	{
+		if (is_null($callback)) {
+			return new HigherOrderTapProxy($value);
+		}
+
+		$callback($value);
+
+		return $value;
+	}
+
+    /**
+     * Get the class "basename" of the given object / class.
+     * These helpers come from Laravel so will not be
+ 	 * re-tested and can be ignored safely.
+ 	 *
+ 	 * @see https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/helpers.php
+ 	 *
+     * @codeCoverageIgnore
+     */
+    function classBasename(string|object $class): string
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+
+        return basename(str_replace('\\', '/', $class));
+    }
+
+    /**
+     * Returns all traits used by a class, its parent classes and trait of their traits.
+     *
+     *
+     * @codeCoverageIgnore
+     */
+    public static function classUsesRecursive(string|object $class): array
+    {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $results = [];
+
+        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
+            $results += self::traitUsesRecursive($class);
+        }
+
+        return array_unique($results);
+    }
+
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @codeCoverageIgnore
+     */
+    public static function traitUsesRecursive(string $trait): array
+    {
+        $traits = class_uses($trait) ?: [];
+
+        foreach ($traits as $trait) {
+            $traits += self::traitUsesRecursive($trait);
+        }
+
+        return $traits;
     }
 }
