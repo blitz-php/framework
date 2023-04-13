@@ -671,7 +671,7 @@ class Helpers
  	 *
      * @codeCoverageIgnore
      */
-    function classBasename(string|object $class): string
+    public static function classBasename(string|object $class): string
     {
         $class = is_object($class) ? get_class($class) : $class;
 
