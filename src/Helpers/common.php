@@ -883,3 +883,13 @@ if (! function_exists('with')) {
         Helpers::with($value, $callback);
     }
 }
+
+if (! function_exists('tap')) {
+    /**
+     * Appelez la Closure donnée avec cette instance puis renvoyez l'instance.
+     */
+    function tap(mixed $value, ?callable $callback = null): mixed
+    {
+        return Helpers::tap($value, $callback);
+    }
+}
