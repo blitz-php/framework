@@ -1014,11 +1014,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Passez la collection à travers une série de canaux appelables et renvoyez le résultat.
      *
      * @param callable[] $callbacks
-     * @param mixed      $pipes
-     *
-     * @return mixed
      */
-    public function pipeThrough($pipes);
+    public function pipeThrough(array $callbacks): mixed;
 
     /**
      * Obtenir les valeurs d'une clé donnée.
