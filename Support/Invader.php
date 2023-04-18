@@ -39,8 +39,10 @@ class Invader
 
 	/**
      * @param T $obj
+     * 
+     * @return T
      */
-	public static function make(object $obj): self
+	public static function make(object $obj)
 	{
 		return new self($obj);
 	}

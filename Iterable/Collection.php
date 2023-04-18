@@ -388,7 +388,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * {@inheritDoc}
      */
-    public function get(int|string|null $key, $default = null)
+    public function get(int|string|null $key, mixed $default = null): mixed
     {
         if ($this->offsetExists($key)) {
             return $this->items[$key];

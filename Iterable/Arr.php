@@ -231,6 +231,52 @@ class Arr
     }
 
     /**
+     * Récupère un élément d'un tableau ou d'un objet en utilisant la notation "point".
+     */
+    public static function dataGet(mixed $target, $key, mixed $default = null): mixed
+    {
+        if (is_null($key)) {
+            return $target;
+        }
+
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        foreach ($key as $i => $segment) {
+            unset($key[$i]);
+
+            if (is_null($segment)) {
+                return $target;
+            }
+
+            if ($segment === '*') {
+                if ($target instanceof Collection) {
+                    $target = $target->all();
+                } elseif (! is_array($target)) {
+                    return value($default);
+                }
+
+                $result = [];
+
+                foreach ($target as $item) {
+                    $result[] = static::dataGet($item, $key);
+                }
+
+                return in_array('*', $key) ? static::collapse($result) : $result;
+            }
+
+            if (static::accessible($target) && static::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && isset($target->{$segment})) {
+                $target = $target->{$segment};
+            } else {
+                return Helpers::value($default);
+            }
+        }
+
+        return $target;
+    }
+    
+    /**
      * Counts the dimensions of an array.
      * Only considers the dimension of the first element in the array.
      *
@@ -1005,7 +1051,7 @@ class Arr
         [$value, $key] = static::explodePluckParameters($value, $key);
 
         foreach ($array as $item) {
-            $itemValue = static::getRecursive($item, $value);
+            $itemValue = static::dataGet($item, $value);
 
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
@@ -1013,7 +1059,7 @@ class Arr
             if (null === $key) {
                 $results[] = $itemValue;
             } else {
-                $itemKey = static::getRecursive($item, $key);
+                $itemKey = static::dataGet($item, $key);
 
                 if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
                     $itemKey = (string) $itemKey;

@@ -430,10 +430,10 @@ class LazyCollection implements Enumerable
     /**
      * {@inheritDoc}
      */
-    public function get(int|string|null $key, $default = null)
+    public function get(int|string|null $key, mixed $default = null): mixed
     {
         if (null === $key) {
-            return;
+            return null;
         }
 
         foreach ($this as $outerKey => $outerValue) {
@@ -607,7 +607,7 @@ class LazyCollection implements Enumerable
     /**
      * {@inheritDoc}
      */
-    public function last(?callable $callback = null, $default = null)
+    public function last(?callable $callback = null, $default = null): mixed
     {
         $needle = $placeholder = new stdClass();
 
