@@ -180,7 +180,7 @@ trait EnumeratesValues
      *
      * @param  (callable(mixed, mixed): bool)|mixed|string  $key
      */
-    public function some($key, mixed $operator = null, mixed $value = null)
+    public function some($key, mixed $operator = null, mixed $value = null): bool
     {
         return $this->contains(...func_get_args());
     }
@@ -674,10 +674,8 @@ trait EnumeratesValues
      * Passez la collection à travers une série de canaux appelables et renvoyez le résultat.
      *
      * @param callable[] $callbacks
-     *
-     * @return mixed
      */
-    public function pipeThrough(array $callbacks)
+    public function pipeThrough(array $callbacks): mixed
     {
         return Collection::make($callbacks)->reduce(
             fn ($carry, $callback) => $callback($carry),
@@ -838,12 +836,8 @@ trait EnumeratesValues
 
     /**
      * Obtenez la collection d'éléments au format JSON.
-     *
-     * @param int $options
-     *
-     * @return string
      */
-    public function toJson($options = 0)
+    public function toJson(int $options = 0): string
     {
         return json_encode($this->jsonSerialize(), $options);
     }
