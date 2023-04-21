@@ -20,8 +20,8 @@ interface SessionInterface
 {
     /**
      * Régénère l'ID de session.
-	 *
-	 * @param bool $destroy Les anciennes données de session doivent-elles être détruites ?
+     *
+     * @param bool $destroy Les anciennes données de session doivent-elles être détruites ?
      */
     public function regenerate(bool $destroy = false): void;
 
@@ -34,15 +34,15 @@ interface SessionInterface
      * Définit les données utilisateur dans la session.
      *
      * Si $data est une chaîne, alors elle est interprétée comme une
-	 * clé de propriété de session, et $value devrait être non nul.
+     * clé de propriété de session, et $value devrait être non nul.
      *
      * Si $data est un tableau, on s'attend à ce qu'il s'agisse
-	 * d'un tableau de paires clé/valeur à définir comme propriétés de session.
+     * d'un tableau de paires clé/valeur à définir comme propriétés de session.
      *
-     * @param array|string $data Nom de propriété ou tableau associatif de propriétés
+     * @param array|string                            $data  Nom de propriété ou tableau associatif de propriétés
      * @param array|bool|float|int|object|string|null $value Valeur de la propriété si une seule clé est fournie
-	 */
-	public function set(array|string $data, mixed $value = null): void;
+     */
+    public function set(array|string $data, mixed $value = null): void;
 
     /**
      * Obtenez les données utilisateur qui ont été définies dans la session.
@@ -67,12 +67,12 @@ interface SessionInterface
      * Supprimer une ou plusieurs propriétés de session.
      *
      * Si $key est un tableau, il est interprété comme un tableau d'identificateurs de
-	 * propriété de chaîne à supprimer. Sinon, il est interprété comme l'identifiant
-	 * d'une propriété de session spécifique à supprimer.
+     * propriété de chaîne à supprimer. Sinon, il est interprété comme l'identifiant
+     * d'une propriété de session spécifique à supprimer.
      *
      * @param array|string $key Identifiant de la ou des propriétés de session à supprimer.
      */
-	public function remove(array|string $key): void;
+    public function remove(array|string $key): void;
 
     /**
      * Définit les données dans la session qui ne dureront que pour une seule demande.
@@ -81,7 +81,7 @@ interface SessionInterface
      * Si $data est un tableau, il est interprété comme un tableau associatif de paires clé/valeur pour les propriétés flashdata.
      * Sinon, il est interprété comme l'identifiant d'une propriété flashdata spécifique, avec $value contenant la valeur de la propriété.
      *
-     * @param array|string $data Identificateur de propriété ou tableau associatif de propriétés
+     * @param array|string                            $data  Identificateur de propriété ou tableau associatif de propriétés
      * @param array|bool|float|int|object|string|null $value Valeur de la propriété si $data est un scalaire
      */
     public function setFlashdata(array|string $data, array|bool|float|int|object|string|null $value = null): void;
@@ -131,9 +131,9 @@ interface SessionInterface
      * Définit de nouvelles données dans la session et les marque comme données temporaires
      * avec une durée de vie définie.
      *
-     * @param array|string $data Clé de données de session ou tableau associatif d'éléments
+     * @param array|string                            $data  Clé de données de session ou tableau associatif d'éléments
      * @param array|bool|float|int|object|string|null $value Valeur à stocker
-     * @param int $ttl Durée de vie en secondes
+     * @param int                                     $ttl   Durée de vie en secondes
      */
     public function setTempdata(array|string $data, array|bool|float|int|object|string|null $value = null, int $ttl = 300): void;
 
@@ -157,7 +157,7 @@ interface SessionInterface
      * il a une durée de vie définie au sein de la session.
      *
      * @param array|string $key Identificateur de propriété ou tableau d'entre eux
-     * @param int $ttl Durée de vie, en secondes
+     * @param int          $ttl Durée de vie, en secondes
      *
      * @return bool False si l'une des propriétés n'a pas été définie
      */
