@@ -232,10 +232,12 @@ class Arr
 
     /**
      * Récupère un élément d'un tableau ou d'un objet en utilisant la notation "point".
+     *
+     * @param mixed $key
      */
     public static function dataGet(mixed $target, $key, mixed $default = null): mixed
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return $target;
         }
 
@@ -244,7 +246,7 @@ class Arr
         foreach ($key as $i => $segment) {
             unset($key[$i]);
 
-            if (is_null($segment)) {
+            if (null === $segment) {
                 return $target;
             }
 
@@ -261,7 +263,7 @@ class Arr
                     $result[] = static::dataGet($item, $key);
                 }
 
-                return in_array('*', $key) ? static::collapse($result) : $result;
+                return in_array('*', $key, true) ? static::collapse($result) : $result;
             }
 
             if (static::accessible($target) && static::exists($target, $segment)) {
@@ -275,7 +277,7 @@ class Arr
 
         return $target;
     }
-    
+
     /**
      * Counts the dimensions of an array.
      * Only considers the dimension of the first element in the array.

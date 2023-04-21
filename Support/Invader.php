@@ -20,12 +20,16 @@ use ReflectionClass;
  * @credit <a href="https://github.com/spatie/invade/blob/main/src/Invader.php">Spatie - Invade</a>
  *
  * @template T of object
+ *
  * @mixin T
  */
 class Invader
 {
-    /** @var T */
+    /**
+     * @var T
+     */
     public object $obj;
+
     public ReflectionClass $reflected;
 
     /**
@@ -33,19 +37,19 @@ class Invader
      */
     public function __construct(object $obj)
     {
-        $this->obj = $obj;
+        $this->obj       = $obj;
         $this->reflected = new ReflectionClass($obj);
     }
 
-	/**
+    /**
      * @param T $obj
-     * 
+     *
      * @return T
      */
-	public static function make(object $obj)
-	{
-		return new self($obj);
-	}
+    public static function make(object $obj)
+    {
+        return new self($obj);
+    }
 
     public function __get(string $name): mixed
     {

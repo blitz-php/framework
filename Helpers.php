@@ -21,7 +21,7 @@ use InvalidArgumentException;
 
 class Helpers
 {
-	/**
+    /**
      * Testez pour voir si une demande a été faite à partir de la ligne de commande.
      */
     public static function isCli(): bool
@@ -655,28 +655,25 @@ class Helpers
         return null === $callback ? $value : $callback($value);
     }
 
-	/**
-	 * Appelez la Closure donnée avec cette instance puis renvoyez l'instance.
-	 *
-	 */
-	public static function tap(mixed $value, ?callable $callback = null): mixed
-	{
-		if (is_null($callback)) {
-			return new HigherOrderTapProxy($value);
-		}
+    /**
+     * Appelez la Closure donnée avec cette instance puis renvoyez l'instance.
+     */
+    public static function tap(mixed $value, ?callable $callback = null): mixed
+    {
+        if (null === $callback) {
+            return new HigherOrderTapProxy($value);
+        }
 
-		$callback($value);
+        $callback($value);
 
-		return $value;
-	}
+        return $value;
+    }
 
     /**
-     * Get the class "basename" of the given object / class.
-     * These helpers come from Laravel so will not be
- 	 * re-tested and can be ignored safely.
- 	 *
- 	 * @see https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/helpers.php
- 	 *
+     * Récupère la classe "basename" de l'objet/classe donné.
+     *
+     * @see https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/helpers.php
+     *
      * @codeCoverageIgnore
      */
     public static function classBasename(string|object $class): string
@@ -686,7 +683,7 @@ class Helpers
         return basename(str_replace('\\', '/', $class));
     }
 
-	/**
+    /**
      * Renvoie la classe d'objets ou le type var de ce n'est pas un objet
      *
      * @param mixed $var Variable à vérifier
@@ -700,7 +697,6 @@ class Helpers
 
     /**
      * Returns all traits used by a class, its parent classes and trait of their traits.
-     *
      *
      * @codeCoverageIgnore
      */
