@@ -10,12 +10,7 @@
         }
     ],
     "require": {
-<<<<<<< HEAD:src/Contracts/composer.json
         "php": ">=7.4"
-=======
-        "php": ">=7.4",
-	    "blitz-php/contracts": "^1"
->>>>>>> Utilities/main:composer.json
     },
     "autoload": {
         "psr-4": {
