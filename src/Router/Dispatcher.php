@@ -780,8 +780,13 @@ class Dispatcher
             return; // @codeCoverageIgnore
         }
 
-        // IIgnorer les requêtes AJAX
+        // Ignorer les requêtes AJAX
         if (method_exists($this->request, 'isAJAX') && $this->request->isAJAX()) {
+            return;
+        }
+
+        // Ignorer les reponses non-HTML
+        if (strpos($this->response->getHeaderLine('Content-Type'), 'text/html') === false) {
             return;
         }
 

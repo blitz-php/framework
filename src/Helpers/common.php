@@ -275,7 +275,7 @@ if (! function_exists('is_cli')) {
      */
     function is_cli(): bool
     {
-        return PHP_SAPI === 'cli' || defined('STDIN');
+        return Helpers::isCli();
     }
 }
 
@@ -696,7 +696,7 @@ if (! function_exists('getTypeName')) {
      */
     function get_type_name($var): string
     {
-        return is_object($var) ? get_class($var) : gettype($var);
+        return Helpers::typeName($var);
     }
 }
 
