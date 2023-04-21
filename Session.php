@@ -25,7 +25,7 @@ use RuntimeException;
 
 class Session implements SessionInterface
 {
-	use LoggerAwareTrait;
+    use LoggerAwareTrait;
 
     /**
      * Un tableau mappant les schémas d'URL aux noms de classe de moteur de session complets.
@@ -48,13 +48,13 @@ class Session implements SessionInterface
      * les clés communes à tous les adaptateurs. Si elle est remplacée, cette propriété n'est pas utilisée.
      *
      * - `cookie_prefix` @var string
-	 * 			Préfixe ajouté à toutes les entrées. Bon pour quand vous avez besoin de partager un keyspace
+     * 			Préfixe ajouté à toutes les entrées. Bon pour quand vous avez besoin de partager un keyspace
      * 			avec une autre configuration de session ou une autre application.
-	 * - `cookie_domain` @var string Domaine des Cookies.
-	 * - `cookie_name` @var string Nom du cookie à utiliser.
+     * - `cookie_domain` @var string Domaine des Cookies.
+     * - `cookie_name` @var string Nom du cookie à utiliser.
      * - `cookie_path` @var string Chemin des Cookies.
      * - `cookie_secure` @var bool Cookie sécurisé ?
-     * - `matchIP` @var bool Faire correspondre les adresses IP pour les cookies ?
+     * - `matchIP` @var bool Faire correspondre les adresses IP pour les cookies ?
      * - `keyPrefix` @var string prefixe de la cle de session (memcached, redis, database)
      * - `savePath` @var array|string Le "chemin d'enregistrement" de la session varie entre
      * - `expiration` @var int Nombre de secondes jusqu'à la fin de la session.
@@ -80,36 +80,39 @@ class Session implements SessionInterface
      */
     private BaseHandler $adapter;
 
-	/**
-	 * Instance de la connexion a la bd (uniquement pour les gestionnaires de session de type base de donnees)
-	 */
-	private ?ConnectionInterface $db = null;
+    /**
+     * Instance de la connexion a la bd (uniquement pour les gestionnaires de session de type base de donnees)
+     */
+    private ?ConnectionInterface $db = null;
 
-	/**
+    /**
      * L'instance de cookie de session.
      */
     protected Cookie $cookie;
 
-	/**
-	* sid regex
-	*
-	* @var string
-	*/
-   protected $sidRegexp;
+    /**
+     * sid regex
+     *
+     * @var string
+     */
+    protected $sidRegexp;
 
     /**
      * Constructeur
      */
-    public function __construct(array $config = [], array $cookie, protected string $ipAddress)
+    public function __construct(array $config, array $cookie, protected string $ipAddress)
     {
-		$this->config = array_merge($this->config, $config);
+        $this->config = array_merge($this->config, $config);
 
-		$this->cookie = Cookie::create($this->config['cookie_name'], '', array_merge($cookie, [
-            'expires'  => $this->config['expiration'] === 0 ? 0 : Date::now()->getTimestamp() + $this->config['expiration'],
-            'httponly' => true, // pour raison de securite
-			])
-		); //->withPrefix(''); // Le prefix du cookie peut etre ignorer
-	}
+        $this->cookie = Cookie::create(
+            $this->config['cookie_name'],
+            '',
+            array_merge($cookie, [
+                'expires'  => $this->config['expiration'] === 0 ? 0 : Date::now()->getTimestamp() + $this->config['expiration'],
+                'httponly' => true, // pour raison de securite
+            ])
+        ); // ->withPrefix(''); // Le prefix du cookie peut etre ignorer
+    }
 
     /**
      * Tente de créer le gestionnaire de session souhaité
@@ -126,15 +129,15 @@ class Session implements SessionInterface
             throw new InvalidArgumentException('La configuration de la session doit avoir un tableau de $valid_handlers.');
         }
 
-        $handler  = $this->config['handler'] ?? null;
+        $handler = $this->config['handler'] ?? null;
 
         if (empty($handler)) {
             throw new InvalidArgumentException('La configuration de la session doit avoir un ensemble de gestionnaires.');
         }
 
-		if (in_array($handler, $validHandlers)) {
-			$handler = array_search($handler, $validHandlers);
-		}
+        if (in_array($handler, $validHandlers, true)) {
+            $handler = array_search($handler, $validHandlers, true);
+        }
         if (! array_key_exists($handler, $validHandlers)) {
             throw new InvalidArgumentException('La configuration de la session a un gestionnaire non valide spécifié.');
         }
@@ -153,33 +156,33 @@ class Session implements SessionInterface
             );
         }
 
-		$adapter->setLogger($this->logger);
+        $adapter->setLogger($this->logger);
 
-		if ($adapter instanceof Database) {
-			$adapter->setDatabase($this->db);
-		}
+        if ($adapter instanceof Database) {
+            $adapter->setDatabase($this->db);
+        }
 
         return $this->adapter = $adapter;
     }
 
-	/**
-	 * Defini l'instance de la database a utiliser (pour les gestionnaire de session de type base de donnees)
-	 */
-	public function setDatabase(?ConnectionInterface $db): self
-	{
-		$this->db = $db;
+    /**
+     * Defini l'instance de la database a utiliser (pour les gestionnaire de session de type base de donnees)
+     */
+    public function setDatabase(?ConnectionInterface $db): self
+    {
+        $this->db = $db;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	 /**
+    /**
      * Initialize the session container and starts up the session.
      *
      * @return self|void
      */
     public function start()
     {
-        if (Helpers::isCli() && !$this->onTest()) {
+        if (Helpers::isCli() && ! $this->onTest()) {
             // @codeCoverageIgnoreStart
             $this->logger->debug('Session: Initialization under CLI aborted.');
 
@@ -211,8 +214,8 @@ class Session implements SessionInterface
 
         $this->startSession();
 
-        // La régénération automatique de l'ID de session est-elle configurée ? (en ignorant les requêtes ajax)
-		if (! Helpers::isAjaxRequest() && ($regenerateTime = $this->config['time_to_update']) > 0) {
+        // La régénération automatique de l'ID de session est-elle configurée ? (en ignorant les requêtes ajax)
+        if (! Helpers::isAjaxRequest() && ($regenerateTime = $this->config['time_to_update']) > 0) {
             if (! isset($_SESSION['__blitz_last_regenerate'])) {
                 $_SESSION['__blitz_last_regenerate'] = Date::now()->getTimestamp();
             } elseif ($_SESSION['__blitz_last_regenerate'] < (Date::now()->getTimestamp() - $regenerateTime)) {
@@ -230,13 +233,12 @@ class Session implements SessionInterface
         return $this;
     }
 
-
     /**
-     * Fait un arrêt complet de la session :
+     * Fait un arrêt complet de la session :
      *
      * - détruit la session
      * - annule l'identifiant de session
-	 * - détruit le cookie de session
+     * - détruit le cookie de session
      */
     public function stop()
     {
@@ -250,7 +252,7 @@ class Session implements SessionInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function regenerate(bool $destroy = false): void
     {
@@ -260,7 +262,7 @@ class Session implements SessionInterface
         // $this->removeOldSessionCookie();
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function destroy(): bool
@@ -272,7 +274,7 @@ class Session implements SessionInterface
         return session_destroy();
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function set(array|string $data, mixed $value = null): void
@@ -292,7 +294,7 @@ class Session implements SessionInterface
         $_SESSION[$data] = $value;
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function get(?string $key = null)
@@ -309,10 +311,10 @@ class Session implements SessionInterface
             return null;
         }
 
-		return Arr::except($_SESSION, array_merge(['__blitz_vars'], $this->getFlashKeys(), $this->getTempKeys()));
+        return Arr::except($_SESSION, array_merge(['__blitz_vars'], $this->getFlashKeys(), $this->getTempKeys()));
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function has(string $key): bool
@@ -320,11 +322,11 @@ class Session implements SessionInterface
         return isset($_SESSION[$key]);
     }
 
-	/**
+    /**
      * Poussez la nouvelle valeur sur la valeur de session qui est un tableau.
      *
-     * @param string $key Identifiant de la propriété de session qui nous intéresse.
-     * @param array $data valeur à pousser vers la clé de session existante.
+     * @param string $key  Identifiant de la propriété de session qui nous intéresse.
+     * @param array  $data valeur à pousser vers la clé de session existante.
      */
     public function push(string $key, array $data)
     {
@@ -349,7 +351,7 @@ class Session implements SessionInterface
         unset($_SESSION[$key]);
     }
 
-	/**
+    /**
      * Méthode magique pour définir des variables dans la session en appelant simplement
      *  $session->foo = bar;
      */
@@ -360,12 +362,12 @@ class Session implements SessionInterface
 
     /**
      * Méthode magique pour obtenir des variables de session en appelant simplement
-	 * $foo = $session->foo ;
+     * $foo = $session->foo ;
      */
     public function __get(string $key): mixed
     {
-        // Remarque : Gardez cet ordre identique, juste au cas où quelqu'un voudrait utiliser 'session_id'
-		// comme clé de données de session, pour quelque raison que ce soit
+        // Remarque : Gardez cet ordre identique, juste au cas où quelqu'un voudrait utiliser 'session_id'
+        // comme clé de données de session, pour quelque raison que ce soit
         if (isset($_SESSION[$key])) {
             return $_SESSION[$key];
         }
@@ -387,7 +389,7 @@ class Session implements SessionInterface
         return isset($_SESSION[$key]) || ($key === 'session_id');
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function setFlashdata(array|string $data, array|bool|float|int|object|string|null $value = null): void
@@ -396,7 +398,7 @@ class Session implements SessionInterface
         $this->markAsFlashdata(is_array($data) ? array_keys($data) : $data);
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function getFlashdata(?string $key = null): ?array
@@ -419,7 +421,7 @@ class Session implements SessionInterface
         return $flashdata;
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function keepFlashdata(array|string $key): void
@@ -455,7 +457,7 @@ class Session implements SessionInterface
         return true;
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function unmarkFlashdata(array|string $key): void
@@ -499,7 +501,7 @@ class Session implements SessionInterface
         return $keys;
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function setTempdata(array|string $data, array|bool|float|int|object|string|null $value = null, int $ttl = 300): void
@@ -531,8 +533,7 @@ class Session implements SessionInterface
         return $tempdata;
     }
 
-
-	/**
+    /**
      * {@inheritDoc}
      */
     public function removeTempdata(string $key): void
@@ -552,7 +553,7 @@ class Session implements SessionInterface
             $temp = [];
 
             foreach ($key as $k => $v) {
-                // Avons-nous une paire clé => ttl, ou juste une clé ?
+                // Avons-nous une paire clé => ttl, ou juste une clé ?
                 if (is_int($k)) {
                     $k = $v;
                     $v = $ttl;
@@ -585,7 +586,7 @@ class Session implements SessionInterface
 
     /**
      * {@inheritDoc}
-	 */
+     */
     public function unmarkTempdata(array|string $key): void
     {
         if (empty($_SESSION['__blitz_vars'])) {
@@ -642,7 +643,7 @@ class Session implements SessionInterface
      */
     protected function startSession()
     {
-		if ($this->onTest()) {
+        if ($this->onTest()) {
             $_SESSION = [];
 
             return;
@@ -651,7 +652,7 @@ class Session implements SessionInterface
         session_start(); // @codeCoverageIgnore
     }
 
-	/**
+    /**
      * Se charge de paramétrer le cookie côté client.
      *
      * @codeCoverageIgnore
@@ -660,9 +661,9 @@ class Session implements SessionInterface
     {
         $expiration   = $this->config['expiration'] === 0 ? 0 : Date::now()->getTimestamp() + $this->config['expiration'];
         $this->cookie = $this->cookie->withValue(session_id())->withExpiry($expiration);
-	}
+    }
 
-	/**
+    /**
      * Configuration.
      *
      * Gérer les liaisons d'entrée et les valeurs par défaut de configuration.
@@ -682,7 +683,7 @@ class Session implements SessionInterface
             'path'     => $this->cookie->getPath(),
             'domain'   => $this->cookie->getDomain(),
             'secure'   => $this->cookie->isSecure(),
-            'httponly' => true, // HTTP uniquement ; Oui, c'est intentionnel et non configurable pour des raisons de sécurité.
+            'httponly' => true, // HTTP uniquement ; Oui, c'est intentionnel et non configurable pour des raisons de sécurité.
             'samesite' => $sameSite,
         ];
 
@@ -769,7 +770,7 @@ class Session implements SessionInterface
             if ($value === 'new') {
                 $_SESSION['__blitz_vars'][$key] = 'old';
             }
-            // NE le déplacez PAS au-dessus du "nouveau" contrôle !
+            // NE le déplacez PAS au-dessus du "nouveau" contrôle !
             elseif ($value === 'old' || $value < $currentTime) {
                 unset($_SESSION[$key], $_SESSION['__blitz_vars'][$key]);
             }
@@ -780,11 +781,11 @@ class Session implements SessionInterface
         }
     }
 
-	/**
-	 * Verifie si on est en test
-	 */
-	private function onTest(): bool
-	{
-		return function_exists('on_test') && on_test();
-	}
+    /**
+     * Verifie si on est en test
+     */
+    private function onTest(): bool
+    {
+        return function_exists('on_test') && on_test();
+    }
 }

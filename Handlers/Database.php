@@ -57,25 +57,25 @@ class Database extends BaseHandler
     /**
      * @throws SessionException
      */
-    public function init(array $config = [], string $ipAddress): bool
-	{
-		parent::init($config, $ipAddress);
+    public function init(array $config, string $ipAddress): bool
+    {
+        parent::init($config, $ipAddress);
 
-		if (!empty($config['group'])) {
-			$this->group = $config['group'];
-		}
+        if (! empty($config['group'])) {
+            $this->group = $config['group'];
+        }
 
-		$this->idPrefix = $this->_config['cookie_name'] . ':';
-		$this->table = $this->_config['savePath'];
+        $this->idPrefix = $this->_config['cookie_name'] . ':';
+        $this->table    = $this->_config['savePath'];
 
-		if (empty($this->table)) {
+        if (empty($this->table)) {
             throw SessionException::missingDatabaseTable();
         }
 
         // $this->db       = Database::connect($this->group);
         $this->platform = $this->db->getPlatform();
 
-		return true;
+        return true;
     }
 
     /**
@@ -117,7 +117,7 @@ class Database extends BaseHandler
 
         if ($result === null) {
             // PHP7 réutilisera le même objet SessionHandler après la régénération de l'ID,
-			// nous devons donc le définir explicitement sur FALSE au lieu de nous fier à la valeur par défaut ...
+            // nous devons donc le définir explicitement sur FALSE au lieu de nous fier à la valeur par défaut ...
             $this->rowExists   = false;
             $this->fingerprint = md5('');
 
@@ -200,15 +200,15 @@ class Database extends BaseHandler
         return true;
     }
 
-	/**
-	 * Defini l'instance de la database a utiliser
-	 */
-	public function setDatabase(ConnectionInterface $db): self
-	{
-		$this->db = $db;
+    /**
+     * Defini l'instance de la database a utiliser
+     */
+    public function setDatabase(ConnectionInterface $db): self
+    {
+        $this->db = $db;
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Préparer les données à insérer/mettre à jour
@@ -276,7 +276,7 @@ class Database extends BaseHandler
             return true;
         }
 
-        // BD non supportée ? Laissez le parent gérer la version simple.
+        // BD non supportée ? Laissez le parent gérer la version simple.
         return parent::releaseLock();
     }
 }

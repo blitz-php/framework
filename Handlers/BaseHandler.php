@@ -13,23 +13,22 @@ namespace BlitzPHP\Session\Handlers;
 
 use BlitzPHP\Traits\InstanceConfigTrait;
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
 use SessionHandlerInterface;
 
 abstract class BaseHandler implements SessionHandlerInterface
 {
     use InstanceConfigTrait;
-	use LoggerAwareTrait;
+    use LoggerAwareTrait;
 
     /**
      * L'empreinte Data.
      */
     protected string $fingerprint = '';
 
-	/**
-	 * Verrouiller l'espace réservé.
-	 */
-	protected bool $lock = false;
+    /**
+     * Verrouiller l'espace réservé.
+     */
+    protected bool $lock = false;
 
     /**
      * L'ID de la session courante
@@ -41,18 +40,18 @@ abstract class BaseHandler implements SessionHandlerInterface
      */
     protected string $ipAddress;
 
-	/**
+    /**
      * La configuration de session par défaut est remplacée dans la plupart des adaptateurs. Ceux-ci sont
      * les clés communes à tous les adaptateurs. Si elle est remplacée, cette propriété n'est pas utilisée.
      *
      * - `cookie_prefix` @var string
-	 * 			Préfixe ajouté à toutes les entrées. Bon pour quand vous avez besoin de partager un keyspace
+     * 			Préfixe ajouté à toutes les entrées. Bon pour quand vous avez besoin de partager un keyspace
      * 			avec une autre configuration de session ou une autre application.
-	 * - `cookie_domain` @var string Domaine des Cookies.
-	 * - `cookie_name` @var string Nom du cookie à utiliser.
+     * - `cookie_domain` @var string Domaine des Cookies.
+     * - `cookie_name` @var string Nom du cookie à utiliser.
      * - `cookie_path` @var string Chemin des Cookies.
      * - `cookie_secure` @var bool Cookie sécurisé ?
-     * - `matchIP` @var bool Faire correspondre les adresses IP pour les cookies ?
+     * - `matchIP` @var bool Faire correspondre les adresses IP pour les cookies ?
      * - `keyPrefix` @var string prefixe de la cle de session (memcached, redis, database)
      * - `savePath` @var array|string Le "chemin d'enregistrement" de la session varie entre
      * - `expiration` @var int Nombre de secondes jusqu'à la fin de la session.
@@ -61,7 +60,7 @@ abstract class BaseHandler implements SessionHandlerInterface
      */
     protected array $_defaultConfig = [
         'savePath'      => [],
-		'keyPrefix' => 'blitz_session:',
+        'keyPrefix'     => 'blitz_session:',
         'cookie_prefix' => 'blitz_',
         'cookie_path'   => '/',
         'cookie_domain' => '',
@@ -81,10 +80,10 @@ abstract class BaseHandler implements SessionHandlerInterface
      *
      * @return bool Vrai si le moteur a été initialisé avec succès, faux sinon
      */
-    public function init(array $config = [], string $ipAddress): bool
+    public function init(array $config, string $ipAddress): bool
     {
         $this->setConfig($config);
-		$this->ipAddress = $ipAddress;
+        $this->ipAddress = $ipAddress;
 
         return true;
     }
@@ -95,17 +94,17 @@ abstract class BaseHandler implements SessionHandlerInterface
     protected function destroyCookie(): bool
     {
         return setcookie($this->_config['cookie_name'], '', [
-			'expires'  => 1,
-			'path'     => $this->_config['cookie_path'],
-			'domain'   => $this->_config['cookie_domain'],
-			'secure'   => $this->_config['cookie_secure'],
-			'httponly' => true
-		]);
+            'expires'  => 1,
+            'path'     => $this->_config['cookie_path'],
+            'domain'   => $this->_config['cookie_domain'],
+            'secure'   => $this->_config['cookie_secure'],
+            'httponly' => true,
+        ]);
     }
 
     /**
      * Une méthode factice permettant aux pilotes sans fonctionnalité de verrouillage
-	 * (bases de données autres que PostgreSQL et MySQL) d'agir comme s'ils acquéraient un verrou.
+     * (bases de données autres que PostgreSQL et MySQL) d'agir comme s'ils acquéraient un verrou.
      */
     protected function lockSession(string $sessionID): bool
     {
@@ -126,11 +125,11 @@ abstract class BaseHandler implements SessionHandlerInterface
 
     /**
      * Les pilotes autres que celui des "fichiers" n'utilisent pas (n'ont pas besoin d'utiliser)
-	 * le paramètre INI session.save_path, mais cela conduit à des messages d'erreur déroutants
-	 * émis par PHP lorsque open() ou write() échoue, car le message contient session.save_path ...
+     * le paramètre INI session.save_path, mais cela conduit à des messages d'erreur déroutants
+     * émis par PHP lorsque open() ou write() échoue, car le message contient session.save_path ...
      *
      * Pour contourner le problème, les pilotes appellent cette méthode
-	 * afin que l'INI soit défini juste à temps pour que le message d'erreur soit correctement généré.
+     * afin que l'INI soit défini juste à temps pour que le message d'erreur soit correctement généré.
      */
     protected function fail(): bool
     {
@@ -147,10 +146,10 @@ abstract class BaseHandler implements SessionHandlerInterface
         return 1;
     }
 
-	public function logMessage(string $message, $level = 'error')
-	{
-		if ($this->logger) {
-			$this->logger->log($level, $message);
-		}
-	}
+    public function logMessage(string $message, $level = 'error')
+    {
+        if ($this->logger) {
+            $this->logger->log($level, $message);
+        }
+    }
 }

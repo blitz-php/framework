@@ -39,21 +39,20 @@ class Redis extends BaseHandler
      */
     protected bool $keyExists = false;
 
-
     /**
      * {@inheritDoc}s
      *
      * @throws SessionException
      */
-    public function init(array $config = [], string $ipAddress): bool
+    public function init(array $config, string $ipAddress): bool
     {
         parent::init($config, $ipAddress);
 
-		if (empty($config['expiration'])) {
-			$this->_config['expiration'] = ini_get('session.gc_maxlifetime');
-		}
+        if (empty($config['expiration'])) {
+            $this->_config['expiration'] = ini_get('session.gc_maxlifetime');
+        }
 
-		// Ajouter un nom de cookie de session pour plusieurs cookies de session.
+        // Ajouter un nom de cookie de session pour plusieurs cookies de session.
         $this->_config['keyPrefix'] .= $this->_config['cookie_name'] . ':';
 
         $this->setSavePath();
@@ -62,7 +61,7 @@ class Redis extends BaseHandler
             $this->_config['keyPrefix'] .= $this->ipAddress . ':';
         }
 
-		return true;
+        return true;
     }
 
     protected function setSavePath(): void
@@ -85,7 +84,7 @@ class Redis extends BaseHandler
                 'timeout'  => preg_match('#timeout=(\d+\.\d+|\d+)#', $matches[4], $match) ? (float) $match[1] : 0.0,
             ];
 
-            preg_match('#prefix=([^\s&]+)#', $matches[4], $match) && $this->_config['keyPrefix']= $match[1];
+            preg_match('#prefix=([^\s&]+)#', $matches[4], $match) && $this->_config['keyPrefix'] = $match[1];
         } else {
             throw SessionException::invalidSavePathFormat($this->_config['savePath']);
         }
@@ -103,11 +102,11 @@ class Redis extends BaseHandler
         $redis = new BaseRedis();
 
         if (! $redis->connect($this->_config['savePath']['protocol'] . '://' . $this->_config['savePath']['host'], ($this->_config['savePath']['host'][0] === '/' ? 0 : $this->_config['savePath']['port']), $this->_config['savePath']['timeout'])) {
-            $this->logMessage('Session : Impossible de se connecter à Redis avec les paramètres configurés.');
+            $this->logMessage("Session\u{a0}: Impossible de se connecter à Redis avec les paramètres configurés.");
         } elseif (isset($this->_config['savePath']['password']) && ! $redis->auth($this->_config['savePath']['password'])) {
-            $this->logMessage('Session : impossible de s\'authentifier auprès de l\'instance Redis.');
+            $this->logMessage("Session\u{a0}: impossible de s'authentifier auprès de l'instance Redis.");
         } elseif (isset($this->_config['savePath']['database']) && ! $redis->select($this->_config['savePath']['database'])) {
-            $this->logMessage('Session : impossible de sélectionner la base de données Redis avec index ' . $this->_config['savePath']['database']);
+            $this->logMessage("Session\u{a0}: impossible de sélectionner la base de données Redis avec index " . $this->_config['savePath']['database']);
         } else {
             $this->redis = $redis;
 
@@ -127,7 +126,7 @@ class Redis extends BaseHandler
                 $this->sessionID = $id;
             }
 
-            $data = $this->redis->get($this->_config['keyPrefix']. $id);
+            $data = $this->redis->get($this->_config['keyPrefix'] . $id);
 
             if (is_string($data)) {
                 $this->keyExists = true;
@@ -165,7 +164,7 @@ class Redis extends BaseHandler
             $this->redis->expire($this->lockKey, 300);
 
             if ($this->fingerprint !== ($fingerprint = md5($data)) || $this->keyExists === false) {
-                if ($this->redis->set($this->_config['keyPrefix']. $id, $data, $this->_config['expiration'])) {
+                if ($this->redis->set($this->_config['keyPrefix'] . $id, $data, $this->_config['expiration'])) {
                     $this->fingerprint = $fingerprint;
                     $this->keyExists   = true;
 
@@ -175,7 +174,7 @@ class Redis extends BaseHandler
                 return false;
             }
 
-            return $this->redis->expire($this->_config['keyPrefix']. $id, $this->_config['expiration']);
+            return $this->redis->expire($this->_config['keyPrefix'] . $id, $this->_config['expiration']);
         }
 
         return false;
@@ -200,7 +199,7 @@ class Redis extends BaseHandler
                     }
                 }
             } catch (RedisException $e) {
-                $this->logMessage('Session : RedisException obtenu sur close() : ' . $e->getMessage());
+                $this->logMessage("Session\u{a0}: RedisException obtenu sur close()\u{a0}: " . $e->getMessage());
             }
 
             $this->redis = null;
@@ -217,8 +216,8 @@ class Redis extends BaseHandler
     public function destroy(string $id): bool
     {
         if (isset($this->redis, $this->lockKey)) {
-            if (($result = $this->redis->del($this->_config['keyPrefix']. $id)) !== 1) {
-                $this->logMessage('Session : Redis :: del() devrait renvoyer 1, a obtenu ' . var_export($result, true) . ' instead.', 'debug');
+            if (($result = $this->redis->del($this->_config['keyPrefix'] . $id)) !== 1) {
+                $this->logMessage("Session\u{a0}: Redis :: del() devrait renvoyer 1, a obtenu " . var_export($result, true) . ' instead.', 'debug');
             }
 
             return $this->destroyCookie();
@@ -232,10 +231,10 @@ class Redis extends BaseHandler
      */
     protected function lockSession(string $sessionID): bool
     {
-        $lockKey = $this->_config['keyPrefix']. $sessionID . ':lock';
+        $lockKey = $this->_config['keyPrefix'] . $sessionID . ':lock';
 
         // PHP 7 réutilise l'objet SessionHandler lors de la régénération,
-		// nous devons donc vérifier ici si la clé de verrouillage correspond à l'ID de session correct.
+        // nous devons donc vérifier ici si la clé de verrouillage correspond à l'ID de session correct.
         if ($this->lockKey === $lockKey) {
             return $this->redis->expire($this->lockKey, 300);
         }
@@ -250,7 +249,7 @@ class Redis extends BaseHandler
             }
 
             if (! $this->redis->setex($lockKey, 300, (string) Date::now()->getTimestamp())) {
-                $this->logMessage('Session : erreur lors de la tentative d\'obtention du verrou pour ' . $this->_config['keyPrefix']. $sessionID);
+                $this->logMessage("Session\u{a0}: erreur lors de la tentative d'obtention du verrou pour " . $this->_config['keyPrefix'] . $sessionID);
 
                 return false;
             }
@@ -260,13 +259,13 @@ class Redis extends BaseHandler
         } while (++$attempt < 30);
 
         if ($attempt === 30) {
-            $this->logMessage('Session: Impossible d\'obtenir le verrou pour ' . $this->_config['keyPrefix']. $sessionID . ' after 30 attempts, aborting.');
+            $this->logMessage('Session: Impossible d\'obtenir le verrou pour ' . $this->_config['keyPrefix'] . $sessionID . ' after 30 attempts, aborting.');
 
             return false;
         }
 
         if ($ttl === -1) {
-            $this->logMessage('Session: Serrure pour ' . $this->_config['keyPrefix']. $sessionID . ' n\'avait pas de TTL, prioritaire.', 'debug');
+            $this->logMessage('Session: Serrure pour ' . $this->_config['keyPrefix'] . $sessionID . ' n\'avait pas de TTL, prioritaire.', 'debug');
         }
 
         $this->lock = true;
@@ -281,7 +280,7 @@ class Redis extends BaseHandler
     {
         if (isset($this->redis, $this->lockKey) && $this->lock) {
             if (! $this->redis->del($this->lockKey)) {
-                $this->logMessage('Session : erreur lors de la tentative de libération du verrou pour ' . $this->lockKey);
+                $this->logMessage("Session\u{a0}: erreur lors de la tentative de libération du verrou pour " . $this->lockKey);
 
                 return false;
             }

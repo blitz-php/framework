@@ -31,11 +31,11 @@ class Memcached extends BaseHandler
     protected ?string $lockKey = null;
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws SessionException
      */
-    public function init(array $config = [], string $ipAddress): bool
+    public function init(array $config, string $ipAddress): bool
     {
         parent::init($config, $ipAddress);
 
@@ -54,7 +54,7 @@ class Memcached extends BaseHandler
             ini_set('memcached.sess_prefix', $this->_config['keyPrefix']);
         }
 
-		return true;
+        return true;
     }
 
     /**
@@ -80,7 +80,7 @@ class Memcached extends BaseHandler
             )
         ) {
             $this->memcached = null;
-            $this->logMessage('Session : format de chemin d\'enregistrement Memcached non valide :' . $this->_config['savePath']);
+            $this->logMessage("Session\u{a0}: format de chemin d'enregistrement Memcached non valide\u{a0}:" . $this->_config['savePath']);
 
             return false;
         }
@@ -89,8 +89,9 @@ class Memcached extends BaseHandler
             // Si Memcached a déjà ce serveur (ou si le port est invalide), ignorez-le
             if (in_array($match[1] . ':' . $match[2], $serverList, true)) {
                 $this->logMessage(
-                    'Session : le pool de serveurs Memcached a déjà' . $match[1] . ':' . $match[2]
-                , 'debug');
+                    "Session\u{a0}: le pool de serveurs Memcached a déjà" . $match[1] . ':' . $match[2],
+                    'debug'
+                );
 
                 continue;
             }
@@ -105,7 +106,7 @@ class Memcached extends BaseHandler
         }
 
         if (empty($serverList)) {
-            $this->logMessage('Session : le pool de serveurs Memcached est vide.');
+            $this->logMessage("Session\u{a0}: le pool de serveurs Memcached est vide.");
 
             return false;
         }
@@ -227,7 +228,7 @@ class Memcached extends BaseHandler
 
             if (! $this->memcached->set($lockKey, Date::now()->getTimestamp(), 300)) {
                 $this->logMessage(
-                    'Session : erreur lors de la tentative d\'obtention du verrou pour' . $this->_config['keyPrefix'] . $sessionID
+                    "Session\u{a0}: erreur lors de la tentative d'obtention du verrou pour" . $this->_config['keyPrefix'] . $sessionID
                 );
 
                 return false;
@@ -261,7 +262,7 @@ class Memcached extends BaseHandler
                 && $this->memcached->getResultCode() !== BaseMemcached::RES_NOTFOUND
             ) {
                 $this->logMessage(
-                    'Session : erreur lors de la tentative de libération du verrou pour' . $this->lockKey
+                    "Session\u{a0}: erreur lors de la tentative de libération du verrou pour" . $this->lockKey
                 );
 
                 return false;

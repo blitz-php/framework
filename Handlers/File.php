@@ -41,13 +41,12 @@ class File extends BaseHandler
      */
     protected string $sessionIDRegex = '';
 
-
-	/**
-	 * {@inheritDoc}
-	 */
-    public function init(array $config = [], string $ipAddress): bool
-	{
-		parent::init($config, $ipAddress);
+    /**
+     * {@inheritDoc}
+     */
+    public function init(array $config, string $ipAddress): bool
+    {
+        parent::init($config, $ipAddress);
 
         if (! empty($this->_config['savePath'])) {
             $this->_config['savePath'] = rtrim($this->_config['savePath'], '/\\');
@@ -64,7 +63,7 @@ class File extends BaseHandler
 
         $this->configureSessionIDRegex();
 
-		return true;
+        return true;
     }
 
     /**
@@ -98,13 +97,13 @@ class File extends BaseHandler
             $this->fileNew = ! is_file($this->filePath . $id);
 
             if (($this->fileHandle = fopen($this->filePath . $id, 'c+b')) === false) {
-				$this->logMessage("Session : Impossible d'ouvrir le fichier '" . $this->filePath . $id . "'.");
+                $this->logMessage("Session : Impossible d'ouvrir le fichier '" . $this->filePath . $id . "'.");
 
                 return false;
             }
 
             if (flock($this->fileHandle, LOCK_EX) === false) {
-                $this->logMessage("Session : impossible d'obtenir le verrou pour le fichier '" . $this->filePath . $id . "'.");
+                $this->logMessage("Session\u{a0}: impossible d'obtenir le verrou pour le fichier '" . $this->filePath . $id . "'.");
                 fclose($this->fileHandle);
                 $this->fileHandle = null;
 
@@ -176,7 +175,7 @@ class File extends BaseHandler
 
             if (! is_int($result)) {
                 $this->fingerprint = md5(substr($data, 0, $written));
-                $this->logMessage('Session : impossible d\'écrire des données.');
+                $this->logMessage("Session\u{a0}: impossible d'écrire des données.");
 
                 return false;
             }
@@ -231,7 +230,7 @@ class File extends BaseHandler
     public function gc(int $max_lifetime): false|int
     {
         if (! is_dir($this->_config['savePath']) || ($directory = opendir($this->_config['savePath'])) === false) {
-            $this->logMessage("Session : le récupérateur de place n'a pas pu répertorier les fichiers dans le répertoire '" . $this->_config['savePath'] . "'.", 'debug');
+            $this->logMessage("Session\u{a0}: le récupérateur de place n'a pas pu répertorier les fichiers dans le répertoire '" . $this->_config['savePath'] . "'.", 'debug');
 
             return false;
         }
