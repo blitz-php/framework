@@ -297,7 +297,7 @@ class Session implements SessionInterface
     /**
      * {@inheritDoc}
      */
-    public function get(?string $key = null)
+    public function get(?string $key = null): mixed
     {
         if (! empty($key) && (null !== ($value = $_SESSION[$key] ?? null) || null !== ($value = Arr::getRecursive($_SESSION ?? [], $key)))) {
             return $value;
