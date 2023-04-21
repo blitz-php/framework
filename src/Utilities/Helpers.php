@@ -11,6 +11,9 @@
 
 namespace BlitzPHP\Utilities;
 
+use BlitzPHP\Traits\Mixins\HigherOrderTapProxy;
+use BlitzPHP\Utilities\Iterable\Collection;
+use Closure;
 use Exception;
 use HTMLPurifier;
 use HTMLPurifier_Config;
@@ -18,6 +21,14 @@ use InvalidArgumentException;
 
 class Helpers
 {
+    /**
+     * Testez pour voir si une demande a été faite à partir de la ligne de commande.
+     */
+    public static function isCli(): bool
+    {
+        return PHP_SAPI === 'cli' || defined('STDIN');
+    }
+
     /**
      * Détermine si la version actuelle de PHP est égale ou supérieure à la valeur fournie
      */
@@ -616,5 +627,107 @@ class Helpers
         }
 
         return $values;
+    }
+
+    /**
+     * Renvoie la valeur par défaut de la valeur donnée.
+     */
+    public static function value(mixed $value, ...$args): mixed
+    {
+        return $value instanceof Closure ? $value(...$args) : $value;
+    }
+
+    /**
+     * Créez une collection à partir de la valeur donnée.
+     */
+    public static function collect(mixed $value = null): Collection
+    {
+        return new Collection($value);
+    }
+
+    /**
+     * Renvoie la valeur donnée, éventuellement transmise via le rappel donné.
+     *
+     * @param mixed $value
+     */
+    public static function with($value, ?callable $callback = null): mixed
+    {
+        return null === $callback ? $value : $callback($value);
+    }
+
+    /**
+     * Appelez la Closure donnée avec cette instance puis renvoyez l'instance.
+     */
+    public static function tap(mixed $value, ?callable $callback = null): mixed
+    {
+        if (null === $callback) {
+            return new HigherOrderTapProxy($value);
+        }
+
+        $callback($value);
+
+        return $value;
+    }
+
+    /**
+     * Récupère la classe "basename" de l'objet/classe donné.
+     *
+     * @see https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/helpers.php
+     *
+     * @codeCoverageIgnore
+     */
+    public static function classBasename(string|object $class): string
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+
+        return basename(str_replace('\\', '/', $class));
+    }
+
+    /**
+     * Renvoie la classe d'objets ou le type var de ce n'est pas un objet
+     *
+     * @param mixed $var Variable à vérifier
+     *
+     * @return string Renvoie le nom de la classe ou le type de variable
+     */
+    public static function typeName(mixed $var): string
+    {
+        return is_object($var) ? get_class($var) : gettype($var);
+    }
+
+    /**
+     * Returns all traits used by a class, its parent classes and trait of their traits.
+     *
+     * @codeCoverageIgnore
+     */
+    public static function classUsesRecursive(string|object $class): array
+    {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $results = [];
+
+        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
+            $results += self::traitUsesRecursive($class);
+        }
+
+        return array_unique($results);
+    }
+
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @codeCoverageIgnore
+     */
+    public static function traitUsesRecursive(string $trait): array
+    {
+        $traits = class_uses($trait) ?: [];
+
+        foreach ($traits as $trait) {
+            $traits += self::traitUsesRecursive($trait);
+        }
+
+        return $traits;
     }
 }

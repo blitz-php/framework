@@ -1,41 +1,97 @@
 {
-    "name": "blitz-php/utilities",
-    "type": "library",
-    "description": "Classes utilitaires PHP principalement utilisées pour Blitz PHP",
+    "name": "blitz-php/framework",
+    "description": "The Blitz framework core",
+    "keywords": ["framework", "blitz php", "flash", "rapid"],
     "license": "MIT",
+    "type": "project",
+    "support": {
+        "issues": "https://github.com/blitz-php/framework/issues",
+        "source": "https://github.com/blitz-php/framework"
+    },
     "authors": [
         {
             "name": "Dimitri Sitchet Tomkeu",
             "email": "devcode.dst@gmail.com"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
+<<<<<<< HEAD
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "adhocore/cli": "^1.0",
+        "dflydev/dot-access-data": "^3.0.1",
+        "guzzlehttp/psr7": "^2.2",
+        "jawira/case-converter": "^3.5",
+        "kint-php/kint": "^5.0.1",
+        "mindplay/annotations": "^1.3",
+        "mirazmac/php-requirements-checker": "^0.2.0",
+        "monolog/monolog": "^2.6",
+        "nette/schema": "^1.2",
+        "php-di/php-di": "^7.0",
+        "psr/http-server-middleware": "^1.0",
+        "psr/simple-cache": "^3.0.0",
+        "symfony/finder": "^6.0"
+    },
+    "require-dev": {
+        "blitz-php/coding-standard": "^1.1",
+        "fakerphp/faker": "^1.9.2",
+        "phpstan/phpstan": "^1.4.7",
+        "scrutinizer/ocular": "^1.8.1",
+        "kahlan/kahlan": "^5.2"
+=======
 	    "blitz-php/contracts": "^1"
+>>>>>>> Utilities/main
     },
     "autoload": {
         "psr-4": {
-            "BlitzPHP\\Utilities\\": ""
+            "BlitzPHP\\": "src/"
         }
     },
-    "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true
+    "autoload-dev": {
+        "psr-4": {
+            "BlitzPHP\\Spec\\": "spec/_support/"
+        }
+    },
+    "scripts": {
+        "analyze": "phpstan analyse",
+        "test": "kahlan",
+        "test-coverage": "kahlan --coverage=3 --reporter=verbose --clover=clover.xml",
+        "cs": [
+            "php-cs-fixer fix --ansi --verbose --dry-run --diff"
+        ],
+        "cs-fix": [
+            "php-cs-fixer fix --ansi --verbose --diff"
+        ]
+    },
+    "scripts-descriptions": {
+        "analyze": "Lance l'analyse statique du code du framework",
+        "test": "Execute les tests unitaires",
+        "cs": "Vérifie les normes de codage",
+        "cs-fix": "Fix the coding style"
+    },
+    "replace": {
+        "blitz-php/annotations": "self.version",
+        "blitz-php/cache": "self.version",
+        "blitz-php/contracts": "self.version",
+        "blitz-php/traits": "self.version",
+        "blitz-php/utilities": "self.version"
     },
     "extra": {
         "branch-alias": {
             "dev-master": "1.x-dev"
         }
     },
-	"suggest": {
-        "firebase/php-jwt": "Réquis pour la gestion des token JWT via le helper `\\BlitzPHP\\Utilities\\Jwt`",
-		"jawira/case-converter": "Réquis pour la convertion des chaîne de caractère via le helper `\\BlitzPHP\\Utilities\\Str`"
+    "suggest": {
+        "ext-ftp": "Required to use the Flysystem FTP driver.",
+        "fakerphp/faker": "Required to make seed of database (^1.9.1).",
+        "filp/whoops": "Required for friendly error pages in development (^2.14.3)."
     },
-    "support": {
-        "issues": "https://github.com/blitz-php/utilities/issues",
-        "source": "https://github.com/blitz-php/utilities"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
 }
