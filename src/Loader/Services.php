@@ -267,7 +267,7 @@ class Services
         }
 
         $config = Config::get('session');
-        $db = null;
+        $db     = null;
 
         if (Text::contains($config['handler'], [DatabaseSessionHandler::class, 'database'])) {
             $group = $config['group'] ?? Config::get('database.connection');

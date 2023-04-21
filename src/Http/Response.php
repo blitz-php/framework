@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Http;
 
-use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Session\Cookie\CookieCollection;
