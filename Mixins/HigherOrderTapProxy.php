@@ -16,11 +16,10 @@ class HigherOrderTapProxy
     /**
      * Créez une nouvelle instance de proxy tactile.
      *
-     * @param  mixed  $target La cible étant tapée.
+     * @param mixed $target La cible étant tapée.
      */
     public function __construct(public mixed $target)
     {
-
     }
 
     /**

@@ -22,6 +22,6 @@ trait Tappable
      */
     public function tap(?callable $callback = null)
     {
-		return Helpers::tap($this, $callback);
+        return Helpers::tap($this, $callback);
     }
 }
