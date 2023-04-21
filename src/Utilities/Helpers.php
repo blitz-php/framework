@@ -479,6 +479,42 @@ class Helpers
         return $base_url;
     }
 
+	/**
+	 * Obtenez l'adresse IP que le client utilise ou dit qu'il utilise.
+	 */
+	public static function ipAddress(): string
+	{
+		// Obtenez une véritable IP de visiteur derrière le réseau CloudFlare
+		if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+			$_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+			$_SERVER['HTTP_CLIENT_IP'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+    	}
+
+		$client  = @$_SERVER['HTTP_CLIENT_IP'];
+    	$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+    	$remote  = @$_SERVER['REMOTE_ADDR'];
+
+    	if (filter_var($client, FILTER_VALIDATE_IP)) {
+        	$ip = $client;
+    	} else if (filter_var($forward, FILTER_VALIDATE_IP)) {
+        	$ip = $forward;
+    	} else if (filter_var($remote, FILTER_VALIDATE_IP)) {
+        	$ip = $remote;
+    	} else {
+			$ip = $_SERVER["SERVER_ADDR"] ?? '';
+			if (empty($ip) || $ip === '::1') {
+				$ip = gethostname();
+				if ($ip) {
+					$ip = gethostbyname($ip);
+				} else {
+					$ip = $_SESSION['HTTP_HOST'] ?? '127.0.0.1';
+				}
+			}
+		}
+
+    	return $ip;
+	}
+
     /**
      * Jolie fonction de commodité d'impression JSON.
      *
