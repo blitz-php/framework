@@ -14,7 +14,7 @@ namespace BlitzPHP\Output;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Loader\Load;
 use BlitzPHP\Loader\Services;
-use BlitzPHP\Utilities\Arr;
+use BlitzPHP\Utilities\Iterable\Arr;
 use MessageFormatter;
 
 class Language

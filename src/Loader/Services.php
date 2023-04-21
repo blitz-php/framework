@@ -15,6 +15,7 @@ use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Cache\Cache;
 use BlitzPHP\Config\Config;
+use BlitzPHP\Config\Database as DatabaseConfig;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
@@ -24,11 +25,15 @@ use BlitzPHP\HTTP\Redirection;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
-use BlitzPHP\Http\Session;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Output\Language;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
+use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
+use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
+use BlitzPHP\Session\Handlers\Database\Postgre as PostgreSessionHandler;
+use BlitzPHP\Session\Session;
+use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\View\View;
 use DI\NotFoundException;
 use stdClass;
@@ -261,16 +266,31 @@ class Services
             return self::singleton(Session::class);
         }
 
-        /**
-         * @var Session
-         */
-        $session = self::factory(Session::class);
+        $config = Config::get('session');
+        $db     = null;
+
+        if (Text::contains($config['handler'], [DatabaseSessionHandler::class, 'database'])) {
+            $group = $config['group'] ?? Config::get('database.connection');
+            $db    = DatabaseConfig::connect($group);
+
+            $driver = $db->getPlatform();
+
+            if (Text::contains($driver, ['mysql', MySQLSessionHandler::class])) {
+                $config['handler'] = MySQLSessionHandler::class;
+            } elseif (Text::contains($driver, ['postgre', PostgreSessionHandler::class])) {
+                $config['handler'] = PostgreSessionHandler::class;
+            }
+        }
+
+        $session = new Session($config, Config::get('cookie'), static::request()->clientIp());
+        $session->setLogger(static::logger());
+        $session->setDatabase($db);
 
         if (session_status() === PHP_SESSION_NONE) {
             $session->start();
         }
 
-        return $session;
+        return static::$instances[Session::class] = $session;
     }
 
     /**

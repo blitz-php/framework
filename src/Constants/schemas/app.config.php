@@ -21,7 +21,7 @@ return Expect::structure([
     'use_absolute_link'            => Expect::bool()->default(true),
     'negotiate_locale'             => Expect::bool()->default(true),
     'supported_locales'            => Expect::listOf('string')->default(['fr', 'en']),
-    'timezone'                     => Expect::string()->default('Africa/Douala'),
+    'timezone'                     => Expect::anyOf(...DateTimeZone::listIdentifiers())->default('UTC'),
     'index_page'                   => Expect::string()->default(''),
 
 ])->otherItems();

@@ -18,6 +18,7 @@ use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Load;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Helpers;
+use BlitzPHP\Utilities\Iterable\Collection;
 use Kint\Kint;
 
 // ================================= FONCTIONS D'ACCESSIBILITE ================================= //
@@ -274,7 +275,7 @@ if (! function_exists('is_cli')) {
      */
     function is_cli(): bool
     {
-        return PHP_SAPI === 'cli' || defined('STDIN');
+        return Helpers::isCli();
     }
 }
 
@@ -695,7 +696,7 @@ if (! function_exists('getTypeName')) {
      */
     function get_type_name($var): string
     {
-        return is_object($var) ? get_class($var) : gettype($var);
+        return Helpers::typeName($var);
     }
 }
 
@@ -854,14 +855,20 @@ if (! function_exists('to_stream')) {
 if (! function_exists('value')) {
     /**
      * Renvoie la valeur par défaut de la valeur donnée.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    function value($value)
+    function value(mixed $value, ...$args): mixed
     {
-        return $value instanceof Closure ? $value() : $value;
+        return Helpers::value($value, ...$args);
+    }
+}
+
+if (! function_exists('collect')) {
+    /**
+     * Créez une collection à partir de la valeur donnée.
+     */
+    function collect(mixed $value = null): Collection
+    {
+        return Helpers::collect($value);
     }
 }
 
@@ -870,11 +877,19 @@ if (! function_exists('with')) {
      * Renvoie la valeur donnée, éventuellement transmise via le rappel donné.
      *
      * @param mixed $value
-     *
-     * @return mixed
      */
-    function with($value, ?callable $callback = null)
+    function with($value, ?callable $callback = null): mixed
     {
-        return null === $callback ? $value : $callback($value);
+        Helpers::with($value, $callback);
+    }
+}
+
+if (! function_exists('tap')) {
+    /**
+     * Appelez la Closure donnée avec cette instance puis renvoyez l'instance.
+     */
+    function tap(mixed $value, ?callable $callback = null): mixed
+    {
+        return Helpers::tap($value, $callback);
     }
 }

@@ -34,14 +34,12 @@ final class Console extends Application
      */
     private bool $suppress = false;
 
-    private Logger $logger;
+    private ?Logger $logger = null;
 
     /**
      * Differents logos
-     *
-     * @var array
      */
-    private $logos = [
+    private array $logos = [
         '
         /$$$$$$$  /$$ /$$   /$$              /$$$$$$$  /$$   /$$ /$$$$$$$
         | $$__  $$| $$|__/  | $$             | $$__  $$| $$  | $$| $$__  $$
@@ -138,9 +136,9 @@ final class Console extends Application
 
         $this->suppress = $suppress;
 
-        $this->discoverCommands();
-
         $this->registerException($this->logger = Services::logger());
+
+        $this->discoverCommands();
     }
 
     /**

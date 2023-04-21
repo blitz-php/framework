@@ -13,7 +13,7 @@ namespace BlitzPHP\Router;
 
 use BlitzPHP\Contracts\Router\AutoRouterInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
-use BlitzPHP\Utilities\Str;
+use BlitzPHP\Utilities\String\Text;
 
 /**
  * Routeur sécurisé pour le routage automatique
@@ -280,7 +280,7 @@ final class AutoRouter implements AutoRouterInterface
 
         return $this->translateURIDashes
             ? str_replace('-', '_', trim($this->controller, '/\\'))
-            : Str::toPascalCase($this->controller);
+            : Text::toPascalCase($this->controller);
     }
 
     /**
@@ -290,7 +290,7 @@ final class AutoRouter implements AutoRouterInterface
     {
         return $this->translateURIDashes
             ? str_replace('-', '_', $this->method)
-            : Str::toCamelCase($this->method);
+            : Text::toCamelCase($this->method);
     }
 
     /**
