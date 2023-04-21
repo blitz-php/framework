@@ -14,8 +14,9 @@ namespace BlitzPHP\Http;
 use BadMethodCallException;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\HttpException;
-use BlitzPHP\Http\Cookie\CookieCollection;
+use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\Session\Session;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
@@ -245,9 +246,7 @@ class ServerRequest implements ServerRequestInterface
     protected function _setConfig(array $config): void
     {
         if (empty($config['session'])) {
-            $config['session'] = new Session([
-                'cookiePath' => $config['base'],
-            ]);
+            $config['session'] = Services::session(false);
         }
 
         if (empty($config['environment']['REQUEST_METHOD'])) {
@@ -329,7 +328,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Renvoie l'instance de l'objet Session pour cette requête
      */
-    public function getSession(): Session
+    public function session(): Session
     {
         return $this->session;
     }

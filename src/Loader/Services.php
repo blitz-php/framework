@@ -33,6 +33,7 @@ use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
 use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
 use BlitzPHP\Session\Handlers\Database\Postgre as PostgreSessionHandler;
 use BlitzPHP\Session\Session;
+use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\View\View;
 use DI\NotFoundException;
@@ -282,7 +283,7 @@ class Services
             }
         }
 
-        $session = new Session($config, Config::get('cookie'), static::request()->clientIp());
+        $session = new Session($config, Config::get('cookie'), Helpers::ipAddress());
         $session->setLogger(static::logger());
         $session->setDatabase($db);
 
