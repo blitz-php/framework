@@ -21,6 +21,14 @@ use InvalidArgumentException;
 
 class Helpers
 {
+	/**
+     * Testez pour voir si une demande a été faite à partir de la ligne de commande.
+     */
+    public static function isCli(): bool
+    {
+        return PHP_SAPI === 'cli' || defined('STDIN');
+    }
+
     /**
      * Détermine si la version actuelle de PHP est égale ou supérieure à la valeur fournie
      */
@@ -676,6 +684,18 @@ class Helpers
         $class = is_object($class) ? get_class($class) : $class;
 
         return basename(str_replace('\\', '/', $class));
+    }
+
+	/**
+     * Renvoie la classe d'objets ou le type var de ce n'est pas un objet
+     *
+     * @param mixed $var Variable à vérifier
+     *
+     * @return string Renvoie le nom de la classe ou le type de variable
+     */
+    public static function typeName(mixed $var): string
+    {
+        return is_object($var) ? get_class($var) : gettype($var);
     }
 
     /**
