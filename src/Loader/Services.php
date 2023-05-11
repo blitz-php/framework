@@ -20,6 +20,7 @@ use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
 use BlitzPHP\Event\EventManager;
+use BlitzPHP\Filesystem\FilesystemManager;
 use BlitzPHP\Http\Client\Request;
 use BlitzPHP\Http\Negotiator;
 use BlitzPHP\HTTP\Redirection;
@@ -88,11 +89,13 @@ class Services
      */
     public static function autoloader(bool $shared = true): Autoloader
     {
+        $config = Config::get('autoload');
+
         if (true === $shared) {
-            return self::singleton(Autoloader::class);
+            return self::singleton(Autoloader::class)->setConfig($config)->setHelpers(['url']);
         }
 
-        return self::factory(Autoloader::class);
+        return self::factory(Autoloader::class, [$config, ['url']]);
     }
 
     /**
@@ -307,6 +310,21 @@ class Services
 
         return static::$instances[Session::class] = $session;
     }
+
+    /**
+     * System de gestion de fichier
+     */
+    public static function storage(bool $shared = true): FilesystemManager
+    {
+        if ($shared && isset(static::$instances[FilesystemManager::class])) {
+            return static::$instances[FilesystemManager::class];
+        }        
+
+        $config = Config::get('filesystems');
+
+        return static::$instances[FilesystemManager::class] = new FilesystemManager($config);
+    }
+
 
     /**
      * La classe Timer fournit un moyen simple d'évaluer des parties de votre application.

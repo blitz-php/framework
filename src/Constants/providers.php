@@ -17,4 +17,6 @@ return [
     Psr\Http\Message\ServerRequestInterface::class            => service('request'),
     Psr\Log\LoggerInterface::class                            => service('logger'),
     Psr\SimpleCache\CacheInterface::class                     => service('cache'),
+    
+    BlitzPHP\Filesystem\FilesystemManager::class => service('storage'),
 ];

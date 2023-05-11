@@ -120,7 +120,7 @@ class FileLocator
      *
      * @template T of \BlitzPHP\Models\BaseModel
      *
-     * @param class-string<T> $name
+     * @param class-string<T> $model
      *
      * @return T
      */
