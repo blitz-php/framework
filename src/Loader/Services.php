@@ -21,7 +21,7 @@ use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
 use BlitzPHP\Event\EventManager;
 use BlitzPHP\Filesystem\FilesystemManager;
-use BlitzPHP\Http\Client\Request;
+use BlitzPHP\HttpClient\Request;
 use BlitzPHP\Http\Negotiator;
 use BlitzPHP\HTTP\Redirection;
 use BlitzPHP\Http\Response;
@@ -89,13 +89,14 @@ class Services
      */
     public static function autoloader(bool $shared = true): Autoloader
     {
-        $config = Config::get('autoload');
+        $config  = Config::get('autoload');
+        $helpers = array_merge(['url'], ($config['helpers'] ?? []));
 
         if (true === $shared) {
-            return self::singleton(Autoloader::class)->setConfig($config)->setHelpers(['url']);
+            return self::singleton(Autoloader::class)->setConfig($config)->setHelpers($helpers);
         }
 
-        return self::factory(Autoloader::class, [$config, ['url']]);
+        return self::factory(Autoloader::class, [$config, $helpers]);
     }
 
     /**

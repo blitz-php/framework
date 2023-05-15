@@ -23,8 +23,10 @@ use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\SingletonTrait;
+use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\View;
 use Closure;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use stdClass;
@@ -305,11 +307,7 @@ class Dispatcher
 
             Services::event()->trigger('post_system');
 
-            if ($returned instanceof ResponseInterface) {
-                $response = $returned;
-            }
-
-            return $response;
+            return $this->formatResponse($response, $returned);
         });
 
         /**
@@ -822,6 +820,39 @@ class Dispatcher
     {
         $this->gatherOutput();
         $this->sendResponse();
+    }
+
+    /**
+     * Construit une reponse adequate en fonction du retour du controleur
+     */
+    protected function formatResponse(ResponseInterface $response, $returned): ResponseInterface
+    {
+        if ($returned instanceof ResponseInterface) {
+            return $returned;
+        } 
+        
+        if (is_object($returned)) {
+            if (method_exists($returned, 'toArray')) {
+                $returned = $returned->toArray();
+            } else if (method_exists($returned, 'toJSON')) {
+                $returned = $returned->toJSON();
+            } else {
+                $returned = (array) $returned;
+            }
+        }
+
+        if (is_array($returned)) {
+            $returned = Helpers::collect($returned);
+            $response = $response->withHeader('Content-Type', 'application/json');
+        }
+            
+        try {
+            $response = $response->withBody(to_stream($returned));
+        }
+        catch (InvalidArgumentException $e) {
+        }
+    
+        return $response;
     }
 
     /**
