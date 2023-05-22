@@ -21,7 +21,6 @@ use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
 use GuzzleHttp\Psr7\Stream;
-use GuzzleHttp\Psr7\UploadedFile;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
@@ -170,9 +169,9 @@ class ServerRequest implements ServerRequestInterface
     protected $emulatedAttributes = ['session', 'flash', 'webroot', 'base', 'params', 'here'];
 
     /**
-     * Tableau d'objets Psr\Http\Message\UploadedFileInterface.
+     * Tableau de fichiers.
      *
-     * @var array
+     * @var UploadedFile[]
      */
     protected $uploadedFiles = [];
 
@@ -2018,7 +2017,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param array $value $_FILES struct
      *
-     * @return array|UploadedFileInterface
+     * @return UploadedFile|UploadedFile[]
      */
     protected function _createUploadedFile(array $value)
     {
@@ -2043,7 +2042,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param array $files The file data to normalize & convert.
      *
-     * @return array An array of UploadedFileInterface objects.
+     * @return UploadedFile[]
      */
     protected function _normalizeNestedFiles(array $files = []): array
     {

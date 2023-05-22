@@ -21,9 +21,10 @@ use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
 use BlitzPHP\Event\EventManager;
 use BlitzPHP\Filesystem\FilesystemManager;
-use BlitzPHP\HttpClient\Request;
+use BlitzPHP\HttpClient\Request as ClientRequest;
 use BlitzPHP\Http\Negotiator;
 use BlitzPHP\HTTP\Redirection;
+use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
@@ -144,13 +145,13 @@ class Services
      * Le client HTTP fourni une interface simple pour interagir avec d'autres serveurs.
      * Typiquement a traver des APIs.
      */
-    public static function httpclient(?string $baseUrl = null, bool $shared = true): Request
+    public static function httpclient(?string $baseUrl = null, bool $shared = true): ClientRequest
     {
         if (true === $shared) {
-            return static::singleton(Request::class)->baseUrl((string) $baseUrl);
+            return static::singleton(ClientRequest::class)->baseUrl((string) $baseUrl);
         }
 
-        return static::factory(Request::class, [static::event()])->baseUrl((string) $baseUrl);
+        return static::factory(ClientRequest::class, [static::event()])->baseUrl((string) $baseUrl);
     }
 
     /**
@@ -223,13 +224,13 @@ class Services
     /**
      * La classe Resquest modélise une reqûete HTTP.
      */
-    public static function request(bool $shared = true): ServerRequest
+    public static function request(bool $shared = true): Request
     {
         if (true === $shared) {
-            return self::singleton(ServerRequest::class);
+            return self::singleton(Request::class);
         }
 
-        return self::factory(ServerRequest::class);
+        return self::factory(Request::class);
     }
 
     /**
