@@ -29,13 +29,13 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
-use BlitzPHP\Output\Language;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
 use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
 use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
 use BlitzPHP\Session\Handlers\Database\Postgre as PostgreSessionHandler;
 use BlitzPHP\Session\Session;
+use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\View\View;
@@ -157,13 +157,25 @@ class Services
     /**
      * Responsable du chargement des traductions des chaînes de langue.
      */
-    public static function language(?string $locale = null, bool $shared = true): Language
+    public static function language(?string $locale = null, bool $shared = true): Translate
     {
-        if (true === $shared) {
-            return self::singleton(Language::class)->setLocale($locale);
+        if (empty($locale)) {
+            if (empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
+                $config = Config::get('app');
+
+                if (empty($locale = static::negotiator()->language($config['supported_locales']))) {
+                    $locale = $config['language'];
+                }
+
+                static::$instances[Translate::class . 'locale'] = $locale;
+            }
         }
 
-        return self::factory(Language::class)->setLocale($locale);
+        if (true === $shared && isset(static::$instances[Translate::class])) {
+            return static::$instances[Translate::class]->setLocale($locale);
+        }
+
+        return static::$instances[Translate::class] = static::factory(Translate::class, [$locale]);
     }
 
     /**

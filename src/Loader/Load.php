@@ -105,20 +105,6 @@ class Load
     }
 
     /**
-     * Charge un fichier de gestion de langue
-     */
-    public static function lang(string $file, ?string $locale = null): array
-    {
-        $locale ??= config('app.language');
-
-        if (! self::isLoaded('langs', $file . $locale)) {
-            self::loaded('langs', $file . $locale, FileLocator::lang($file, $locale));
-        }
-
-        return self::getLoaded('langs', $file . $locale);
-    }
-
-    /**
      * Verifie si un element est chargé dans la liste des modules
      *
      * @param mixed $element

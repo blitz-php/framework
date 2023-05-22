@@ -724,13 +724,8 @@ if (! function_exists('lang')) {
     /**
      * Une méthode pratique pour traduire une chaîne ou un tableau d'entrées et formater
      * le résultat avec le MessageFormatter de l'extension intl.
-     *
-     * @param array  $args
-     * @param string $locale
-     *
-     * @return string
      */
-    function lang(string $line, ?array $args = [], ?string $locale = null)
+    function lang(string $line, array $args = [], ?string $locale = null): string
     {
         return Services::language($locale)->getLine($line, $args);
     }
