@@ -42,6 +42,13 @@ trait GeneratorTrait
     protected $template;
 
     /**
+     * Chemin dans du dossier dans lequelle les vues de generation sont cherchees
+     *
+     * @var string
+     */
+    protected $templatePath = SYST_PATH . 'Cli/Commands/Generators/Views';
+
+    /**
      * Clé de chaîne de langue pour les noms de classe requis.
      *
      * @var string
@@ -231,7 +238,7 @@ trait GeneratorTrait
      */
     protected function renderTemplate(array $data = []): string
     {
-        $viewer = new NativeAdapter([], SYST_PATH . 'Cli/Commands/Generators/Views', false);
+        $viewer = new NativeAdapter([], $this->templatePath, false);
 
         return $viewer->setData($data)->render($this->template);
     }
