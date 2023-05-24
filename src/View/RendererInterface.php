@@ -20,8 +20,10 @@ interface RendererInterface
 {
     /**
      * Constructeur
+     * 
+     * @param string|\BlitzPHP\Autoloader\Locator|null $viewPathLocator
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null);
+    public function __construct(array $config, $viewPathLocator = null, bool $debug = BLITZ_DEBUG);
 
     /**
      * Définit plusieurs éléments de données de vue à la fois.

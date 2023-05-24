@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\View\Adapters;
 
-use BlitzPHP\Exceptions\ViewException;
 use RuntimeException;
 
 /**
@@ -81,11 +80,11 @@ class NativeAdapter extends AbstractAdapter
     protected $_lib_scripts = [];
 
     /**
-     * Constructor.
+     * {@inheritDoc}
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
+    public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
     {
-        parent::__construct($config, $viewPath, $debug);
+        parent::__construct($config, $viewPathLocator, $debug);
 
         $this->saveData = (bool) ($config['save_data'] ?? true);
     }
@@ -123,11 +122,7 @@ class NativeAdapter extends AbstractAdapter
             }
         }
 
-        $this->renderVars['file'] = str_replace('/', DS, rtrim($options['viewPath'] ?? $this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
-
-        if (! is_file($this->renderVars['file'])) {
-            throw ViewException::invalidFile($this->renderVars['view']);
-        }
+        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], 'php');
 
         // Rendre nos données de vue disponibles pour la vue.
         $this->prepareTemplateData($saveData);

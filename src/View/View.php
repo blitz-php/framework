@@ -12,6 +12,7 @@
 namespace BlitzPHP\View;
 
 use BlitzPHP\Exceptions\ConfigException;
+use BlitzPHP\Loader\Services;
 use BlitzPHP\View\Adapters\BladeAdapter;
 use BlitzPHP\View\Adapters\LatteAdapter;
 use BlitzPHP\View\Adapters\NativeAdapter;
@@ -202,7 +203,7 @@ class View
 
         $this->adapter = new self::$validAdapters[$adapter](
             $config,
-            $this->config['view_base'] ?? VIEW_PATH,
+            $this->config['view_base'] ?? Services::locator(),
             $debug
         );
 

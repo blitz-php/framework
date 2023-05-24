@@ -11,6 +11,9 @@
 
 namespace BlitzPHP\View\Adapters;
 
+use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Exceptions\ViewException;
+use BlitzPHP\Loader\Services;
 use BlitzPHP\View\RendererInterface;
 
 abstract class AbstractAdapter implements RendererInterface
@@ -34,14 +37,12 @@ abstract class AbstractAdapter implements RendererInterface
      *
      * @var string
      */
-    protected $viewPath;
+    protected $viewPath = '';
 
     /**
-     * Configuration actuelle de l'adapter
-     *
-     * @var array
+     * Instance de Locator lorsque nous devons tenter de trouver une vue qui n'est pas à l'emplacement standard.
      */
-    protected $config;
+    protected ?Locator $locator = null;
 
     /**
      * Le nom de la mise en page utilisée, le cas échéant.
@@ -59,21 +60,26 @@ abstract class AbstractAdapter implements RendererInterface
     protected $performanceData = [];
 
     /**
-     * Devrions-nous stocker des informations sur les performances ?
-     *
-     * @var bool
-     */
-    protected $debug = false;
-
-    /**
      * {@inheritDoc}
+     * 
+     * @param array $config Configuration actuelle de l'adapter
+     * @param bool $debug Devrions-nous stocker des informations sur les performances ?
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
+    public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
     {
-        $this->config   = $config;
-        $this->debug    = $debug ?? BLITZ_DEBUG;
-        $this->viewPath = rtrim($viewPath, '\\/ ') . DS;
         helper('assets');
+        
+        if (! empty($viewPathLocator)) {
+            if (is_string($viewPathLocator)) {
+                $this->viewPath = rtrim($viewPathLocator, '\\/ ') . DS;
+            }
+            else if ($viewPathLocator instanceof Locator) {
+                $this->locator = $viewPathLocator;
+            }
+        }
+        else {
+            $this->locator = Services::locator();
+        }
     }
 
     /**
@@ -206,6 +212,27 @@ abstract class AbstractAdapter implements RendererInterface
         $meta[$key] = esc($value);
 
         return $this->setVar('meta', $meta);
+    }
+
+    /**
+     * Recupere le chemin absolue du fichier de vue a rendre
+     */
+    protected function getRenderedFile(?array $options, string $view, string $ext = 'php'): string
+    {
+        $options = (array) $options;
+        
+        $file = str_replace('/', DS, rtrim($options['viewPath'] ?? $this->viewPath, '/\\') . DS . ltrim($view, '/\\'));
+
+        if (! is_file($file) && $this->locator instanceof Locator) {
+            $file = $this->locator->locateFile($view, 'Views', empty($ext) ? 'php' : $ext);
+        }
+
+        // locateFile renverra une chaîne vide si le fichier est introuvable.
+        if (! is_file($file)) {
+            throw ViewException::invalidFile($view);
+        }
+
+        return $file;
     }
 
     /**

@@ -25,9 +25,9 @@ class SmartyAdapter extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $config, string $viewPath = VIEW_PATH, ?bool $debug = null)
+    public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
     {
-        parent::__construct($config, $viewPath, $debug);
+        parent::__construct($config, $viewPathLocator, $debug);
 
         $this->engine = new Smarty();
 
@@ -57,7 +57,8 @@ class SmartyAdapter extends AbstractAdapter
         $this->renderVars['start']   = microtime(true);
         $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
-        $this->renderVars['file']    = str_replace('/', DS, rtrim($this->viewPath, '/\\') . DS . ltrim($this->renderVars['view'], '/\\'));
+
+        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], 'tpl');
 
         $layout = $this->layout;
         if (! empty($layout)) {
