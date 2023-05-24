@@ -12,7 +12,7 @@
 namespace BlitzPHP\Cli\Commands\Generators;
 
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Cli\Console\GeneratorTrait;
+use BlitzPHP\Cli\Traits\GeneratorTrait;
 
 /**
  * Génère un fichier squelette de seeder.

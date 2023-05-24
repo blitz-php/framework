@@ -12,7 +12,7 @@
 namespace BlitzPHP\Cli\Commands\Generators;
 
 use BlitzPHP\Cli\Console\Command as ConsoleCommand;
-use BlitzPHP\Cli\Console\GeneratorTrait;
+use BlitzPHP\Cli\Traits\GeneratorTrait;
 
 /**
  * Generates a skeleton command file.
