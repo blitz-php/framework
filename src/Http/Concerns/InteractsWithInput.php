@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Http\Concerns;
 
-use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\UploadedFile;
 use BlitzPHP\Utilities\Date;
 use BlitzPHP\Utilities\Iterable\Arr;
@@ -26,7 +25,7 @@ use stdClass;
 /**
  * @credit <a href="http://laravel.com/">Laravel - Illuminate\Http\Concerns\InteractsWithInput</a>
  */
-class InteractsWithInput extends ServerRequest
+trait InteractsWithInput
 {
     /**
      * Récupérez une variable de serveur à partir de la requête.

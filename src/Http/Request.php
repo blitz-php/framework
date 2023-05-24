@@ -15,7 +15,6 @@ use ArrayAccess;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Contracts\Session\SessionInterface;
 use BlitzPHP\Contracts\Support\Arrayable;
-use BlitzPHP\Traits\Macroable;
 use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\Validation\Validator;
@@ -25,8 +24,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
 {
     use Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithInput,
-        Concerns\InteractsWithFlashData,
-        Macroable;
+        Concerns\InteractsWithFlashData;
 
     /**
      * Validation des donnees de la requete

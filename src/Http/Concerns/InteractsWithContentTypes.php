@@ -45,38 +45,6 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Détermine si les requêtes en cours acceptent un type de contenu donné.
-     */
-    public function accepts(string|array $contentTypes): bool
-    {
-        $accepts = $this->getAcceptableContentTypes();
-
-        if (count($accepts) === 0) {
-            return true;
-        }
-
-        $types = (array) $contentTypes;
-
-        foreach ($accepts as $accept) {
-            if ($accept === '*/*' || $accept === '*') {
-                return true;
-            }
-
-            foreach ($types as $type) {
-                $accept = strtolower($accept);
-
-                $type = strtolower($type);
-
-                if ($this->matchesType($accept, $type) || $accept === strtok($type, '/').'/*') {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Renvoie le type de contenu le plus approprié à partir du tableau donné en fonction de la négociation de contenu.
      */
     public function prefers(string|array $contentTypes): ?string
