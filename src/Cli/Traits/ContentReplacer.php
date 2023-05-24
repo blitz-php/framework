@@ -16,24 +16,40 @@ trait ContentReplacer
     /**
      * Chemin source
      */
-    protected string $sourcePath = '';
+    protected string $sourcePath = __DIR__ .'/../';
 
     /**
      * Chemin cible pour le replacement
      */
     protected string $distPath = APP_PATH;
     
+
+
+    /**
+     * Recupere le chemin source complet d'un fichier
+     */
+    protected function sourcePath(string $file): string
+    {
+        return str_replace('/', DS, rtrim($this->sourcePath, '/\\') . DS . $file);
+    }
+
+    /**
+     * Recupere le chemin de destination complet d'un fichier
+     */
+    protected function distPath(string $file): string
+    {
+        return str_replace('/', DS, rtrim($this->distPath, '/\\') . DS . $file);
+    }
+
     /**
      * @param string $file     Chemin de fichier relatif comme 'config/auth.php'.
      * @param array  $replaces [search => replace]
      */
     protected function copyAndReplace(string $file, array $replaces): void
     {
-        $path = rtrim($this->sourcePath, '/\\') . DS . $file;
-
-        $content = file_get_contents($path);
-
-        $content = $this->replace($content, $replaces);
+        $content = file_get_contents($this->sourcePath($file));
+        
+        $content = strtr($content, $replaces);
 
         $this->writeFile($file, $content);
     }
@@ -47,7 +63,7 @@ trait ContentReplacer
     {
         helper('filesystem');
 
-        $path      = rtrim($this->distPath, '/\\') . DS . $file;
+        $path      = $this->distPath($file);
         $cleanPath = clean_path($path);
 
         $directory = dirname($path);
@@ -67,10 +83,9 @@ trait ContentReplacer
         }
 
         if (write_file($path, $content)) {
-            $this->writer->boldWhiteBgGreen(' Created: ');
-            $this->write(' ' . $cleanPath, true);
+            $this->success($cleanPath, true, 'Created:');
         } else {
-            $this->error("  Error creating {$cleanPath}.");
+            $this->error("Error creating {$cleanPath}.");
         }
     }
 
@@ -81,7 +96,9 @@ trait ContentReplacer
      */
     protected function replace(string $file, array $replaces): bool
     {
-        $path      = $this->distPath . $file;
+        helper('filesystem');
+
+        $path      = $this->distPath($file);
         $cleanPath = clean_path($path);
 
         $content = file_get_contents($path);
@@ -93,8 +110,7 @@ trait ContentReplacer
         }
 
         if (write_file($path, $output)) {
-            $this->writer->boldWhiteBgGreen(' Updated: ');
-            $this->write(' ' . $cleanPath, true);
+            $this->success($cleanPath, true, 'Updated:');
 
             return true;
         }
@@ -111,7 +127,8 @@ trait ContentReplacer
     protected function addContent(string $file, string $code, string $pattern, string $replace): void
     {
         helper('filesystem');
-        $path      = $this->distPath . $file;
+
+        $path      = $this->distPath($file);
         $cleanPath = clean_path($path);
 
         $content = file_get_contents($path);
@@ -130,8 +147,7 @@ trait ContentReplacer
         }
 
         if (write_file($path, $output)) {
-            $this->writer->boldWhiteBgGreen(' Updated: ');
-            $this->write(' ' . $cleanPath, true);
+            $this->success($cleanPath, true, 'Updated:');
         } else {
             $this->error("Erreur lors de la mise à jour de {$cleanPath}.");
         }

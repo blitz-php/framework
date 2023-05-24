@@ -304,12 +304,12 @@ abstract class Command
     /**
      * Ecrit un message de succes
      */
-    final protected function success(string $message, bool $badge = true): self
+    final protected function success(string $message, bool $badge = true, string $label = 'SUCCESS'): self
     {
         if (! $badge) {
-            $this->writer->okBold('SUCCESS');
+            $this->writer->okBold($label);
         } else {
-            $this->writer->boldWhiteBgGreen(' SUCCESS ');
+            $this->writer->boldWhiteBgGreen(" {$label} ");
         }
 
         return $this->write(' ' . $message, true);
@@ -318,12 +318,12 @@ abstract class Command
     /**
      * Ecrit un message d'avertissement
      */
-    final protected function warning(string $message, bool $badge = true): self
+    final protected function warning(string $message, bool $badge = true, string $label = 'WARNING'): self
     {
         if (! $badge) {
-            $this->writer->warnBold('WARNING');
+            $this->writer->warnBold($label);
         } else {
-            $this->writer->boldWhiteBgYellow(' WARNING ');
+            $this->writer->boldWhiteBgYellow(" {$label} ");
         }
 
         return $this->write(' ' . $message, true);
@@ -332,12 +332,12 @@ abstract class Command
     /**
      * Ecrit un message d'information
      */
-    final protected function info(string $message, bool $badge = true): self
+    final protected function info(string $message, bool $badge = true, string $label = 'INFO'): self
     {
         if (! $badge) {
-            $this->writer->infoBold('INFO');
+            $this->writer->infoBold($label);
         } else {
-            $this->writer->boldWhiteBgCyan(' INFO ');
+            $this->writer->boldWhiteBgCyan(" {$label} ");
         }
 
         return $this->write(' ' . $message, true);
@@ -346,12 +346,12 @@ abstract class Command
     /**
      * Ecrit un message d'erreur
      */
-    final protected function error(string $message, bool $badge = true): self
+    final protected function error(string $message, bool $badge = true, string $label = 'ERROR'): self
     {
         if (! $badge) {
-            $this->writer->errorBold('ERROR');
+            $this->writer->errorBold($label);
         } else {
-            $this->writer->boldWhiteBgRed(' ERROR ');
+            $this->writer->boldWhiteBgRed(" {$label} ");
         }
 
         return $this->write(' ' . $message, true);
