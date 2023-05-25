@@ -12,8 +12,8 @@
 namespace BlitzPHP\Controllers;
 
 use BlitzPHP\Exceptions\HttpException;
+use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
-use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Router\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
@@ -50,7 +50,7 @@ abstract class BaseController
     /**
      * Instance de l'objet Request principal.
      *
-     * @var ServerRequest
+     * @var Request
      */
     protected $request;
 
@@ -86,7 +86,7 @@ abstract class BaseController
         $this->response = $response; // @phpstan-ignore-line
         $this->logger   = $logger;
 
-        Services::container()->set(ServerRequest::class, $request);
+        Services::container()->set(Request::class, $request);
         Services::container()->set(Response::class, $response);
 
         if ($this->forceHTTPS > 0) {

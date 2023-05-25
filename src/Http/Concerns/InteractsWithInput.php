@@ -282,7 +282,7 @@ trait InteractsWithInput
      */
     public function string(string $key, mixed $default = null): Stringable
     {
-        return Text::of($this->input($key, $default));
+        return Text::of($this->data($key, $default));
     }
 
     /**
@@ -292,7 +292,7 @@ trait InteractsWithInput
      */
     public function boolean(?string $key = null, bool $default = false): bool
     {
-        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->data($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -300,7 +300,7 @@ trait InteractsWithInput
      */
     public function integer(string $key, int $default = 0): int
     {
-        return intval($this->input($key, $default));
+        return intval($this->data($key, $default));
     }
 
     /**
@@ -308,7 +308,7 @@ trait InteractsWithInput
      */
     public function float(string $key, float $default = 0.0): float
     {
-        return floatval($this->input($key, $default));
+        return floatval($this->data($key, $default));
     }
 
     /**
@@ -321,7 +321,7 @@ trait InteractsWithInput
         }
 
         if (is_null($format)) {
-            return Date::parse($this->input($key), $tz);
+            return Date::parse($this->data($key), $tz);
         }
 
         return Date::createFromFormat($format, $this->input($key), $tz);
@@ -344,7 +344,7 @@ trait InteractsWithInput
             return null;
         }
 
-        return $enumClass::tryFrom($this->input($key));
+        return $enumClass::tryFrom($this->data($key));
     }
 
     /**

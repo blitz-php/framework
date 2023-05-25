@@ -15,6 +15,7 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\LoadException;
+use BlitzPHP\Http\Concerns\ResponseTrait;
 use BlitzPHP\Session\Cookie\CookieCollection;
 use DateTime;
 use DateTimeInterface;
@@ -41,6 +42,7 @@ use SplFileInfo;
 class Response implements ResponseInterface
 {
     use MessageTrait;
+    use ResponseTrait;
 
     /**
      * @var int
