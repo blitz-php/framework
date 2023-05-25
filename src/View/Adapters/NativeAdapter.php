@@ -270,11 +270,16 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Commence contient le contenu d'une section dans la mise en page.
      */
-    public function start(string $name)
+    public function start(string $name, ?string $content = null)
     {
-        $this->sectionStack[] = $name;
+        if (empty($content)) {
+            $this->sectionStack[] = $name;
 
-        ob_start();
+            ob_start();
+        }
+        else {
+            $this->sections[$name] = [$content];
+        }
     }
 
     /**
@@ -282,9 +287,9 @@ class NativeAdapter extends AbstractAdapter
      *
      * @alias self::start()
      */
-    public function section(string $name): void
+    public function section(string $name, ?string $content = null): void
     {
-        $this->start($name);
+        $this->start($name, $content);
     }
 
     /**
@@ -292,9 +297,9 @@ class NativeAdapter extends AbstractAdapter
      *
      * @alias self::start()
      */
-    public function begin(string $name): void
+    public function begin(string $name, ?string $content = null): void
     {
-        $this->start($name);
+        $this->start($name, $content);
     }
 
     /**
