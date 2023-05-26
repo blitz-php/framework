@@ -78,11 +78,11 @@ class Redirection extends Response
     public function withInput(): self
     {
         $session = Services::session();
-
-        /*  $session->setFlashdata('_ci_old_input', [
+        
+        $session->setFlashdata('_blitz_old_input', [
              'get'  => $_GET ?? [],
              'post' => $_POST ?? [],
-         ]); */
+         ]);
 
         // Si la validation contient des erreurs, retransmettez-les
         // afin qu'ils puissent être affichés lors de la validation
@@ -104,7 +104,7 @@ class Redirection extends Response
      */
     public function with(string $key, $message): self
     {
-        // Services::session()->setFlashdata($key, $message);
+        Services::session()->setFlashdata($key, $message);
 
         return $this;
     }
