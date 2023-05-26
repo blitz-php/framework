@@ -17,6 +17,7 @@ use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Load;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\Session\Session;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
 use Kint\Kint;
@@ -546,6 +547,29 @@ if (! function_exists('cache')) {
         }
 
         return $cache->set($key, $value);
+    }
+}
+
+if (! function_exists('session')) {
+    /**
+     * Une méthode pratique pour accéder à l'instance de session, ou un élément qui a été défini dans la session.
+     *
+     * Exemples:
+     *    session()->set('foo', 'bar');
+     *    $foo = session('bar');
+     *
+     * @return array|bool|float|int|object|Session|string|null
+     */
+    function session(?string $val = null)
+    {
+        $session = Services::session();
+
+        // Vous retournez un seul element ?
+        if (is_string($val)) {
+            return $session->get($val);
+        }
+
+        return $session;
     }
 }
 
