@@ -203,7 +203,7 @@ class View
 
         $this->adapter = new self::$validAdapters[$adapter](
             $config,
-            $this->config['view_base'] ?? Services::locator(),
+            Services::locator(),
             $debug
         );
 

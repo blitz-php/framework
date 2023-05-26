@@ -14,6 +14,7 @@ namespace BlitzPHP\View\Adapters;
 use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\RendererInterface;
 
 abstract class AbstractAdapter implements RendererInterface
@@ -220,9 +221,17 @@ abstract class AbstractAdapter implements RendererInterface
     protected function getRenderedFile(?array $options, string $view, string $ext = 'php'): string
     {
         $options = (array) $options;
+    
+        $viewPath = $options['viewPath'] ?? $this->viewPath;
+        if (! empty($viewPath)) {
+            $file = str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($view, '/\\'));
+        }
+        else {
+            $file = $view;
+        }
         
-        $file = str_replace('/', DS, rtrim($options['viewPath'] ?? $this->viewPath, '/\\') . DS . ltrim($view, '/\\'));
-
+        $file = Helpers::ensureExt($file, $ext);
+        
         if (! is_file($file) && $this->locator instanceof Locator) {
             $file = $this->locator->locateFile($view, 'Views', empty($ext) ? 'php' : $ext);
         }
