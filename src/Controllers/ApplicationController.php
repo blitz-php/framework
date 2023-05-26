@@ -38,11 +38,16 @@ class ApplicationController extends BaseController
      *
      * @throws ReflectionException
      */
-    final protected function view(string $view, ?array $data = [], ?array $options = []): View
+    protected function view(string $view, ?array $data = [], ?array $options = []): View
     {
-        $reflection = new ReflectionClass(static::class);
-        $path       = str_replace([CONTROLLER_PATH, 'Controller', '.php'], '', $reflection->getFileName());
-        $path       = trim(strtolower($path), '/\\');
+        $path = '';
+
+        // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
+        if (strpos($view, '\\') === false) {
+            $reflection = new ReflectionClass(static::class);
+            $path       = str_replace([CONTROLLER_PATH, 'Controller', '.php'], '', $reflection->getFileName());
+            $path       = strtolower($path) . '/';
+        }
 
         $object = Services::viewer();
 
@@ -56,7 +61,7 @@ class ApplicationController extends BaseController
             $object->addData($this->viewDatas);
         }
 
-        return $object->display($path . '/' . $view)->setVar('title', str_ireplace('Controller', '', Dispatcher::getController(false)) . ' - ' . Dispatcher::getMethod());
+        return $object->display($path . $view)->setVar('title', str_ireplace('Controller', '', Dispatcher::getController(false)) . ' - ' . Dispatcher::getMethod());
     }
 
     /**
