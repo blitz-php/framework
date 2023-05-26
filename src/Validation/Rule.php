@@ -2,6 +2,7 @@
 
 namespace BlitzPHP\Validation;
 
+use BlitzPHP\Utilities\String\Text;
 use Dimtrovich\Validation\Rule as DimtrovichRule;
 
 
@@ -12,5 +13,10 @@ use Dimtrovich\Validation\Rule as DimtrovichRule;
  */
 abstract class Rule extends DimtrovichRule
 {
+    public static function __callStatic(string $name, array $arguments = [])
+    {
+        $name = Text::snake($name);
 
+        return Validator::rule($name, ...$arguments);
+    }
 }
