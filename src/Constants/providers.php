@@ -10,6 +10,7 @@
  */
 
 return [
+    BlitzPHP\Contracts\Database\ConnectionInterface::class => BlitzPHP\Config\Database::connect(),
     BlitzPHP\Contracts\Event\EventManagerInterface::class     => service('event'),
     BlitzPHP\Contracts\Router\RouteCollectionInterface::class => service('routes'),
     Psr\Container\ContainerInterface::class                   => service('container'),

@@ -116,7 +116,7 @@ class FileLocator
             throw LoadException::modelNotFound($model);
         }
 
-        return Injector::make($model, [$connection]);
+        return Injector::make($model, ['db' => $connection]);
     }
 
     /**
