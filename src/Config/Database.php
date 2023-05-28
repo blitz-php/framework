@@ -52,14 +52,13 @@ class Database
 
         if (empty($group)) {
             $group = $config['connection'] ?? 'auto';
+        }
+        if ($group === 'auto') {
+            $group = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
+        }
 
-            if ($group === 'auto') {
-                $group = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
-            }
-
-            if (! isset($config[$group])) {
-                $group = 'default';
-            }
+        if (! isset($config[$group])) {
+            $group = 'default';
         }
 
         if (is_string($group) && ! isset($config[$group]) && strpos($group, 'custom-') !== 0) {
