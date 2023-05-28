@@ -90,14 +90,14 @@ class Services
      */
     public static function autoloader(bool $shared = true): Autoloader
     {
+        if (true === $shared && isset(static::$instances[Autoloader::class])) {
+            return static::$instances[Autoloader::class];
+        }
+        
         $config  = Config::get('autoload');
         $helpers = array_merge(['url'], ($config['helpers'] ?? []));
 
-        if (true === $shared) {
-            return self::singleton(Autoloader::class)->setConfig($config)->setHelpers($helpers);
-        }
-
-        return self::factory(Autoloader::class, [$config, $helpers]);
+        return static::$instances[Autoloader::class] = static::factory(Autoloader::class, compact('config', 'helpers'));
     }
 
     /**
@@ -110,11 +110,15 @@ class Services
             $config = Config::get('cache');
         }
 
-        if (true === $shared) {
-            return self::singleton(Cache::class)->setConfig($config);
+        if (true === $shared && isset(static::$instances[Cache::class])) {
+            $instance = static::$instances[Cache::class];
+            if (null === func_get_arg(0)) {
+                return $instance;
+            }
+            return $instance->setConfig($config);
         }
 
-        return self::factory(Cache::class, [$config]);
+        return static::$instances[Cache::class] = static::factory(Cache::class, compact('config'));
     }
 
     /**
@@ -122,11 +126,11 @@ class Services
      */
     public static function emitter(bool $shared = true): ResponseEmitter
     {
-        if (true === $shared) {
-            return self::singleton(ResponseEmitter::class);
+        if (true === $shared && isset(static::$instances[ResponseEmitter::class])) {
+            return static::$instances[ResponseEmitter::class];
         }
 
-        return self::factory(ResponseEmitter::class);
+        return static::$instances[ResponseEmitter::class] = static::factory(ResponseEmitter::class);
     }
 
     /**
@@ -134,11 +138,11 @@ class Services
      */
     public static function event(bool $shared = true): EventManager
     {
-        if (true === $shared) {
-            return self::singleton(EventManager::class);
+        if (true === $shared && isset(static::$instances[EventManager::class])) {
+            return static::$instances[EventManager::class];
         }
 
-        return self::factory(EventManager::class);
+        return static::$instances[EventManager::class] = static::factory(EventManager::class);
     }
 
     /**
@@ -147,11 +151,11 @@ class Services
      */
     public static function httpclient(?string $baseUrl = null, bool $shared = true): ClientRequest
     {
-        if (true === $shared) {
-            return static::singleton(ClientRequest::class)->baseUrl((string) $baseUrl);
+        if (true === $shared && isset(static::$instances[ClientRequest::class])) {
+            return static::$instances[ClientRequest::class]->baseUrl((string) $baseUrl);
         }
 
-        return static::factory(ClientRequest::class, [static::event()])->baseUrl((string) $baseUrl);
+        return static::$instances[ClientRequest::class] = static::factory(ClientRequest::class, ['event' => static::event()])->baseUrl((string) $baseUrl);
     }
 
     /**
@@ -175,7 +179,7 @@ class Services
             return static::$instances[Translate::class]->setLocale($locale);
         }
 
-        return static::$instances[Translate::class] = static::factory(Translate::class, [$locale]);
+        return static::$instances[Translate::class] = static::factory(Translate::class, compact('locale'));
     }
 
     /**
@@ -184,12 +188,11 @@ class Services
      */
     public static function locator(bool $shared = true): Locator
     {
-        $autoloader = static::autoloader();
-        if ($shared) {
-            return self::singleton(Locator::class)->setAutoloader($autoloader);
+        if ($shared && isset(static::$instances[Locator::class])) {
+            return static::$instances[Locator::class];
         }
-
-        return self::factory(Locator::class, [$autoloader]);
+        
+        return static::$instances[Locator::class] = static::factory(Locator::class, ['autoloader' => static::autoloader()]);
     }
 
     /**
@@ -198,11 +201,11 @@ class Services
      */
     public static function logger(bool $shared = true): Logger
     {
-        if ($shared) {
-            return self::singleton(Logger::class);
+        if ($shared && isset(static::$instances[Logger::class])) {
+            return static::$instances[Logger::class];
         }
 
-        return self::factory(Logger::class);
+        return static::$instances[Logger::class] = static::factory(Logger::class);
     }
 
     /**
@@ -214,11 +217,16 @@ class Services
             $request = static::request(true);
         }
 
-        if (true === $shared) {
-            return self::singleton(Negotiator::class)->setRequest($request);
+        if (true === $shared && isset(static::$instances[Negotiator::class])) {
+            $instance = static::$instances[Negotiator::class];
+            if (null === func_get_arg(0)) {
+                return $instance;
+            }
+
+            return $instance->setRequest($request);
         }
 
-        return self::factory(Negotiator::class, [$request]);
+        return static::$instances[Negotiator::class] = static::factory(Negotiator::class, compact('request'));
     }
 
     /**
@@ -226,11 +234,11 @@ class Services
      */
     public static function redirection(bool $shared = true): Redirection
     {
-        if (true === $shared) {
-            return self::singleton(Redirection::class);
+        if (true === $shared && isset(static::$instances[Redirection::class])) {
+            return static::$instances[Redirection::class];
         }
 
-        return self::factory(Redirection::class);
+        return static::$instances[Redirection::class] = static::factory(Redirection::class);
     }
 
     /**
@@ -238,11 +246,11 @@ class Services
      */
     public static function request(bool $shared = true): Request
     {
-        if (true === $shared) {
-            return self::singleton(Request::class);
+        if (true === $shared && isset(static::$instances[Request::class])) {
+            return static::$instances[Request::class];
         }
 
-        return self::factory(Request::class);
+        return static::$instances[Request::class] = static::factory(Request::class);
     }
 
     /**
@@ -250,11 +258,11 @@ class Services
      */
     public static function response(bool $shared = true): Response
     {
-        if (true === $shared) {
-            return self::singleton(Response::class);
+        if (true === $shared && isset(static::$instances[Response::class])) {
+            return static::$instances[Response::class];
         }
 
-        return self::factory(Response::class);
+        return static::$instances[Response::class] = static::factory(Response::class);
     }
 
     /**
@@ -263,11 +271,11 @@ class Services
      */
     public static function routes(bool $shared = true): RouteCollection
     {
-        if (true === $shared) {
-            return self::singleton(RouteCollection::class);
+        if (true === $shared && isset(static::$instances[RouteCollection::class])) {
+            return static::$instances[RouteCollection::class];
         }
 
-        return self::factory(RouteCollection::class);
+        return static::$instances[RouteCollection::class] = static::factory(RouteCollection::class);
     }
 
     /**
@@ -277,7 +285,7 @@ class Services
     public static function router(?RouteCollection $routes = null, ?ServerRequest $request = null, bool $shared = true): Router
     {
         if (true === $shared) {
-            return self::singleton(Router::class);
+            return static::singleton(Router::class);
         }
         if (empty($routes)) {
             $routes = static::routes(true);
@@ -286,16 +294,16 @@ class Services
             $request = static::request(true);
         }
 
-        return self::factory(Router::class)->init($routes, $request);
+        return static::factory(Router::class)->init($routes, $request);
     }
 
     /**
-     * Return the session manager.
+     * Retourne le gestionnaire de session.
      */
     public static function session(bool $shared = true): Session
     {
         if (true === $shared) {
-            return self::singleton(Session::class);
+            return static::singleton(Session::class);
         }
 
         $config = Config::get('session');
@@ -334,9 +342,7 @@ class Services
             return static::$instances[FilesystemManager::class];
         }        
 
-        $config = Config::get('filesystems');
-
-        return static::$instances[FilesystemManager::class] = new FilesystemManager($config);
+        return static::$instances[FilesystemManager::class] = static::factory(FilesystemManager::class, ['config' => Config::get('filesystems')]);
     }
 
 
@@ -345,11 +351,11 @@ class Services
      */
     public static function timer(bool $shared = true): Timer
     {
-        if (true === $shared) {
-            return self::singleton(Timer::class);
+        if (true === $shared && isset(static::$instances[Timer::class])) {
+            return static::$instances[Timer::class];
         }
 
-        return self::factory(Timer::class);
+        return static::$instances[Timer::class] = static::factory(Timer::class);
     }
 
     /**
@@ -357,13 +363,13 @@ class Services
      */
     public static function toolbar(?stdClass $config = null, bool $shared = true): Toolbar
     {
-        if ($shared) {
-            return self::singleton(Toolbar::class);
+        if ($shared && isset(static::$instances[Toolbar::class])) {
+            return static::$instances[Toolbar::class];
         }
 
         $config ??= (object) config('toolbar');
 
-        return self::factory(Toolbar::class, [$config]);
+        return static::$instances[Toolbar::class] = static::factory(Toolbar::class, compact('config'));
     }
 
     /**
@@ -371,11 +377,11 @@ class Services
      */
     public static function uri(?string $uri = null, bool $shared = true): Uri
     {
-        if (true === $shared) {
-            return self::singleton(Uri::class)->setURI($uri);
+        if (true === $shared && isset(static::$instances[Uri::class])) {
+            return static::$instances[Uri::class]->setURI($uri);
         }
 
-        return self::factory(Uri::class, [$uri]);
+        return static::$instances[Uri::class] = static::factory(Uri::class, compact('uri'));
     }
 
     /**
@@ -385,11 +391,11 @@ class Services
      */
     public static function viewer(bool $shared = true): View
     {
-        if (true === $shared) {
-            return self::singleton(View::class);
+        if (true === $shared && isset(static::$instances[View::class])) {
+            return static::$instances[View::class];
         }
 
-        return self::factory(View::class);
+        return static::$instances[View::class] = static::factory(View::class);
     }
 
     /**
@@ -399,11 +405,11 @@ class Services
      */
     public static function __callStatic(string $name, array $arguments)
     {
-        if (method_exists(self::class, $name)) {
-            return self::$name(...$arguments);
+        if (method_exists(static::class, $name)) {
+            return static::$name(...$arguments);
         }
 
-        return self::discoverServices($name, $arguments);
+        return static::discoverServices($name, $arguments);
     }
 
     /**
@@ -415,10 +421,10 @@ class Services
     {
         $shared = array_pop($arguments);
         if ($shared !== true) {
-            return self::discoverServiceFactory($name, $arguments);
+            return static::discoverServiceFactory($name, $arguments);
         }
 
-        return self::discoverServiceSingleton($name, ...$arguments);
+        return static::discoverServiceSingleton($name, ...$arguments);
     }
 
     /**
@@ -429,10 +435,10 @@ class Services
     private static function discoverServiceFactory(string $name, array $arguments)
     {
         try {
-            return self::factory($name, $arguments);
+            return static::factory($name, $arguments);
         } catch (NotFoundException $e) {
             try {
-                return self::factory($name . 'Service', $arguments);
+                return static::factory($name . 'Service', $arguments);
             } catch (NotFoundException $ex) {
                 throw $e;
             }
@@ -450,10 +456,10 @@ class Services
         $name      = array_shift($arguments);
 
         try {
-            return self::singleton($name, ...$arguments);
+            return static::singleton($name, ...$arguments);
         } catch (NotFoundException $e) {
             try {
-                return self::singleton($name . 'Service', ...$arguments);
+                return static::singleton($name . 'Service', ...$arguments);
             } catch (NotFoundException $ex) {
                 throw $e;
             }
@@ -472,9 +478,9 @@ class Services
 
         if (empty(static::$instances[$name])) {
             if (! empty($arguments)) {
-                static::$instances[$name] = self::injector()->make($name, $arguments);
+                static::$instances[$name] = static::factory($name, $arguments);
             } else {
-                static::$instances[$name] = self::injector()->get($name);
+                static::$instances[$name] = static::injector()->get($name);
             }
         }
 
@@ -488,6 +494,6 @@ class Services
      */
     public static function factory(string $name, array $arguments = [])
     {
-        return self::injector()->make($name, $arguments);
+        return static::injector()->make($name, $arguments);
     }
 }
