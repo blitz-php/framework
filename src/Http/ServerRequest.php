@@ -1543,6 +1543,17 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
+     * Tentatives d'obtenir de vieilles données d'entrée qui a été flashé à la session avec redirect_with_input(). 
+     * Il vérifie d'abord les données dans les anciennes données POST, puis les anciennes données GET et enfin vérifier les tableaux de points 
+     *
+     * @return array|string|null
+     */
+    public function getOldInput(string $key)
+    {
+        return $this->session()->getOldInput($key);
+    }
+
+    /**
      * Lire un attribut de la requête ou obtenir la valeur par défaut
      *
      * @param string     $name    Le nom de l'attribut.

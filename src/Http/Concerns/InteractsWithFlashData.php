@@ -11,22 +11,30 @@
 
 namespace BlitzPHP\Http\Concerns;
 
+use BlitzPHP\Wolke\Model;
+
 /**
  * @credit <a href="http://laravel.com/">Laravel - Illuminate\Http\Concerns\InteractsWithFlashData</a>
  */
 trait InteractsWithFlashData
 {
     /**
-     * Retrieve an old input item.
+     * Récupérer un ancien élément d'entrée.
      * 
      * @param  Model|string|array|null  $default
      * @return string|array|null
      */
     public function old(?string $key = null, $default = null)
     {
-        $default = $default instanceof Model ? $default->getAttribute($key) : $default;
+        if (class_exists(Model::class) && $default instanceof Model) {
+            $default = $default->getAttribute($key);
+        }
+        
+        if (null !== $value = $this->getOldInput($key)) {
+            return $value;
+        }
 
-        return $this->hasSession() ? $this->session()->getOldInput($key, $default) : $default;
+        return $default;
     }
 
     /**
