@@ -14,6 +14,7 @@ namespace BlitzPHP\Loader;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Utilities\Helpers;
+use BlitzPHP\Utilities\String\Text;
 
 class FileLocator
 {
@@ -95,21 +96,15 @@ class FileLocator
      *
      * @return T
      */
-    public static function model(string $model, array $options = [], ?ConnectionInterface $connection = null)
+    public static function model(string $model, ?ConnectionInterface $connection = null)
     {
-        $options = array_merge([
-            'preferApp' => true,
-        ], $options);
-
-        if (! preg_match('#Model$#', $model)) {
+        if (! class_exists($model) && ! Text::endsWith($model, 'Model')) {
             $model .= 'Model';
         }
-
-        if ($options['preferApp'] === true) {
-            // $model = self::getBasename($model);
-
+        
+        if (! class_exists($model)) {
             $model = str_replace(APP_NAMESPACE . '\\Models\\', '', $model);
-            $model = APP_NAMESPACE . '\\Models\\' . $model;
+            $model = APP_NAMESPACE . '\\Models\\' . $model;        
         }
 
         if (! class_exists($model)) {

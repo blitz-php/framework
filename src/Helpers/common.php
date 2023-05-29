@@ -68,9 +68,9 @@ if (! function_exists('model')) {
      *
      * @return T
      */
-    function model(string|array $name, array $options = [], ?ConnectionInterface &$conn = null)
+    function model(string|array $name, ?ConnectionInterface &$conn = null)
     {
-        return Load::model($name, $options, $conn);
+        return Load::model($name, $conn);
     }
 }
 
@@ -435,6 +435,31 @@ if (! function_exists('clean_path')) {
     }
 }
 
+if (! function_exists('old')) {
+    /**
+     * Fournit l'accès à "entrée ancienne" qui a été définie dans la session lors d'un redirect()-withInput().
+     *
+     * @param false|string $escape
+     * @phpstan-param false|'attr'|'css'|'html'|'js'|'raw'|'url' $escape
+     *
+     * @return array|string|null
+     */
+    function old(string $key, ?string $default = null, $escape = 'html')
+    {
+        // Assurez-vous de charger la session
+        if (session_status() === PHP_SESSION_NONE && !on_test()) {
+            session(); // @codeCoverageIgnore
+        }
+
+        // Retourne la valeur par défaut si rien n'a été trouvé dans l'ancien input.
+        if (null === $value = Services::request()->old($key)) {
+            return $default;
+        }
+
+        return $escape === false ? $value : esc($value, $escape);
+    }
+}
+
 // ================================= FONCTIONS DE DEBOGAGE ================================= //
 
 if (! function_exists('dd')) {
@@ -685,7 +710,7 @@ if (! function_exists('force_https')) {
 
         // Si la bibliothèque de session est chargée, nous devons régénérer
         // l'ID de session pour des raisons de sécurité.
-        Services::session()->renew();
+        Services::session()->regenerate();
 
         $baseURL = base_url();
 

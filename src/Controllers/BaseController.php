@@ -114,9 +114,7 @@ abstract class BaseController
         }
 
         if (empty($this->model) && ! empty($this->modelName) && class_exists($this->modelName)) {
-            $this->model = model($this->modelName, [
-                'preferApp' => false
-            ]);
+            $this->model = model($this->modelName);
         }
 
         if (! empty($this->model) && empty($this->modelName)) {

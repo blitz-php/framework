@@ -81,7 +81,7 @@ class Load
      *
      * @throws LoadException
      */
-    public static function model(string|array $model, array $options = [], ?ConnectionInterface $connection = null)
+    public static function model(string|array $model, ?ConnectionInterface $connection = null)
     {
         if (empty($model)) {
             throw new LoadException('Veuillez specifier le modele à charger');
@@ -91,14 +91,14 @@ class Load
             $models = [];
 
             foreach ($model as $value) {
-                $models[] = self::model($value, $options, $connection);
+                $models[] = self::model($value, $connection);
             }
 
             return $models;
         }
 
         if (! self::isLoaded('models', $model)) {
-            self::loaded('models', $model, FileLocator::model($model, $options, $connection));
+            self::loaded('models', $model, FileLocator::model($model, $connection));
         }
 
         return self::getLoaded('models', $model);
