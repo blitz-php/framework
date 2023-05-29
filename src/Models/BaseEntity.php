@@ -11,9 +11,19 @@
 
 namespace BlitzPHP\Models;
 
+use BlitzPHP\Config\Database;
+use BlitzPHP\Database\Connection\BaseConnection;
 use BlitzPHP\Wolke\Model;
 
 abstract class BaseEntity extends Model
 {
-    
+    /**
+     * {@inheritDoc}
+     * 
+     * @internal Permet l'initialisation de la base de donnees pour l'ORM Wolke
+     */
+    public static function resolveConnection(?string $connection = null): BaseConnection
+    {
+        return static::$resolver = Database::connect($connection);
+    }
 }

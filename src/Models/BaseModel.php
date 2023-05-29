@@ -15,18 +15,23 @@ use BadMethodCallException;
 use BlitzPHP\Config\Database;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Database\Builder\BaseBuilder;
+use BlitzPHP\Database\Connection\BaseConnection;
+use BlitzPHP\Database\Exceptions\DataException;
+use BlitzPHP\Database\Result\BaseResult;
+use BlitzPHP\Utilities\Date;
+use InvalidArgumentException;
+use ReflectionClass;
+use ReflectionProperty;
+use stdClass;
 
 /**
- * The Model class extends BaseModel and provides additional
- * convenient features that makes working with a SQL database
- * table less painful.
+ * La classe Model étend BaseModel et fournit des
+ * fonctionnalités pratiques qui rendent le travail avec une table de base de données SQL moins pénible.
  *
- * It will:
- *      - automatically connect to database
- *      - allow intermingling calls to the builder
- *      - removes the need to use Result object directly in most cases
- *
- * @property ConnectionInterface $db
+ * Ce sera:
+ * - se connecte automatiquement à la base de données
+ * - autoriser les appels croisés au constructeur
+ * - supprime le besoin d'utiliser directement l'objet Result dans la plupart des cas
  *
  * @method array                                                       all(int|string $type = \PDO::FETCH_OBJ, ?string $key = null, int $expire = 0)
  * @method float                                                       avg(string $field, ?string $key = null, int $expire = 0)
@@ -100,6 +105,7 @@ use BlitzPHP\Database\Builder\BaseBuilder;
  * @method $this                                                       rightJoin(string $table, array|string $fields, bool $outer = false)
  * @method mixed                                                       row(int $index, int|string $type = \PDO::FETCH_OBJ, ?string $key = null, int $expire = 0)
  * @method $this                                                       select(array|string $fields = '*', ?int $limit = null, ?int $offset = null)
+ * @method $this                                                       set(array|object|string $key, mixed $value = '', ?bool $escape = null)
  * @method $this                                                       sortAsc(string|string[] $field, ?bool $escape = null)
  * @method $this                                                       sortDesc(string|string[] $field, ?bool $escape = null)
  * @method $this                                                       sortRand(?int $digit = null)
@@ -137,6 +143,13 @@ abstract class BaseModel
     protected $primaryKey = 'id';
 
     /**
+     * Primary Key value when inserting and useAutoIncrement is false.
+     *
+     * @var int|string|null
+     */
+    private $primaryKeyValue;
+
+    /**
      * Groupe de la base de données a utiliser
      *
      * @var string
@@ -151,6 +164,22 @@ abstract class BaseModel
     protected $useAutoIncrement = true;
 
     /**
+     * Le type de colonne que created_at et updated_at sont censés avoir.
+     *
+     * Autorisé: 'datetime', 'date', 'int'
+     *
+     * @var string
+     */
+    protected $dateFormat = 'datetime';
+ 
+    /**
+     * Connexion à la base de données
+     *
+     * @var BaseConnection
+     */
+    protected $db;
+
+    /**
      * Query Builder
      *
      * @var BaseBuilder|null
@@ -158,17 +187,14 @@ abstract class BaseModel
     protected $builder;
 
     /**
-     * Holds information passed in via 'set'
-     * so that we can capture it (not the builder)
-     * and ensure it gets validated first.
+     * Contient les informations transmises via 'set' afin que nous puissions les capturer (pas le constructeur) et nous assurer qu'elles sont validées en premier.
      *
      * @var array
      */
     protected $tempData = [];
 
     /**
-     * Escape array that maps usage of escape
-     * flag for every parameter.
+     * Tableau d'échappement qui mappe l'utilisation de l'indicateur d'échappement pour chaque paramètre.
      *
      * @var array
      */
@@ -199,21 +225,26 @@ abstract class BaseModel
      */
     public function builder(?string $table = null): BaseBuilder
     {
-        if ($this->builder instanceof BaseBuilder) {
+        if ($this->builder instanceof BaseBuilder) {            
             // S'assurer que la table utilisee differe de celle du builder
-            if ($table && $this->builder->getTable() !== $table) {
+            $builderTable = $this->builder->getTable();
+            if ($table && $builderTable !== $this->db->prefixTable($table)) {
                 return $this->db->table($table);
             }
 
+            if (empty($builderTable) && !empty($this->table)) {
+                $this->builder = $this->builder->table($this->table);
+            }
+          
             return $this->builder;
         }
-
-        $table = empty($table) ? $this->table : $table;
 
         // S'assurer qu'on a une bonne connxion a la base de donnees
         if (! $this->db instanceof ConnectionInterface) {
             $this->db = Database::connect($this->group);
         }
+
+        $table = empty($table) ? $this->table : $table;
 
         if (empty($table)) {
             $builder = $this->db->table('.')->from([], true);
@@ -230,7 +261,103 @@ abstract class BaseModel
     }
 
     /**
-     * Provides/instantiates the builder/db connection and model's table/primary key names and return type.
+     * Insere les données dans la base de données.
+     * Si un objet est fourni, il tentera de le convertir en un tableau.
+     *
+     * @param bool              $returnID Si l'ID de l'element inséré doit être retourné ou non.
+     *
+     * @return BaseResult|int
+     *
+     * @throws ReflectionException
+     */
+    public function create(array|object|null $data = null, bool $returnID = true)
+    {
+        if (! empty($this->tempData['data'])) {
+            if (empty($data)) {
+                $data = $this->tempData['data'];
+            } else {
+                $data = $this->transformDataToArray($data, 'insert');
+                $data = array_merge($this->tempData['data'], $data);
+            }
+        }
+
+        if ($this->useAutoIncrement === false) {
+            if (is_array($data) && isset($data[$this->primaryKey])) {
+                $this->primaryKeyValue = $data[$this->primaryKey];
+            } elseif (is_object($data) && isset($data->{$this->primaryKey})) {
+                $this->primaryKeyValue = $data->{$this->primaryKey};
+            }
+        }
+
+        $this->escape   = $this->tempData['escape'] ?? [];
+        $this->tempData = [];
+
+        /** @var BaseResult $inserted */
+        $inserted = $this->builder()->insert($data);
+
+        if ($returnID) {
+            return $inserted->lastId();
+        }
+
+        return $inserted;
+    }
+
+    /**
+     * Met à jour un seul enregistrement dans la base de données.
+     * Si un objet est fourni, il tentera de le convertir en tableau.
+     *
+     * @param array|int|string|null $id
+     * @param array|object|null     $data
+     *
+     * @throws ReflectionException
+     */
+    public function modify($id = null, $data = null): bool
+    {
+        $id = $id ?: $this->primaryKeyValue;
+
+        if (! empty($this->tempData['data'])) {
+            if (empty($data)) {
+                $data = $this->tempData['data'];
+            } else {
+                $data = $this->transformDataToArray($data, 'update');
+                $data = array_merge($this->tempData['data'], $data);
+            }
+
+            $id = $id ?: $this->idValue($data);
+        }
+
+        $this->escape   = $this->tempData['escape'] ?? [];
+        $this->tempData = [];
+
+        return $this->builder()->whereIn($this->primaryKey, (array) $id)->update($data);
+    }
+    
+    /**
+     * Une méthode pratique qui tentera de déterminer si les données doivent être insérées ou mises à jour.
+     * Fonctionnera avec un tableau ou un objet.
+     * Lors de l'utilisation avec des objets de classe personnalisés, vous devez vous assurer que la classe fournira l'accès aux variables de classe, même via une méthode magique.
+     */
+    public function save(array|object $data): bool
+    {
+        if (empty($data)) {
+            return true;
+        }
+
+        if ($this->shouldUpdate($data)) {
+            $response = $this->modify($this->idValue($data), $data);
+        } else {
+            $response = $this->create($data, false);
+
+            if ($response !== false) {
+                $response = true;
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Fournit/instancie la connexion builder/db et les noms de table/clé primaire du modèle et le type de retour.
      *
      * @return mixed
      */
@@ -282,7 +409,7 @@ abstract class BaseModel
             $result = $this->db->{$name}(...$params);
         } elseif (method_exists($builder, $name)) {
             $this->checkBuilderMethod($name);
-
+            
             $result = $builder->{$name}(...$params);
         } else {
             throw new BadMethodCallException('Call to undefined method ' . static::class . '::' . $name);
@@ -293,6 +420,158 @@ abstract class BaseModel
         }
 
         return $result;
+    }
+    
+    /**
+     * Renvoie la valeur id pour le tableau de données ou l'objet.
+     *
+     * @return array|int|string|null
+     */
+    protected function idValue(array|object $data)
+    {
+       if (is_object($data) && isset($data->{$this->primaryKey})) {
+            return $data->{$this->primaryKey};
+        }
+
+        if (is_array($data) && ! empty($data[$this->primaryKey])) {
+            return $data[$this->primaryKey];
+        }
+
+        return null;
+    }
+
+    /**
+     * Cette méthode est appelée lors de la sauvegarde pour déterminer si l'entrée doit être mise à jour.
+     * Si cette méthode renvoie une opération d'insertion fausse, elle sera exécutée
+     */
+    protected function shouldUpdate(array|object $data): bool
+    {
+        return ! empty($this->idValue($data));
+    }
+
+    /**
+     * Prend une classe et retourne un tableau de ses propriétés publiques et protégées sous la forme d'un tableau adapté à une utilisation dans les créations et les mises à jour.
+     * Cette méthode utilise objectToRawArray() en interne et effectue la conversion en chaîne sur toutes les instances Time
+     *
+     * @param bool          $onlyChanged Propriété modifiée uniquement
+     * @param bool          $recursive   Si vrai, les entités internes seront également converties en tableau
+     *
+     * @throws ReflectionException
+     */
+    protected function objectToArray(object|string $data, bool $onlyChanged = true, bool $recursive = false): array
+    {
+        $properties = $this->objectToRawArray($data, $onlyChanged, $recursive);
+
+        // Convertissez toutes les instances de Date en $dateFormat approprié
+        if ($properties) {
+            $properties = array_map(function ($value) {
+                if ($value instanceof Date) {
+                    return $this->timeToDate($value);
+                }
+
+                return $value;
+            }, $properties);
+        }
+
+        return $properties;
+    }
+
+    /**
+     * Prend une classe et renvoie un tableau de ses propriétés publiques et protégées sous la forme d'un tableau avec des valeurs brutes.
+     *
+     * @param bool          $onlyChanged Propriété modifiée uniquement
+     * @param bool          $recursive   Si vrai, les entités internes seront également converties en tableau
+     *
+     * @throws ReflectionException
+     */
+    protected function objectToRawArray(object|string $data, bool $onlyChanged = true, bool $recursive = false): ?array
+    {
+        if (method_exists($data, 'toRawArray')) {
+            $properties = $data->toRawArray($onlyChanged, $recursive);
+        } else if (method_exists($data, 'toArray')) {
+            $properties = $data->toArray();
+        } else {
+            $mirror = new ReflectionClass($data);
+            $props  = $mirror->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+
+            $properties = [];
+
+            // Boucle sur chaque propriété, en enregistrant le nom/valeur dans un nouveau tableau 
+            // que nous pouvons retourner.
+            foreach ($props as $prop) {
+                // Doit rendre les valeurs protégées accessibles.
+                $prop->setAccessible(true);
+                $properties[$prop->getName()] = $prop->getValue($data);
+            }
+        }
+
+        return $properties;
+    }
+    
+    /**
+     * Convertit la valeur Date en chaîne en utilisant $this->dateFormat.
+     *
+     * Les formats disponibles sont :
+     * - 'int' - Stocke la date sous la forme d'un horodatage entier
+     * - 'datetime' - Stocke les données au format datetime SQL
+     * - 'date' - Stocke la date (uniquement) au format de date SQL.
+     *
+     * @return int|string
+     */
+    protected function timeToDate(Date $value)
+    {
+        switch ($this->dateFormat) {
+            case 'datetime':
+                return $value->format('Y-m-d H:i:s');
+
+            case 'date':
+                return $value->format('Y-m-d');
+
+            case 'int':
+                return $value->getTimestamp();
+
+            default:
+                return (string) $value;
+        }
+    }
+
+    /**
+     * Transformer les données en tableau.
+     *
+     * @param string            $type Type de donnees (insert|update)
+     *
+     * @throws DataException
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
+     */
+    protected function transformDataToArray(array|object|null $data, string $type): array
+    {
+        if (! in_array($type, ['insert', 'update'], true)) {
+            throw new InvalidArgumentException(sprintf('Invalid type "%s" used upon transforming data to array.', $type));
+        }
+
+        if (empty($data)) {
+            throw DataException::emptyDataset($type);
+        }
+
+        // Si $data utilise une classe personnalisée avec des propriétés publiques ou protégées représentant 
+        // les éléments de la collection, nous devons les saisir sous forme de tableau.
+        if (is_object($data) && ! $data instanceof stdClass) {
+            $data = $this->objectToArray($data, $type === 'update', true);
+        }
+
+        // S'il s'agit toujours d'une stdClass, continuez et convertissez en un tableau afin que 
+        // les autres méthodes de modèle n'aient pas à effectuer de vérifications spéciales.
+        if (is_object($data)) {
+            $data = (array) $data;
+        }
+
+        // S'il est toujours vide ici, cela signifie que $data n'a pas changé ou est un objet vide
+        if (! $this->allowEmptyInserts && empty($data)) {
+            throw DataException::emptyDataset($type);
+        }
+
+        return $data;
     }
 
     /**
