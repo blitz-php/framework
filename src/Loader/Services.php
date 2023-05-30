@@ -112,7 +112,7 @@ class Services
 
         if (true === $shared && isset(static::$instances[Cache::class])) {
             $instance = static::$instances[Cache::class];
-            if (null === func_get_arg(0)) {
+            if (empty(func_get_args()[0])) {
                 return $instance;
             }
             return $instance->setConfig($config);
@@ -219,7 +219,7 @@ class Services
 
         if (true === $shared && isset(static::$instances[Negotiator::class])) {
             $instance = static::$instances[Negotiator::class];
-            if (null === func_get_arg(0)) {
+            if (empty(func_get_args()[0])) {
                 return $instance;
             }
 
