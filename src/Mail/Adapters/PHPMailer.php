@@ -21,10 +21,21 @@ class PHPMailer extends AbstractAdapter
 
     public function __construct(bool $debug = false)
     {
-        parent::__construct($debug);
-
         $this->mailer = new Mailer();
-        $this->mailer->SMTPAuth   = true;
+
+        parent::__construct($debug);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function init(array $config): self
+    {
+        if (!empty($config['username']) && !empty($config['password'])) {
+            $this->mailer->SMTPAuth = true;
+        }
+        
+        return parent::init($config);
     }
 
     /**

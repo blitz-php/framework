@@ -36,9 +36,9 @@ class SymfonyMailer extends AbstractAdapter
 
     public function __construct(bool $debug = false)
     {
-        parent::__construct($debug);
-
         $this->mailer = new Email();
+
+        parent::__construct($debug);
     }
 
     /**
