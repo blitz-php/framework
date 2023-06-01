@@ -852,9 +852,8 @@ class Dispatcher
      */
     protected function initMiddlewareQueue(): void
     {
-        $this->middleware = Services::injector()->make(Middleware::class, [$this->response]);
-        $this->middleware->prepend($this->spoofRequestMethod());
-
+        $this->middleware = Services::injector()->make(Middleware::class, ['response' => $this->response]);
+        
         $middlewaresFile = CONFIG_PATH . 'middlewares.php';
         if (file_exists($middlewaresFile) && ! in_array($middlewaresFile, get_included_files(), true)) {
             $middleware = require $middlewaresFile;
@@ -865,6 +864,8 @@ class Dispatcher
                 }
             }
         }
+
+        $this->middleware->prepend($this->spoofRequestMethod());
     }
 
     /**

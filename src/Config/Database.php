@@ -57,7 +57,7 @@ class Database
             $group = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
         }
 
-        if (! isset($config[$group])) {
+        if (! isset($config[$group]) && strpos($group, 'custom-') === false) {
             $group = 'default';
         }
 
