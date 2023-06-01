@@ -16,6 +16,8 @@ use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Loader\Services;
 use BlitzPHP\Router\Dispatcher;
+use BlitzPHP\Validation\Validation;
+use Dimtrovich\Validation\ValidatedInput;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -98,6 +100,22 @@ abstract class BaseController
         if (! empty($this->helpers)) {
             helper($this->helpers);
         }
+    }
+
+    /**
+     * Validation des donnees de la requete actuelle
+     */
+    protected function validate(array $rules, array $messages = []): ValidatedInput
+    {
+        return $this->request->validate($rules, $messages);
+    }
+
+    /**
+     * Cree un validateur avec les donnees de la requete actuelle
+     */
+    protected function validation(array $rules, array $messages = []): Validation
+    {
+        return $this->request->validation($rules, $messages);
     }
 
     /**

@@ -12,11 +12,14 @@
 namespace BlitzPHP\Router;
 
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Controllers\ApplicationController;
+use BlitzPHP\Controllers\RestController;
 use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
+use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Http\Middleware;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
@@ -285,30 +288,7 @@ class Dispatcher
         $routeMiddlewares = (array) $this->dispatchRoutes($routes);
 
         // The bootstrapping in a middleware
-        $this->middleware->append(function (ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface {
-            $returned = $this->startController($request, $response);
-
-            // Closure controller has run in startController().
-            if (! is_callable($this->controller)) {
-                $controller = $this->createController($request, $response);
-
-                if (! method_exists($controller, '_remap') && ! is_callable([$controller, $this->method], false)) {
-                    throw PageNotFoundException::methodNotFound($this->method);
-                }
-
-                // Is there a "post_controller_constructor" event?
-                Services::event()->trigger('post_controller_constructor');
-
-                $returned = $this->runController($controller);
-            } else {
-                $this->timer->stop('controller_constructor');
-                $this->timer->stop('controller');
-            }
-
-            Services::event()->trigger('post_system');
-
-            return $this->formatResponse($response, $returned);
-        });
+        $this->middleware->append($this->bootApp());
 
         /**
          * Ajouter des middlewares de routes
@@ -905,6 +885,65 @@ class Dispatcher
             }
 
             return $next($request, $response);
+        };
+    }
+
+    private function bootApp(): callable
+    {
+        $_this = $this;
+
+        return static function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use($_this): ResponseInterface {
+            try {
+                $returned = $_this->startController($request, $response);
+
+                // Closure controller has run in startController().
+                if (! is_callable($_this->controller)) {
+                    $controller = $_this->createController($request, $response);
+
+                    if (! method_exists($controller, '_remap') && ! is_callable([$controller, $_this->method], false)) {
+                        throw PageNotFoundException::methodNotFound($_this->method);
+                    }
+
+                    // Is there a "post_controller_constructor" event?
+                    Services::event()->trigger('post_controller_constructor');
+
+                    $returned = $_this->runController($controller);
+                } else {
+                    $_this->timer->stop('controller_constructor');
+                    $_this->timer->stop('controller');
+                }
+
+                Services::event()->trigger('post_system');
+
+                return $_this->formatResponse($response, $returned);
+            }
+            catch (ValidationException $e) {
+                $code   = $e->getCode();
+                $errors = $e->getErrors();
+                if (empty($errors)) {
+                    $errors = [$e->getMessage()];
+                }
+
+                if (is_string($_this->controller)) {
+                    if (strtoupper($request->getMethod()) === 'POST') {
+                        if (is_subclass_of($_this->controller, ApplicationController::class)) {
+                            return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
+                        }
+                        else if (is_subclass_of($_this->controller, RestController::class)) {
+                            return $_this->formatResponse($response->withStatus($code), [
+                                'success' => false,
+                                'code'    => $code,
+                                'errors'  => $errors,
+                            ]);
+                        }
+                    }
+                }
+                else if (strtoupper($request->getMethod()) === 'POST') {
+                    return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
+                }
+
+                throw $e;
+            }
         };
     }
 }

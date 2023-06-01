@@ -15,10 +15,13 @@ use ArrayAccess;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Contracts\Session\SessionInterface;
 use BlitzPHP\Contracts\Support\Arrayable;
+use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\String\Text;
+use BlitzPHP\Validation\Validation;
 use BlitzPHP\Validation\Validator;
-use Dimtrovich\Validation\Exceptions\ValidationException;
+use Dimtrovich\Validation\Exceptions\ValidationException as DimtrovichValidationException;
+use Dimtrovich\Validation\ValidatedInput;
 
 class Request extends ServerRequest implements Arrayable, ArrayAccess
 {
@@ -28,17 +31,25 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
 
     /**
      * Validation des donnees de la requete
-     *
-     * @return array|Redirection
      */
-    public function validate(array $rules, array $messages = [])
+    public function validate(array $rules, array $messages = []): ValidatedInput
     {
         try {
-            return Validator::validate($this->all(), $rules, $messages);  
+            return $this->validation($rules, $messages)->safe();  
         }
-        catch (ValidationException $e) {
-            return redirect()->back()->withInput();
+        catch (DimtrovichValidationException $e) {
+            $th = new ValidationException($e->getMessage());
+            $th->setErrors([$e->getMessage()]);
+            throw $th;
         }
+    }
+
+    /**
+     * Cree un validateur avec les donnees de la requete actuelle
+     */
+    protected function validation(array $rules, array $messages = []): Validation
+    {
+        return Validator::make($this->all(), $rules, $messages);
     }
 
 

@@ -13,6 +13,7 @@ namespace BlitzPHP\Http;
 
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Loader\Services;
+use Rakit\Validation\ErrorBag;
 
 /**
  * Gérer une réponse de redirection
@@ -70,6 +71,28 @@ class Redirection extends Response
     }
 
     /**
+     * Ajoute des erreurs à la session en tant que Flashdata.
+     */
+    public function withErrors(array|ErrorBag|string $errors, string $key = 'default'): self
+    {
+        if ($errors instanceof ErrorBag) {
+            $errors = $errors->all();
+        } else if (is_string($errors)) {
+            $errors = [$errors];
+        }
+
+        if (!empty($errors)) {
+            $session = Services::session();
+            $_errors = $session->getFlashdata('errors') ?? [];
+            $session->setFlashdata(
+                'errors', array_merge($_errors, [$key => $errors])
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Spécifie que les tableaux $_GET et $_POST actuels doivent être
      * emballé avec la réponse.
      *
@@ -77,24 +100,10 @@ class Redirection extends Response
      */
     public function withInput(): self
     {
-        $session = Services::session();
-
-        /*  $session->setFlashdata('_ci_old_input', [
-             'get'  => $_GET ?? [],
-             'post' => $_POST ?? [],
-         ]); */
-
-        // Si la validation contient des erreurs, retransmettez-les
-        // afin qu'ils puissent être affichés lors de la validation
-        // dans une méthode différente de l'affichage du formulaire.
-
-        /* $validation = Services::validation();
-
-        if ($validation->getErrors()) {
-            //$session->setFlashdata('_ci_validation_errors', serialize($validation->getErrors()));
-        } */
-
-        return $this;
+        return $this->with('_blitz_old_input', [
+            'get'  => $_GET ?? [],
+            'post' => $_POST ?? [],
+        ]);
     }
 
     /**
