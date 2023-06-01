@@ -11,6 +11,11 @@
 
 // Email language settings
 return [
+    'invalidHandler'         => 'The specified email handler `{0}` is invalid.',
+    'undefinedHandler'       => 'Undefined email handler.',
+    'handlerMustExtendClass' => 'The specified email handler `{0}` must be a subclass of `{1}`.',
+    'dependancyNotFound'     => 'Dependency `{0}` of adapter `{1}` is not installed. Please install it : `composer require {2}`',
+
     'mustBeArray'          => 'The email validation method must be passed an array.',
     'invalidAddress'       => 'Invalid email address: {0}',
     'attachmentMissing'    => 'Unable to locate the following email attachment: {0}',

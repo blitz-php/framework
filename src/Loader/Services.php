@@ -29,6 +29,7 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
+use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
 use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
@@ -208,6 +209,27 @@ class Services
         return static::$instances[Logger::class] = static::factory(Logger::class);
     }
 
+    /**
+     * La classe de mail vous permet d'envoyer par courrier électronique via mail, sendmail, SMTP. 
+     */
+    public static function mail(?array $config = null, bool $shared = true): Mail
+    {
+        if (empty($config)) {
+            $config = Config::get('mail');
+        }
+
+        if (true === $shared && isset(static::$instances[Mail::class])) {
+            /** @var Mail $instance */
+            $instance = static::$instances[Mail::class];
+            if (empty(func_get_args()[0])) {
+                return $instance;
+            }
+            return $instance->merge($config);
+        }
+
+        return static::$instances[Mail::class] = static::factory(Mail::class, compact('config'));
+    }
+    
     /**
      * La classe Input générale modélise une requête HTTP.
      */
