@@ -135,9 +135,19 @@ class Mail implements MailerInterface
     /**
 	 * {@inheritDoc}
      */
-    public function attachment(array|string $path, string $name = '', string $encoding = '', string $disposition = 'attachment'): self
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
     {
-        $this->factory()->attachment($path, $name, $encoding, $disposition);
+        $this->factory()->attach($path, $name, $type, $encoding, $disposition);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
+    {
+        $this->factory()->attachBinary($binary, $name, $type, $encoding, $disposition);
 
         return $this;
     }
@@ -158,6 +168,36 @@ class Mail implements MailerInterface
     public function cc(array|string $address, bool|string $name = '', bool $set = false): self
     {
         $this->factory()->cc($address, $name, $set);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
+    {
+        $this->factory()->dkim($pk, $passphrase, $selector, $domain);
+
+        return $this;
+    }
+
+    /**
+	 * {@inheritDoc}
+     */
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    {
+        $this->factory()->embedded($path, $cid, $name, $encoding, $type, $disposition);
+
+        return $this;
+    }
+
+    /**
+	 * {@inheritDoc}
+     */
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    {
+        $this->factory()->embeddedBinary($binary, $cid, $name, $encoding, $type, $disposition);
 
         return $this;
     }
@@ -279,13 +319,18 @@ class Mail implements MailerInterface
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du parametre "view_base"
         if (strpos($view, '\\') === false) {
-            $path = $this->config['view_base'] ?? '';
+            $path = $this->config['view_dir'] ?? '';
             if (! empty($path)) {
                 $path .= '/';
             }
         }
         
-        return $this->html(view($path . $view, $data)->get(false));
+        $view = view($path . $view, $data);
+        if (! empty($this->config['template'])) {
+            $view->setLayout($this->config['template']);
+        }
+
+        return $this->html($view->get(false));
     }
     
     public function __call(string $method, array $arguments)

@@ -8,16 +8,45 @@ interface MailerInterface
     public const PRIORITY_NORMAL = 3;
     public const PRIORITY_LOW    = 5;
 
+    public const PROTOCOL_GMAIL    = 'gmail';
     public const PROTOCOL_MAIL     = 'mail';
-    public const PROTOCOL_QMAIL    = 'qmail';
-    public const PROTOCOL_SENDMAIL = 'sendmail';
-    public const PROTOCOL_SMTP     = 'smtp';
-    public const PROTOCOL_SES      = 'ses';
     public const PROTOCOL_MAILGUN  = 'mailgun';
+    public const PROTOCOL_MANDRILL = 'mandrill';
     public const PROTOCOL_POSTMARK = 'postmark';
+    public const PROTOCOL_QMAIL    = 'qmail';
+    public const PROTOCOL_SENDGRID = 'sendgrid';
+    public const PROTOCOL_SENDMAIL = 'sendmail';
+    public const PROTOCOL_SES      = 'ses';
+    public const PROTOCOL_SMTP     = 'smtp';
 
     public const ENCRYPTION_SSL = 'ssl';
     public const ENCRYPTION_TLS = 'tls';
+
+    public const CHARSET_ASCII = 'us-ascii';
+    public const CHARSET_ISO88591 = 'iso-8859-1';
+    public const CHARSET_UTF8 = 'utf-8';
+
+    public const CONTENT_TYPE_PLAINTEXT = 'text/plain';
+    public const CONTENT_TYPE_TEXT_CALENDAR = 'text/calendar';
+    public const CONTENT_TYPE_TEXT_HTML = 'text/html';
+    public const CONTENT_TYPE_MULTIPART_ALTERNATIVE = 'multipart/alternative';
+    public const CONTENT_TYPE_MULTIPART_MIXED = 'multipart/mixed';
+    public const CONTENT_TYPE_MULTIPART_RELATED = 'multipart/related';
+
+    public const ENCODING_7BIT = '7bit';
+    public const ENCODING_8BIT = '8bit';
+    public const ENCODING_BASE64 = 'base64';
+    public const ENCODING_BINARY = 'binary';
+    public const ENCODING_QUOTED_PRINTABLE = 'quoted-printable';
+
+    public const ICAL_METHOD_REQUEST = 'REQUEST';
+    public const ICAL_METHOD_PUBLISH = 'PUBLISH';
+    public const ICAL_METHOD_REPLY = 'REPLY';
+    public const ICAL_METHOD_ADD = 'ADD';
+    public const ICAL_METHOD_CANCEL = 'CANCEL';
+    public const ICAL_METHOD_REFRESH = 'REFRESH';
+    public const ICAL_METHOD_COUNTER = 'COUNTER';
+    public const ICAL_METHOD_DECLINECOUNTER = 'DECLINECOUNTER';
 
     /**
 	 * Ajoute un texte alternatif pour le message en cas de nom prise en charge du html
@@ -31,8 +60,15 @@ interface MailerInterface
      * Explicitement *ne prend pas* en charge la transmission d'URL ; Mailer n'est pas un client HTTP.
      * Si vous avez besoin de le faire, récupérez la ressource vous-même et transmettez-la via un fichier local ou une chaîne.
      */
-    public function attachment(string $path, string $name = '', string $encoding = '', string $disposition = 'attachment'): self;
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self;
 
+    /**
+     * Ajoutez une chaîne ou une pièce jointe binaire (non-système de fichiers).
+     * Cette méthode peut être utilisée pour joindre des données ascii ou binaires,
+     * tel qu'un enregistrement BLOB d'une base de données.
+     */
+    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self;
+    
     /**
      *Ajoute des adresses de copie (BCC) au mail
      */
@@ -42,6 +78,26 @@ interface MailerInterface
      * Ajoute des adresses de copie (CC) au mail
      */
     public function cc(array|string $address, bool|string $name = '', bool $set = false): self;
+
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self;
+
+    /**
+     * Ajouter une pièce jointe intégrée (en ligne) à partir d'un fichier.
+     * Cela peut inclure des images, des sons et à peu près n'importe quel autre type de document.
+     * Celles-ci diffèrent des pièces jointes « régulières » en ce sens qu'elles sont destinées à être
+     * affiché en ligne avec le message, pas seulement en pièce jointe pour le téléchargement.
+     * Ceci est utilisé dans les messages HTML qui intègrent les images
+     * le HTML fait référence à l'utilisation de la valeur `$cid` dans les balises `img`, par exemple `<img src="cid:mylogo">`.
+     * N'utilisez jamais un chemin d'accès fourni par l'utilisateur vers un fichier !     *
+     */
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self;
+
+    /**
+     * Ajoutez une pièce jointe stringifiée intégrée.
+     * Cela peut inclure des images, des sons et à peu près n'importe quel autre type de document.
+     * Si votre nom de fichier ne contient pas d'extension, assurez-vous de définir $type sur un type MIME approprié.
+     */
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self;
 
     /**
      * Defini l'adresse de l'expéditeur (From) du mail

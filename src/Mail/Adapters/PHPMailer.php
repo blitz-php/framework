@@ -2,6 +2,7 @@
 
 namespace BlitzPHP\Mail\Adapters;
 
+use BlitzPHP\Loader\Services;
 use PHPMailer\PHPMailer\PHPMailer as Mailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -22,6 +23,9 @@ class PHPMailer extends AbstractAdapter
     public function __construct(bool $debug = false)
     {
         $this->mailer = new Mailer();
+        $this->mailer->Debugoutput = function($str, $level) {
+            Services::logger()->info('[Mail][' . $level . ']: ' . $str);
+        };
 
         parent::__construct($debug);
     }
@@ -171,15 +175,27 @@ class PHPMailer extends AbstractAdapter
 	 *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function attachment(array|string $path, string $name = '', string $encoding = Mailer::ENCODING_BASE64, string $disposition = 'attachment'): self
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
     {
         if (is_string($path)) {
             $path = [$path => $name];
         }
 
         foreach ($path As $key => $value) {
-            $this->mailer->addAttachment($key, $value, $encoding, '', $disposition);
+            $this->mailer->addAttachment($key, $value, $encoding, $type, $disposition);
         }
+
+        return $this;
+    }
+
+    /**
+	 * {@inheritDoc}
+	 *
+     * @throws \PHPMailer\PHPMailer\Exception
+     */
+    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
+    {
+        $this->mailer->addStringAttachment($binary, $name, $encoding, $type, $disposition);
 
         return $this;
     }
@@ -221,6 +237,44 @@ class PHPMailer extends AbstractAdapter
             $this->mailer->addCC(...$address);
         }
         
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
+    {
+        $this->mailer->DKIM_domain = $domain;
+        $this->mailer->DKIM_private = $pk;
+        $this->mailer->DKIM_selector = $selector ?: 'blitz';
+        $this->mailer->DKIM_passphrase = $passphrase;
+        $this->mailer->DKIM_identity = $this->mailer->From;
+    
+        return $this;
+    }
+
+    /**
+	 * {@inheritDoc}
+	 *
+     * @throws \PHPMailer\PHPMailer\Exception
+     */
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    {
+        $this->mailer->addEmbeddedImage($path, $cid, $name, $encoding, $type, $disposition);
+
+        return $this;
+    }
+
+    /**
+	 * {@inheritDoc}
+	 *
+     * @throws \PHPMailer\PHPMailer\Exception
+     */
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    {
+        $this->mailer->addStringEmbeddedImage($binary, $cid, $name, $encoding, $type, $disposition);
+
         return $this;
     }
 
@@ -312,6 +366,9 @@ class PHPMailer extends AbstractAdapter
         return $this->mailer->send();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): self
     {
         $this->mailer->sign($cert_filename, $key_filename, $key_pass, $extracerts_filename);
@@ -357,22 +414,5 @@ class PHPMailer extends AbstractAdapter
         }
 
         return $this;
-    }
-    
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @return array
-     */
-    protected function makeAddress(string $email, string $name) 
-    {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
-            $tmp = $email;
-            $email = $name;
-            $name = $tmp;
-        }
-
-        return [$email, $name];
     }
 }

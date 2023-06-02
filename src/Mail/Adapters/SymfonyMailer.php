@@ -5,7 +5,11 @@ namespace BlitzPHP\Mail\Adapters;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Crypto\DkimSigner;
+use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Throwable;
 
 class SymfonyMailer extends AbstractAdapter
@@ -24,7 +28,8 @@ class SymfonyMailer extends AbstractAdapter
 
     private ?Mailer $transporter = null;
 
-    private string $charset    = 'utf-8';
+    private string $charset    = self::CHARSET_UTF8;
+    private string $dsn        = '';
     private string $protocol   = self::PROTOCOL_SMTP;
     private int $timeout       = 0;
     private int $port          = 587;
@@ -39,6 +44,14 @@ class SymfonyMailer extends AbstractAdapter
         $this->mailer = new Email();
 
         parent::__construct($debug);
+    }
+
+
+    public function setDsn(string $dsn): self
+    {
+        $this->dsn = $dsn;
+
+        return $this;
     }
 
     /**
@@ -157,16 +170,26 @@ class SymfonyMailer extends AbstractAdapter
     /**
 	 * {@inheritDoc}
      */
-    public function attachment(array|string $path, string $name = '', string $encoding = '', string $disposition = 'attachment'): self
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
     {
         if (is_string($path)) {
             $path = [$path => $name];
         }
 
         foreach ($path As $key => $value) {
-            $this->mailer->attachFromPath($key, $value, $encoding);
+            $this->mailer->addPart(new DataPart(new File($key), $value, $type));
         }
 
+        return $this;
+    }
+
+    /**
+	 * {@inheritDoc}
+     */
+    public function attachBinary($binary, string $name, string $encoding = self::ENCODING_BASE64, string $type = '', string $disposition = 'attachment'): self
+    {
+        $this->mailer->addPart(new DataPart(@fopen($binary, 'r'), $name, $type));
+     
         return $this;
     }
 
@@ -198,6 +221,39 @@ class SymfonyMailer extends AbstractAdapter
         } else {
             $this->mailer->addCC(...$addresses);
         }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
+    {
+        
+        $signer = new DkimSigner($pk, $domain ?: site_url(), $selector ?: 'blitz', [], $passphrase);
+        
+        $this->mailer = $signer->sign($this->mailer);
+        
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    {
+        $this->mailer->addPart((new DataPart(new File($path), $cid, $type))->asInline());
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    {
+        $this->mailer->addPart((new DataPart(@fopen($binary, 'r'), $name, $type))->asInline());
 
         return $this;
     }
@@ -285,6 +341,10 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): self
     {
+        $signer = new SMimeSigner($cert_filename, $key_filename, $key_pass, $extracerts_filename);
+        
+        $this->mailer = $signer->sign($this->mailer);
+
         return $this;
     }
 
@@ -340,11 +400,7 @@ class SymfonyMailer extends AbstractAdapter
      */
     protected function makeAddress(string $email, string $name) 
     {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
-            $tmp = $email;
-            $email = $name;
-            $name = $tmp;
-        }
+        [$email, $name] = parent::makeAddress($email, $name);
 
         return new Address($email, $name);
     }
@@ -362,6 +418,17 @@ class SymfonyMailer extends AbstractAdapter
 
     private function buildDsn(): string
     {
-        return '';  
+        if (! empty($this->dsn)) {
+            return $this->dsn;
+        }
+
+        return match($this->protocol) {
+            static::PROTOCOL_SMTP     => "smtp://{$this->username}:{$this->password}@{$this->host}:{$this->port}",
+            static::PROTOCOL_SENDMAIL => "sendmail://default",
+            static::PROTOCOL_MAIL     => "sendmail://default",
+            static::PROTOCOL_POSTMARK => "postmark+smtp://{$this->username}@default",                                // username joue le role de ID
+            static::PROTOCOL_SENDGRID => "sendgrid+smtp://apikey:{$this->username}@default",                         // username joue le role de API_KEY
+            default                   => "{$this->protocol}+smtp://{$this->username}:{$this->password}@default",
+        };  
     }
 }

@@ -80,11 +80,6 @@ abstract class AbstractAdapter implements MailerInterface
 
     public abstract function setEncryption(?string $encryption): self;
 
-    /**
-     * Cree une adresse au format valide pour l'adapter
-     */
-    protected abstract function makeAddress(string $email, string $name);
-
     public function __call(string $method, array $arguments)
     {
         $name = static::methodName($method, 'set');
@@ -107,6 +102,22 @@ abstract class AbstractAdapter implements MailerInterface
     protected static function methodName(string $name, string $prefix = 'set'): string
     {
         return Text::camel($prefix . '_' . $name);
+    }
+
+    /**
+     * Cree une adresse au format valide pour l'adapter
+     * 
+     * @return array
+     */
+    protected function makeAddress(string $email, string $name)
+    {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
+            $tmp = $email;
+            $email = $name;
+            $name = $tmp;
+        }
+
+        return [$email, $name];
     }
 
     protected function parseMultipleAddresses(array|string $address, bool|string $name = '', bool $set = false): array
