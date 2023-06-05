@@ -47,7 +47,7 @@ class RoutesCollector extends BaseCollector
     public function display(): array
     {
         $rawRoutes = Services::routes(true);
-        $router    = Services::router(null, null, true);
+        $router    = Services::router($rawRoutes, null, true);
 
         // Route correspondante
         $route = $router->getMatchedRoute();

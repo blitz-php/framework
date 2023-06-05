@@ -525,7 +525,7 @@ class Dispatcher
         $this->timer->start('routing');
 
         ob_start();
-        $this->controller = $this->router->handle($path);
+        $this->controller = $this->router->handle($path ?: '/');
         $this->method     = $this->router->methodName();
 
         // Si un segment {locale} correspondait dans la route finale,
@@ -553,7 +553,7 @@ class Dispatcher
             ? $this->request->getPath()
             : $this->request->getUri()->getPath();
 
-        return preg_replace('#^' . App::getUri()->getPath() . '#i', '', $path);
+        return $this->path = preg_replace('#^' . App::getUri()->getPath() . '#i', '', $path);
     }
 
     /**
@@ -852,16 +852,16 @@ class Dispatcher
      */
     protected function initMiddlewareQueue(): void
     {
-        $this->middleware = Services::injector()->make(Middleware::class, ['response' => $this->response]);
+        $this->middleware = Services::injector()->make(Middleware::class, [
+            'response' => $this->response,
+            'path'     => $this->determinePath()
+        ]);
         
         $middlewaresFile = CONFIG_PATH . 'middlewares.php';
         if (file_exists($middlewaresFile) && ! in_array($middlewaresFile, get_included_files(), true)) {
             $middleware = require $middlewaresFile;
             if (is_callable($middleware)) {
-                $middlewareQueue = $middleware($this->middleware, $this->request);
-                if ($middlewareQueue instanceof Middleware) {
-                    $this->middleware = $middlewareQueue;
-                }
+                $middleware($this->middleware, $this->request);
             }
         }
 

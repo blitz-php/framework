@@ -26,7 +26,7 @@
         "blitz-php/filesystem": "^1.0",
         "blitz-php/session": "^1.0",
         "blitz-php/traits": "^1.3",
-        "blitz-php/translator": "^0.1.1",
+        "blitz-php/translator": "^0.1",
         "dflydev/dot-access-data": "^3.0.1",
         "dimtrovich/validation": "^1.0",
         "guzzlehttp/psr7": "^2.2",
@@ -40,9 +40,9 @@
     },
     "require-dev": {
         "blitz-php/coding-standard": "^1.1",
+        "kahlan/kahlan": "^5.2",
         "phpstan/phpstan": "^1.4.7",
-        "scrutinizer/ocular": "^1.8.1",
-        "kahlan/kahlan": "^5.2"
+        "scrutinizer/ocular": "^1.8.1"
     },
     "autoload": {
         "psr-4": {

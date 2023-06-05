@@ -20,6 +20,7 @@ use BlitzPHP\Loader\Services;
 use BlitzPHP\Session\Session;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
+use BlitzPHP\Utilities\Support\Invader;
 use Kint\Kint;
 
 // ================================= FONCTIONS D'ACCESSIBILITE ================================= //
@@ -935,5 +936,30 @@ if (! function_exists('tap')) {
     function tap(mixed $value, ?callable $callback = null): mixed
     {
         return Helpers::tap($value, $callback);
+    }
+}
+
+if (! function_exists('last')) {
+    /**
+     * Recupere le dernier element d'un tableau
+     */
+    function last(array|object $array)
+    {
+        return end($array);
+    }
+}
+
+if (! function_exists('invade')) {
+    /**
+     * Cette classe offre une fonction d'invasion qui vous permettra de lire / écrire des propriétés privées d'un objet. 
+     * Il vous permettra également de définir, obtenir et appeler des méthodes privées. 
+     *
+     * @return Invader
+     *
+     * @see https://github.com/spatie/invade/blob/main/src/Invader.php
+     */
+    function invade(object $object)
+    {
+        return Invader::make($object);
     }
 }

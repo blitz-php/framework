@@ -20,7 +20,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Cors
  *  Middleware cors pour gerer les requetes d'origine croisees
  */
-class Cors implements MiddlewareInterface
+class Cors extends BaseMiddleware implements MiddlewareInterface
 {
     protected $config = [
         'AllowOrigin'      => true,
@@ -34,9 +34,11 @@ class Cors implements MiddlewareInterface
     /**
      * Constructor
      */
-    public function __construct(array $config = [])
+    public function init(array $config = []): self
     {
         $this->config = array_merge($this->config, $config);
+
+        return parent::init($config);
     }
 
     /**

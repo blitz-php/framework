@@ -22,44 +22,41 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * BodyParser
  *
- * Parse encoded request body data.
+ * Analysez les données du corps de la requête encodée.
+ * 
+ * Permet aux charges utiles de requête JSON et XML d'être analysées dans la protection et la validation CSRF de la requête.
  *
- * Enables JSON and XML request payloads to be parsed into the request's
- * Provides CSRF protection & validation.
- *
- * You can also add your own request body parsers usi *
+ * Vous pouvez également ajouter vos propres analyseurs de corps de requête usi
  *
  * @credit		CakePHP (Cake\Http\Middleware\BodyParserMiddleware - https://cakephp.org)
  */
-class BodyParser implements MiddlewareInterface
+class BodyParser extends BaseMiddleware implements MiddlewareInterface
 {
     /**
-     * Registered Parsers
+     * Parseurs enregistrés
      *
      * @var Closure[]
      */
-    protected $parsers = [];
+    protected array $parsers = [];
 
     /**
-     * The HTTP methods to parse data on.
+     * Les méthodes HTTP sur lesquelles analyser les données.
      *
      * @var string[]
      */
-    protected $methods = ['PUT', 'POST', 'PATCH', 'DELETE'];
+    protected array $methods = ['PUT', 'POST', 'PATCH', 'DELETE'];
 
     /**
      * Constructor
      *
      * ### Options
      *
-     * - `json` Set to false to disable JSON body parsing.
-     * - `xml` Set to true to enable XML parsing. Defaults to false, as XML
-     *   handling requires more care than JSON does.
-     * - `methods` The HTTP methods to parse on. Defaults to PUT, POST, PATCH DELETE.
-     *
-     * @param array $options The options to use. See above.
+     * - `json` Définir sur false pour désactiver l'analyse du corps JSON.
+     * - `xml` Définir sur true pour activer l'analyse XML. La valeur par défaut est false, en tant que XML
+     * La manipulation nécessite plus de soin que JSON.
+     * - `methods` Les méthodes HTTP à analyser. Par défaut, PUT, POST, PATCH DELETE.
      */
-    public function __construct(array $options = [])
+    public function init(array $options = []): self
     {
         $options += ['json' => true, 'xml' => false, 'methods' => null];
         if ($options['json']) {
@@ -74,15 +71,14 @@ class BodyParser implements MiddlewareInterface
                 Closure::fromCallable([$this, 'decodeXml'])
             );
         }
-        if ($options['methods']) {
-            $this->setMethods($options['methods']);
-        }
+
+        return parent::init($options);
     }
 
     /**
-     * Set the HTTP methods to parse request bodies on.
+     * Définissez les méthodes HTTP sur lesquelles analyser les corps de requête.
      *
-     * @param string[] $methods The methods to parse data on.
+     * @param string[] $methods Les méthodes sur lesquelles analyser les données.
      */
     public function setMethods(array $methods): self
     {
@@ -92,7 +88,7 @@ class BodyParser implements MiddlewareInterface
     }
 
     /**
-     * Get the HTTP methods to parse request bodies on.
+     * Obtenez les méthodes HTTP pour analyser les corps de requête.
      *
      * @return string[]
      */
@@ -102,13 +98,13 @@ class BodyParser implements MiddlewareInterface
     }
 
     /**
-     * Add a parser.
+     * Ajoute un parser.
      *
-     * Map a set of content-type header values to be parsed by the $parser.
+     * Mappez un ensemble de valeurs d'en-tête de type de contenu à analyser par $parser.
      *
      * ### Example
      *
-     * An naive CSV request body parser could be built like so:
+     * Un parseur de corps de requête CSV naïf pourrait être construit comme suit :
      *
      * ```
      * $parser->addParser(['text/csv'], function ($body) {
@@ -116,9 +112,8 @@ class BodyParser implements MiddlewareInterface
      * });
      * ```
      *
-     * @param string[] $types  An array of content-type header values to match. eg. application/json
-     * @param Closure  $parser The parser function. Must return an array of data to be inserted
-     *                         into the request.
+     * @param string[] $types  Un tableau de valeurs d'en-tête de type de contenu à faire correspondre. par exemple. application/json
+     * @param Closure $parser La fonction de parser. Doit renvoyer un tableau de données à insérer dans la requête.
      */
     public function addParser(array $types, Closure $parser): self
     {
@@ -131,7 +126,7 @@ class BodyParser implements MiddlewareInterface
     }
 
     /**
-     * Get the current parsers
+     * Obtenir les parseurs actuels
      *
      * @return Closure[]
      */
@@ -141,14 +136,9 @@ class BodyParser implements MiddlewareInterface
     }
 
     /**
-     * Apply the middleware.
+     * {@inheritDoc}
      *
-     * Will modify the request adding a parsed body if the content-type is known.
-     *
-     * @param ServerRequestInterface  $request The request.
-     * @param RequestHandlerInterface $handler The request handler.
-     *
-     * @return ResponseInterface A response.
+     * Modifie la requête en ajoutant un corps analysé si le type de contenu est connu.
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -173,9 +163,9 @@ class BodyParser implements MiddlewareInterface
     }
 
     /**
-     * Decode JSON into an array.
+     * Décode JSON dans un tableau.
      *
-     * @param string $body The request body to decode
+     * @param string $body Le corps de la requête à décoder
      */
     protected function decodeJson(string $body): ?array
     {
@@ -191,9 +181,9 @@ class BodyParser implements MiddlewareInterface
     }
 
     /**
-     * Decode XML into an array.
+     * Décode XML dans un tableau.
      *
-     * @param string $body The request body to decode
+     * @param string $body Le corps de la requête à décoder
      */
     protected function decodeXml(string $body): array
     {
