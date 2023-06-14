@@ -387,7 +387,7 @@ class Router implements RouterInterface
                 if (is_array($handler)) {
                     $handler = implode('::', $handler);
                 }
-                
+
                 [$controller] = explode('::', $handler);
 
                 // Vérifie `/` dans le nom du contrôleur

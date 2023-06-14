@@ -54,14 +54,14 @@ trait InteractsWithContentTypes
         $contentTypes = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
-            if (in_array($accept, ['*/*', '*'])) {
+            if (in_array($accept, ['*/*', '*'], true)) {
                 return $contentTypes[0];
             }
 
             foreach ($contentTypes as $contentType) {
                 $type = $contentType;
 
-                if (! is_null($mimeType = $this->getMimeType($contentType))) {
+                if (null !== ($mimeType = $this->getMimeType($contentType))) {
                     $type = $mimeType;
                 }
 
@@ -69,7 +69,7 @@ trait InteractsWithContentTypes
 
                 $type = strtolower($type);
 
-                if ($this->matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
+                if ($this->matchesType($type, $accept) || $accept === strtok($type, '/') . '/*') {
                     return $contentType;
                 }
             }
@@ -115,7 +115,7 @@ trait InteractsWithContentTypes
 
         $split = explode('/', $actual);
 
-        return isset($split[1]) && preg_match('#'.preg_quote($split[0], '#').'/.+\+'.preg_quote($split[1], '#').'#', $type);
+        return isset($split[1]) && preg_match('#' . preg_quote($split[0], '#') . '/.+\+' . preg_quote($split[1], '#') . '#', $type);
     }
 
     /**

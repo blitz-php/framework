@@ -16,14 +16,12 @@ trait ContentReplacer
     /**
      * Chemin source
      */
-    protected string $sourcePath = __DIR__ .'/../';
+    protected string $sourcePath = __DIR__ . '/../';
 
     /**
      * Chemin cible pour le replacement
      */
     protected string $distPath = APP_PATH;
-    
-
 
     /**
      * Recupere le chemin source complet d'un fichier
@@ -48,12 +46,12 @@ trait ContentReplacer
     protected function copyAndReplace(string $file, array $replaces): void
     {
         $content = file_get_contents($this->sourcePath($file));
-        
+
         $content = strtr($content, $replaces);
 
         $this->writeFile($file, $content);
     }
-    
+
     /**
      * Écrivez un fichier, attrapez toutes les exceptions et affichez une erreur bien formatée.
      *
@@ -90,7 +88,6 @@ trait ContentReplacer
     }
 
     /**
-     *
      * @param string $file     Chemin de fichier relatif comme 'Controllers/BaseController.php'.
      * @param array  $replaces [search => replace]
      */
@@ -158,7 +155,7 @@ trait ContentReplacer
      * @param string $pattern Modèle de recherche d'expression régulière.
      * @param string $replace Remplacement de Regexp incluant le texte à ajouter.
      *
-     * @return bool|string true : déjà mis à jour, false : erreur d'expression régulière.
+     * @return bool|string true : déjà mis à jour, false : erreur d'expression régulière.
      */
     private function _addContent(string $content, string $text, string $pattern, string $replace)
     {

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Mail\Adapters;
 
 use BlitzPHP\Loader\Services;
@@ -12,18 +21,18 @@ class PHPMailer extends AbstractAdapter
      * {@inheritDoc}
      */
     protected array $dependancies = [
-        ['class' => Mailer::class, 'package' => 'phpmailer/phpmailer']
+        ['class' => Mailer::class, 'package' => 'phpmailer/phpmailer'],
     ];
 
     /**
-	 * @var Mailer
-	 */
+     * @var Mailer
+     */
     protected $mailer;
 
     public function __construct(bool $debug = false)
     {
-        $this->mailer = new Mailer();
-        $this->mailer->Debugoutput = function($str, $level) {
+        $this->mailer              = new Mailer();
+        $this->mailer->Debugoutput = function ($str, $level) {
             Services::logger()->info('[Mail][' . $level . ']: ' . $str);
         };
 
@@ -35,17 +44,17 @@ class PHPMailer extends AbstractAdapter
      */
     public function init(array $config): self
     {
-        if (!empty($config['username']) && !empty($config['password'])) {
+        if (! empty($config['username']) && ! empty($config['password'])) {
             $this->mailer->SMTPAuth = true;
         }
-        
+
         return parent::init($config);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setPort(int $port): self 
+    public function setPort(int $port): self
     {
         $this->mailer->Port = $port;
 
@@ -55,17 +64,17 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setHost(string $host): self 
+    public function setHost(string $host): self
     {
         $this->mailer->Host = $host;
 
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public function setUsername(string $username): self 
+    public function setUsername(string $username): self
     {
         $this->mailer->Username = $username;
 
@@ -75,7 +84,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPassword(string $password): self 
+    public function setPassword(string $password): self
     {
         $this->mailer->Password = $password;
 
@@ -85,7 +94,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setDebug(int $debug = SMTP::DEBUG_SERVER): self 
+    public function setDebug(int $debug = SMTP::DEBUG_SERVER): self
     {
         $this->mailer->SMTPDebug = $debug;
 
@@ -95,18 +104,21 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setProtocol(string $protocol): self 
+    public function setProtocol(string $protocol): self
     {
         switch (strtolower($protocol)) {
             case static::PROTOCOL_MAIL:
                 $this->mailer->isMail();
                 break;
+
             case static::PROTOCOL_QMAIL:
                 $this->mailer->isQmail();
                 break;
+
             case static::PROTOCOL_SENDMAIL:
                 $this->mailer->isSendmail();
                 break;
+
             default:
                 $this->mailer->isSMTP();
                 break;
@@ -118,17 +130,17 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setTimeout(int $timeout): self 
+    public function setTimeout(int $timeout): self
     {
         $this->mailer->Timeout = $timeout;
 
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public function setCharset(string $charset): self 
+    public function setCharset(string $charset): self
     {
         $this->mailer->CharSet = $charset;
 
@@ -138,7 +150,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPriority(int $priority): self 
+    public function setPriority(int $priority): self
     {
         if (in_array($priority, static::PRIORITY_MAP, true)) {
             $this->mailer->Priority = $priority;
@@ -150,7 +162,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setEncryption(?string $encryption): self 
+    public function setEncryption(?string $encryption): self
     {
         if (in_array($encryption, [null, static::ENCRYPTION_SSL, static::ENCRYPTION_TLS], true)) {
             $this->mailer->SMTPSecure = $encryption;
@@ -159,11 +171,10 @@ class PHPMailer extends AbstractAdapter
         return $this;
     }
 
-
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
-    public function alt(string $content) : self
+    public function alt(string $content): self
     {
         $this->mailer->AltBody = $content;
 
@@ -171,8 +182,8 @@ class PHPMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
@@ -181,7 +192,7 @@ class PHPMailer extends AbstractAdapter
             $path = [$path => $name];
         }
 
-        foreach ($path As $key => $value) {
+        foreach ($path as $key => $value) {
             $this->mailer->addAttachment($key, $value, $encoding, $type, $disposition);
         }
 
@@ -189,8 +200,8 @@ class PHPMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
@@ -202,7 +213,7 @@ class PHPMailer extends AbstractAdapter
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function bcc(array|string $address, bool|string $name = '', bool $set = false): self
@@ -211,8 +222,8 @@ class PHPMailer extends AbstractAdapter
 
         if ($set) {
             $this->mailer->clearBCCs();
-        } 
-        
+        }
+
         foreach ($addresses as $address) {
             $this->mailer->addBCC(...$address);
         }
@@ -221,8 +232,8 @@ class PHPMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function cc(array|string $address, bool|string $name = '', bool $set = false): self
@@ -231,12 +242,12 @@ class PHPMailer extends AbstractAdapter
 
         if ($set) {
             $this->mailer->clearCCs();
-        } 
-        
+        }
+
         foreach ($addresses as $address) {
             $this->mailer->addCC(...$address);
         }
-        
+
         return $this;
     }
 
@@ -245,18 +256,18 @@ class PHPMailer extends AbstractAdapter
      */
     public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
     {
-        $this->mailer->DKIM_domain = $domain;
-        $this->mailer->DKIM_private = $pk;
-        $this->mailer->DKIM_selector = $selector ?: 'blitz';
+        $this->mailer->DKIM_domain     = $domain;
+        $this->mailer->DKIM_private    = $pk;
+        $this->mailer->DKIM_selector   = $selector ?: 'blitz';
         $this->mailer->DKIM_passphrase = $passphrase;
-        $this->mailer->DKIM_identity = $this->mailer->From;
-    
+        $this->mailer->DKIM_identity   = $this->mailer->From;
+
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
@@ -267,8 +278,8 @@ class PHPMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
@@ -279,32 +290,32 @@ class PHPMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function from(string $address, string $name = '') : self
+    public function from(string $address, string $name = ''): self
     {
         $this->mailer->setFrom($address, $name);
-      
+
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function header(array|string $name, ?string $value = null) : self
+    public function header(array|string $name, ?string $value = null): self
     {
         if (is_string($name)) {
             $name = [$name => $value];
         }
 
-        foreach ($name As $key => $value) {
+        foreach ($name as $key => $value) {
             $this->mailer->addCustomHeader($key, $value);
         }
-        
+
         return $this;
     }
 
@@ -314,20 +325,20 @@ class PHPMailer extends AbstractAdapter
     public function html(string $content): self
     {
         $this->mailer->isHTML(true);
-        
+
         return $this->message($content);
     }
-    
+
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function lastId(): string
     {
         return $this->mailer->getLastMessageID();
     }
-    
+
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function message(string $message): self
     {
@@ -337,8 +348,8 @@ class PHPMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function replyTo(array|string $address, bool|string $name = '', bool $set = false): self
@@ -347,8 +358,8 @@ class PHPMailer extends AbstractAdapter
 
         if ($set) {
             $this->mailer->clearReplyTos();
-        } 
-        
+        }
+
         foreach ($addresses as $address) {
             $this->mailer->addReplyTo(...$address);
         }
@@ -358,7 +369,7 @@ class PHPMailer extends AbstractAdapter
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function send(): bool
@@ -377,7 +388,7 @@ class PHPMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function subject(string $subject): self
     {
@@ -392,13 +403,13 @@ class PHPMailer extends AbstractAdapter
     public function text(string $content): self
     {
         $this->mailer->isHTML(false);
-        
+
         return $this->message($content);
     }
 
     /**
-	 * {@inheritDoc}
-	 *
+     * {@inheritDoc}
+     *
      * @throws \PHPMailer\PHPMailer\Exception
      */
     public function to(array|string $address, bool|string $name = '', bool $set = false): self
@@ -407,8 +418,8 @@ class PHPMailer extends AbstractAdapter
 
         if ($set) {
             $this->mailer->clearAddresses();
-        } 
-        
+        }
+
         foreach ($addresses as $address) {
             $this->mailer->addAddress(...$address);
         }

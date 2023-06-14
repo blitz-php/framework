@@ -62,23 +62,21 @@ abstract class AbstractAdapter implements RendererInterface
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @param array $config Configuration actuelle de l'adapter
-     * @param bool $debug Devrions-nous stocker des informations sur les performances ?
+     * @param bool  $debug  Devrions-nous stocker des informations sur les performances ?
      */
     public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
     {
         helper('assets');
-        
+
         if (! empty($viewPathLocator)) {
             if (is_string($viewPathLocator)) {
                 $this->viewPath = rtrim($viewPathLocator, '\\/ ') . DS;
-            }
-            else if ($viewPathLocator instanceof Locator) {
+            } elseif ($viewPathLocator instanceof Locator) {
                 $this->locator = $viewPathLocator;
             }
-        }
-        else {
+        } else {
             $this->locator = Services::locator();
         }
     }
@@ -221,17 +219,16 @@ abstract class AbstractAdapter implements RendererInterface
     protected function getRenderedFile(?array $options, string $view, string $ext = 'php'): string
     {
         $options = (array) $options;
-    
+
         $viewPath = $options['viewPath'] ?? $this->viewPath;
         if (! empty($viewPath)) {
             $file = str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($view, '/\\'));
-        }
-        else {
+        } else {
             $file = $view;
         }
-        
+
         $file = Helpers::ensureExt($file, $ext);
-        
+
         if (! is_file($file) && $this->locator instanceof Locator) {
             $file = $this->locator->locateFile($view, 'Views', empty($ext) ? 'php' : $ext);
         }

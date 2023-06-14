@@ -271,8 +271,7 @@ class NativeAdapter extends AbstractAdapter
             $this->sectionStack[] = $name;
 
             ob_start();
-        }
-        else {
+        } else {
             $this->sections[$name] = [$content];
         }
     }

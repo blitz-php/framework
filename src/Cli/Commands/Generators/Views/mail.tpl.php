@@ -25,7 +25,7 @@ class {class} extends Mailable
             // 'text' => ''
         ];
     }
-    
+
     /**
      * Définition des données à transférer à la vue qui générera le mail
      */

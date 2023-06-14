@@ -1,11 +1,20 @@
-<?php 
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
 
 namespace BlitzPHP\Mail;
 
 use ReflectionClass;
 use ReflectionProperty;
 
-abstract class Mailable 
+abstract class Mailable
 {
     /**
      * Définition des pièces jointes du mail
@@ -17,10 +26,10 @@ abstract class Mailable
 
     /**
      * Définition des adresses de copie (BCC) au mail
-     * 
+     *
      * @return array<string, string>|string[]
-     * 
-     * @example 
+     *
+     * @example
      * ```php
      *  [
      *      'johndoe@mail.com' => 'john doe',
@@ -32,13 +41,13 @@ abstract class Mailable
     {
         return [];
     }
-    
+
     /**
      * Définition des adresses de copie (CC) au mail
-     * 
+     *
      * @return array<string, string>|string[]
-     * 
-     * @example 
+     *
+     * @example
      * ```php
      *  [
      *      'johndoe@mail.com' => 'john doe',
@@ -59,15 +68,15 @@ abstract class Mailable
         return [
             'view' => '',
             'html' => '',
-            'text' => ''
+            'text' => '',
         ];
     }
 
     /**
      * Définition de l'adresse de l'expediteur du mail
-     * 
+     *
      * @return string[]
-     * 
+     *
      * @example
      * ```php
      *  ['johndoe@mail.com', 'John Doe']
@@ -81,9 +90,9 @@ abstract class Mailable
 
     /**
      * Définition des entetes supplementaires du mail
-     * 
+     *
      * @return array<string, string>
-     * 
+     *
      * @example
      * ```php
      *  [
@@ -106,10 +115,10 @@ abstract class Mailable
 
     /**
      * Définition des adresses de reponse (ReplyTo) du mail
-     * 
+     *
      * @return array<string, string>|string[]
-     * 
-     * @example 
+     *
+     * @example
      * ```php
      *  [
      *      'johndoe@mail.com' => 'john doe',
@@ -121,7 +130,7 @@ abstract class Mailable
     {
         return [];
     }
-    
+
     /**
      * Définition du sujet du mail
      */
@@ -152,22 +161,22 @@ abstract class Mailable
         foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
             $data[$prop->getName()] = $prop->getValue();
         }
-        
+
         return array_merge($data, $this->with());
     }
 
     /**
-     * Envoi du mail 
+     * Envoi du mail
      *
      * @internal
      */
-    public function send(Mail $mail): bool 
+    public function send(Mail $mail): bool
     {
         foreach ($this->bcc() as $key => $value) {
             if (empty($value) || ! is_string($value)) {
                 continue;
             }
-            
+
             if (is_string($key)) {
                 $mail->bcc($key, $value);
             } else {
@@ -179,7 +188,7 @@ abstract class Mailable
             if (empty($value) || ! is_string($value)) {
                 continue;
             }
-            
+
             if (is_string($key)) {
                 $mail->cc($key, $value);
             } else {
@@ -188,12 +197,12 @@ abstract class Mailable
         }
 
         $content = $this->content();
-        
+
         if (! empty($content['view'])) {
             $mail->view($content['view'], $this->data());
         } elseif (! empty($content['html'])) {
             $mail->html($content['html']);
-        } 
+        }
         if (! empty($content['text'])) {
             $mail->text($content['text']);
         }
@@ -213,7 +222,7 @@ abstract class Mailable
                 $mail->replyTo($value);
             }
         }
-        
+
         $mail->subject($this->subject());
 
         return $mail->send();

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Validation\Rules;
 
 use BlitzPHP\Contracts\Database\ConnectionInterface;
@@ -7,8 +16,7 @@ use Dimtrovich\Validation\Rules\AbstractRule;
 
 class Unique extends AbstractRule
 {
-    protected $message = ":attribute :value has been used";
-
+    protected $message        = ':attribute :value has been used';
     protected $fillableParams = ['table', 'column', 'except'];
 
     public function __construct(protected ConnectionInterface $db)
@@ -22,9 +30,9 @@ class Unique extends AbstractRule
         $table  = $this->parameter('table');
         $except = $this->parameter('except');
         $column = $this->parameter('column');
-        $column = $column ?: $this->getAttribute()->getKey(); 
+        $column = $column ?: $this->getAttribute()->getKey();
 
-        if ($except && $except == $value) {
+        if ($except && $except === $value) {
             return true;
         }
 

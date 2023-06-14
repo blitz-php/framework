@@ -171,7 +171,7 @@ abstract class BaseModel
      * @var string
      */
     protected $dateFormat = 'datetime';
- 
+
     /**
      * Connexion à la base de données
      *
@@ -225,17 +225,17 @@ abstract class BaseModel
      */
     public function builder(?string $table = null): BaseBuilder
     {
-        if ($this->builder instanceof BaseBuilder) {            
+        if ($this->builder instanceof BaseBuilder) {
             // S'assurer que la table utilisee differe de celle du builder
             $builderTable = $this->builder->getTable();
             if ($table && $builderTable !== $this->db->prefixTable($table)) {
                 return $this->db->table($table);
             }
 
-            if (empty($builderTable) && !empty($this->table)) {
+            if (empty($builderTable) && ! empty($this->table)) {
                 $this->builder = $this->builder->table($this->table);
             }
-          
+
             return $this->builder;
         }
 
@@ -264,7 +264,7 @@ abstract class BaseModel
      * Insere les données dans la base de données.
      * Si un objet est fourni, il tentera de le convertir en un tableau.
      *
-     * @param bool              $returnID Si l'ID de l'element inséré doit être retourné ou non.
+     * @param bool $returnID Si l'ID de l'element inséré doit être retourné ou non.
      *
      * @return BaseResult|int
      *
@@ -331,7 +331,7 @@ abstract class BaseModel
 
         return $this->builder()->whereIn($this->primaryKey, (array) $id)->update($data);
     }
-    
+
     /**
      * Une méthode pratique qui tentera de déterminer si les données doivent être insérées ou mises à jour.
      * Fonctionnera avec un tableau ou un objet.
@@ -409,7 +409,7 @@ abstract class BaseModel
             $result = $this->db->{$name}(...$params);
         } elseif (method_exists($builder, $name)) {
             $this->checkBuilderMethod($name);
-            
+
             $result = $builder->{$name}(...$params);
         } else {
             throw new BadMethodCallException('Call to undefined method ' . static::class . '::' . $name);
@@ -421,7 +421,7 @@ abstract class BaseModel
 
         return $result;
     }
-    
+
     /**
      * Renvoie la valeur id pour le tableau de données ou l'objet.
      *
@@ -429,7 +429,7 @@ abstract class BaseModel
      */
     protected function idValue(array|object $data)
     {
-       if (is_object($data) && isset($data->{$this->primaryKey})) {
+        if (is_object($data) && isset($data->{$this->primaryKey})) {
             return $data->{$this->primaryKey};
         }
 
@@ -453,8 +453,8 @@ abstract class BaseModel
      * Prend une classe et retourne un tableau de ses propriétés publiques et protégées sous la forme d'un tableau adapté à une utilisation dans les créations et les mises à jour.
      * Cette méthode utilise objectToRawArray() en interne et effectue la conversion en chaîne sur toutes les instances Time
      *
-     * @param bool          $onlyChanged Propriété modifiée uniquement
-     * @param bool          $recursive   Si vrai, les entités internes seront également converties en tableau
+     * @param bool $onlyChanged Propriété modifiée uniquement
+     * @param bool $recursive   Si vrai, les entités internes seront également converties en tableau
      *
      * @throws ReflectionException
      */
@@ -479,8 +479,8 @@ abstract class BaseModel
     /**
      * Prend une classe et renvoie un tableau de ses propriétés publiques et protégées sous la forme d'un tableau avec des valeurs brutes.
      *
-     * @param bool          $onlyChanged Propriété modifiée uniquement
-     * @param bool          $recursive   Si vrai, les entités internes seront également converties en tableau
+     * @param bool $onlyChanged Propriété modifiée uniquement
+     * @param bool $recursive   Si vrai, les entités internes seront également converties en tableau
      *
      * @throws ReflectionException
      */
@@ -488,7 +488,7 @@ abstract class BaseModel
     {
         if (method_exists($data, 'toRawArray')) {
             $properties = $data->toRawArray($onlyChanged, $recursive);
-        } else if (method_exists($data, 'toArray')) {
+        } elseif (method_exists($data, 'toArray')) {
             $properties = $data->toArray();
         } else {
             $mirror = new ReflectionClass($data);
@@ -496,7 +496,7 @@ abstract class BaseModel
 
             $properties = [];
 
-            // Boucle sur chaque propriété, en enregistrant le nom/valeur dans un nouveau tableau 
+            // Boucle sur chaque propriété, en enregistrant le nom/valeur dans un nouveau tableau
             // que nous pouvons retourner.
             foreach ($props as $prop) {
                 // Doit rendre les valeurs protégées accessibles.
@@ -507,11 +507,11 @@ abstract class BaseModel
 
         return $properties;
     }
-    
+
     /**
      * Convertit la valeur Date en chaîne en utilisant $this->dateFormat.
      *
-     * Les formats disponibles sont :
+     * Les formats disponibles sont :
      * - 'int' - Stocke la date sous la forme d'un horodatage entier
      * - 'datetime' - Stocke les données au format datetime SQL
      * - 'date' - Stocke la date (uniquement) au format de date SQL.
@@ -538,7 +538,7 @@ abstract class BaseModel
     /**
      * Transformer les données en tableau.
      *
-     * @param string            $type Type de donnees (insert|update)
+     * @param string $type Type de donnees (insert|update)
      *
      * @throws DataException
      * @throws InvalidArgumentException
@@ -554,13 +554,13 @@ abstract class BaseModel
             throw DataException::emptyDataset($type);
         }
 
-        // Si $data utilise une classe personnalisée avec des propriétés publiques ou protégées représentant 
+        // Si $data utilise une classe personnalisée avec des propriétés publiques ou protégées représentant
         // les éléments de la collection, nous devons les saisir sous forme de tableau.
         if (is_object($data) && ! $data instanceof stdClass) {
             $data = $this->objectToArray($data, $type === 'update', true);
         }
 
-        // S'il s'agit toujours d'une stdClass, continuez et convertissez en un tableau afin que 
+        // S'il s'agit toujours d'une stdClass, continuez et convertissez en un tableau afin que
         // les autres méthodes de modèle n'aient pas à effectuer de vérifications spéciales.
         if (is_object($data)) {
             $data = (array) $data;

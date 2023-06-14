@@ -448,7 +448,7 @@ if (! function_exists('old')) {
     function old(string $key, ?string $default = null, $escape = 'html')
     {
         // Assurez-vous de charger la session
-        if (session_status() === PHP_SESSION_NONE && !on_test()) {
+        if (session_status() === PHP_SESSION_NONE && ! on_test()) {
             session(); // @codeCoverageIgnore
         }
 
@@ -951,8 +951,8 @@ if (! function_exists('last')) {
 
 if (! function_exists('invade')) {
     /**
-     * Cette classe offre une fonction d'invasion qui vous permettra de lire / écrire des propriétés privées d'un objet. 
-     * Il vous permettra également de définir, obtenir et appeler des méthodes privées. 
+     * Cette classe offre une fonction d'invasion qui vous permettra de lire / écrire des propriétés privées d'un objet.
+     * Il vous permettra également de définir, obtenir et appeler des méthodes privées.
      *
      * @return Invader
      *

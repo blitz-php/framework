@@ -34,8 +34,8 @@ trait ResponseTrait
     public function json(array|string $body, int $status = StatusCode::OK): self
     {
         return $this->withType('application/json')
-                    ->withStringBody(Formatter::type('json')->format($body))
-                    ->withStatus($status);
+            ->withStringBody(Formatter::type('json')->format($body))
+            ->withStatus($status);
     }
 
     /**
@@ -56,8 +56,8 @@ trait ResponseTrait
     public function xml(array|string $body, int $status = StatusCode::OK): self
     {
         return $this->withType('application/xml')
-                    ->withStringBody(Formatter::type('xml')->format($body))
-                    ->withStatus($status);
+            ->withStringBody(Formatter::type('xml')->format($body))
+            ->withStatus($status);
     }
 
     /**
@@ -78,9 +78,9 @@ trait ResponseTrait
     public function noCache(): self
     {
         return $this->withoutHeader('Cache-Control')
-                    ->withHeader('Cache-Control', ['no-store', 'max-age=0', 'no-cache']);
+            ->withHeader('Cache-Control', ['no-store', 'max-age=0', 'no-cache']);
     }
-    
+
     /**
      * Génère les en-têtes qui forcent un téléchargement à se produire.
      * Et envoie le fichier au navigateur.
@@ -97,11 +97,11 @@ trait ResponseTrait
 
             return $this->withFile($filepath, ['download' => true, 'name' => $filename]);
         }
-        
+
         if (! empty($data)) {
             return $this->withStringBody($data)
-                    ->withType(pathinfo($filename, PATHINFO_EXTENSION))
-                    ->withDownload($filename);
+                ->withType(pathinfo($filename, PATHINFO_EXTENSION))
+                ->withDownload($filename);
         }
 
         return $this;

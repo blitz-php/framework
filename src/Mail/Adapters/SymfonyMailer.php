@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Mail\Adapters;
 
 use Symfony\Component\Mailer\Mailer;
@@ -18,26 +27,25 @@ class SymfonyMailer extends AbstractAdapter
      * {@inheritDoc}
      */
     protected array $dependancies = [
-        ['class' => Mailer::class, 'package' => 'symfony/mailer']
+        ['class' => Mailer::class, 'package' => 'symfony/mailer'],
     ];
 
     /**
-	 * @var Email
-	 */
+     * @var Email
+     */
     protected $mailer;
 
     private ?Mailer $transporter = null;
-
-    private string $charset    = self::CHARSET_UTF8;
-    private string $dsn        = '';
-    private string $protocol   = self::PROTOCOL_SMTP;
-    private int $timeout       = 0;
-    private int $port          = 587;
-    private string $host       = '';
-    private string $username   = '';
-    private string $password   = '';
-    private string $encryption = self::ENCRYPTION_TLS;
-    private int $debug         = 0;
+    private string $charset      = self::CHARSET_UTF8;
+    private string $dsn          = '';
+    private string $protocol     = self::PROTOCOL_SMTP;
+    private int $timeout         = 0;
+    private int $port            = 587;
+    private string $host         = '';
+    private string $username     = '';
+    private string $password     = '';
+    private string $encryption   = self::ENCRYPTION_TLS;
+    private int $debug           = 0;
 
     public function __construct(bool $debug = false)
     {
@@ -45,7 +53,6 @@ class SymfonyMailer extends AbstractAdapter
 
         parent::__construct($debug);
     }
-
 
     public function setDsn(string $dsn): self
     {
@@ -57,7 +64,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPort(int $port): self 
+    public function setPort(int $port): self
     {
         $this->port = $port;
 
@@ -67,7 +74,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setHost(string $host): self 
+    public function setHost(string $host): self
     {
         $this->host = $host;
 
@@ -77,7 +84,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setUsername(string $username): self 
+    public function setUsername(string $username): self
     {
         $this->username = $username;
 
@@ -87,7 +94,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPassword(string $password): self 
+    public function setPassword(string $password): self
     {
         $this->password = $password;
 
@@ -97,7 +104,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setDebug(int $debug = 1): self 
+    public function setDebug(int $debug = 1): self
     {
         $this->debug = $debug;
 
@@ -107,7 +114,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setProtocol(string $protocol): self 
+    public function setProtocol(string $protocol): self
     {
         $this->protocol = $protocol;
 
@@ -117,7 +124,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setTimeout(int $timeout): self 
+    public function setTimeout(int $timeout): self
     {
         $this->timeout = $timeout;
 
@@ -127,7 +134,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setCharset(string $charset): self 
+    public function setCharset(string $charset): self
     {
         $this->charset = $charset;
 
@@ -137,7 +144,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPriority(int $priority): self 
+    public function setPriority(int $priority): self
     {
         if (in_array($priority, static::PRIORITY_MAP, true)) {
             $this->mailer->priority($priority);
@@ -149,7 +156,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setEncryption(?string $encryption): self 
+    public function setEncryption(?string $encryption): self
     {
         if (in_array($encryption, [null, static::ENCRYPTION_SSL, static::ENCRYPTION_TLS], true)) {
             $this->encryption = $encryption;
@@ -158,17 +165,16 @@ class SymfonyMailer extends AbstractAdapter
         return $this;
     }
 
-
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
-    public function alt(string $content) : self
+    public function alt(string $content): self
     {
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
     {
@@ -176,7 +182,7 @@ class SymfonyMailer extends AbstractAdapter
             $path = [$path => $name];
         }
 
-        foreach ($path As $key => $value) {
+        foreach ($path as $key => $value) {
             $this->mailer->addPart(new DataPart(new File($key), $value, $type));
         }
 
@@ -184,12 +190,12 @@ class SymfonyMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function attachBinary($binary, string $name, string $encoding = self::ENCODING_BASE64, string $type = '', string $disposition = 'attachment'): self
     {
-        $this->mailer->addPart(new DataPart(@fopen($binary, 'r'), $name, $type));
-     
+        $this->mailer->addPart(new DataPart(@fopen($binary, 'rb'), $name, $type));
+
         return $this;
     }
 
@@ -210,7 +216,7 @@ class SymfonyMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function cc(array|string $address, bool|string $name = '', bool $set = false): self
     {
@@ -230,11 +236,10 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
     {
-        
         $signer = new DkimSigner($pk, $domain ?: site_url(), $selector ?: 'blitz', [], $passphrase);
-        
+
         $this->mailer = $signer->sign($this->mailer);
-        
+
         return $this;
     }
 
@@ -253,23 +258,23 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
     {
-        $this->mailer->addPart((new DataPart(@fopen($binary, 'r'), $name, $type))->asInline());
+        $this->mailer->addPart((new DataPart(@fopen($binary, 'rb'), $name, $type))->asInline());
 
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function from(string $address, string $name = ''): self
     {
         $this->mailer->from($this->makeAddress($address, $name));
-      
+
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function header(array|string $name, ?string $value = null): self
     {
@@ -277,10 +282,10 @@ class SymfonyMailer extends AbstractAdapter
             $name = [$name => $value];
         }
 
-        foreach ($name As $key => $value) {
+        foreach ($name as $key => $value) {
             $this->mailer->getHeaders()->addTextHeader($key, $value);
         }
-        
+
         return $this;
     }
 
@@ -290,12 +295,12 @@ class SymfonyMailer extends AbstractAdapter
     public function html(string $content): self
     {
         $this->mailer->html($content, $this->charset);
-        
+
         return $this;
     }
-    
+
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function message(string $message): self
     {
@@ -303,7 +308,7 @@ class SymfonyMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function replyTo(array|string $address, bool|string $name = '', bool $set = false): self
     {
@@ -321,11 +326,11 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function send() : bool
+    public function send(): bool
     {
         try {
             $this->transporter()->send($this->mailer);
-        
+
             return true;
         } catch (Throwable $e) {
             if ($this->debug > 0) {
@@ -342,16 +347,16 @@ class SymfonyMailer extends AbstractAdapter
     public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): self
     {
         $signer = new SMimeSigner($cert_filename, $key_filename, $key_pass, $extracerts_filename);
-        
+
         $this->mailer = $signer->sign($this->mailer);
 
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
-    public function subject(string $subject) : self
+    public function subject(string $subject): self
     {
         $this->mailer->subject($subject);
 
@@ -364,12 +369,12 @@ class SymfonyMailer extends AbstractAdapter
     public function text(string $content): self
     {
         $this->mailer->text($content, $this->charset);
-        
+
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function to(array|string $address, bool|string $name = '', bool $set = false): self
     {
@@ -385,20 +390,19 @@ class SymfonyMailer extends AbstractAdapter
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function lastId(): string
     {
         return $this->mailer->generateMessageId();
     }
-    
 
     /**
      * {@inheritDoc}
      *
      * @return Address
      */
-    protected function makeAddress(string $email, string $name) 
+    protected function makeAddress(string $email, string $name)
     {
         [$email, $name] = parent::makeAddress($email, $name);
 
@@ -422,13 +426,13 @@ class SymfonyMailer extends AbstractAdapter
             return $this->dsn;
         }
 
-        return match($this->protocol) {
+        return match ($this->protocol) {
             static::PROTOCOL_SMTP     => "smtp://{$this->username}:{$this->password}@{$this->host}:{$this->port}",
-            static::PROTOCOL_SENDMAIL => "sendmail://default",
-            static::PROTOCOL_MAIL     => "sendmail://default",
+            static::PROTOCOL_SENDMAIL => 'sendmail://default',
+            static::PROTOCOL_MAIL     => 'sendmail://default',
             static::PROTOCOL_POSTMARK => "postmark+smtp://{$this->username}@default",                                // username joue le role de ID
             static::PROTOCOL_SENDGRID => "sendgrid+smtp://apikey:{$this->username}@default",                         // username joue le role de API_KEY
             default                   => "{$this->protocol}+smtp://{$this->username}:{$this->password}@default",
-        };  
+        };
     }
 }

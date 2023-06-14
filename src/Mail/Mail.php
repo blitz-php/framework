@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Mail;
 
 use BlitzPHP\Mail\Adapters\AbstractAdapter;
@@ -9,7 +18,7 @@ use InvalidArgumentException;
 
 /**
  * Envoi d'e-mail en utilisant Mail, Sendmail ou SMTP.
- * 
+ *
  * @method $this charset(string $charset)
  * @method $this priority(int $priority)
  * @method $this setCharset(string $charset)
@@ -55,7 +64,7 @@ class Mail implements MailerInterface
         $this->init($config);
     }
 
-    public function clear(): void 
+    public function clear(): void
     {
         $this->adapter = null;
     }
@@ -67,7 +76,7 @@ class Mail implements MailerInterface
     {
         return $mailable->send($this);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -106,7 +115,7 @@ class Mail implements MailerInterface
             return $this->adapter;
         }
 
-        $handler  = $this->config['handler'] ?? null;
+        $handler = $this->config['handler'] ?? null;
 
         if (empty($handler)) {
             throw new InvalidArgumentException(lang('Mail.undefinedHandler'));
@@ -119,7 +128,7 @@ class Mail implements MailerInterface
         if (! class_exists($handler)) {
             throw new InvalidArgumentException(lang('Mail.invalidHandler', [$handler]));
         }
-        
+
         $debug = $this->config['debug'] ?? 'auto';
         if ($debug === 'auto') {
             $debug = on_dev();
@@ -128,7 +137,7 @@ class Mail implements MailerInterface
         if (! is_subclass_of($handler, AbstractAdapter::class)) {
             throw new InvalidArgumentException(lang('Mail.handlerMustExtendClass', [$handler, AbstractAdapter::class]));
         }
-        
+
         /** @var AbstractAdapter $adapter */
         $adapter = new $handler($debug);
 
@@ -136,9 +145,9 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
-    public function alt(string $content) : self
+    public function alt(string $content): self
     {
         $this->factory()->alt($content);
 
@@ -146,7 +155,7 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
     {
@@ -168,7 +177,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function bcc(array|string $address, bool|string $name = '', bool $set = false) : self
+    public function bcc(array|string $address, bool|string $name = '', bool $set = false): self
     {
         $this->factory()->bcc($address, $name, $set);
 
@@ -176,7 +185,7 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function cc(array|string $address, bool|string $name = '', bool $set = false): self
     {
@@ -196,7 +205,7 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
     {
@@ -206,7 +215,7 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
     {
@@ -216,22 +225,22 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function from(string $address, string $name = ''): self
     {
         $this->factory()->from($address, $name);
-      
+
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function header(array|string $name, ?string $value = null): self
     {
         $this->factory()->header($name, $value);
-        
+
         return $this;
     }
 
@@ -241,10 +250,10 @@ class Mail implements MailerInterface
     public function html(string $content): self
     {
         $this->factory()->html($content);
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -254,11 +263,11 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function message(string $message): self
     {
-        return match($this->config['mailType']) {
+        return match ($this->config['mailType']) {
             'html'  => $this->html($message),
             'text'  => $this->text($message),
             default => $this
@@ -266,7 +275,7 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function replyTo(array|string $address, bool|string $name = '', bool $set = false): self
     {
@@ -278,7 +287,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function send() : bool
+    public function send(): bool
     {
         return $this->factory()->send();
     }
@@ -294,9 +303,9 @@ class Mail implements MailerInterface
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
-    public function subject(string $subject) : self
+    public function subject(string $subject): self
     {
         $this->factory()->subject($subject);
 
@@ -309,35 +318,35 @@ class Mail implements MailerInterface
     public function text(string $content): self
     {
         $this->factory()->text($content);
-        
+
         return $this;
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      */
     public function to(array|string $address, bool|string $name = '', bool $set = false): self
     {
         $this->factory()->to($address, $name, $set);
-        
+
         return $this;
-    }  
+    }
 
     /**
      * Utilise une vue html pour generer le message de l'email
      */
-    public function view(string $view, array $data = []): self 
+    public function view(string $view, array $data = []): self
     {
         $path = '';
 
-        // N'est-il pas namespaced ? on cherche le dossier en fonction du parametre "view_base"
+        // N'est-il pas namespaced ? on cherche le dossier en fonction du parametre "view_base"
         if (strpos($view, '\\') === false) {
             $path = $this->config['view_dir'] ?? '';
             if (! empty($path)) {
                 $path .= '/';
             }
         }
-        
+
         $view = view($path . $view, $data);
         if (! empty($this->config['template'])) {
             $view->setLayout($this->config['template']);
@@ -345,7 +354,7 @@ class Mail implements MailerInterface
 
         return $this->html($view->get(false));
     }
-    
+
     public function __call(string $method, array $arguments)
     {
         $result = call_user_func_array([$this->factory(), $method], $arguments);

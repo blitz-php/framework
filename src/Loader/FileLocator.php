@@ -101,10 +101,10 @@ class FileLocator
         if (! class_exists($model) && ! Text::endsWith($model, 'Model')) {
             $model .= 'Model';
         }
-        
+
         if (! class_exists($model)) {
             $model = str_replace(APP_NAMESPACE . '\\Models\\', '', $model);
-            $model = APP_NAMESPACE . '\\Models\\' . $model;        
+            $model = APP_NAMESPACE . '\\Models\\' . $model;
         }
 
         if (! class_exists($model)) {

@@ -37,7 +37,7 @@ abstract class BaseMiddleware implements MiddlewareInterface
             $method = Text::camel('set_' . $argument);
             if (method_exists($this, $method)) {
                 call_user_func([$this, $method], $value);
-            }           
+            }
         }
 
         return $this;

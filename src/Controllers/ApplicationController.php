@@ -42,7 +42,7 @@ class ApplicationController extends BaseController
     {
         $path = '';
 
-        // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
+        // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
         if (strpos($view, '\\') === false) {
             $reflection = new ReflectionClass(static::class);
             $path       = str_replace([CONTROLLER_PATH, 'Controller', '.php'], '', $reflection->getFileName());

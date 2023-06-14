@@ -77,15 +77,16 @@ class Redirection extends Response
     {
         if ($errors instanceof ErrorBag) {
             $errors = $errors->all();
-        } else if (is_string($errors)) {
+        } elseif (is_string($errors)) {
             $errors = [$errors];
         }
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $session = Services::session();
             $_errors = $session->getFlashdata('errors') ?? [];
             $session->setFlashdata(
-                'errors', array_merge($_errors, [$key => $errors])
+                'errors',
+                array_merge($_errors, [$key => $errors])
             );
         }
 

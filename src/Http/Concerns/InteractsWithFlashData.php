@@ -20,16 +20,17 @@ trait InteractsWithFlashData
 {
     /**
      * Récupérer un ancien élément d'entrée.
-     * 
-     * @param  Model|string|array|null  $default
-     * @return string|array|null
+     *
+     * @param array|Model|string|null $default
+     *
+     * @return array|string|null
      */
     public function old(?string $key = null, $default = null)
     {
         if (class_exists(Model::class) && $default instanceof Model) {
             $default = $default->getAttribute($key);
         }
-        
+
         if (null !== $value = $this->getOldInput($key)) {
             return $value;
         }
@@ -48,7 +49,7 @@ trait InteractsWithFlashData
     /**
      * Ne flashez qu'une partie des entrées de la session.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
      */
     public function flashOnly($keys): void
     {
@@ -60,7 +61,7 @@ trait InteractsWithFlashData
     /**
      * Ne flashez qu'une partie des entrées de la session.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
      */
     public function flashExcept($keys): void
     {

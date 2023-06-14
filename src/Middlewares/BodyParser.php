@@ -23,7 +23,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * BodyParser
  *
  * Analysez les données du corps de la requête encodée.
- * 
+ *
  * Permet aux charges utiles de requête JSON et XML d'être analysées dans la protection et la validation CSRF de la requête.
  *
  * Vous pouvez également ajouter vos propres analyseurs de corps de requête usi
@@ -104,7 +104,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      *
      * ### Example
      *
-     * Un parseur de corps de requête CSV naïf pourrait être construit comme suit :
+     * Un parseur de corps de requête CSV naïf pourrait être construit comme suit :
      *
      * ```
      * $parser->addParser(['text/csv'], function ($body) {
@@ -113,7 +113,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      * ```
      *
      * @param string[] $types  Un tableau de valeurs d'en-tête de type de contenu à faire correspondre. par exemple. application/json
-     * @param Closure $parser La fonction de parser. Doit renvoyer un tableau de données à insérer dans la requête.
+     * @param Closure  $parser La fonction de parser. Doit renvoyer un tableau de données à insérer dans la requête.
      */
     public function addParser(array $types, Closure $parser): self
     {

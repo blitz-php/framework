@@ -27,7 +27,7 @@ class Middleware implements RequestHandlerInterface
      * Middlewares a executer pour la requete courante
      */
     protected array $middlewares = [];
-    
+
     /**
      * Index du middleware actuellement executer
      */
@@ -69,11 +69,10 @@ class Middleware implements RequestHandlerInterface
             $middlewares = [$middlewares];
         }
 
-        
         foreach ($middlewares as $middleware) {
             $this->append($middleware, $options);
         }
-        
+
         return $this;
     }
 
@@ -244,10 +243,10 @@ class Middleware implements RequestHandlerInterface
             if (array_key_exists($middleware, $this->aliases)) {
                 $middleware = $this->aliases[$middleware];
             }
-            
+
             $middleware = Services::container()->get($middleware);
         }
-        
+
         return $middleware;
     }
 

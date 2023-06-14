@@ -19,7 +19,7 @@ abstract class BaseEntity extends Model
 {
     /**
      * {@inheritDoc}
-     * 
+     *
      * @internal Permet l'initialisation de la base de donnees pour l'ORM Wolke
      */
     public static function resolveConnection(?string $connection = null): BaseConnection

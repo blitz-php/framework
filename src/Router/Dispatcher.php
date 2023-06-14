@@ -692,7 +692,7 @@ class Dispatcher
             if (ob_get_level() > 0) {
                 ob_end_flush();
             }
-        // @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreEnd
         }
         // Lors des tests, l'un est pour phpunit, l'autre pour le cas de test.
         elseif (ob_get_level() > 2) {
@@ -804,17 +804,19 @@ class Dispatcher
 
     /**
      * Construit une reponse adequate en fonction du retour du controleur
+     *
+     * @param mixed $returned
      */
     protected function formatResponse(ResponseInterface $response, $returned): ResponseInterface
     {
         if ($returned instanceof ResponseInterface) {
             return $returned;
-        } 
-        
+        }
+
         if (is_object($returned)) {
             if (method_exists($returned, 'toArray')) {
                 $returned = $returned->toArray();
-            } else if (method_exists($returned, 'toJSON')) {
+            } elseif (method_exists($returned, 'toJSON')) {
                 $returned = $returned->toJSON();
             } else {
                 $returned = (array) $returned;
@@ -825,13 +827,12 @@ class Dispatcher
             $returned = Helpers::collect($returned);
             $response = $response->withHeader('Content-Type', 'application/json');
         }
-            
+
         try {
             $response = $response->withBody(to_stream($returned));
+        } catch (InvalidArgumentException $e) {
         }
-        catch (InvalidArgumentException $e) {
-        }
-    
+
         return $response;
     }
 
@@ -854,9 +855,9 @@ class Dispatcher
     {
         $this->middleware = Services::injector()->make(Middleware::class, [
             'response' => $this->response,
-            'path'     => $this->determinePath()
+            'path'     => $this->determinePath(),
         ]);
-        
+
         $middlewaresFile = CONFIG_PATH . 'middlewares.php';
         if (file_exists($middlewaresFile) && ! in_array($middlewaresFile, get_included_files(), true)) {
             $middleware = require $middlewaresFile;
@@ -893,7 +894,7 @@ class Dispatcher
     {
         $_this = $this;
 
-        return static function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use($_this): ResponseInterface {
+        return static function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($_this): ResponseInterface {
             try {
                 $returned = $_this->startController($request, $response);
 
@@ -917,8 +918,7 @@ class Dispatcher
                 Services::event()->trigger('post_system');
 
                 return $_this->formatResponse($response, $returned);
-            }
-            catch (ValidationException $e) {
+            } catch (ValidationException $e) {
                 $code   = $e->getCode();
                 $errors = $e->getErrors();
                 if (empty($errors)) {
@@ -930,7 +930,7 @@ class Dispatcher
                         if (is_subclass_of($_this->controller, ApplicationController::class)) {
                             return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
                         }
-                        else if (is_subclass_of($_this->controller, RestController::class)) {
+                        if (is_subclass_of($_this->controller, RestController::class)) {
                             return $_this->formatResponse($response->withStatus($code), [
                                 'success' => false,
                                 'code'    => $code,
@@ -938,8 +938,7 @@ class Dispatcher
                             ]);
                         }
                     }
-                }
-                else if (strtoupper($request->getMethod()) === 'POST') {
+                } elseif (strtoupper($request->getMethod()) === 'POST') {
                     return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
                 }
 

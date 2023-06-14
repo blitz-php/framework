@@ -30,7 +30,7 @@ trait InteractsWithInput
     /**
      * Récupérez une variable de serveur à partir de la requête.
      *
-     * @return string|array|null
+     * @return array|string|null
      */
     public function server(?string $key = null, string|array|null $default = null)
     {
@@ -39,12 +39,12 @@ trait InteractsWithInput
 
     /**
      * Récupérer un en-tête de la requête.
-     * 
-     * @return string|array|null
+     *
+     * @return array|string|null
      */
     public function header(?string $key = null, string|array|null $default = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return $this->getHeaders();
         }
 
@@ -109,8 +109,8 @@ trait InteractsWithInput
 
     /**
      * Appliquez le rappel si la demande contient la clé d'élément d'entrée donnée.
-     * 
-     * @return self|mixed
+     *
+     * @return mixed|self
      */
     public function whenHas(string $key, callable $callback, ?callable $default = null)
     {
@@ -175,8 +175,8 @@ trait InteractsWithInput
 
     /**
      * Appliquez le rappel si la requête contient une valeur non vide pour la clé d'élément d'entrée donnée.
-     * 
-     * @return self|mixed
+     *
+     * @return mixed|self
      */
     public function whenFilled(string $key, callable $callback, ?callable $default = null)
     {
@@ -203,10 +203,10 @@ trait InteractsWithInput
 
     /**
      * Appliquez le rappel s'il manque à la demande la clé d'élément d'entrée donnée.
-     * 
-     * @return self|mixed
+     *
+     * @return mixed|self
      */
-    public function whenMissing(string $key, callable $callback, callable $default = null)
+    public function whenMissing(string $key, callable $callback, ?callable $default = null)
     {
         if ($this->missing($key)) {
             return $callback(Arr::dataGet($this->all(), $key)) ?: $this;
@@ -240,7 +240,7 @@ trait InteractsWithInput
     /**
      * Obtenez toutes les entrées et tous les fichiers de la requête.
      *
-     * @param  array|mixed|null  $keys
+     * @param array|mixed|null $keys
      */
     public function all($keys = null): array
     {
@@ -265,7 +265,9 @@ trait InteractsWithInput
     public function data(?string $key = null, mixed $default = null): mixed
     {
         return Arr::dataGet(
-            $this->data + $this->query, $key, $default
+            $this->data + $this->query,
+            $key,
+            $default
         );
     }
 
@@ -300,15 +302,15 @@ trait InteractsWithInput
      */
     public function integer(string $key, int $default = 0): int
     {
-        return intval($this->data($key, $default));
+        return (int) ($this->data($key, $default));
     }
 
     /**
-     * Récupérer l'entrée sous forme de valeur flottante.   
+     * Récupérer l'entrée sous forme de valeur flottante.
      */
     public function float(string $key, float $default = 0.0): float
     {
-        return floatval($this->data($key, $default));
+        return (float) ($this->data($key, $default));
     }
 
     /**
@@ -320,7 +322,7 @@ trait InteractsWithInput
             return null;
         }
 
-        if (is_null($format)) {
+        if (null === $format) {
             return Date::parse($this->data($key), $tz);
         }
 
@@ -332,15 +334,16 @@ trait InteractsWithInput
      *
      * @template TEnum
      *
-     * @param  class-string<TEnum>  $enumClass
+     * @param class-string<TEnum> $enumClass
+     *
      * @return TEnum|null
      */
     public function enum(string $key, $enumClass)
     {
-        if ($this->isNotFilled($key) ||
-            ! function_exists('enum_exists') ||
-            ! enum_exists($enumClass) ||
-            ! method_exists($enumClass, 'tryFrom')) {
+        if ($this->isNotFilled($key)
+            || ! function_exists('enum_exists')
+            || ! enum_exists($enumClass)
+            || ! method_exists($enumClass, 'tryFrom')) {
             return null;
         }
 
@@ -358,7 +361,7 @@ trait InteractsWithInput
     /**
      * Obtenez un sous-ensemble contenant les clés fournies avec les valeurs des données d'entrée.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
      */
     public function only($keys): array
     {
@@ -366,7 +369,7 @@ trait InteractsWithInput
 
         $input = $this->all();
 
-        $placeholder = new stdClass;
+        $placeholder = new stdClass();
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
             $value = Arr::dataGet($input, $key, $placeholder);
@@ -382,7 +385,7 @@ trait InteractsWithInput
     /**
      * Récupère toutes les entrées à l'exception d'un tableau d'éléments spécifié.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
      */
     public function except($keys): array
     {
@@ -398,7 +401,7 @@ trait InteractsWithInput
     /**
      * Récupérez un élément de chaîne de requête à partir de la demande.
      *
-     * @return string|array|null
+     * @return array|string|null
      */
     public function query(?string $key = null, string|array|null $default = null)
     {
@@ -408,7 +411,7 @@ trait InteractsWithInput
     /**
      * Récupérer un élément de charge utile de requête à partir de la requête.
      *
-     * @return string|array|null
+     * @return array|string|null
      */
     public function post(?string $key = null, string|array|null $default = null)
     {
@@ -424,17 +427,17 @@ trait InteractsWithInput
      */
     public function hasCookie(string $key): bool
     {
-        return ! is_null($this->cookie($key));
+        return null !== $this->cookie($key);
     }
 
     /**
      * Récupérer un cookie de la requête.
      *
-     * @return string|array|null
+     * @return array|string|null
      */
     public function cookie(?string $key = null, string|array|null $default = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return $this->getCookieParams();
         }
 
@@ -478,7 +481,7 @@ trait InteractsWithInput
     /**
      * Récupérer un fichier à partir de la requête.
      *
-     * @return UploadedFile|UploadedFile[]|array|null
+     * @return array|UploadedFile|UploadedFile[]|null
      */
     public function file(?string $key = null, mixed $default = null)
     {
@@ -500,7 +503,7 @@ trait InteractsWithInput
     /**
      * Videz les elements.
      *
-     * @param  mixed  $keys
+     * @param mixed $keys
      */
     public function dump($keys = []): self
     {

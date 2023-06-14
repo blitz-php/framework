@@ -20,8 +20,8 @@ interface RendererInterface
 {
     /**
      * Constructeur
-     * 
-     * @param string|\BlitzPHP\Autoloader\Locator|null $viewPathLocator
+     *
+     * @param \BlitzPHP\Autoloader\Locator|string|null $viewPathLocator
      */
     public function __construct(array $config, $viewPathLocator = null, bool $debug = BLITZ_DEBUG);
 

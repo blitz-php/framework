@@ -25,9 +25,9 @@ use Dimtrovich\Validation\ValidatedInput;
 
 class Request extends ServerRequest implements Arrayable, ArrayAccess
 {
-    use Concerns\InteractsWithContentTypes,
-        Concerns\InteractsWithInput,
-        Concerns\InteractsWithFlashData;
+    use Concerns\InteractsWithContentTypes;
+    use Concerns\InteractsWithInput;
+    use Concerns\InteractsWithFlashData;
 
     /**
      * Validation des donnees de la requete
@@ -35,11 +35,11 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     public function validate(array $rules, array $messages = []): ValidatedInput
     {
         try {
-            return $this->validation($rules, $messages)->safe();  
-        }
-        catch (DimtrovichValidationException $e) {
+            return $this->validation($rules, $messages)->safe();
+        } catch (DimtrovichValidationException $e) {
             $th = new ValidationException($e->getMessage());
             $th->setErrors([$e->getMessage()]);
+
             throw $th;
         }
     }
@@ -51,7 +51,6 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     {
         return Validator::make($this->all(), $rules, $messages);
     }
-
 
     /**
      * Obtenez la méthode de requête.
@@ -98,7 +97,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     public function fullUrl(): string
     {
         if (! empty($query = $this->getEnv('QUERY_STRING'))) {
-            return $this->url().'?'.$query;
+            return $this->url() . '?' . $query;
         }
 
         return $this->url();
@@ -112,8 +111,8 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
         $question = '?';
 
         return count($this->query()) > 0
-            ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
-            : $this->fullUrl().$question.Arr::query($query);
+            ? $this->url() . $question . Arr::query(array_merge($this->query(), $query))
+            : $this->fullUrl() . $question . Arr::query($query);
     }
 
     /**
@@ -124,7 +123,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
         $query = Arr::except($this->query(), $keys);
 
         return count($query) > 0
-            ? $this->url().'?'.Arr::query($query)
+            ? $this->url() . '?' . Arr::query($query)
             : $this->url();
     }
 
@@ -165,7 +164,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * Déterminez si le nom de l'itinéraire correspond à un modèle donné.
      *
-     * @param  mixed  ...$patterns
+     * @param mixed ...$patterns
      */
     public function routeIs(...$patterns): bool
     {
@@ -176,7 +175,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * Déterminez si l'URL de requête et la chaîne de requête actuelles correspondent à un modèle.
      *
-     * @param  mixed  ...$patterns
+     * @param mixed ...$patterns
      */
     public function fullUrlIs(...$patterns): bool
     {
@@ -214,8 +213,8 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function prefetch(): bool
     {
-        return strcasecmp($this->server('HTTP_X_MOZ', ''), 'prefetch') === 0 ||
-               strcasecmp($this->header('Purpose', ''), 'prefetch') === 0;
+        return strcasecmp($this->server('HTTP_X_MOZ', ''), 'prefetch') === 0
+               || strcasecmp($this->header('Purpose', ''), 'prefetch') === 0;
     }
 
     /**
@@ -257,7 +256,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function mergeIfMissing(array $input): self
     {
-        return $this->merge(collect($input)->filter(fn($value, $key) => $this->missing($key))->toArray());
+        return $this->merge(collect($input)->filter(fn ($value, $key) => $this->missing($key))->toArray());
     }
 
     /**
@@ -271,11 +270,11 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasSession(): bool
     {
-        return ! is_null($this->session);
+        return null !== $this->session;
     }
 
     /**
@@ -297,7 +296,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritDoc}
      *
-     * @param  string  $offset
+     * @param string $offset
      */
     public function offsetExists($offset): bool
     {
@@ -307,7 +306,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritDoc}
      *
-     * @param  string  $offset
+     * @param string $offset
      */
     public function offsetGet($offset): mixed
     {
@@ -317,7 +316,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritDoc}
      *
-     * @param  string  $offset
+     * @param string $offset
      */
     public function offsetSet($offset, $value): void
     {
@@ -327,7 +326,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritDoc}
      *
-     * @param  string  $offset
+     * @param string $offset
      */
     public function offsetUnset($offset): void
     {
@@ -339,7 +338,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function __isset(string $key): bool
     {
-        return ! is_null($this->__get($key));
+        return null !== $this->__get($key);
     }
 
     /**

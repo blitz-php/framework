@@ -169,45 +169,83 @@ class Database
     private static function createMockConnection(): ConnectionInterface
     {
         /* trigger_warning('
-            Utilisation d\'une connexion à la base de données invalide. 
+            Utilisation d\'une connexion à la base de données invalide.
             Veuillez installer le package `blitz-php/database`.
         '); */
 
-        return new class implements ConnectionInterface
-        {
-            public function initialize() {}
+        return new class () implements ConnectionInterface {
+            public function initialize()
+            {
+            }
 
-            public function connect(bool $persistent = false) {}
+            public function connect(bool $persistent = false)
+            {
+            }
 
-            public function persistentConnect() {}
+            public function persistentConnect()
+            {
+            }
 
-            public function reconnect() {}
+            public function reconnect()
+            {
+            }
 
-            public function getConnection(?string $alias = null) {}
+            public function getConnection(?string $alias = null)
+            {
+            }
 
-            public function setDatabase(string $databaseName) {}
+            public function setDatabase(string $databaseName)
+            {
+            }
 
-            public function getDatabase(): string { return ''; }
+            public function getDatabase(): string
+            {
+                return '';
+            }
 
-            public function error(): array { return []; }
+            public function error(): array
+            {
+                return [];
+            }
 
-            public function getPlatform(): string { return ''; }
+            public function getPlatform(): string
+            {
+                return '';
+            }
 
-            public function getVersion(): string { return ''; }
+            public function getVersion(): string
+            {
+                return '';
+            }
 
-            public function query(string $sql, $binds = null) {}
+            public function query(string $sql, $binds = null)
+            {
+            }
 
-            public function simpleQuery(string $sql) {}
+            public function simpleQuery(string $sql)
+            {
+            }
 
-            public function table($tableName) {}
+            public function table($tableName)
+            {
+            }
 
-            public function getLastQuery() {}
+            public function getLastQuery()
+            {
+            }
 
-            public function escape($str) {}
+            public function escape($str)
+            {
+            }
 
-            public function callFunction(string $functionName, ...$params) {}
+            public function callFunction(string $functionName, ...$params)
+            {
+            }
 
-            public function isWriteType($sql): bool { return false; }
+            public function isWriteType($sql): bool
+            {
+                return false;
+            }
         };
     }
 }

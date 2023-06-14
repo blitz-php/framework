@@ -20,12 +20,13 @@ use GuzzleHttp\Psr7\UploadedFile as GuzzleUploadedFile;
 
 class UploadedFile extends GuzzleUploadedFile
 {
-    use FileHelpers, Macroable;
+    use FileHelpers;
+    use Macroable;
 
     /**
      * Stockez le fichier téléchargé sur un disque de système de fichiers.
      *
-     * @return string|false
+     * @return false|string
      */
     public function store(string $path, array|string $options = [])
     {
@@ -35,7 +36,7 @@ class UploadedFile extends GuzzleUploadedFile
     /**
      * Stockez le fichier téléchargé sur un disque de système de fichiers avec une visibilité publique.
      *
-     * @return string|false
+     * @return false|string
      */
     public function storePublicly(string $path, array|string $options = [])
     {
@@ -45,7 +46,7 @@ class UploadedFile extends GuzzleUploadedFile
     /**
      * Stockez le fichier téléchargé sur un disque de système de fichiers avec une visibilité publique.
      *
-     * @return string|false
+     * @return false|string
      */
     public function storePubliclyAs(string $path, string $name, array|string $options = [])
     {
@@ -59,7 +60,7 @@ class UploadedFile extends GuzzleUploadedFile
     /**
      * Stockez le fichier téléchargé sur un disque de système de fichiers.
      *
-     * @return string|false
+     * @return false|string
      */
     public function storeAs(string $path, string $name, array|string $options = [])
     {
@@ -68,7 +69,10 @@ class UploadedFile extends GuzzleUploadedFile
         $disk = Arr::pull($options, 'disk');
 
         Services::storage()->disk($disk)->putFileAs(
-            $path, $this, $name, $options
+            $path,
+            $this,
+            $name,
+            $options
         );
     }
 
@@ -103,7 +107,7 @@ class UploadedFile extends GuzzleUploadedFile
 
     /**
      * Créez une nouvelle instance de fichier à partir d'une instance de base.
-     * 
+     *
      * @return static
      */
     public static function createFromBase(GuzzleUploadedFile $file)

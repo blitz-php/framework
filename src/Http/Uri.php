@@ -439,7 +439,7 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withUserInfo(string $user, string $password = null): self
+    public function withUserInfo(string $user, ?string $password = null): self
     {
         return $this->setUserInfo($user, $password);
     }

@@ -21,7 +21,6 @@ use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
 use BlitzPHP\Event\EventManager;
 use BlitzPHP\Filesystem\FilesystemManager;
-use BlitzPHP\HttpClient\Request as ClientRequest;
 use BlitzPHP\Http\Negotiator;
 use BlitzPHP\HTTP\Redirection;
 use BlitzPHP\Http\Request;
@@ -29,6 +28,7 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
+use BlitzPHP\HttpClient\Request as ClientRequest;
 use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
@@ -94,7 +94,7 @@ class Services
         if (true === $shared && isset(static::$instances[Autoloader::class])) {
             return static::$instances[Autoloader::class];
         }
-        
+
         $config  = Config::get('autoload');
         $helpers = array_merge(['url'], ($config['helpers'] ?? []));
 
@@ -116,6 +116,7 @@ class Services
             if (empty(func_get_args()[0])) {
                 return $instance;
             }
+
             return $instance->setConfig($config);
         }
 
@@ -192,7 +193,7 @@ class Services
         if ($shared && isset(static::$instances[Locator::class])) {
             return static::$instances[Locator::class];
         }
-        
+
         return static::$instances[Locator::class] = static::factory(Locator::class, ['autoloader' => static::autoloader()]);
     }
 
@@ -210,7 +211,7 @@ class Services
     }
 
     /**
-     * La classe de mail vous permet d'envoyer par courrier électronique via mail, sendmail, SMTP. 
+     * La classe de mail vous permet d'envoyer par courrier électronique via mail, sendmail, SMTP.
      */
     public static function mail(?array $config = null, bool $shared = true): Mail
     {
@@ -224,12 +225,13 @@ class Services
             if (empty(func_get_args()[0])) {
                 return $instance;
             }
+
             return $instance->merge($config);
         }
 
         return static::$instances[Mail::class] = static::factory(Mail::class, compact('config'));
     }
-    
+
     /**
      * La classe Input générale modélise une requête HTTP.
      */
@@ -362,11 +364,10 @@ class Services
     {
         if ($shared && isset(static::$instances[FilesystemManager::class])) {
             return static::$instances[FilesystemManager::class];
-        }        
+        }
 
         return static::$instances[FilesystemManager::class] = static::factory(FilesystemManager::class, ['config' => Config::get('filesystems')]);
     }
-
 
     /**
      * La classe Timer fournit un moyen simple d'évaluer des parties de votre application.

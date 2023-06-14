@@ -14,8 +14,8 @@ namespace BlitzPHP\Http;
 use BadMethodCallException;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\HttpException;
-use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Loader\Services;
+use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Session\Session;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
@@ -1543,8 +1543,8 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * Tentatives d'obtenir de vieilles données d'entrée qui a été flashé à la session avec redirect_with_input(). 
-     * Il vérifie d'abord les données dans les anciennes données POST, puis les anciennes données GET et enfin vérifier les tableaux de points 
+     * Tentatives d'obtenir de vieilles données d'entrée qui a été flashé à la session avec redirect_with_input().
+     * Il vérifie d'abord les données dans les anciennes données POST, puis les anciennes données GET et enfin vérifier les tableaux de points
      *
      * @return array|string|null
      */

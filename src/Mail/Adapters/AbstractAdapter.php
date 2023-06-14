@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Mail\Adapters;
 
 use BadMethodCallException;
@@ -9,28 +18,28 @@ use InvalidArgumentException;
 use RuntimeException;
 
 abstract class AbstractAdapter implements MailerInterface
-{  
+{
+    protected const PRIORITY_MAP = [
+        self::PRIORITY_HIGH,
+        self::PRIORITY_NORMAL,
+        self::PRIORITY_LOW,
+    ];
+
     /**
      * Dependances necessaires a l'adapter
-     * 
+     *
      * @var array<string, string>[]
      */
     protected array $dependancies = [];
 
     protected $mailer;
 
-    protected const PRIORITY_MAP = [
-        self::PRIORITY_HIGH, 
-        self::PRIORITY_NORMAL, 
-        self::PRIORITY_LOW
-    ];
-
     public function __construct(bool $debug = false)
     {
         foreach ($this->dependancies as $dependency) {
             if (empty($dependency['class']) || empty($dependency['package'])) {
                 throw new InvalidArgumentException('Invalid dependencies property');
-            }            
+            }
             if (! is_string($dependency['class']) || ! is_string($dependency['package'])) {
                 throw new InvalidArgumentException('Invalid dependencies property');
             }
@@ -39,7 +48,7 @@ abstract class AbstractAdapter implements MailerInterface
                 throw new RuntimeException(lang('Mail.dependancyNotFound', [$dependency['class'], static::class, $dependency['package']]));
             }
         }
-        
+
         if ($debug) {
             $this->setDebug();
         }
@@ -60,25 +69,25 @@ abstract class AbstractAdapter implements MailerInterface
         return $this;
     }
 
-    public abstract function setPort(int $port): self;
+    abstract public function setPort(int $port): self;
 
-    public abstract function setHost(string $host): self;
-    
-    public abstract function setUsername(string $username): self;
+    abstract public function setHost(string $host): self;
 
-    public abstract function setPassword(string $password): self;
+    abstract public function setUsername(string $username): self;
 
-    public abstract function setDebug(int $debug = 1): self;
+    abstract public function setPassword(string $password): self;
 
-    public abstract function setProtocol(string $protocol): self;
+    abstract public function setDebug(int $debug = 1): self;
 
-    public abstract function setTimeout(int $timeout): self;
-    
-    public abstract function setCharset(string $charset): self;
+    abstract public function setProtocol(string $protocol): self;
 
-    public abstract function setPriority(int $priority): self;
+    abstract public function setTimeout(int $timeout): self;
 
-    public abstract function setEncryption(?string $encryption): self;
+    abstract public function setCharset(string $charset): self;
+
+    abstract public function setPriority(int $priority): self;
+
+    abstract public function setEncryption(?string $encryption): self;
 
     public function __call(string $method, array $arguments)
     {
@@ -106,15 +115,15 @@ abstract class AbstractAdapter implements MailerInterface
 
     /**
      * Cree une adresse au format valide pour l'adapter
-     * 
+     *
      * @return array
      */
     protected function makeAddress(string $email, string $name)
     {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) == false) {
-            $tmp = $email;
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            $tmp   = $email;
             $email = $name;
-            $name = $tmp;
+            $name  = $tmp;
         }
 
         return [$email, $name];
@@ -128,13 +137,13 @@ abstract class AbstractAdapter implements MailerInterface
             }
 
             $address = [$address => $name];
-        } else if (is_bool($name)) {
+        } elseif (is_bool($name)) {
             $set = $name;
         }
-        
+
         $addresses = [];
-        
-        foreach ($address As $key => $value) {
+
+        foreach ($address as $key => $value) {
             $addresses[] = $this->makeAddress($key, $value);
         }
 
