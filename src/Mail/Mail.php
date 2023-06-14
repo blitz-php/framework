@@ -3,7 +3,6 @@
 namespace BlitzPHP\Mail;
 
 use BlitzPHP\Mail\Adapters\AbstractAdapter;
-use BlitzPHP\Mail\Adapters\NetteMailer;
 use BlitzPHP\Mail\Adapters\PHPMailer;
 use BlitzPHP\Mail\Adapters\SymfonyMailer;
 use InvalidArgumentException;
@@ -36,7 +35,6 @@ class Mail implements MailerInterface
     protected static array $validHandlers = [
         'phpmailer' => PHPMailer::class,
         'symfony'   => SymfonyMailer::class,
-        'nette'     => NetteMailer::class,
     ];
 
     /**
@@ -57,6 +55,19 @@ class Mail implements MailerInterface
         $this->init($config);
     }
 
+    public function clear(): void 
+    {
+        $this->adapter = null;
+    }
+
+    /**
+     * Envoi d'un mail de type Mailable
+     */
+    public function envoi(Mailable $mailable): bool
+    {
+        return $mailable->send($this);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -68,6 +79,13 @@ class Mail implements MailerInterface
         return $this;
     }
 
+    public function mailer(string $handler): self
+    {
+        $this->clear();
+
+        return $this->merge(['handler' => $handler]);
+    }
+
     public function merge(array $config): self
     {
         $this->config = array_merge($this->config, $config);
@@ -77,11 +95,6 @@ class Mail implements MailerInterface
         }
 
         return $this;
-    }
-
-    public function clear(): void 
-    {
-        $this->adapter = null;
     }
 
     /**
