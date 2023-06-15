@@ -52,11 +52,8 @@ class RoutesCollector extends BaseCollector
         // Route correspondante
         $route = $router->getMatchedRoute();
 
-        $controllerName = $router->controllerName();
-        if (empty($controllerName)) {
-            $controllerName = Dispatcher::getController();
-        }
-        $methodName = Dispatcher::getMethod();
+        $controllerName = Dispatcher::getController();
+        $methodName     = Dispatcher::getMethod();
 
         // Récupère nos paramètres
         // Route sous forme de callback

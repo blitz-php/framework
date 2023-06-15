@@ -115,10 +115,8 @@ class Dispatcher
 
     /**
      * Délai d'expiration du cache
-     *
-     * @var int
      */
-    protected static $cacheTTL = 0;
+    protected static int $cacheTTL = 0;
 
     /**
      * Chemin de requête à utiliser.
@@ -126,14 +124,11 @@ class Dispatcher
      * @var string
      */
     protected $path;
-
+    
     /**
-     * L'instance Response doit-elle "faire semblant"
-     * pour éviter de définir des en-têtes/cookies/etc
-     *
-     * @var bool
-     */
-    protected $useSafeOutput = false;
+    * Indique s'il faut renvoyer l'objet Response ou envoyer la réponse.
+    */
+   protected bool $returnResponse = false;
 
     /**
      * Constructor.
@@ -141,8 +136,7 @@ class Dispatcher
     private function __construct()
     {
         $this->startTime = microtime(true);
-
-        $this->config = (object) config('app');
+        $this->config    = (object) config('app');
     }
 
     public static function init(bool $returnResponse = false)
@@ -199,6 +193,8 @@ class Dispatcher
      */
     public function run(?RouteCollectionInterface $routes = null, bool $returnResponse = false)
     {
+        $this->returnResponse = $returnResponse;
+
         $this->startBenchmark();
 
         $this->getRequestObject();
@@ -222,7 +218,7 @@ class Dispatcher
         // si la page a été mise en cache.
         $response = $this->displayCache();
         if ($response instanceof ResponseInterface) {
-            if ($returnResponse) {
+            if ($this->returnResponse) {
                 return $response;
             }
 
@@ -230,7 +226,7 @@ class Dispatcher
         }
 
         try {
-            return $this->handleRequest($routes, $returnResponse);
+            return $this->handleRequest($routes);
         } catch (RedirectException $e) {
             Services::logger()->info('REDIRECTED ROUTE at ' . $e->getMessage());
 
@@ -245,49 +241,27 @@ class Dispatcher
 
             return;
         } catch (PageNotFoundException $e) {
-            $this->display404errors($e);
+            $return = $this->display404errors($e);
+
+            if ($return instanceof ResponseInterface) {
+                return $return;
+            }
         }
     }
 
     /**
-     * Définissez notre instance Response sur le mode "faire semblant" afin que des choses comme
-     * les cookies et les en-têtes ne sont pas réellement envoyés, permettant à PHP 7.2+ de
-     * ne pas se plaindre lorsque la fonction ini_set() est utilisée.
-     */
-    public function useSafeOutput(bool $safe = true): self
-    {
-        $this->useSafeOutput = $safe;
-
-        return $this;
-    }
-
-    /**
-     * Handles the main request logic and fires the controller.
+     * Gère la logique de requête principale et déclenche le contrôleur.
      *
-     * @return mixed|RequestInterface|ResponseInterface
+     * @return mixed|ResponseInterface
      *
      * @throws PageNotFoundException
      * @throws RedirectException
      */
-    protected function handleRequest(?RouteCollectionInterface $routes = null, bool $returnResponse = false)
+    protected function handleRequest(?RouteCollectionInterface $routes = null)
     {
-        if (empty($routes)) {
-            $routes_file = CONFIG_PATH . 'routes.php';
-
-            if (file_exists($routes_file)) {
-                require_once $routes_file;
-            }
-        }
-        if (empty($routes) || ! ($routes instanceof RouteCollection)) {
-            $routes = Services::routes();
-        }
-
-        /**
-         * Route middlewares
-         */
         $routeMiddlewares = (array) $this->dispatchRoutes($routes);
 
-        // The bootstrapping in a middleware
+        // Le bootstrap dans un middleware
         $this->middleware->append($this->bootApp());
 
         /**
@@ -306,7 +280,7 @@ class Dispatcher
          */
         $this->gatherOutput($this->middleware->handle($this->request));
 
-        if (! $returnResponse) {
+        if (! $this->returnResponse) {
             $this->sendResponse();
         }
 
@@ -417,7 +391,7 @@ class Dispatcher
         if ($cachedResponse = Services::cache()->read($this->generateCacheName())) {
             $cachedResponse = unserialize($cachedResponse);
             if (! is_array($cachedResponse) || ! isset($cachedResponse['output']) || ! isset($cachedResponse['headers'])) {
-                throw new FrameworkException('Error unserializing page cache');
+                throw new FrameworkException('Erreur lors de la désérialisation du cache de page');
             }
 
             $headers = $cachedResponse['headers'];
@@ -433,7 +407,8 @@ class Dispatcher
                 $this->response = $this->response->withHeader($name, $value);
             }
 
-            $output = $this->displayPerformanceMetrics($output);
+            $this->totalTime = $this->timer->getElapsedTime('total_execution');
+            $output          = $this->displayPerformanceMetrics($output);
 
             return $this->response->withBody(to_stream($output));
         }
@@ -510,13 +485,16 @@ class Dispatcher
      *
      * @param RouteCollectionInterface|null $routes Une interface de collecte à utiliser à la place
      *                                              du fichier de configuration.
-     *
-     * @return string|string[]|null
+     * @return string[]
      *
      * @throws RedirectException
      */
-    protected function dispatchRoutes(RouteCollectionInterface $routes)
+    protected function dispatchRoutes(?RouteCollectionInterface $routes = null): array
     {
+        if ($routes === null) {
+            $routes = Services::routes()->loadRoutes();
+        }
+
         $this->router = Services::router($routes, $this->request, false);
 
         $path = $this->determinePath();
@@ -599,7 +577,7 @@ class Dispatcher
         }
 
         // Essayez de charger automatiquement la classe
-        if (! class_exists($this->controller, true) || $this->method[0] === '_') {
+        if (! class_exists($this->controller, true) || ($this->method[0] === '_' && $this->method !== '__invoke')) {
             throw PageNotFoundException::controllerNotFound($this->controller, $this->method);
         }
 
@@ -662,8 +640,10 @@ class Dispatcher
      */
     protected function display404errors(PageNotFoundException $e)
     {
-        // Is there a 404 Override available?
+        // Existe-t-il une dérogation 404 disponible ?
         if ($override = $this->router->get404Override()) {
+            $returned = null;
+            
             if ($override instanceof Closure) {
                 echo $override($e->getMessage());
             } elseif (is_array($override)) {
@@ -674,14 +654,18 @@ class Dispatcher
                 $this->method     = $override[1];
 
                 $controller = $this->createController($this->request, $this->response);
-                $this->runController($controller);
+                $returned   = $this->runController($controller);
             }
 
             unset($override);
 
+            $this->gatherOutput($returned);
+            if ($this->returnResponse) {
+                return $this->response;
+            }
             $this->emitResponse();
 
-            return;
+            return $returned;
         }
 
         // Affiche l'erreur 404
@@ -814,7 +798,9 @@ class Dispatcher
         }
 
         if (is_object($returned)) {
-            if (method_exists($returned, 'toArray')) {
+            if (method_exists($returned, '__toString')) {
+                $returned = $returned->__toString();
+            } elseif (method_exists($returned, 'toArray')) {
                 $returned = $returned->toArray();
             } elseif (method_exists($returned, 'toJSON')) {
                 $returned = $returned->toJSON();

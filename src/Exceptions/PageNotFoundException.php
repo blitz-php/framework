@@ -43,4 +43,9 @@ class PageNotFoundException extends OutOfBoundsException implements ExceptionInt
     {
         return new static(self::lang('HTTP.methodNotFound', [$method]));
     }
+
+    public static function localeNotSupported(string $locale)
+    {
+        return new static(self::lang('HTTP.localeNotSupported', [$locale]));
+    }
 }

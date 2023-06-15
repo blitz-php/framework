@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Router;
 
+use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Loader\Services;
@@ -22,57 +23,45 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * L'espace de noms à ajouter à tous les contrôleurs.
      * Par défaut, les espaces de noms globaux (\)
-     *
-     * @var string
      */
-    protected $defaultNamespace = '\\';
+    protected string $defaultNamespace = '\\';
 
     /**
      * Le nom du contrôleur par défaut à utiliser
      * lorsqu'aucun autre contrôleur n'est spécifié.
      *
      * Non utilisé ici. Valeur d'intercommunication pour la classe Routeur.
-     *
-     * @var string
      */
-    protected $defaultController = 'Home';
+    protected string $defaultController = 'Home';
 
     /**
      * Le nom de la méthode par défaut à utiliser
      * lorsqu'aucune autre méthode n'a été spécifiée.
      *
      * Non utilisé ici. Valeur d'intercommunication pour la classe Routeur.
-     *
-     * @var string
      */
-    protected $defaultMethod = 'index';
+    protected string $defaultMethod = 'index';
 
     /**
      * L'espace réservé utilisé lors du routage des "ressources"
      * lorsqu'aucun autre espace réservé n'a été spécifié.
-     *
-     * @var string
      */
-    protected $defaultPlaceholder = 'any';
+    protected string $defaultPlaceholder = 'any';
 
     /**
      * S'il faut convertir les tirets en traits de soulignement dans l'URI.
      *
      * Non utilisé ici. Valeur d'intercommunication pour la classe Routeur.
-     *
-     * @var bool
      */
-    protected $translateURIDashes = true;
+    protected bool $translateURIDashes = true;
 
     /**
      * S'il faut faire correspondre l'URI aux contrôleurs
      * lorsqu'il ne correspond pas aux itinéraires définis.
      *
      * Non utilisé ici. Valeur d'intercommunication pour la classe Routeur.
-     *
-     * @var bool
      */
-    protected $autoRoute = true;
+    protected bool $autoRoute = true;
 
     /**
      * Un appelable qui sera affiché
@@ -83,11 +72,9 @@ class RouteCollection implements RouteCollectionInterface
     protected $override404;
 
     /**
-     * Espaces réservés définis pouvant être utilisés
-     *
-     * @var array
+     * Espaces réservés définis pouvant être utilisés.
      */
-    protected $placeholders = [
+    protected array $placeholders = [
         'any'      => '.*',
         'segment'  => '[^/]+',
         'alphanum' => '[a-zA-Z0-9]+',
@@ -99,10 +86,22 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * Tableau de toutes les routes et leurs mappages.
-     *
-     * @var array
+     * 
+     * @example 
+     * ```php 
+     * [
+     *     verb => [
+     *         routeName => [
+     *             'route' => [
+     *                 routeKey(regex) => handler,
+     *             ],
+     *             'redirect' => statusCode,
+     *         ]
+     *     ],
+     * ]
+     * ```
      */
-    protected $routes = [
+    protected array $routes = [
         '*'       => [],
         'options' => [],
         'get'     => [],
@@ -116,26 +115,31 @@ class RouteCollection implements RouteCollectionInterface
     ];
 
     /**
-     * Tableaux des options des routes
-     *
-     * @var array
+     * Tableaux des options des routes.
+     * 
+     * @example 
+     * ```php
+     * [
+     *     verb => [
+     *         routeKey(regex) => [
+     *             key => value,
+     *         ]
+     *     ],
+     * ]
+     * ```
      */
-    protected $routesOptions = [];
+    protected array $routesOptions = [];
 
     /**
      * La méthode actuelle par laquelle le script est appelé.
-     *
-     * @var string
      */
-    protected $HTTPVerb = '*';
+    protected string $HTTPVerb = '*';
 
     /**
      * La liste par défaut des méthodes HTTP (et CLI pour l'utilisation de la ligne de commande)
      * qui est autorisé si aucune autre méthode n'est fournie.
-     *
-     * @var array
      */
-    protected $defaultHTTPMethods = [
+    protected array $defaultHTTPMethods = [
         'options',
         'get',
         'head',
@@ -170,50 +174,82 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * Un petit booster de performances.
-     *
-     * @var bool
      */
-    protected $didDiscover = false;
+    protected bool $didDiscover = false;
 
     /**
-     * Handle to the file locator to use.
+     * Descripteur du localisateur de fichiers à utiliser.
      *
-     * @var FileLocator
+     * @var Locator
      */
-    protected $fileLocator;
+    protected $locator;
 
     /**
-     * Handle to the modules config.
-     *
-     * @var Modules
+     * Drapeau pour trier les routes par priorité.
      */
-    protected $moduleConfig;
+    protected bool $prioritize = false;
 
     /**
-     * Flag for sorting routes by priority.
-     *
-     * @var bool
+     * Indicateur de détection de priorité de route.
      */
-    protected $prioritize = false;
+    protected bool $prioritizeDetected = false;
 
     /**
-     * Route priority detection flag.
-     *
-     * @var bool
+     * Drapeau pour limiter ou non les routes avec l'espace réservé {locale} vers App::$supportedLocales
      */
-    protected $prioritizeDetected = false;
+    protected bool $useSupportedLocalesOnly = false;
+
+    /**
+     * Le nom d'hôte actuel de $_SERVER['HTTP_HOST']
+     */
+    private ?string $httpHost = null;
 
     /**
      * Constructor
-     *
-     * @param mixed $placeholder
      */
-    /* public function __construct(FileLocator $locator, Modules $moduleConfig)
+    public function __construct()
     {
-        $this->fileLocator  = $locator;
-        $this->moduleConfig = $moduleConfig;
-    } */
+        $this->locator  = Services::locator();
+        $this->httpHost = Services::request()->getEnv('HTTP_HOST');
+    }
 
+    /**
+     * Charge le fichier des routes principales et découvre les routes.
+     *
+     * Charge une seule fois sauf réinitialisation.
+     */
+    public function loadRoutes(string $routesFile = CONFIG_PATH . 'routes.php'): self
+    {
+        if ($this->didDiscover) {
+            return $this;
+        }
+
+        // Nous avons besoin de cette variable dans la portée locale pour que les fichiers de route puissent y accéder.
+        $routes = $this;
+
+        require $routesFile;
+
+        $this->discoverRoutes();
+
+        return $this;
+    }
+
+    /**
+     * Réinitialisez les routes, afin qu'un cas de test puisse fournir le
+     * ceux explicites nécessaires pour cela.
+     */
+    public function resetRoutes()
+    {
+        $this->routes = ['*' => []];
+
+        foreach ($this->defaultHTTPMethods as $verb) {
+            $this->routes[$verb] = [];
+        }
+
+        $this->prioritizeDetected = false;
+        $this->didDiscover        = false;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -307,18 +343,23 @@ class RouteCollection implements RouteCollectionInterface
             return;
         }
 
-        /* if ($this->moduleConfig->shouldDiscover('routes')) {
-            $files = $this->fileLocator->search('Config/Routes.php');
+        // Nous avons besoin de cette variable dans la portée locale pour que les fichiers de route puissent y accéder.
+        $routes = $this;
 
-            foreach ($files as $file) {
-                // N'incluez plus notre fichier principal...
-                if ($file === CONFIG_PATH . 'Routes.php') {
-                    continue;
-                }
+        $files    = $this->locator->search('Config/routes.php');
+        $excludes = [
+            APP_PATH  . 'Config' . DS . 'routes.php',
+            SYST_PATH . 'Config' . DS . 'routes.php',
+        ];
 
-                include $file;
+        foreach ($files as $file) {
+            // N'incluez plus notre fichier principal...
+            if (in_array($file, $excludes, true)) {
+                continue;
             }
-        } */
+
+            include_once $file;
+        }
 
         $this->didDiscover = true;
     }
@@ -377,6 +418,65 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
+     * Activer ou désactiver le tri des routes par priorité
+     */
+    public function setPrioritize(bool $enabled = true): self
+    {
+        $this->prioritize = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * Définissez le drapeau qui limite ou non les routes avec l'espace réservé {locale} à App::$supportedLocales
+     */
+    public function useSupportedLocalesOnly(bool $useOnly): self
+    {
+        $this->useSupportedLocalesOnly = $useOnly;
+
+        return $this;
+    }
+
+    /**
+     * Obtenez le drapeau qui limite ou non les routes avec l'espace réservé {locale} vers App::$supportedLocales
+     */
+    public function shouldUseSupportedLocalesOnly(): bool
+    {
+        return $this->useSupportedLocalesOnly;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRegisteredControllers(?string $verb = '*'): array
+    {
+        $controllers = [];
+
+        if ($verb === '*') {
+            foreach ($this->defaultHTTPMethods as $tmpVerb) {
+                foreach ($this->routes[$tmpVerb] as $route) {
+                    $routeKey   = key($route['route']);
+                    $controller = $this->getControllerName($route['route'][$routeKey]);
+                    if ($controller !== null) {
+                        $controllers[] = $controller;
+                    }
+                }
+            }
+        } else {
+            $routes = $this->getRoutes($verb);
+
+            foreach ($routes as $handler) {
+                $controller = $this->getControllerName($handler);
+                if ($controller !== null) {
+                    $controllers[] = $controller;
+                }
+            }
+        }
+
+        return array_unique($controllers);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getRoutes(?string $verb = null, bool $withName = false): array
@@ -397,10 +497,7 @@ class RouteCollection implements RouteCollectionInterface
         if (isset($this->routes[$verb])) {
             // Conserve les itinéraires du verbe actuel au début afin qu'ils soient
             // mis en correspondance avant l'un des itinéraires génériques "add".
-            if (isset($this->routes['*'])) {
-                $extraRules = array_diff_key($this->routes['*'], $this->routes[$verb]);
-                $collection = array_merge($this->routes[$verb], $extraRules);
-            }
+            $collection = $this->routes[$verb] + ($this->routes['*'] ?? []);
 
             foreach ($collection as $name => $r) {
                 $key = key($r['route']);
@@ -789,7 +886,7 @@ class RouteCollection implements RouteCollectionInterface
     public function match(array $verbs = [], string $from = '', $to = '', ?array $options = null): self
     {
         if (empty($from) || empty($to)) {
-            throw new InvalidArgumentException('You must supply the parameters: from, to.');
+            throw new InvalidArgumentException('Vous devez fournir les paramètres : $from, $to.');
         }
 
         foreach ($verbs as $verb) {
@@ -898,6 +995,23 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
+     * Spécifie une route qui n'affichera qu'une vue.
+     * Ne fonctionne que pour les requêtes GET.
+     */
+    public function view(string $from, string $view, ?array $options = null): self
+    {
+        $to = static fn (...$data) => Services::viewer()
+            ->setData(['segments' => $data], 'raw')
+            ->display($view)
+            ->setOptions($options)
+            ->render();
+
+        $this->create('get', $from, $to, $options);
+
+        return $this;
+    }
+
+    /**
      * Limite les itinéraires à un ENVIRONNEMENT spécifié ou ils ne fonctionneront pas.
      */
     public function environment(string $env, Closure $callback): self
@@ -917,10 +1031,17 @@ class RouteCollection implements RouteCollectionInterface
         // Les routes nommées ont une priorité plus élevée.
         foreach ($this->routes as $collection) {
             if (array_key_exists($search, $collection)) {
-                $route = $this->fillRouteParams(key($collection[$search]['route']), $params);
-
-                return $this->localizeRoute($route);
+                return $this->buildReverseRoute(key($collection[$search]['route']), $params);
             }
+        }
+
+        // Ajoutez l'espace de noms par défaut si nécessaire.
+        $namespace = trim($this->defaultNamespace, '\\') . '\\';
+        if (
+            substr($search, 0, 1) !== '\\'
+            && substr($search, 0, strlen($namespace)) !== $namespace
+        ) {
+            $search = $namespace . $search;
         }
 
         // Si ce n'est pas une route nommée, alors bouclez
@@ -937,6 +1058,7 @@ class RouteCollection implements RouteCollectionInterface
 
                 // Perd toute barre oblique d'espace de noms au début des chaînes
                 // pour assurer une correspondance plus cohérente.$to     = ltrim($to, '\\');
+                $to     = ltrim($to, '\\');
                 $search = ltrim($search, '\\');
 
                 // S'il y a une chance de correspondance, alors ce sera
@@ -951,22 +1073,12 @@ class RouteCollection implements RouteCollectionInterface
                     continue;
                 }
 
-                $route = $this->fillRouteParams($from, $params);
-
-                return $this->localizeRoute($route);
+                return $this->buildReverseRoute($from, $params);
             }
         }
 
         // Si nous sommes toujours là, alors nous n'avons pas trouvé de correspondance.
         return false;
-    }
-
-    /**
-     * Remplace la balise {locale} par les paramètres régionaux actuels de l'application
-     */
-    protected function localizeRoute(string $route): string
-    {
-        return strtr($route, ['{locale}' => Services::request()->getLocale()]);
     }
 
     /**
@@ -999,31 +1111,71 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * @throws RouterException
+     * Construit une route inverse
+     *
+     * @param array $params Un ou plusieurs paramètres à transmettre à la route.
+     *                      Le dernier paramètre vous permet de définir la locale.
      */
-    protected function fillRouteParams(string $from, ?array $params = null): string
+    protected function buildReverseRoute(string $from, array $params): string
     {
-        // Retrouvez toutes nos back-références dans la route d'origine
+        $locale = null;
+
+        // Retrouvez l'ensemble de nos rétro-références dans le parcours d'origine.
         preg_match_all('/\(([^)]+)\)/', $from, $matches);
 
         if (empty($matches[0])) {
+            if (strpos($from, '{locale}') !== false) {
+                $locale = $params[0] ?? null;
+            }
+
+            $from = $this->replaceLocale($from, $locale);
+
             return '/' . ltrim($from, '/');
         }
 
-        // Construire notre chaîne résultante, en insérant les $params dans
-        // les endroits appropriés.
+        // Les paramètres régionaux sont passés ?
+        $placeholderCount = count($matches[0]);
+        if (count($params) > $placeholderCount) {
+            $locale = $params[$placeholderCount];
+        }
+
+        // Construisez notre chaîne résultante, en insérant les $params aux endroits appropriés.
         foreach ($matches[0] as $index => $pattern) {
             if (! preg_match('#^' . $pattern . '$#u', $params[$index])) {
                 throw RouterException::invalidParameterType();
             }
 
-            // Assurez-vous que le paramètre que nous insérons correspond
-            // le type de paramètre attendu.
+            // Assurez-vous que le paramètre que nous insérons correspond au type de paramètre attendu.
             $pos  = strpos($from, $pattern);
             $from = substr_replace($from, $params[$index], $pos, strlen($pattern));
         }
 
+        $from = $this->replaceLocale($from, $locale);
+
         return '/' . ltrim($from, '/');
+    }
+
+    /**
+     * Charger les options d'itinéraires en fonction du verbe
+     */
+    protected function loadRoutesOptions(?string $verb = null): array
+    {
+        $verb = $verb ?: $this->getHTTPVerb();
+
+        $options = $this->routesOptions[$verb] ?? [];
+
+        if (isset($this->routesOptions['*'])) {
+            foreach ($this->routesOptions['*'] as $key => $val) {
+                if (isset($options[$key])) {
+                    $extraOptions  = array_diff_key($val, $options[$key]);
+                    $options[$key] = array_merge($options[$key], $extraOptions);
+                } else {
+                    $options[$key] = $val;
+                }
+            }
+        }
+
+        return $options;
     }
 
     /**
@@ -1045,6 +1197,15 @@ class RouteCollection implements RouteCollectionInterface
         if ($from !== '/') {
             $from = trim($from, '/');
         }
+        
+        if (is_string($to) && strpos($to, '::') === false && class_exists($to) && method_exists($to, '__invoke')) {
+            $to = [$to, '__invoke'];
+        }
+
+        // Lors de la redirection vers une route nommée, $to est un tableau tel que `['zombies' => '\Zombies::index']`.
+        if (is_array($to) && count($to) === 2) {
+            $to = $this->processArrayCallableSyntax($from, $to);
+        }
 
         $options = array_merge($this->currentOptions ?? [], $options ?? []);
 
@@ -1059,8 +1220,8 @@ class RouteCollection implements RouteCollectionInterface
 
         // Limitation du nom d'hôte ?
         if (! empty($options['hostname'])) {
-            // @todo determine if there's a way to whitelist hosts?
-            if (isset($_SERVER['HTTP_HOST']) && strtolower($_SERVER['HTTP_HOST']) !== strtolower($options['hostname'])) {
+            // @todo déterminer s'il existe un moyen de mettre les hôtes sur liste blanche ?
+            if (! $this->checkHostname($options['hostname'])) {
                 return;
             }
 
@@ -1137,6 +1298,21 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
+     * Compare le nom d'hôte transmis avec le nom d'hôte actuel sur cette demande de page.
+     *
+     * @param string $hostname Nom d'hôte dans les options d'itinéraire
+     */
+    private function checkHostname(string $hostname): bool
+    {
+        // Les appels CLI ne peuvent pas être sur le nom d'hôte.
+        if (! isset($this->httpHost) || is_cli()) {
+            return false;
+        }
+
+        return strtolower($this->httpHost) === strtolower($hostname);
+    }
+    
+    /**
      * Compare le ou les sous-domaines transmis avec le sous-domaine actuel
      * sur cette page demande.
      *
@@ -1180,7 +1356,7 @@ class RouteCollection implements RouteCollectionInterface
         // Nous devons nous assurer qu'un schéma existe
         // sur l'URL sinon parse_url sera mal interprété
         // 'hôte' comme 'chemin'.
-        $url = $_SERVER['HTTP_HOST'];
+        $url = $this->httpHost;
         if (strpos($url, 'http') !== 0) {
             $url = 'http://' . $url;
         }
@@ -1194,7 +1370,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Débarrassez-vous de tous les domaines, qui seront les derniers
-        unset($host[count($host)]);
+        unset($host[count($host) -1]);
 
         // Compte pour les domaines .co.uk, .co.nz, etc.
         if (end($host) === 'co') {
@@ -1211,89 +1387,84 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Réinitialisez les routes, afin qu'un cas de test puisse fournir le
-     * ceux explicites nécessaires pour cela.
+     *
      */
-    public function resetRoutes()
+    private function getControllerName(Closure|string $handler): ?string
     {
-        $this->routes = ['*' => []];
-
-        foreach ($this->defaultHTTPMethods as $verb) {
-            $this->routes[$verb] = [];
+        if (! is_string($handler)) {
+            return null;
         }
 
-        $this->prioritizeDetected = false;
+        [$controller] = explode('::', $handler, 2);
+
+        return $controller;
+    }
+    
+    /**
+     * Renvoie la chaîne de paramètres de méthode comme `/$1/$2` pour les espaces réservés
+     */
+    private function getMethodParams(string $from): string
+    {
+        preg_match_all('/\(.+?\)/', $from, $matches);
+        $count = is_countable($matches[0]) ? count($matches[0]) : 0;
+
+        $params = '';
+
+        for ($i = 1; $i <= $count; $i++) {
+            $params .= '/$' . $i;
+        }
+
+        return $params;
+    }
+
+    private function processArrayCallableSyntax(string $from, array $to): string
+    {
+        // [classname, method]
+        // eg, [Home::class, 'index']
+        if (is_callable($to, true, $callableName)) {
+            // Si la route a des espaces réservés, ajoutez des paramètres automatiquement.
+            $params = $this->getMethodParams($from);
+
+            if (strpos($callableName, '\\') !== false && $callableName[0] !== '\\') {
+                $callableName = '\\' . $callableName;
+            }
+
+            return $callableName . $params;
+        }
+
+        // [[classname, method], params]
+        // eg, [[Home::class, 'index'], '$1/$2']
+        if (
+            isset($to[0], $to[1])
+            && is_callable($to[0], true, $callableName)
+            && is_string($to[1])
+        ) {
+            $to = '\\' . $callableName . '/' . $to[1];
+        }
+
+        return $to;
     }
 
     /**
-     * Charger les options d'itinéraires en fonction du verbe
+     * Remplace la balise {locale} par la locale.
      */
-    protected function loadRoutesOptions(?string $verb = null): array
+    private function replaceLocale(string $route, ?string $locale = null): string
     {
-        $verb = $verb ?: $this->getHTTPVerb();
+        if (strpos($route, '{locale}') === false) {
+            return $route;
+        }
 
-        $options = $this->routesOptions[$verb] ?? [];
-
-        if (isset($this->routesOptions['*'])) {
-            foreach ($this->routesOptions['*'] as $key => $val) {
-                if (isset($options[$key])) {
-                    $extraOptions  = array_diff_key($val, $options[$key]);
-                    $options[$key] = array_merge($options[$key], $extraOptions);
-                } else {
-                    $options[$key] = $val;
-                }
+        // Vérifier les paramètres régionaux non valides
+        if ($locale !== null) {
+            if (! in_array($locale, config('app.supported_locales'), true)) {
+                $locale = null;
             }
         }
 
-        return $options;
-    }
-
-    /**
-     * Activer ou désactiver le tri des routes par priorité
-     */
-    public function setPrioritize(bool $enabled = true): self
-    {
-        $this->prioritize = $enabled;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getRegisteredControllers(?string $verb = '*'): array
-    {
-        $routes = [];
-
-        if ($verb === '*') {
-            $rawRoutes = [];
-
-            foreach ($this->defaultHTTPMethods as $tmpVerb) {
-                $rawRoutes = array_merge($rawRoutes, $this->routes[$tmpVerb]);
-            }
-
-            foreach ($rawRoutes as $route) {
-                $key     = key($route['route']);
-                $handler = $route['route'][$key];
-
-                $routes[$key] = $handler;
-            }
-        } else {
-            $routes = $this->getRoutes($verb);
+        if ($locale === null) {
+            $locale = Services::request()->getLocale();
         }
 
-        $controllers = [];
-
-        foreach ($routes as $handler) {
-            if (! is_string($handler)) {
-                continue;
-            }
-
-            [$controller] = explode('::', $handler, 2);
-
-            $controllers[] = $controller;
-        }
-
-        return array_unique($controllers);
+        return strtr($route, ['{locale}' => $locale]);
     }
 }

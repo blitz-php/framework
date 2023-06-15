@@ -23,13 +23,6 @@ use BlitzPHP\Utilities\String\Text;
 final class AutoRouter implements AutoRouterInterface
 {
     /**
-     * Liste des contrôleurs enregistrés pour le verbe CLI qui ne doivent pas être accessibles sur le Web.
-     *
-     * @var class-string[]
-     */
-    private array $protectedControllers;
-
-    /**
      * Sous-répertoire contenant la classe contrôleur demandée.
      * Principalement utilisé par 'autoRoute'.
      */
@@ -46,34 +39,21 @@ final class AutoRouter implements AutoRouterInterface
     private string $method;
 
     /**
-     * Indique si les tirets dans les URI doivent être convertis
-     * en traits de soulignement lors de la détermination des noms de méthode.
+     * Constructeur
+     *
+     * @param class-string[] $protectedControllers Liste des contrôleurs enregistrés pour le verbe CLI qui ne doivent pas être accessibles sur le Web.
+     * @param string $defaultNamespace Espace de noms par défaut pour les contrôleurs.
+     * @param boolean $translateURIDashes Indique si les tirets dans les URI doivent être convertis en traits de soulignement lors de la détermination des noms de méthode.
+     * @param string $httpVerb Verbe HTTP pour la requête.
      */
-    private bool $translateURIDashes;
-
-    /**
-     * Verbe HTTP pour la requête.
-     */
-    private string $httpVerb;
-
-    /**
-     * Espace de noms par défaut pour les contrôleurs.
-     */
-    private string $defaultNamespace;
-
     public function __construct(
-        array $protectedControllers,
-        string $defaultNamespace,
+        private array $protectedControllers,
+        private string $defaultNamespace,
         string $defaultController,
         string $defaultMethod,
-        bool $translateURIDashes,
-        string $httpVerb
+        private bool $translateURIDashes,
+        private string $httpVerb
     ) {
-        $this->protectedControllers = $protectedControllers;
-        $this->defaultNamespace     = $defaultNamespace;
-        $this->translateURIDashes   = $translateURIDashes;
-        $this->httpVerb             = $httpVerb;
-
         $this->controller = $defaultController;
         $this->method     = $defaultMethod;
     }
@@ -143,14 +123,13 @@ final class AutoRouter implements AutoRouterInterface
                 }
 
                 throw new PageNotFoundException(
-                    'Cannot access the controller in a CLI Route. Controller: ' . $controllerInRoute
+                    'Impossible d\'accéder au contrôleur dans une route CLI. Controleur: ' . $controllerInRoute
                 );
             }
         }
 
         // Charge le fichier afin qu'il soit disponible.
-        $file = CONTROLLER_PATH . $this->directory . $controllerName . '.php';
-        if (is_file($file)) {
+        if (is_file($file = CONTROLLER_PATH . $this->directory . $controllerName . '.php')) {
             include_once $file;
         }
 
@@ -221,7 +200,7 @@ final class AutoRouter implements AutoRouterInterface
     /**
      * Renvoie true si la chaîne $segment fournie représente un segment d'espace de noms/répertoire valide conforme à PSR-4
      *
-     * regex comes from https://www.php.net/manual/en/language.variables.basics.php
+     * La regex vient de https://www.php.net/manual/en/language.variables.basics.php
      */
     private function isValidSegment(string $segment): bool
     {

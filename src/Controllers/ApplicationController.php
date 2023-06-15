@@ -49,19 +49,23 @@ class ApplicationController extends BaseController
             $path       = strtolower($path) . '/';
         }
 
-        $object = Services::viewer();
+        $viewer = Services::viewer();
 
-        $object->setData($data)->setOptions($options);
+        $viewer->setData($data)->setOptions($options);
 
         if (! empty($this->layout) && is_string($this->layout)) {
-            $object->setLayout($this->layout);
+            $viewer->setLayout($this->layout);
         }
 
         if (! empty($this->viewDatas) && is_array($this->viewDatas)) {
-            $object->addData($this->viewDatas);
+            $viewer->addData($this->viewDatas);
         }
 
-        return $object->display($path . $view)->setVar('title', str_ireplace('Controller', '', Dispatcher::getController(false)) . ' - ' . Dispatcher::getMethod());
+        if (! is_string($controllerName = Dispatcher::getController(false))) {
+            $controllerName = static::class;
+        }
+
+        return $viewer->display($path . $view)->setVar('title', str_ireplace('Controller', '', $controllerName) . ' - ' . Dispatcher::getMethod());
     }
 
     /**

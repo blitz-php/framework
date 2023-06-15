@@ -108,7 +108,7 @@ class Router implements RouterInterface
      *
      * @return self
      */
-    public function init(RouteCollectionInterface $routes, ServerRequestInterface $request)
+    public function __construct(RouteCollectionInterface $routes, ServerRequestInterface $request)
     {
         $this->collection = $routes;
 
@@ -119,20 +119,28 @@ class Router implements RouterInterface
 
         $this->translateURIDashes = $this->collection->shouldTranslateURIDashes();
 
-        $this->autoRouter = new AutoRouter(
-            $this->collection->getRegisteredControllers('cli'),
-            $this->collection->getDefaultNamespace(),
-            $this->collection->getDefaultController(),
-            $this->collection->getDefaultMethod(),
-            $this->translateURIDashes,
-            $this->collection->getHTTPVerb()
-        );
+        if ($this->collection->shouldAutoRoute()) {
+            $this->autoRouter = new AutoRouter(
+                $this->collection->getRegisteredControllers('cli'),
+                $this->collection->getDefaultNamespace(),
+                $this->collection->getDefaultController(),
+                $this->collection->getDefaultMethod(),
+                $this->translateURIDashes,
+                $this->collection->getHTTPVerb()
+            );   
+        }
+    }
 
+    /**
+     * @deprecated
+     */
+    public function init(RouteCollectionInterface $routes, ServerRequestInterface $request)
+    {
         return $this;
     }
 
     /**
-     * @return Closure|string Controller classname or Closure
+     * @return Closure|string Nom de classe du contrôleur ou closure
      *
      * @throws PageNotFoundException
      * @throws RedirectException
@@ -142,19 +150,18 @@ class Router implements RouterInterface
         // Si nous ne trouvons pas d'URI à comparer, alors
         // tout fonctionne à partir de ses paramètres par défaut.
         if ($uri === null || $uri === '') {
-            return strpos($this->controller, '\\') === false
-                ? $this->collection->getDefaultNamespace() . $this->controller
-                : $this->controller;
+            $uri = '/';
         }
 
-        $uri = urldecode($uri);
+        $uri                   = urldecode($uri);
+        $this->middlewaresInfo = [];
 
         if ($this->checkRoutes($uri)) {
             if ($this->collection->isFiltered($this->matchedRoute[0])) {
                 $this->middlewaresInfo = $this->collection->getFiltersForRoute($this->matchedRoute[0]);
             }
 
-            return $this->controller;
+            return $this->controllerName();
         }
 
         // Toujours là ? Ensuite, nous pouvons essayer de faire correspondre l'URI avec
@@ -163,7 +170,7 @@ class Router implements RouterInterface
         if (! $this->collection->shouldAutoRoute()) {
             $verb = strtolower($this->collection->getHTTPVerb());
 
-            throw new PageNotFoundException("Can't find a route for '{$verb}: {$uri}'.");
+            throw new PageNotFoundException("Impossible de trouver une route pour '{$verb}: {$uri}'.");
         }
 
         $this->autoRoute($uri);
@@ -192,9 +199,15 @@ class Router implements RouterInterface
             return $this->controller;
         }
 
+        $controller = preg_replace(
+            ['#(\_)?Controller$#i', '#' . config('app.url_suffix') . '$#i'],
+            '',
+            ucfirst($this->controller)
+        ) . 'Controller';
+
         return $this->translateURIDashes
-            ? str_replace('-', '_', trim($this->controller, '/\\'))
-            : Text::toPascalCase($this->controller);
+            ? str_replace('-', '_', trim($controller, '/\\'))
+            : Text::toPascalCase($controller);
     }
 
     /**
@@ -365,6 +378,13 @@ class Router implements RouterInterface
                         $matched
                     );
 
+                    if ($this->collection->shouldUseSupportedLocalesOnly()
+                        && ! in_array($matched['locale'], config('App')->supportedLocales, true)) {
+                        // Lancer une exception pour empêcher l'autorouteur,
+                        // si activé, essayer de trouver une route
+                        throw PageNotFoundException::localeNotSupported($matched['locale']);
+                    }
+
                     $this->detectedLocale = $matched['locale'];
                     unset($matched);
                 }
@@ -498,7 +518,7 @@ class Router implements RouterInterface
 
         $this->setController($class);
 
-        logger()->info('Used the default controller.');
+        logger()->info('Utilisé le contrôleur par défaut.');
     }
 
     /**

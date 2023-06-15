@@ -318,7 +318,7 @@ class Services
             $request = static::request(true);
         }
 
-        return static::factory(Router::class)->init($routes, $request);
+        return static::factory(Router::class, compact('routes', 'request'));
     }
 
     /**
