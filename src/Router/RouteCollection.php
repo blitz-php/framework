@@ -1086,9 +1086,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function isFiltered(string $search, ?string $verb = null): bool
     {
-        $options = $this->loadRoutesOptions($verb);
-
-        return isset($options[$search]['middlewares']) || isset($options[$search]['filter']);
+        return $this->getFiltersForRoute($search, $verb) !== [];
     }
 
     /**

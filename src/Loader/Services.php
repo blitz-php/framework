@@ -519,4 +519,16 @@ class Services
     {
         return static::injector()->make($name, $arguments);
     }
+
+    /**
+     * Définissez un objet ou une valeur dans le conteneur.
+     *
+     * @param string $name  Nom de l'entrée
+     * @param mixed  $value utilisez les aides à la définition pour définir les objets
+     */
+    public static function set(string $name, $value)
+    {
+        static::$instances[$name] = $value;
+        static::container()->set($name, $value);
+    }
 }
