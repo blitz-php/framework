@@ -60,15 +60,16 @@ final class RouteBuilder
      * Les attributs qui peuvent être définis via cette classe.
      */
     private array $allowedAttributes = [
-        'as', 'controller', 'domain', 'hostname', 'middleware', 'name', 
-        'namespace', 'placeholder', 'prefix', 'priority', 'subdomain',
+        'as', 'controller', 'domain', 'hostname', 'middlewares', 'middleware', 
+        'name', 'namespace', 'placeholder', 'prefix', 'priority', 'subdomain',
     ];
 
     /**
      * Les attributs qui sont des alias.
      */
     private array $aliases = [
-        'name' => 'as',
+        'name'        => 'as',
+        'middlewares' => 'middleware',
     ];
 
     private array $allowedMethods = [
@@ -103,8 +104,10 @@ final class RouteBuilder
         }
 
         if (in_array($method, $this->allowedAttributes)) {
-            if ($method === 'middleware') {
-                return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            if (in_array($method, ['middleware', 'middlewares'], true)) {
+                $parameters = is_array($parameters[0]) ? $parameters[0] : $parameters;
+
+                return $this->attribute($method, array_merge($this->attributes[$method] ?? [], $parameters));
             }
 
             return $this->attribute($method, $parameters[0]);
@@ -126,7 +129,7 @@ final class RouteBuilder
 
     public function configure(callable $callback)
     {
-        $callback($this->collection);    
+        $callback($this);    
     }
 
     /**
@@ -149,7 +152,9 @@ final class RouteBuilder
      */
     public function group(callable $callback): void
     {
-        $this->collection->group($this->attributes['prefix'] ?? '', $this->attributes, $callback);
+        $this->collection->group($this->attributes['prefix'] ?? '', $this->attributes, fn () => $callback($this));
+       
+        // $callback($this);
     }
 
     /**

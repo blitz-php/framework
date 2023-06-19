@@ -16,6 +16,7 @@ use BlitzPHP\Router\RouteBuilder;
 
 /**
  * @method static RouteBuilder addPlaceholder($placeholder, ?string $pattern = null) Enregistre une nouvelle contrainte auprès du système.
+ * @method static void configure(callable $callback(RouteBuilder $route)) Configure les parametres de routing.
  * @method static RouteBuilder setDefaultNamespace(string $value) Définit l'espace de noms par défaut à utiliser pour les contrôleurs lorsqu'aucun autre n'a été spécifié.
  * @method static RouteBuilder setDefaultController(string $value) Définit le contrôleur par défaut à utiliser lorsqu'aucun autre contrôleur n'a été spécifié.
  * @method static RouteBuilder setDefaultMethod(string $value) Définit la méthode par défaut pour appeler le contrôleur lorsqu'aucun autre méthode a été définie dans la route.

@@ -401,6 +401,11 @@ class RouteCollection implements RouteCollectionInterface
         return $this->defaultNamespace;
     }
 
+    public function getPlaceholders(): array
+    {
+        return $this->placeholders;
+    }
+
     /**
      *{@inheritDoc}
      */
@@ -656,7 +661,7 @@ class RouteCollection implements RouteCollectionInterface
         // Pour enregistrer une route, nous allons définir un indicateur afin que notre routeur
         // donc il verra le nom du groupe.
         // Si le nom du groupe est vide, nous continuons à utiliser le nom du groupe précédemment construit.
-        $this->group = $name ? ltrim($oldGroup . '/' . $name, '/') : $oldGroup;
+        $this->group = implode('/', array_unique(explode('/', $name ? ltrim($oldGroup . '/' . $name, '/') : $oldGroup)));
 
         $callback = array_pop($params);
 
@@ -1103,7 +1108,9 @@ class RouteCollection implements RouteCollectionInterface
     {
         $options = $this->loadRoutesOptions($verb);
 
-        $middlewares = $options[$search]['middlewares'] ?? ($options[$search]['filter'] ?? []);
+        $middlewares = $options[$search]['middlewares'] ?? (
+            $options[$search]['middleware'] ?? ($options[$search]['filter'] ?? [])
+        );
 
         return (array) $middlewares;
     }
