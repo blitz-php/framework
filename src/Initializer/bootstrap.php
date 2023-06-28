@@ -10,8 +10,7 @@
  */
 
 use BlitzPHP\Core\Application;
-use BlitzPHP\Loader\FileLocator;
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
@@ -79,7 +78,7 @@ return function (array $paths, string $paths_config_file, bool $is_cli) {
     /**
      * On charge le helper `common` qui est utilisé par le framework et presque toutes les applications
      */
-    FileLocator::helper('common');
+    require_once SYST_PATH . 'Helpers' . DS . 'common.php';
 
     // Initialise et enregistre le loader avec la pile SPL autoloader.
     Services::autoloader()->initialize()->register();

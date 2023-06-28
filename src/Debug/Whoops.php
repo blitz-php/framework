@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Debug;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use Throwable;
 use Whoops\Exception\Inspector;
 use Whoops\Handler\Handler;
@@ -56,11 +56,7 @@ class Whoops
          * On log toutes les erreurs
          */
         $whoops->pushHandler(static function (Throwable $exception, Inspector $inspector, RunInterface $run) {
-            /**
-             * @var Logger
-             */
-            $logger = Services::logger();
-            $logger->error($exception);
+            Services::logger()->error($exception);
 
             return Handler::DONE;
         });

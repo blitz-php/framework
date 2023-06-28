@@ -10,13 +10,13 @@
  */
 
 use BlitzPHP\Config\Config;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Load;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Session\Session;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
@@ -46,14 +46,12 @@ if (! function_exists('helper')) {
      * Charge un fichier d'aide en mémoire. Prend en charge les assistants d'espace de noms,
      * à la fois dans et hors du répertoire 'helpers' d'un répertoire à espace de noms.
      *
-     * Chargera TOUS les assistants du nom correspondant, dans l'ordre suivant :
+     * Chargera TOUS les helpers du nom correspondant, dans l'ordre suivant :
      *   1. app/Helpers
      *   2. {namespace}/Helpers
      *   3. system/Helpers
-     *
-     * @param array|string $filenames
      */
-    function helper($filenames)
+    function helper(array|string $filenames)
     {
         Load::helper($filenames);
     }

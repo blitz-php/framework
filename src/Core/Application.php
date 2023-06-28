@@ -12,10 +12,10 @@
 namespace BlitzPHP\Core;
 
 use BlitzPHP\Config\Config;
+use BlitzPHP\Container\Injector;
 use BlitzPHP\Debug\Whoops;
 use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Loader\DotEnv;
-use BlitzPHP\Loader\Injector;
 use BlitzPHP\Router\Dispatcher;
 use MirazMac\Requirements\Checker;
 use ReflectionException;
@@ -79,16 +79,6 @@ class Application
          * Lance la capture des exceptions et erreurs
          */
         Whoops::init();
-
-        /**
-         * Demarre la session
-         */
-        // Session::start();
-
-        /**
-         * Autocharge les elements specifiés par le dev a travers le fichier /app/config/autoload
-         */
-        // Load::init();
 
         return $this;
     }

@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Container\Injector;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Utilities\Helpers;
@@ -19,31 +21,85 @@ use BlitzPHP\Utilities\String\Text;
 class FileLocator
 {
     /**
-     * Charge un fichier d'aide (helper)
+     * Charge un fichier d'aide en mémoire. 
+     * Prend en charge les helpers d'espace de noms, à la fois dans et hors du répertoire 'helpers' d'un répertoire d'espace de noms.
      *
-     * @return void
+     * Chargera TOUS les helpers du nom correspondant, dans l'ordre suivant :
+     *   1. app/Helpers
+     *   2. {namespace}/Helpers
+     *   3. system/Helpers
+     *
+     * @throws FileNotFoundException
      */
-    public static function helper(string $helper)
+    public static function helper(array|string $filenames)
     {
-        $file  = Helpers::ensureExt($helper, 'php');
-        $paths = [
-            // Helpers système
-            SYST_PATH . 'Helpers' . DS . $file,
+        static $loaded = [];
 
-            // Helpers de l'application
-            APP_PATH . 'Helpers' . DS . $file,
-        ];
-        $file_exist = false;
+        $loader = Services::locator();
 
-        foreach ($paths as $path) {
-            if (file_exists($path)) {
-                require_once $path;
-                $file_exist = true;
+        if (! is_array($filenames)) {
+            $filenames = [$filenames];
+        }
+
+        // Enregistrez une liste de tous les fichiers à inclure...
+        $includes = [];
+
+        foreach ($filenames as $filename) {
+            // Stockez nos versions d'helpers système et d'application afin que nous puissions contrôler l'ordre de chargement.
+            $systemHelper  = null;
+            $appHelper     = null;
+            $localIncludes = [];
+
+            // Vérifiez si ce helper a déjà été chargé
+            if (in_array($filename, $loaded, true)) {
+                continue;
+            }
+
+            // Si le fichier est dans un espace de noms, nous allons simplement saisir ce fichier et ne pas en rechercher d'autres
+            if (strpos($filename, '\\') !== false) {
+                $path = $loader->locateFile($filename, 'Helpers');
+
+                if (empty($path)) {
+                    throw LoadException::helperNotFound($filename);
+                }
+
+                $includes[] = $path;
+                $loaded[]   = $filename;
+            } else {
+                // Pas d'espaces de noms, donc recherchez dans tous les emplacements disponibles
+                $paths = $loader->search('Helpers/' . $filename);
+
+                foreach ($paths as $path) {
+                    if (strpos($path, APP_PATH . 'Helpers' . DS) === 0) {
+                        $appHelper = $path;
+                    } elseif (strpos($path, SYST_PATH . 'Helpers' . DS) === 0) {
+                        $systemHelper = $path;
+                    } else {
+                        $localIncludes[] = $path;
+                        $loaded[]        = $filename;
+                    }
+                }
+
+                // Les helpers au niveau de l'application doivent remplacer tous les autres
+                if (! empty($appHelper)) {
+                    $includes[] = $appHelper;
+                    $loaded[]   = $filename;
+                }
+
+                // Tous les fichiers avec espace de noms sont ajoutés ensuite
+                $includes = [...$includes, ...$localIncludes];
+
+                // Et celui par défaut du système doit être ajouté en dernier.
+                if (! empty($systemHelper)) {
+                    $includes[] = $systemHelper;
+                    $loaded[]   = $filename;
+                }
             }
         }
 
-        if (true !== $file_exist) {
-            throw LoadException::helperNotFound($helper);
+        // Incluez maintenant tous les fichiers
+        foreach ($includes as $path) {
+            include_once $path;
         }
     }
 

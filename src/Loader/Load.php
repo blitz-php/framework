@@ -30,30 +30,6 @@ class Load
         'models'      => [],
     ];
 
-    /**
-     * Recupere toutes les definitions des services a injecter dans le container
-     */
-    public static function providers(): array
-    {
-        $providers = [];
-
-        // services système
-        $filename = SYST_PATH . 'Constants' . DS . 'providers.php';
-        if (! file_exists($filename)) {
-            throw LoadException::providersDefinitionDontExist($filename);
-        }
-        if (! in_array($filename, get_included_files(), true)) {
-            $providers = array_merge($providers, require $filename);
-        }
-
-        // services de l'application
-        $filename = CONFIG_PATH . 'providers.php';
-        if (file_exists($filename) && ! in_array($filename, get_included_files(), true)) {
-            $providers = array_merge($providers, require $filename);
-        }
-
-        return $providers;
-    }
 
     /**
      * Charge un fichier d'aide

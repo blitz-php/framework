@@ -10,13 +10,13 @@
  */
 
 return [
-    BlitzPHP\Contracts\Database\ConnectionInterface::class    => BlitzPHP\Config\Database::connect(),
-    BlitzPHP\Contracts\Event\EventManagerInterface::class     => service('event'),
-    BlitzPHP\Contracts\Router\RouteCollectionInterface::class => service('routes'),
-    BlitzPHP\Filesystem\FilesystemManager::class              => service('storage'),
-    Psr\Container\ContainerInterface::class                   => service('container'),
-    Psr\Http\Message\ResponseInterface::class                 => service('response'),
-    Psr\Http\Message\ServerRequestInterface::class            => service('request'),
-    Psr\Log\LoggerInterface::class                            => service('logger'),
-    Psr\SimpleCache\CacheInterface::class                     => service('cache'),
+    BlitzPHP\Contracts\Database\ConnectionInterface::class    => fn() => BlitzPHP\Config\Database::connect(),
+    BlitzPHP\Contracts\Event\EventManagerInterface::class     => fn() => service('event'),
+    BlitzPHP\Contracts\Router\RouteCollectionInterface::class => fn() => service('routes'),
+    BlitzPHP\Filesystem\FilesystemManager::class              => fn() => service('storage'),
+    Psr\Container\ContainerInterface::class                   => fn() => service('container'),
+    Psr\Http\Message\ResponseInterface::class                 => fn() => service('response'),
+    Psr\Http\Message\ServerRequestInterface::class            => fn() => service('request'),
+    Psr\Log\LoggerInterface::class                            => fn() => service('logger'),
+    Psr\SimpleCache\CacheInterface::class                     => fn() => service('cache'),
 ];

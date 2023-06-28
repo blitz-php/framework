@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Loader;
+namespace BlitzPHP\Container;
 
 use BlitzPHP\Traits\SingletonTrait;
 use DI\Container;
@@ -41,9 +41,13 @@ class Injector
     {
         $this->builder = new ContainerBuilder();
         $this->builder->useAutowiring(true);
+        $this->builder->useAttributes(true);
 
-        if (on_prod()) {
-            $this->builder->enableCompilation(SYST_PATH . 'Constants' . DS);
+        if (on_prod(true)) {
+            if (extension_loaded('apcu')) {
+                $this->builder->enableDefinitionCache(str_replace([' ', '/', '\\', '.'], '', APP_PATH));
+            }
+            $this->builder->enableCompilation(FRAMEWORK_STORAGE_PATH . 'cache');    
         }
 
         $this->container = new Container();
@@ -54,9 +58,9 @@ class Injector
      */
     private function loadProviders()
     {
-        $providers = Load::providers();
+        $providers = self::providers();
 
-        $this->builder->addDefinitions($providers);
+        $this->builder->addDefinitions(...$providers);
 
         $this->container = $this->builder->build();
     }
@@ -160,5 +164,51 @@ class Injector
     public static function add(string $name, $value): void
     {
         self::container()->set($name, $value);
+    }
+
+
+    /**
+     * Recupere toutes les definitions des services à injecter dans le container
+     */
+    private static function providers(): array
+    {
+        $providers = [];
+
+        $loader = Services::locator();
+
+        // Stockez nos versions d'helpers système et d'application afin que nous puissions contrôler l'ordre de chargement.
+        $systemProvider = null;
+        $appProvider    = null;
+        $localIncludes  = [];
+
+        $paths = array_merge(
+            $loader->search('Constants/providers'), // providers system
+            $loader->search('Config/providers') // providers de l'application ou des fournisseurs
+        );
+
+        foreach ($paths as $path) {
+            if (strpos($path, APP_PATH . 'Config' . DS) === 0) {
+                $appProvider = $path;
+            } elseif (strpos($path, SYST_PATH . 'Constants' . DS) === 0) {
+                $systemProvider = $path;
+            } else {
+                $localIncludes[] = $path;
+            }
+        }
+
+        // Les providers par défaut du système doivent être ajouté en premier pour que les autres puisse les surcharger
+        if (! empty($systemProvider)) {
+            $providers[] = $systemProvider;
+        }
+
+        // Tous les providers avec espace de noms sont ajoutés ensuite
+        $providers = [...$providers, ...$localIncludes];
+
+        // Enfin ceux de l'application doivent remplacer tous les autres
+        if (! empty($appProvider)) {
+            $providers[] = $appProvider;
+        }
+       
+        return $providers;
     }
 }
