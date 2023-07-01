@@ -13,9 +13,10 @@ namespace BlitzPHP\Cli\Console;
 
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
+use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\CLIException;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\SingletonTrait;
 use Composer\InstalledVersions;
 use ReflectionClass;
@@ -25,21 +26,21 @@ use Throwable;
 /**
  * Classe abstraite pour le fonctionnement de la console
  */
-final class Console extends Application
+class Console extends Application
 {
     use SingletonTrait;
 
-    /**
-     * Defini si on doit suppriemer les information du header (nom/version du framework) ou pas
-     */
-    private bool $suppress = false;
+    protected const APP_NAME        = 'BlitzPHP';
+    protected const APP_VERSION     = \BlitzPHP\Core\Application::VERSION;
+    protected const CONSOLE_NAME    = 'klinge';
+    protected const CONSOLE_VERSION = '1.0';
 
     private ?Logger $logger = null;
 
     /**
      * Differents logos
      */
-    private array $logos = [
+    protected array $logos = [
         '
         /$$$$$$$  /$$ /$$   /$$              /$$$$$$$  /$$   /$$ /$$$$$$$
         | $$__  $$| $$|__/  | $$             | $$__  $$| $$  | $$| $$__  $$
@@ -126,15 +127,16 @@ final class Console extends Application
      *
      * @var array<string, callable>
      */
-    private array $_commands = [];
+    protected array $_commands = [];
 
-    public function __construct(bool $suppress = false)
+    /**
+     * @param bool $suppress Defini si on doit suppriemer les information du header (nom/version du framework) ou pas
+     */
+    public function __construct(private bool $suppress = false)
     {
-        parent::__construct('BlitzPHP', \BlitzPHP\Core\Application::VERSION);
+        parent::__construct(static::APP_NAME, static::APP_VERSION);
 
         $this->logo($this->logos[array_rand($this->logos)]);
-
-        $this->suppress = $suppress;
 
         $this->registerException($this->logger = Services::logger());
 
@@ -157,6 +159,21 @@ final class Console extends Application
     }
 
     /**
+     * Definie les fichiers qui pourront etre considerer comme commandes
+     * 
+     * @return string[] Chemins absolus des fichiers 
+     */
+    protected function files(Locator $locator): array
+    {
+        $files = array_merge(
+            $locator->listFiles('Commands/'), // Commandes de l'application ou des fournisseurs
+            $locator->listFiles('Cli/Commands/') // Commandes internes du framework
+        );
+
+        return array_unique($files);
+    }
+
+    /**
      * Recherche toutes les commandes dans le framework et dans le code de l'utilisateur
      * et collecte leurs instances pour fonctionner avec eux.
      */
@@ -166,13 +183,7 @@ final class Console extends Application
             return;
         }
 
-        $locator = Services::locator();
-        $files   = array_merge(
-            $locator->listFiles('Commands/'), // Commandes de l'application ou des fournisseurs
-            $locator->listFiles('Cli/Commands/') // Commandes internes du framework
-        );
-
-        if ($files === []) {
+        if ([] === $files = $this->files($locator = Services::locator())) {
             return; // @codeCoverageIgnore
         }
 
@@ -326,16 +337,17 @@ final class Console extends Application
      *
      * @return void
      */
-    private function start(string $service)
+    protected function start(string $service)
     {
-        $io = $this->io();
+        $service = trim($service);
+        $message = static::APP_NAME . ' Command Line Interface';
+        if ('' !== $service) {
+            $message .= ' | ' . $service;
+        }
+        
+        $eq_str = str_repeat('=', strlen($message));
 
-        $eq_str = str_repeat('=', strlen($service));
-
-        $io->write('==================================' . $eq_str, true);
-        $io->write('BlitzPHP Command Line Interface | ' . $service, true);
-        $io->write('==================================' . $eq_str, true);
-        $io->eol();
+        $this->io()->write($eq_str . "\n" . $message . "\n" . $eq_str . "\n", true);
     }
 
     /**
@@ -343,11 +355,11 @@ final class Console extends Application
      *
      * @return void
      */
-    private function end()
+    protected function end()
     {
         $io = $this->io();
 
-        $info = 'BlitzPHP v' . $this->version() . ' * klinge v1.0 * ' . date('Y-m-d H:i:s');
+        $info = static::APP_NAME . ' v' . $this->version() . ' * ' . static::CONSOLE_NAME . ' v' . static::CONSOLE_VERSION . ' * ' . date('Y-m-d H:i:s');
 
         $io->write("\n\n" . str_repeat('-', strlen($info)) . "\n");
         $io->writer()->bold->info($info, true);
