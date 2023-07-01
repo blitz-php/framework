@@ -396,6 +396,8 @@ class NativeAdapter extends AbstractAdapter
             $current_dir = pathinfo($this->renderVars['file'] ?? '', PATHINFO_DIRNAME);
             if (file_exists(rtrim($current_dir, DS) . DS . $view)) {
                 $view = rtrim($current_dir, DS) . DS . $view;
+            } elseif (file_exists(rtrim($current_dir, DS) . DS . 'partials' . DS . $view)) {
+                $view = rtrim($current_dir, DS) . DS . 'partials' . DS . $view;
             } elseif (file_exists($this->viewPath . 'partials' . DS . $view)) {
                 $view = $this->viewPath . 'partials' . DS . $view;
             } elseif (file_exists($this->viewPath . trim(dirname($current_dir), '/\\') . DS . $view)) {

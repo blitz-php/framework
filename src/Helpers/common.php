@@ -401,6 +401,10 @@ if (! function_exists('link_to')) {
     {
         $url = Services::routes()->reverseRoute($method, ...$params);
 
+        if (empty($url)) {
+            return '';
+        }
+
         return site_url($url);
     }
 }

@@ -9,11 +9,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Core\App;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Helpers;
 
 /**
@@ -503,16 +503,16 @@ if (! function_exists('link_active')) {
         $current_url     = trim(current_url(false), '/');
         $current_section = trim(str_replace(trim(site_url(), '/'), '', $current_url), '/');
 
+        
         if ($current_section === $path) {
             return $active_class;
         }
-
+        
         if (! $exact && preg_match('#^' . $path . '/?#i', $current_section)) {
             return $active_class;
         }
-
-        $link_to = trim(link_to($path), '/');
-        if ($link_to === $current_url) {
+        
+        if (trim(link_to($path), '/') === $current_url) {
             return $active_class;
         }
 
@@ -524,5 +524,15 @@ if (! function_exists('clean_url')) {
     function clean_url(string $url): string
     {
         return Helpers::cleanUrl($url);
+    }
+}
+
+if (! function_exists('is_absolute_link')) {
+    /**
+     * Verifies si un chemin donnée est une url absolue ou relative
+     */
+    function is_absolute_link(string $url): string
+    {
+        return Helpers::isAbsoluteUrl($url);
     }
 }
