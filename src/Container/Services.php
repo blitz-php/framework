@@ -20,6 +20,7 @@ use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
 use BlitzPHP\Event\EventManager;
+use BlitzPHP\Filesystem\Filesystem;
 use BlitzPHP\Filesystem\FilesystemManager;
 use BlitzPHP\Http\Negotiator;
 use BlitzPHP\HTTP\Redirection;
@@ -145,6 +146,18 @@ class Services
         }
 
         return static::$instances[EventManager::class] = static::factory(EventManager::class);
+    }
+
+    /**
+     * System de gestion de fichier
+     */
+    public static function fs(bool $shared = true): Filesystem
+    {
+        if (true === $shared && isset(static::$instances[Filesystem::class])) {
+            return static::$instances[Filesystem::class];
+        }
+
+        return static::$instances[Filesystem::class] = static::factory(Filesystem::class);
     }
 
     /**
@@ -358,7 +371,7 @@ class Services
     }
 
     /**
-     * System de gestion de fichier
+     * System de gestion de fichier par disque
      */
     public static function storage(bool $shared = true): FilesystemManager
     {
@@ -366,7 +379,7 @@ class Services
             return static::$instances[FilesystemManager::class];
         }
 
-        return static::$instances[FilesystemManager::class] = static::factory(FilesystemManager::class, ['config' => Config::get('filesystems')]);
+        return static::$instances[FilesystemManager::class] = new FilesystemManager(Config::get('filesystems'));
     }
 
     /**

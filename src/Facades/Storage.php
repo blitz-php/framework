@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 
 /**
  * @method static array                                              allDirectories(string|null $directory = null)

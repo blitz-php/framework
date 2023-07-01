@@ -13,9 +13,9 @@ defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 defined('COMPOSER_PATH') || define('COMPOSER_PATH', VENDOR_PATH . 'autoload.php');
 
-define('BASEPATH', dirname(VENDOR_PATH) . DS);
+defined('BASEPATH') || define('BASEPATH', dirname(VENDOR_PATH) . DS);
 
-define('ROOTPATH', dirname(WEBROOT) . DS);
+defined('ROOTPATH') || define('ROOTPATH', dirname(WEBROOT) . DS);
 
 /**
  * Chemin  vers le dossier des configurations
