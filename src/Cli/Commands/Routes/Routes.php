@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Cli\Commands\Utilities;
+namespace BlitzPHP\Cli\Commands\Routes;
 
 use BlitzPHP\Cli\Commands\Utilities\Routes\AutoRouteCollector;
 use BlitzPHP\Cli\Commands\Utilities\Routes\MiddlewareCollector;
@@ -34,7 +34,7 @@ class Routes extends Command
     /**
      * @var string Nom
      */
-    protected $name = 'routes';
+    protected $name = 'route:list';
 
     /**
      * @var string Description

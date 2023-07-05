@@ -9,9 +9,9 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Cli\Commands\Utilities\Routes;
+namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Router\Router;
 
 /**
