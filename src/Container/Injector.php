@@ -47,7 +47,7 @@ class Injector
             if (extension_loaded('apcu')) {
                 $this->builder->enableDefinitionCache(str_replace([' ', '/', '\\', '.'], '', APP_PATH));
             }
-            $this->builder->enableCompilation(FRAMEWORK_STORAGE_PATH . 'cache');    
+            $this->builder->enableCompilation(FRAMEWORK_STORAGE_PATH . 'cache');
         }
 
         $this->container = new Container();
@@ -166,7 +166,6 @@ class Injector
         self::container()->set($name, $value);
     }
 
-
     /**
      * Recupere toutes les definitions des services à injecter dans le container
      */
@@ -208,7 +207,7 @@ class Injector
         if (! empty($appProvider)) {
             $providers[] = $appProvider;
         }
-       
+
         return $providers;
     }
 }

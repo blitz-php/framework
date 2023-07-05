@@ -503,15 +503,14 @@ if (! function_exists('link_active')) {
         $current_url     = trim(current_url(false), '/');
         $current_section = trim(str_replace(trim(site_url(), '/'), '', $current_url), '/');
 
-        
         if ($current_section === $path) {
             return $active_class;
         }
-        
+
         if (! $exact && preg_match('#^' . $path . '/?#i', $current_section)) {
             return $active_class;
         }
-        
+
         if (trim(link_to($path), '/') === $current_url) {
             return $active_class;
         }

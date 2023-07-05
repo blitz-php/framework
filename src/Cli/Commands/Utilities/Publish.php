@@ -15,7 +15,7 @@ use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Publisher\Publisher;
 
 /**
- * Découvre toutes les classes Publisher à partir du répertoire « Publishers/ » dans les espaces de noms.
+ * Découvre toutes les classes Publisher à partir du répertoire « Publishers/ » dans les espaces de noms.
  * Exécute `publish()` à partir de chaque instance, en analysant chaque résultat.
  */
 class Publish extends Command
@@ -24,7 +24,7 @@ class Publish extends Command
      * @var string Groupe
      */
     protected $group = 'BlitzPHP';
-    
+
     /**
      * @var string Nom
      */
@@ -41,7 +41,7 @@ class Publish extends Command
      * @var array<string, string>
      */
     protected $arguments = [
-        '[directory:Publishers]' => '[Facultatif] Le répertoire à analyser dans chaque espace de noms. Par défaut : "Publishers".',
+        '[directory:Publishers]' => "[Facultatif] Le répertoire à analyser dans chaque espace de noms. Par défaut\u{a0}: \"Publishers\".",
     ];
 
     /**

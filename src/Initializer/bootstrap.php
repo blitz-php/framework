@@ -9,8 +9,8 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Core\Application;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Core\Application;
 
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 

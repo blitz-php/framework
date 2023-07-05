@@ -84,7 +84,7 @@ class Serve extends Command
      */
     protected $taskMessages = [
         'demarrage' => '', // Message a afficher lors du demarrage du serveur
-        'demarrer' => '', // Message a afficher lorsque le serveur a demarré
+        'demarrer'  => '', // Message a afficher lorsque le serveur a demarré
     ];
 
     /**

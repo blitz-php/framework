@@ -30,7 +30,6 @@ class Load
         'models'      => [],
     ];
 
-
     /**
      * Charge un fichier d'aide
      *

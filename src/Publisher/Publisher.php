@@ -29,7 +29,7 @@ use Throwable;
  *
  * Les opérations d'écriture intercepteront toutes les erreurs dans le fichier spécifique
  * Propriété $errors pour minimiser l'impact des opérations par lots partielles.
- * 
+ *
  * @credit <a href="http://codeigniter.com">CodeIgniter 4 - \CodeIgniter\Publisher\Publisher</a>
  */
 class Publisher extends FileCollection

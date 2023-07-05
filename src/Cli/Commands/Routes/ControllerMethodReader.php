@@ -133,7 +133,7 @@ final class ControllerMethodReader
         $classPath  = '';
 
         foreach ($classParts as $part) {
-            // mettre la première lettre en minuscule, car le routage automatique 
+            // mettre la première lettre en minuscule, car le routage automatique
             // met la première lettre du chemin URI en majuscule et recherche le contrôleur
             $classPath .= lcfirst($part) . '/';
         }

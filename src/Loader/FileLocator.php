@@ -21,10 +21,10 @@ use BlitzPHP\Utilities\String\Text;
 class FileLocator
 {
     /**
-     * Charge un fichier d'aide en mémoire. 
+     * Charge un fichier d'aide en mémoire.
      * Prend en charge les helpers d'espace de noms, à la fois dans et hors du répertoire 'helpers' d'un répertoire d'espace de noms.
      *
-     * Chargera TOUS les helpers du nom correspondant, dans l'ordre suivant :
+     * Chargera TOUS les helpers du nom correspondant, dans l'ordre suivant :
      *   1. app/Helpers
      *   2. {namespace}/Helpers
      *   3. system/Helpers

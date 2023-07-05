@@ -87,14 +87,13 @@ class Routes extends Command
                 if (is_string($handler) || $handler instanceof Closure) {
                     $sampleUri = $uriGenerator->get($route);
                     $filters   = $middlewareCollector->get($method, $sampleUri);
-                    
+
                     if ($handler instanceof Closure) {
                         $handler = '(Closure)';
                     }
 
                     $routeName = $collection->getRoutesOptions($route)['as'] ?? '»';
 
-                    
                     $tbody[] = [
                         strtoupper($method),
                         $route,
@@ -121,7 +120,7 @@ class Routes extends Command
 
                 $routes[] = implode(' ', array_map([Helpers::class, 'classBasename'], $filters));
             }
-  
+
             $tbody = [...$tbody, ...$autoRoutes];
         }
 
@@ -131,13 +130,14 @@ class Routes extends Command
         }
 
         $table = [];
+
         foreach ($tbody as $route) {
             $table[] = [
-                               'Methode'                           => $route[0],
-                               'Route'                             => $route[1],
-                               'Nom'                               => $route[2],
+                'Methode'                                          => $route[0],
+                'Route'                                            => $route[1],
+                'Nom'                                              => $route[2],
                 $sortByHandler ? 'Gestionnaire ↓' : 'Gestionnaire' => $route[3],
-                               'Middlewares'                       => $route[4],
+                'Middlewares'                                      => $route[4],
             ];
         }
 

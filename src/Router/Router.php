@@ -127,7 +127,7 @@ class Router implements RouterInterface
                 $this->collection->getDefaultMethod(),
                 $this->translateURIDashes,
                 $this->collection->getHTTPVerb()
-            );   
+            );
         }
     }
 

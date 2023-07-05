@@ -23,7 +23,7 @@ final class MiddlewareFinder
 
     public function __construct(?Router $router = null)
     {
-        $this->router  = $router ?? Services::router();
+        $this->router = $router ?? Services::router();
     }
 
     /**

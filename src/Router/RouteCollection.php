@@ -86,9 +86,9 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * Tableau de toutes les routes et leurs mappages.
-     * 
-     * @example 
-     * ```php 
+     *
+     * @example
+     * ```php
      * [
      *     verb => [
      *         routeName => [
@@ -116,8 +116,8 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * Tableaux des options des routes.
-     * 
-     * @example 
+     *
+     * @example
      * ```php
      * [
      *     verb => [
@@ -249,7 +249,7 @@ class RouteCollection implements RouteCollectionInterface
         $this->prioritizeDetected = false;
         $this->didDiscover        = false;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -348,7 +348,7 @@ class RouteCollection implements RouteCollectionInterface
 
         $files    = $this->locator->search('Config/routes.php');
         $excludes = [
-            APP_PATH  . 'Config' . DS . 'routes.php',
+            APP_PATH . 'Config' . DS . 'routes.php',
             SYST_PATH . 'Config' . DS . 'routes.php',
         ];
 
@@ -1138,7 +1138,7 @@ class RouteCollection implements RouteCollectionInterface
             return '/' . ltrim($from, '/');
         }
 
-        // Les paramètres régionaux sont passés ?
+        // Les paramètres régionaux sont passés ?
         $placeholderCount = count($matches[0]);
         if (count($params) > $placeholderCount) {
             $locale = $params[$placeholderCount];
@@ -1202,7 +1202,7 @@ class RouteCollection implements RouteCollectionInterface
         if ($from !== '/') {
             $from = trim($from, '/');
         }
-        
+
         if (is_string($to) && strpos($to, '::') === false && class_exists($to) && method_exists($to, '__invoke')) {
             $to = [$to, '__invoke'];
         }
@@ -1225,7 +1225,7 @@ class RouteCollection implements RouteCollectionInterface
 
         // Limitation du nom d'hôte ?
         if (! empty($options['hostname'])) {
-            // @todo déterminer s'il existe un moyen de mettre les hôtes sur liste blanche ?
+            // @todo déterminer s'il existe un moyen de mettre les hôtes sur liste blanche ?
             if (! $this->checkHostname($options['hostname'])) {
                 return;
             }
@@ -1316,7 +1316,7 @@ class RouteCollection implements RouteCollectionInterface
 
         return strtolower($this->httpHost) === strtolower($hostname);
     }
-    
+
     /**
      * Compare le ou les sous-domaines transmis avec le sous-domaine actuel
      * sur cette page demande.
@@ -1375,7 +1375,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Débarrassez-vous de tous les domaines, qui seront les derniers
-        unset($host[count($host) -1]);
+        unset($host[count($host) - 1]);
 
         // Compte pour les domaines .co.uk, .co.nz, etc.
         if (end($host) === 'co') {
@@ -1391,9 +1391,6 @@ class RouteCollection implements RouteCollectionInterface
         return array_shift($host);
     }
 
-    /**
-     *
-     */
     private function getControllerName(Closure|string $handler): ?string
     {
         if (! is_string($handler)) {
@@ -1404,7 +1401,7 @@ class RouteCollection implements RouteCollectionInterface
 
         return $controller;
     }
-    
+
     /**
      * Renvoie la chaîne de paramètres de méthode comme `/$1/$2` pour les espaces réservés
      */

@@ -18,5 +18,4 @@ use BlitzPHP\Container\Services as ContainerServices;
  */
 final class Services extends ContainerServices
 {
-
 }

@@ -124,11 +124,11 @@ class Dispatcher
      * @var string
      */
     protected $path;
-    
+
     /**
-    * Indique s'il faut renvoyer l'objet Response ou envoyer la réponse.
-    */
-   protected bool $returnResponse = false;
+     * Indique s'il faut renvoyer l'objet Response ou envoyer la réponse.
+     */
+    protected bool $returnResponse = false;
 
     /**
      * Constructor.
@@ -485,6 +485,7 @@ class Dispatcher
      *
      * @param RouteCollectionInterface|null $routes Une interface de collecte à utiliser à la place
      *                                              du fichier de configuration.
+     *
      * @return string[]
      *
      * @throws RedirectException
@@ -640,10 +641,10 @@ class Dispatcher
      */
     protected function display404errors(PageNotFoundException $e)
     {
-        // Existe-t-il une dérogation 404 disponible ?
+        // Existe-t-il une dérogation 404 disponible ?
         if ($override = $this->router->get404Override()) {
             $returned = null;
-            
+
             if ($override instanceof Closure) {
                 echo $override($e->getMessage());
             } elseif (is_array($override)) {

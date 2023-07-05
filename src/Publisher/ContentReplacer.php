@@ -15,7 +15,7 @@ use RuntimeException;
 
 /**
  * Remplacer le contenu du texte
- * 
+ *
  * @credit <a href="http://codeigniter.com">CodeIgniter 4 - \CodeIgniter\Publisher\ContentReplacer</a>
  */
 class ContentReplacer
@@ -33,7 +33,7 @@ class ContentReplacer
     /**
      * Ajouter du texte
      *
-     * @param string $text Texte à ajouter.
+     * @param string $text    Texte à ajouter.
      * @param string $pattern Modèle de recherche d'expression régulière.
      * @param string $replace Remplacement de Regexp incluant le texte à ajouter.
      *
@@ -67,8 +67,8 @@ class ContentReplacer
      * Ajouter une ligne après la ligne avec la chaîne
      *
      * @param string $content Contenu entier.
-     * @param string $line Ligne à ajouter.
-     * @param string $after Chaîne à rechercher.
+     * @param string $line    Ligne à ajouter.
+     * @param string $after   Chaîne à rechercher.
      *
      * @return string|null Contenu mis à jour, ou null si non mis à jour.
      */
@@ -84,8 +84,8 @@ class ContentReplacer
      * Ajouter une ligne avant la ligne avec la chaîne
      *
      * @param string $content Contenu entier.
-     * @param string $line Ligne à ajouter.
-     * @param string $before String à rechercher.
+     * @param string $line    Ligne à ajouter.
+     * @param string $before  String à rechercher.
      *
      * @return string|null Contenu mis à jour, ou null si non mis à jour.
      */

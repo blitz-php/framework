@@ -21,7 +21,7 @@ use BlitzPHP\Router\Router;
 final class MiddlewareCollector
 {
     /**
-     * @param boolean $resetRoutes Indique s'il faut réinitialiser les routes définies. S'il est défini sur true, les middlewares de routage sont introuvables.
+     * @param bool $resetRoutes Indique s'il faut réinitialiser les routes définies. S'il est défini sur true, les middlewares de routage sont introuvables.
      */
     public function __construct(private bool $resetRoutes = false)
     {
@@ -41,7 +41,7 @@ final class MiddlewareCollector
 
         $request = Services::request(false)->withMethod($method);
 
-        $router  = $this->createRouter($request);
+        $router = $this->createRouter($request);
 
         $finder = new MiddlewareFinder($router);
 

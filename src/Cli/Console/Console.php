@@ -160,8 +160,8 @@ class Console extends Application
 
     /**
      * Definie les fichiers qui pourront etre considerer comme commandes
-     * 
-     * @return string[] Chemins absolus des fichiers 
+     *
+     * @return string[] Chemins absolus des fichiers
      */
     protected function files(Locator $locator): array
     {
@@ -344,7 +344,7 @@ class Console extends Application
         if ('' !== $service) {
             $message .= ' | ' . $service;
         }
-        
+
         $eq_str = str_repeat('=', strlen($message));
 
         $this->io()->write($eq_str . "\n" . $message . "\n" . $eq_str . "\n", true);

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Router;
 
 use BadMethodCallException;
@@ -9,40 +18,40 @@ use Closure;
 use InvalidArgumentException;
 
 /**
- * @method $this addPlaceholder($placeholder, ?string $pattern = null) Enregistre une nouvelle contrainte auprès du système.
- * @method $this setDefaultNamespace(string $value) Définit l'espace de noms par défaut à utiliser pour les contrôleurs lorsqu'aucun autre n'a été spécifié.
- * @method $this setDefaultController(string $value) Définit le contrôleur par défaut à utiliser lorsqu'aucun autre contrôleur n'a été spécifié.
- * @method $this setDefaultMethod(string $value) Définit la méthode par défaut pour appeler le contrôleur lorsqu'aucun autre méthode a été définie dans la route.
- * @method $this setTranslateURIDashes(bool $value) Indique au système s'il faut convertir les tirets des chaînes URI en traits de soulignement.
- * @method $this setAutoRoute(bool $value) Si TRUE, le système tentera de faire correspondre l'URI avec
-     * Contrôleurs en faisant correspondre chaque segment avec des dossiers/fichiers
-     * dans CONTROLLER_PATH, lorsqu'aucune correspondance n'a été trouvée pour les routes définies.
- * @method $this set404Override($callable = null) Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
- * @method $this setDefaultConstraint(string $placeholder) Définit la contrainte par défaut à utiliser dans le système. Typiquement à utiliser avec la méthode 'ressource'.
- * @method $this setPrioritize(bool $enabled = true) Activer ou désactiver le tri des routes par priorité
- * @method $this addRedirect(string $from, string $to, int $status = 302) Ajoute une redirection temporaire d'une route à une autre.
+ * @method void  add(string $from, array|callable|string $to, array $options = [])     Enregistre une seule route à la collection.
+ * @method $this addPlaceholder($placeholder, ?string $pattern = null)                 Enregistre une nouvelle contrainte auprès du système.
+ * @method $this addRedirect(string $from, string $to, int $status = 302)              Ajoute une redirection temporaire d'une route à une autre.
  * @method $this as(string $name)
+ * @method void  cli(string $from, array|callable|string $to, array $options = [])     Enregistre une route qui ne sera disponible que pour les requêtes de ligne de commande.
  * @method $this controller(string $controller)
+ * @method void  delete(string $from, array|callable|string $to, array $options = [])  Enregistre une route qui ne sera disponible que pour les requêtes DELETE.
  * @method $this domain(string $domain)
+ * @method void  get(string $from, array|callable|string $to, array $options = [])     Enregistre une route qui ne sera disponible que pour les requêtes GET.
+ * @method void  head(string $from, array|callable|string $to, array $options = [])    Enregistre une route qui ne sera disponible que pour les requêtes HEAD.
  * @method $this hostname(string $hostname)
  * @method $this middleware(array|string $middleware)
  * @method $this name(string $name)
  * @method $this namespace(string $namespace)
+ * @method void  options(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes OPTIONS.
+ * @method void  patch(string $from, array|callable|string $to, array $options = [])   Enregistre une route qui ne sera disponible que pour les requêtes PATCH.
  * @method $this placeholder(string $placeholder)
+ * @method void  post(string $from, array|callable|string $to, array $options = [])    Enregistre une route qui ne sera disponible que pour les requêtes POST.
  * @method $this prefix(string $prefix)
  * @method $this priority(int $priority)
+ * @method void  put(string $from, array|callable|string $to, array $options = [])     Enregistre une route qui ne sera disponible que pour les requêtes PUT.
+ * @method $this set404Override($callable = null)                                      Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
+ * @method $this setAutoRoute(bool $value)                                             Si TRUE, le système tentera de faire correspondre l'URI avec
+ *                                                                                     Contrôleurs en faisant correspondre chaque segment avec des dossiers/fichiers
+ *                                                                                     dans CONTROLLER_PATH, lorsqu'aucune correspondance n'a été trouvée pour les routes définies.
+ * @method $this setDefaultConstraint(string $placeholder)                             Définit la contrainte par défaut à utiliser dans le système. Typiquement à utiliser avec la méthode 'ressource'.
+ * @method $this setDefaultController(string $value)                                   Définit le contrôleur par défaut à utiliser lorsqu'aucun autre contrôleur n'a été spécifié.
+ * @method $this setDefaultMethod(string $value)                                       Définit la méthode par défaut pour appeler le contrôleur lorsqu'aucun autre méthode a été définie dans la route.
+ * @method $this setDefaultNamespace(string $value)                                    Définit l'espace de noms par défaut à utiliser pour les contrôleurs lorsqu'aucun autre n'a été spécifié.
+ * @method $this setPrioritize(bool $enabled = true)                                   Activer ou désactiver le tri des routes par priorité
+ * @method $this setTranslateURIDashes(bool $value)                                    Indique au système s'il faut convertir les tirets des chaînes URI en traits de soulignement.
  * @method $this subdomain(string $subdomain)
- * @method void add(string $from, array|callable|string $to, array $options = []) Enregistre une seule route à la collection.
- * @method void cli(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes de ligne de commande.
- * @method void delete(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes DELETE.
- * @method void get(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes GET.
- * @method void head(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes HEAD.
- * @method void options(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes OPTIONS.
- * @method void patch(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes PATCH.
- * @method void post(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes POST.
- * @method void put(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes PUT.
  */
-final class RouteBuilder 
+final class RouteBuilder
 {
     /**
      * Les attributs à transmettre au routeur.
@@ -60,7 +69,7 @@ final class RouteBuilder
      * Les attributs qui peuvent être définis via cette classe.
      */
     private array $allowedAttributes = [
-        'as', 'controller', 'domain', 'hostname', 'middlewares', 'middleware', 
+        'as', 'controller', 'domain', 'hostname', 'middlewares', 'middleware',
         'name', 'namespace', 'placeholder', 'prefix', 'priority', 'subdomain',
     ];
 
@@ -73,21 +82,17 @@ final class RouteBuilder
     ];
 
     private array $allowedMethods = [
-        'addPlaceholder', 'addRedirect',       
+        'addPlaceholder', 'addRedirect',
         'set404Override', 'setAutoRoute',
         'setDefaultConstraint', 'setDefaultController', 'setDefaultMethod', 'setDefaultNamespace',
         'setTranslateURIDashes', 'setPrioritize',
     ];
 
-    
     /**
      * Constructeur
-     *
-     * @param RouteCollection $collection
      */
     public function __construct(private RouteCollection $collection)
     {
-
     }
 
     /**
@@ -99,11 +104,11 @@ final class RouteBuilder
      */
     public function __call(string $method, array $parameters = [])
     {
-        if (in_array($method, $this->passthru)) {
+        if (in_array($method, $this->passthru, true)) {
             return $this->registerRoute($method, ...$parameters);
         }
 
-        if (in_array($method, $this->allowedAttributes)) {
+        if (in_array($method, $this->allowedAttributes, true)) {
             if (in_array($method, ['middleware', 'middlewares'], true)) {
                 $parameters = is_array($parameters[0]) ? $parameters[0] : $parameters;
 
@@ -113,7 +118,7 @@ final class RouteBuilder
             return $this->attribute($method, $parameters[0]);
         }
 
-        if (in_array($method, $this->allowedMethods)) {
+        if (in_array($method, $this->allowedMethods, true)) {
             $collection = $this->collection->{$method}(...$parameters);
 
             if ($collection instanceof RouteCollection) {
@@ -124,12 +129,12 @@ final class RouteBuilder
             return $this;
         }
 
-        throw new BadMethodCallException(sprintf('La méthode %s::%s n\'existe pas.', static::class, $method));
+        throw new BadMethodCallException(sprintf('La méthode %s::%s n\'existe pas.', self::class, $method));
     }
 
     public function configure(callable $callback)
     {
-        $callback($this);    
+        $callback($this);
     }
 
     /**
@@ -153,7 +158,7 @@ final class RouteBuilder
     public function group(callable $callback): void
     {
         $this->collection->group($this->attributes['prefix'] ?? '', $this->attributes, fn () => $callback($this));
-       
+
         // $callback($this);
     }
 
@@ -258,11 +263,13 @@ final class RouteBuilder
     /**
      * Defini une valeur pour l'attribut donné
      *
+     * @param mixed $value
+     *
      * @throws InvalidArgumentException
      */
     private function attribute(string $key, $value): self
     {
-        if (! in_array($key, $this->allowedAttributes)) {
+        if (! in_array($key, $this->allowedAttributes, true)) {
             throw new InvalidArgumentException("L'attribute [{$key}] n'existe pas.");
         }
 
@@ -273,6 +280,8 @@ final class RouteBuilder
 
     /**
      * Enregistre une nouvelle route avec le routeur.
+     *
+     * @param mixed $to
      */
     private function registerRoute(string $method, string $from, $to, array $options = []): self
     {
