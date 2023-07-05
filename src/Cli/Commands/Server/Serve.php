@@ -71,25 +71,58 @@ class Serve extends Command
     protected $tries = 10;
 
     /**
+     * Chemin de base dans lequel sera lancer le server
+     *
+     * @var string
+     */
+    protected $rootDirectory = WEBROOT;
+
+    /**
+     * Liste des messages des taches
+     *
+     * @var array
+     */
+    protected $taskMessages = [
+        'demarrage' => '', // Message a afficher lors du demarrage du serveur
+        'demarrer' => '', // Message a afficher lorsque le serveur a demarré
+    ];
+
+    /**
      * {@inheritDoc}
      */
     public function execute(array $params)
     {
-        $php  = escapeshellarg($params['php'] ?? $this->options['--php'][1] ?? PHP_BINARY);
-        $host = $params['host'] ?? $this->options['--host'][1] ?? 'localhost';
-        $port = (int) ($params['port'] ?? $this->options['--port'][1] ?? 3300) + $this->portOffset;
+        $options = [
+            'php'  => PHP_BINARY,
+            'host' => 'localhost',
+            'port' => 3300,
+        ];
 
-        $this->task('Demarrage du serveur de developpement');
+        if (isset($this->options['--php'])) {
+            $options['php'] = $this->options['--php'][1] ?? PHP_BINARY;
+        }
+        if (isset($this->options['--host'])) {
+            $options['host'] = $this->options['--host'][1] ?? 'localhost';
+        }
+        if (isset($this->options['--port'])) {
+            $options['port'] = $this->options['--port'][1] ?? 3300;
+        }
+
+        $php  = escapeshellarg($params['php'] ?: $options['php']);
+        $host = $params['host'] ?: $options['host'];
+        $port = (int) ($params['port'] ?: $options['port']) + $this->portOffset;
+
+        $this->task($this->taskMessages['demarrage'] ?: 'Demarrage du serveur de developpement');
         sleep(2);
 
-        $this->io->ok('Le serveur de développement BlitzPHP a démarré sur ');
+        $this->io->ok($this->taskMessages['demarrer'] ?: 'Le serveur de développement BlitzPHP a démarré sur ');
         $this->writer->boldGreen('http://' . $host . ':' . $port, true);
         $this->write("Appuyez sur Control-C pour arrêter.\n", true);
 
         // Appelez le serveur Web intégré de PHP, en veillant à définir notre
         // chemin de base vers le dossier public et pour utiliser le fichier de réécriture
         // pour s'assurer que notre environnement est défini et qu'il simule le mod_rewrite de base.
-        passthru($php . ' -S ' . $host . ':' . $port . ' -t ' . escapeshellarg(WEBROOT), $status);
+        passthru($php . ' -S ' . $host . ':' . $port . ' -t ' . escapeshellarg($this->rootDirectory), $status);
 
         if ($status && $this->portOffset < $this->tries) {
             $this->portOffset++;
