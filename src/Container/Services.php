@@ -194,7 +194,7 @@ class Services
             return static::$instances[Translate::class]->setLocale($locale);
         }
 
-        return static::$instances[Translate::class] = static::factory(Translate::class, compact('locale'));
+        return static::$instances[Translate::class] = static::factory(Translate::class, ['locale' => $locale, 'locator' => static::locator()]);
     }
 
     /**
