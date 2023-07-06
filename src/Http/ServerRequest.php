@@ -12,9 +12,10 @@
 namespace BlitzPHP\Http;
 
 use BadMethodCallException;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\HttpException;
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Filesystem\Files\UploadedFile;
 use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Session\Session;
 use BlitzPHP\Utilities\Helpers;
