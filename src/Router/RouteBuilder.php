@@ -12,7 +12,7 @@
 namespace BlitzPHP\Router;
 
 use BadMethodCallException;
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Utilities\Iterable\Arr;
 use Closure;
 use InvalidArgumentException;
@@ -158,8 +158,6 @@ final class RouteBuilder
     public function group(callable $callback): void
     {
         $this->collection->group($this->attributes['prefix'] ?? '', $this->attributes, fn () => $callback($this));
-
-        // $callback($this);
     }
 
     /**

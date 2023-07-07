@@ -14,9 +14,9 @@ namespace BlitzPHP\Controllers;
 use BlitzPHP\Annotations\AnnotationReader;
 use BlitzPHP\Annotations\Http\AjaxOnlyAnnotation;
 use BlitzPHP\Annotations\Http\RequestMappingAnnotation;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Formatter\Formatter;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\Http\ApiResponseTrait;
 use BlitzPHP\Utilities\Jwt;
 use mindplay\annotations\IAnnotation;
@@ -285,7 +285,10 @@ class RestController extends BaseController
         return lang($line, $args, $this->locale);
     }
 
-    private function _translate(string $line, ?array $args = null): string
+    /**
+     * @internal Ne pas censé être utilisé par le developpeur
+     */
+    protected function _translate(string $line, ?array $args = null): string
     {
         return $this->lang('Rest.' . $line, $args);
     }

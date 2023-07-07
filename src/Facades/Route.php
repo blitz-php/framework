@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Router\RouteBuilder;
 
 /**

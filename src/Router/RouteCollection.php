@@ -12,9 +12,9 @@
 namespace BlitzPHP\Router;
 
 use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Exceptions\RouterException;
-use BlitzPHP\Loader\Services;
 use Closure;
 use InvalidArgumentException;
 
@@ -661,7 +661,7 @@ class RouteCollection implements RouteCollectionInterface
         // Pour enregistrer une route, nous allons définir un indicateur afin que notre routeur
         // donc il verra le nom du groupe.
         // Si le nom du groupe est vide, nous continuons à utiliser le nom du groupe précédemment construit.
-        $this->group = implode('/', array_unique(explode('/', $name ? ltrim($oldGroup . '/' . $name, '/') : $oldGroup)));
+        $this->group = implode('/', array_unique(explode('/', $name ? (rtrim($oldGroup ?? '', '/') . '/' . ltrim($name, '/')) : $oldGroup)));
 
         $callback = array_pop($params);
 
@@ -1195,7 +1195,7 @@ class RouteCollection implements RouteCollectionInterface
         $overwrite = false;
         $prefix    = $this->group === null ? '' : $this->group . '/';
 
-        $from = esc(strip_tags($prefix . $from));
+        $from = esc(strip_tags(rtrim($prefix, '/') . '/' . ltrim($from, '/')));
 
         // Alors que nous voulons ajouter une route dans un groupe de '/',
         // ça ne marche pas avec la correspondance, alors supprimez-les...

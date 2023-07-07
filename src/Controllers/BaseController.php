@@ -11,10 +11,10 @@
 
 namespace BlitzPHP\Controllers;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Router\Dispatcher;
 use BlitzPHP\Validation\Validation;
 use Dimtrovich\Validation\ValidatedInput;

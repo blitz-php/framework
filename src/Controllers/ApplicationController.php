@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Controllers;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Router\Dispatcher;
 use BlitzPHP\View\View;
 use Psr\Http\Message\ResponseInterface;
