@@ -11,11 +11,8 @@
 
 namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Cli\Commands\Utilities\Routes\AutoRouteCollector;
-use BlitzPHP\Cli\Commands\Utilities\Routes\MiddlewareCollector;
-use BlitzPHP\Cli\Commands\Utilities\Routes\SampleURIGenerator;
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Utilities\Helpers;
 use Closure;
 
