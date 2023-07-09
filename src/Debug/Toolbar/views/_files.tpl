@@ -10,15 +10,6 @@
         </tr>
     {/userFiles}
         <tr>
-            <td colspan="2" style="font-weight: bold; color:#DD4814">Vendor Files ( {countVendorFiles} )</td>
-        </tr>
-    {vendorFiles}
-        <tr class="muted">
-            <td class="debug-bar-width20e">{name}</td>
-            <td>{path}</td>
-        </tr>
-    {/vendorFiles}
-        <tr>
             <td colspan="2" style="font-weight: bold; color:#DD4814">System Files ( {countCoreFiles} )</td>
         </tr>
     {coreFiles}
@@ -27,5 +18,23 @@
             <td>{path}</td>
         </tr>
     {/coreFiles}
+        <tr>
+            <td colspan="2" style="font-weight: bold; color:#DD4814">BlitzPHP Components Files ( {countBlitzFiles} )</td>
+        </tr>
+    {blitzFiles}
+        <tr class="muted">
+            <td class="debug-bar-width20e">{name}</td>
+            <td>{path}</td>
+        </tr>
+    {/blitzFiles}
+        <tr>
+            <td colspan="2" style="font-weight: bold; color:#DD4814">Vendor Files ( {countVendorFiles} )</td>
+        </tr>
+    {vendorFiles}
+        <tr class="muted">
+            <td class="debug-bar-width20e">{name}</td>
+            <td>{path}</td>
+        </tr>
+    {/vendorFiles}
     </tbody>
 </table>

@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\View\View;
 
 /**
@@ -24,27 +24,27 @@ class ViewsCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = true;
+    protected bool $hasTimeline = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = false;
+    protected bool $hasTabContent = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasLabel = true;
+    protected bool $hasLabel = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasVarData = true;
+    protected bool $hasVarData = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'Views';
+    protected string $title = 'Views';
 
     /**
      * Instance du service de rendu
@@ -58,7 +58,7 @@ class ViewsCollector extends BaseCollector
      *
      * @var array
      */
-    protected $views = [];
+    protected array $views = [];
 
     /**
      * Constructeur.

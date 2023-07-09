@@ -23,39 +23,37 @@ class HistoryCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = false;
+    protected bool $hasTimeline = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = true;
+    protected bool $hasTabContent = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasLabel = true;
+    protected bool $hasLabel = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'History';
+    protected string $title = 'History';
 
     /**
      * Fichiers d'historique
-     *
-     * @var array
      */
-    protected $files = [];
+    protected array $files = [];
 
     /**
      * Spécifiez la limite de temps et le nombre de fichiers pour l'historique de débogage.
      *
-     * @param int $current Heure actuelle de l'historique
+     * @param string $current Heure actuelle de l'historique
      * @param int $limit   Fichiers d'historique max.
      */
-    public function setFiles(int $current, int $limit = 20)
+    public function setFiles(string $current, int $limit = 20)
     {
-        $filenames = glob(STORAGE_PATH . 'debugbar/debugbar_*.json');
+        $filenames = glob(FRAMEWORK_STORAGE_PATH . 'debugbar/debugbar_*.json');
 
         $files   = [];
         $counter = 0;
@@ -75,9 +73,9 @@ class HistoryCollector extends BaseCollector
 
             $contents = @json_decode($contents);
             if (json_last_error() === JSON_ERROR_NONE) {
-                preg_match_all('/\d+/', $filename, $time);
-                $time = (int) end($time[0]);
-
+                preg_match('/debugbar_(.*)\.json$/s', $filename, $time);
+                $time = sprintf('%.6f', $time[1] ?? 0);
+                
                 // Fichiers de la barre de débogage affichés dans History Collector
                 $files[] = [
                     'time'        => $time,

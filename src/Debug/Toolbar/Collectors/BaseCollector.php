@@ -21,42 +21,32 @@ abstract class BaseCollector
     /**
      * Si ce collecteur possède des données pouvant
      * être affichées dans la chronologie.
-     *
-     * @var bool
      */
-    protected $hasTimeline = false;
+    protected bool $hasTimeline = false;
 
     /**
      * Indique si ce collecteur doit afficher
      * du contenu dans un onglet ou non.
-     *
-     * @var bool
      */
-    protected $hasTabContent = false;
+    protected bool $hasTabContent = false;
 
     /**
      * Si ce collecteur doit afficher
      * une étiquette ou non.
-     *
-     * @var bool
      */
-    protected $hasLabel = false;
+    protected bool $hasLabel = false;
 
     /**
      * Indique si ce collecteur contient des données qui
      * doivent être affichées dans l'onglet Vars.
-     *
-     * @var bool
      */
-    protected $hasVarData = false;
+    protected bool $hasVarData = false;
 
     /**
      * Le 'titre' de ce Collector.
      * Utilisé pour nommer les choses dans la barre d'outils HTML.
-     *
-     * @var string
      */
-    protected $title = '';
+    protected string $title = '';
 
     /**
      * Obtient le titre du collecteur
@@ -83,7 +73,7 @@ abstract class BaseCollector
      */
     public function hasTabContent(): bool
     {
-        return (bool) $this->hasTabContent;
+        return $this->hasTabContent;
     }
 
     /**
@@ -91,7 +81,7 @@ abstract class BaseCollector
      */
     public function hasLabel(): bool
     {
-        return (bool) $this->hasLabel;
+        return $this->hasLabel;
     }
 
     /**
@@ -99,7 +89,7 @@ abstract class BaseCollector
      */
     public function hasTimelineData(): bool
     {
-        return (bool) $this->hasTimeline;
+        return $this->hasTimeline;
     }
 
     /**
@@ -121,7 +111,7 @@ abstract class BaseCollector
      */
     public function hasVarData(): bool
     {
-        return (bool) $this->hasVarData;
+        return $this->hasVarData;
     }
 
     /**

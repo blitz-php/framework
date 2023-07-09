@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 
 /**
  * Collecteur de logs pour la barre d'outils de débogage
@@ -23,24 +23,22 @@ class LogsCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = false;
+    protected bool $hasTimeline = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = true;
+    protected bool $hasTabContent = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'Logs';
+    protected string $title = 'Logs';
 
     /**
      * Nos données collectées
-     *
-     * @var array
      */
-    protected $data;
+    protected array $data = [];
 
     /**
      * {@inheritDoc}

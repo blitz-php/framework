@@ -421,16 +421,19 @@ if (! function_exists('clean_path')) {
 
         switch (true) {
             case strpos($path, APP_PATH) === 0:
-                return 'APP_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(APP_PATH));
+                return 'APP_PATH' . DS . substr($path, strlen(APP_PATH));
 
             case strpos($path, SYST_PATH) === 0:
-                return 'SYST_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(SYST_PATH));
+                return 'SYST_PATH' . DS . substr($path, strlen(SYST_PATH));
+            
+            case defined('VENDOR_PATH') && strpos($path, VENDOR_PATH . 'blitz-php' . DS) === 0:
+                return 'BLITZ_PATH' . DS . substr($path, strlen(VENDOR_PATH . 'blitz-php' . DS));
 
             case defined('VENDOR_PATH') && strpos($path, VENDOR_PATH) === 0:
-                return 'VENDOR_PATH' . DIRECTORY_SEPARATOR . substr($path, strlen(VENDOR_PATH));
+                return 'VENDOR_PATH' . DS . substr($path, strlen(VENDOR_PATH));
 
             case strpos($path, ROOTPATH) === 0:
-                return 'ROOTPATH' . DIRECTORY_SEPARATOR . substr($path, strlen(ROOTPATH));
+                return 'ROOTPATH' . DS . substr($path, strlen(ROOTPATH));
 
             default:
                 return $path;

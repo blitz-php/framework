@@ -12,8 +12,6 @@
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
 use BlitzPHP\Event\EventManager;
-use BlitzPHP\Loader\Services;
-use BlitzPHP\View\View;
 
 /**
  * Collecteur pour l'onglet "Evenements" de la barre d'outils de débogage.
@@ -25,37 +23,22 @@ class EventsCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = false;
+    protected bool $hasTimeline = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = true;
+    protected bool $hasTabContent = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasVarData = false;
+    protected bool $hasVarData = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'Events';
-
-    /**
-     * Instance du service de rendu
-     *
-     * @var View
-     */
-    protected $viewer;
-
-    /**
-     * Constructeur.
-     */
-    public function __construct()
-    {
-        $this->viewer = Services::viewer();
-    }
+    protected string $title = 'Events';
 
     /**
      * {@inheritDoc}
@@ -64,12 +47,12 @@ class EventsCollector extends BaseCollector
     {
         $data = [];
 
-        $rows = $this->viewer->getPerformanceData();
+        $rows = EventManager::getPerformanceLogs();
 
-        foreach ($rows as $name => $info) {
+        foreach ($rows as $info) {
             $data[] = [
-                'name'      => 'View: ' . $info['view'],
-                'component' => 'Views',
+                'name'      => 'Event: ' . $info['event'],
+                'component' => 'Events',
                 'start'     => $info['start'],
                 'duration'  => $info['end'] - $info['start'],
             ];

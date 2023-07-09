@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Core\Application;
-use BlitzPHP\Loader\Services;
 
 /**
  * Configuration de la barre d'outils de débogage

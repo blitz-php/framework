@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Router\Dispatcher;
 use ReflectionException;
 use ReflectionFunction;
@@ -27,17 +27,17 @@ class RoutesCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = false;
+    protected bool $hasTimeline = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = true;
+    protected bool $hasTabContent = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'Routes';
+    protected string $title = 'Routes';
 
     /**
      * {@inheritDoc}

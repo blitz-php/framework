@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 
 /**
  * Collecteur de temporisateurs pour la barre d'outils de débogage
@@ -23,17 +23,17 @@ class TimersCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = true;
+    protected bool $hasTimeline = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = false;
+    protected bool $hasTabContent = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'Timers';
+    protected string $title = 'Timers';
 
     /**
      * {@inheritDoc}

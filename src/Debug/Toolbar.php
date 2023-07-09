@@ -12,12 +12,13 @@
 namespace BlitzPHP\Debug;
 
 use BlitzPHP\Core\Application;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Debug\Toolbar\Collectors\BaseCollector;
 use BlitzPHP\Debug\Toolbar\Collectors\Config;
 use BlitzPHP\Debug\Toolbar\Collectors\HistoryCollector;
 use BlitzPHP\Formatter\JsonFormatter;
 use BlitzPHP\Formatter\XmlFormatter;
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Utilities\Date;
 use BlitzPHP\View\Parser;
 use Exception;
 use GuzzleHttp\Psr7\Utils;
@@ -154,16 +155,7 @@ class Toolbar
             if (empty($value)) {
                 continue;
             }
-
-            if (! is_array($value)) {
-                $value = [$value];
-            }
-
-            foreach ($value as $h) {
-                if (is_object($h) && method_exists($h, 'getName') && method_exists($h, 'getValueLine')) {
-                    $data['vars']['headers'][esc($h->getName())] = esc($h->getValueLine());
-                }
-            }
+            $data['vars']['headers'][esc($header)] = esc($request->getHeaderLine($header));
         }
 
         foreach ($request->getCookieParams() as $name => $value) {
@@ -175,7 +167,7 @@ class Toolbar
         $data['vars']['response'] = [
             'statusCode'  => $response->getStatusCode(),
             'reason'      => esc($response->getReasonPhrase()),
-            'contentType' => esc($response->getHeaderLine('content-type')),
+            'contentType' => esc($response->getHeaderLine('Content-Type')),
             'headers'     => [],
         ];
 
@@ -183,16 +175,7 @@ class Toolbar
             if (empty($value)) {
                 continue;
             }
-
-            if (! is_array($value)) {
-                $value = [$value];
-            }
-
-            foreach ($value as $h) {
-                if (is_object($h) && method_exists($h, 'getName') && method_exists($h, 'getValueLine')) {
-                    $data['vars']['response']['headers'][esc($h->getName())] = esc($h->getValueLine());
-                }
-            }
+            $data['vars']['response']['headers'][esc($header)] = esc($response->getHeaderLine($header));
         }
 
         $data['config'] = Config::display();
@@ -229,7 +212,7 @@ class Toolbar
             $open = $row['name'] === 'Controller';
 
             if ($hasChildren || $isQuery) {
-                $output .= '<tr class="timeline-parent' . ($open ? ' timeline-parent-open' : '') . '" id="timeline-' . $styleCount . '_parent" onclick="ciDebugBar.toggleChildRows(\'timeline-' . $styleCount . '\');">';
+                $output .= '<tr class="timeline-parent' . ($open ? ' timeline-parent-open' : '') . '" id="timeline-' . $styleCount . '_parent" onclick="blitzphpDebugBar.toggleChildRows(\'timeline-' . $styleCount . '\');">';
             } else {
                 $output .= '<tr>';
             }
@@ -402,7 +385,7 @@ class Toolbar
         );
 
         // Mise à jour vers microtime() pour que nous puissions obtenir l'historique
-        $time = sprintf('%.6f', microtime(true));
+        $time = sprintf('%.6f', Date::now()->format('U.u'));
 
         if (! is_dir($this->debugPath)) {
             mkdir($this->debugPath, 0777);
@@ -410,7 +393,7 @@ class Toolbar
 
         $this->writeFile($this->debugPath . '/debugbar_' . $time . '.json', $data, 'w+');
 
-        $format = $response->getHeaderLine('content-type');
+        $format = $response->getHeaderLine('Content-Type');
 
         // Les formats non HTML ne doivent pas inclure la barre de débogage,
         // puis nous envoyons des en-têtes indiquant où trouver les données de débogage pour cette réponse
@@ -443,9 +426,9 @@ class Toolbar
         }
 
         if (strpos($responseContent, '</body>') !== false) {
-            $responseContent = preg_replace('/<\/body>/', '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>ciDebugBar.init();</script></body>', $responseContent, 1);
+            $responseContent = preg_replace('/<\/body>/', '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>blitzphpDebugBar.init();</script></body>', $responseContent, 1);
         } else {
-            $responseContent .= '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>ciDebugBar.init();</script>';
+            $responseContent .= '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>blitzphpDebugBar.init();</script>';
         }
 
         return $response->withBody(
@@ -488,10 +471,10 @@ class Toolbar
             // Négociation du type de contenu pour formater la sortie
             $format = $request->negotiate('media', ['text/html', 'application/json', 'application/xml']);
             $format = explode('/', $format)[1];
-
+            
             $filename = 'debugbar_' . $debugbarTime;
             $filename = $this->debugPath . DS . $filename . '.json';
-
+            
             if (is_file($filename)) {
                 // Affiche la barre d'outils si elle existe
                 return $this->format($debugbarTime, file_get_contents($filename), $format);
@@ -508,8 +491,10 @@ class Toolbar
 
     /**
      * Formatte la sortie
+     * 
+     * @param double $debugbar_time
      */
-    protected function format(float $debugbar_time, string $data, string $format = 'html'): string
+    protected function format($debugbar_time, string $data, string $format = 'html'): string
     {
         $data = json_decode($data, true);
 

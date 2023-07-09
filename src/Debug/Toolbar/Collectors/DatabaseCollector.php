@@ -24,36 +24,36 @@ class DatabaseCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = true;
+    protected bool $hasTimeline = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = true;
+    protected bool $hasTabContent = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasVarData = false;
+    protected bool $hasVarData = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'Database';
+    protected string $title = 'Database';
 
     /**
      * Tableau de connexions à la base de données.
      *
      * @var BaseConnection[]
      */
-    protected $connections;
+    protected array $connections = [];
 
     /**
      * Les instances de requête qui ont été collectées via l'événement DBQuery.
      *
      * @var stdClass[]
      */
-    protected static $queries = [];
+    protected static array $queries = [];
 
     /**
      * Constructeur

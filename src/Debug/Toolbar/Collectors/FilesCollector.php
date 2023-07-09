@@ -21,17 +21,17 @@ class FilesCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected $hasTimeline = false;
+    protected bool $hasTimeline = false;
 
     /**
      * {@inheritDoc}
      */
-    protected $hasTabContent = true;
+    protected bool $hasTabContent = true;
 
     /**
      * {@inheritDoc}
      */
-    protected $title = 'Files';
+    protected string $title = 'Files';
 
     /**
      * {@inheritDoc}
@@ -49,6 +49,7 @@ class FilesCollector extends BaseCollector
         $rawFiles    = get_included_files();
         $coreFiles   = [];
         $userFiles   = [];
+        $blitzFiles  = [];
         $vendorFiles = [];
 
         foreach ($rawFiles as $file) {
@@ -56,6 +57,11 @@ class FilesCollector extends BaseCollector
 
             if (strpos($path, 'SYST_PATH') !== false) {
                 $coreFiles[] = [
+                    'name' => basename($file),
+                    'path' => $path,
+                ];
+            } elseif (strpos($path, 'BLITZ_PATH') !== false) {
+                $blitzFiles[] = [
                     'name' => basename($file),
                     'path' => $path,
                 ];
@@ -74,11 +80,14 @@ class FilesCollector extends BaseCollector
 
         sort($userFiles);
         sort($coreFiles);
+        sort($blitzFiles);
         sort($vendorFiles);
 
         return [
             'coreFiles'        => $coreFiles,
             'countCoreFiles'   => count($coreFiles),
+            'blitzFiles'       => $blitzFiles,
+            'countBlitzFiles'  => count($blitzFiles),
             'userFiles'        => $userFiles,
             'countUserFiles'   => count($userFiles),
             'vendorFiles'      => $vendorFiles,
