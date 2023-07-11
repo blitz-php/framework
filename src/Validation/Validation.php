@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Validation;
 
-use BlitzPHP\Loader\Injector;
+use BlitzPHP\Container\Injector;
 use Dimtrovich\Validation\Validation as BaseValidation;
 
 class Validation extends BaseValidation

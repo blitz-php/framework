@@ -195,11 +195,11 @@ class ResponseEmitter
                 setcookie(
                     $cookie['name'],
                     $cookie['value'],
-                    $cookie['expire'],
+                    $cookie['expires'],
                     $cookie['path'],
                     $cookie['domain'],
                     $cookie['secure'],
-                    $cookie['httpOnly']
+                    $cookie['httponly']
                 );
 
                 continue;

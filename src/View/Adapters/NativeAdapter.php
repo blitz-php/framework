@@ -133,9 +133,6 @@ class NativeAdapter extends AbstractAdapter
             return ob_get_clean() ?: '';
         })();
 
-        // Récupère les variables actuelles
-        $this->renderVars = $renderVars;
-
         // Lors de l'utilisation de mises en page, les données ont déjà été stockées
         // dans $this->sections, et aucune autre sortie valide
         // est autorisé dans $output donc nous allons l'écraser.
@@ -145,8 +142,6 @@ class NativeAdapter extends AbstractAdapter
             // Enregistrer les variables actuelles
             $renderVars = $this->renderVars;
             $output     = $this->render($layoutView, array_merge($options ?? [], ['viewPath' => LAYOUT_PATH]), $saveData);
-            // Récupère les variables actuelles
-            $this->renderVars = $renderVars;
         }
 
         $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
@@ -167,6 +162,9 @@ class NativeAdapter extends AbstractAdapter
         }
 
         $this->tempData = null;
+
+        // Récupère les variables actuelles
+        $this->renderVars = $renderVars;
 
         return $output;
     }

@@ -786,6 +786,19 @@ if (! function_exists('lang')) {
     }
 }
 
+if (! function_exists('__')) {
+    /**
+     * Une méthode pratique pour traduire une chaîne ou un tableau d'entrées et formater
+     * le résultat avec le MessageFormatter de l'extension intl.
+     */
+    function __(string $line, array $args = [], ?string $locale = null): string
+    {
+        $tranlation = lang('App.' . $line, $args, $locale);
+
+        return preg_replace('/^(App\.)/i', '', $tranlation);
+    }
+}
+
 if (! function_exists('namespace_split')) {
     /**
      * Séparez l'espace de noms du nom de classe.

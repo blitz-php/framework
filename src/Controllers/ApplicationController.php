@@ -44,9 +44,11 @@ class ApplicationController extends BaseController
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
         if (strpos($view, '\\') === false) {
-            $reflection = new ReflectionClass(static::class);
-            $path       = str_replace([CONTROLLER_PATH, 'Controller', '.php'], '', $reflection->getFileName());
-            $path       = strtolower($path) . '/';
+            $reflection                                      = new ReflectionClass(static::class);
+            ['dirname' => $dirname, 'filename' => $filename] = pathinfo($reflection->getFileName());
+            $dirname                                         = str_ireplace('Controllers', 'Views', $dirname);
+            $filename                                        = strtolower(str_ireplace('Controller', '', $filename));
+            $path                                            = implode(DS, [$dirname, $filename]) . DS;
         }
 
         $viewer = Services::viewer();

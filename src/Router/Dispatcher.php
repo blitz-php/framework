@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Router;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Controllers\ApplicationController;
 use BlitzPHP\Controllers\RestController;
@@ -24,7 +25,6 @@ use BlitzPHP\Http\Middleware;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Traits\SingletonTrait;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\View;

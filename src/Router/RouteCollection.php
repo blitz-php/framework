@@ -1165,8 +1165,8 @@ class RouteCollection implements RouteCollectionInterface
      */
     protected function loadRoutesOptions(?string $verb = null): array
     {
-        $verb = $verb ?: $this->getHTTPVerb();
-
+        $verb = strtolower($verb ?: $this->getHTTPVerb());
+        
         $options = $this->routesOptions[$verb] ?? [];
 
         if (isset($this->routesOptions['*'])) {

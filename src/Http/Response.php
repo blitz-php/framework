@@ -1304,7 +1304,7 @@ class Response implements ResponseInterface
     public function getCookies(): array
     {
         $out = [];
-        /** @var array<\BlitzPHP\Http\Cookie\Cookie> $cookies */
+        /** @var array<\BlitzPHP\Session\Cookie\Cookie> $cookies */
         $cookies = $this->_cookies;
 
         foreach ($cookies as $cookie) {

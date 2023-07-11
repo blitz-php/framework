@@ -33,6 +33,7 @@ use BlitzPHP\HttpClient\Request as ClientRequest;
 use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
+use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
 use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
 use BlitzPHP\Session\Handlers\Database\Postgre as PostgreSessionHandler;
@@ -339,8 +340,8 @@ class Services
      */
     public static function session(bool $shared = true): Session
     {
-        if (true === $shared) {
-            return static::singleton(Session::class);
+        if (true === $shared && isset(static::$instances[Session::class])) {
+            return static::$instances[Session::class];
         }
 
         $config = Config::get('session');
@@ -359,7 +360,8 @@ class Services
             }
         }
 
-        $session = new Session($config, Config::get('cookie'), Helpers::ipAddress());
+        Cookie::setDefaults($cookies = Config::get('cookie'));
+        $session = new Session($config, $cookies, Helpers::ipAddress());
         $session->setLogger(static::logger());
         $session->setDatabase($db);
 
