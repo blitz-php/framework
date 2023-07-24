@@ -153,6 +153,42 @@ if (! function_exists('public_path')) {
     }
 }
 
+if (! function_exists('root_path')) {
+    /**
+     * ROOT PATH
+     *
+     * Renvoie le chemin absolu du dossier racine
+     *
+     * @param string $name nom du fichier dont on veut avoir le chemin
+     */
+    function root_path(string $name = ''): string
+    {
+        if (! empty($name)) {
+            $name = ltrim($name, '/\\');
+        }
+
+        return ROOTPATH . str_replace('/', DS, $name);
+    }
+}
+
+if (! function_exists('base_path')) {
+    /**
+     * BASE PATH
+     *
+     * Renvoie le chemin absolu du dossier de base
+     *
+     * @param string $name nom du fichier dont on veut avoir le chemin
+     */
+    function base_path(string $name = ''): string
+    {
+        if (! empty($name)) {
+            $name = ltrim($name, '/\\');
+        }
+
+        return BASEPATH . str_replace('/', DS, $name);
+    }
+}
+
 if (! function_exists('class_path')) {
     /**
      * CLASS PATH

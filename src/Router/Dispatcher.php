@@ -13,6 +13,7 @@ namespace BlitzPHP\Router;
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Contracts\Support\Responsable;
 use BlitzPHP\Controllers\ApplicationController;
 use BlitzPHP\Controllers\RestController;
 use BlitzPHP\Core\App;
@@ -797,6 +798,10 @@ class Dispatcher
         if ($returned instanceof ResponseInterface) {
             return $returned;
         }
+
+		if ($returned instanceof Responsable) {
+			return $returned->toResponse($this->request);
+		}
 
         if (is_object($returned)) {
             if (method_exists($returned, '__toString')) {
