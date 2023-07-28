@@ -11,6 +11,8 @@
 
 // Files language settings
 return [
+    'configFileDoesNotExist'    => 'Unable to loader the "{0} "configuration because the config file does not exist',
     'fileDoesNotExist'          => 'Unable to loader the "{0} "configuration, the {1} file does not exist',
+    'notFound'                  => 'No configuration found for the given path: {0}',
     'viewAdapterConfigNotFound' => 'No configuration found for adapter {0}',
 ];

@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Config;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
-use BlitzPHP\Traits\SingletonTrait;
 use BlitzPHP\Utilities\Helpers;
 use InvalidArgumentException;
 use Nette\Schema\Expect;
@@ -20,62 +20,81 @@ use Nette\Schema\Schema;
 
 class Config
 {
-    use SingletonTrait;
-
-    /**
-     * @var Configurator
-     */
-    private $configurator;
-
     /**
      * Fichier de configuration déjà chargé
-     *
-     * @var array
      */
-    private static $loaded = [];
+    private static array $loaded = [];
 
-    protected function __construct()
+	/**
+	 * Drapeau permettant de savoir si la config a deja ete initialiser
+	 */
+	private static bool $initialized = false;
+
+	private Configurator $configurator;
+
+    public function __construct()
     {
-        $this->configurator = new Configurator();
+		$this->configurator = new Configurator();
+		$this->initialize();
     }
+
+	/**
+     * Détermine si une clé de configuration existe.
+     */
+	public function exists(string $key): bool
+	{
+		if (! $this->configurator->exists($key)) {
+			$config = explode('.', $key);
+        	$this->load($config[0]);
+
+        	return $this->configurator->exists(implode('.', $config));
+		}
+
+		return true;
+	}
+
+	/**
+     * Détermine s'il y'a une clé de configuration.
+     */
+	public function has(string $key): bool
+	{
+		return $this->exists($key);
+	}
+
+	/**
+     * Détermine s'il manque une clé de configuration.
+     */
+	public function missing(string $key): bool
+	{
+		return ! $this->exists($key);
+	}
 
     /**
      * Renvoyer une configuration de l'application
      *
      * @return mixed
      */
-    public static function get(string $key)
+    public function get(string $key, mixed $default = null)
     {
-        $configurator = self::instance()->configurator;
-
-        if ($configurator->exists($key)) {
-            return $configurator->get($key);
+        if ($this->exists($key)) {
+            return $this->configurator->get($key);
         }
 
-        $config = explode('.', $key);
-        self::load($config[0]);
+		if (func_num_args() > 1) {
+			return $default;
+		}
+		
+		$path = explode('.', $key);
 
-        return self::instance()->configurator->get(implode('.', $config));
-    }
+		throw ConfigException::notFound(implode(' » ', $path));
+	}
 
     /**
      * Définir une configuration de l'application
-     *
-     * @param mixed $value
      */
-    public static function set(string $key, $value)
+    public function set(string $key, $value)
     {
-        self::instance()->configurator->set($key, $value);
-    }
-
-    /**
-     * Config constructor.
-     */
-    public static function init()
-    {
-        self::load(['app']);
-
-        self::instance()->initialize();
+       $this->configurator->set($key, $value);
     }
 
     /**
@@ -83,7 +102,7 @@ class Config
      *
      * @param string|string[] $config
      */
-    public static function load($config, ?string $file = null, ?Schema $schema = null)
+    public function load($config, ?string $file = null, ?Schema $schema = null)
     {
         if (is_array($config)) {
             foreach ($config as $key => $value) {
@@ -113,8 +132,8 @@ class Config
                 $schema = self::schema($config);
             }
 
-            self::instance()->configurator->addSchema($config, $schema, false);
-            self::instance()->configurator->merge([$config => (array) $configurations]);
+			$this->configurator->addSchema($config, $schema, false);
+			$this->configurator->merge([$config => (array) $configurations]);
 
             self::$loaded[$config] = $file;
         }
@@ -142,23 +161,19 @@ class Config
      */
     public static function path(string $path): string
     {
-        $_config_file = [
-            'app'      => CONFIG_PATH . 'app.php',
-            'autoload' => CONFIG_PATH . 'autoload.php',
-            'data'     => CONFIG_PATH . 'data.php',
-            'database' => CONFIG_PATH . 'database.php',
-            'layout'   => CONFIG_PATH . 'layout.php',
-
-            'email' => CONFIG_PATH . 'email.php',
-            'rest'  => CONFIG_PATH . 'rest.php',
-        ];
         $path = preg_replace('#\.php$#', '', $path);
 
-        if (isset($_config_file[$path])) {
-            return $_config_file[$path];
-        }
+		if (file_exists($file = CONFIG_PATH . $path . '.php')) {
+			return $file;
+		}
 
-        return CONFIG_PATH . $path . '.php';
+		$paths = Services::locator()->search('Config/' . $path);
+
+		if (isset($paths[0]) && file_exists($path[0])) {
+			return $paths[0];
+		}
+		
+		return '';
     }
 
     /**
@@ -188,12 +203,20 @@ class Config
      */
     private function initialize()
     {
+		if (self::$initialized) {
+			return;
+		}
+		
+		$this->load(['app']);
+        
         ini_set('log_errors', 1);
         ini_set('error_log', LOG_PATH . 'blitz-logs');
 
         $this->initializeURL();
         $this->initializeEnvironment();
         $this->initializeDebugbar();
+
+		self::$initialized = true;
     }
 
     /**
@@ -201,17 +224,13 @@ class Config
      */
     private function initializeURL()
     {
-        if (! $this->configurator->exists('app.base_url')) {
-            $config = 'auto';
-        } else {
-            $config = $this->configurator->get('app.base_url');
-        }
-
+        $config = $this->get('app.base_url', 'auto');
+        
         if ($config === 'auto' || empty($config)) {
             $config = rtrim(str_replace('\\', '/', Helpers::findBaseUrl()), '/');
         }
 
-        $this->configurator->set('app.base_url', $config);
+        $this->set('app.base_url', $config);
     }
 
     /**
@@ -219,7 +238,7 @@ class Config
      */
     private function initializeEnvironment()
     {
-        $environment = $config = $this->configurator->get('app.environment');
+        $environment = $config = $this->get('app.environment');
 
         if ($config === 'auto') {
             $config = is_online() ? 'production' : 'development';
@@ -230,7 +249,7 @@ class Config
         }
 
         if ($config !== $environment) {
-            $this->configurator->set('app.environment', $config);
+            $this->set('app.environment', $config);
         }
 
         switch ($config) {
@@ -257,17 +276,14 @@ class Config
      */
     private function initializeDebugbar()
     {
-        if (! $this->configurator->exists('app.show_debugbar')) {
-            $config = 'auto';
-        } else {
-            $config = $this->configurator->get('app.show_debugbar');
-        }
-
+        $config = $this->get('app.show_debugbar', 'auto');
+        
         if (! in_array($config, ['auto', true, false], true)) {
             self::exceptBadConfigValue('show_debugbar', ['auto', true, false], 'app');
         }
+
         if ($config === 'auto') {
-            $this->configurator->set('app.show_debugbar', ! is_online());
+            $this->set('app.show_debugbar', ! is_online());
         }
     }
 }

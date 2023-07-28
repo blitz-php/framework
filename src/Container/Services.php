@@ -97,7 +97,7 @@ class Services
             return static::$instances[Autoloader::class];
         }
 
-        $config  = Config::get('autoload');
+        $config  = static::config()->get('autoload');
         $helpers = array_merge(['url'], ($config['helpers'] ?? []));
 
         return static::$instances[Autoloader::class] = static::factory(Autoloader::class, compact('config', 'helpers'));
@@ -110,7 +110,7 @@ class Services
     public static function cache(?array $config = null, bool $shared = true): Cache
     {
         if (empty($config)) {
-            $config = Config::get('cache');
+            $config = static::config()->get('cache');
         }
 
         if (true === $shared && isset(static::$instances[Cache::class])) {
@@ -124,6 +124,18 @@ class Services
 
         return static::$instances[Cache::class] = static::factory(Cache::class, compact('config'));
     }
+
+	/**
+	 * La clase Config offre une api fluide por gerer les configurations de l'application
+	 */
+	public static function config(bool $shared = true): Config
+	{
+		if (true === $shared && isset(static::$instances[Config::class])) {
+            return static::$instances[Config::class];
+        }
+		
+		return static::$instances[Config::class] = new Config();
+	}
 
     /**
      * Émetteur de réponse au client
@@ -181,7 +193,7 @@ class Services
     {
         if (empty($locale)) {
             if (empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
-                $config = Config::get('app');
+                $config = static::config()->get('app');
 
                 if (empty($locale = static::negotiator()->language($config['supported_locales']))) {
                     $locale = $config['language'];
@@ -230,7 +242,7 @@ class Services
     public static function mail(?array $config = null, bool $shared = true): Mail
     {
         if (empty($config)) {
-            $config = Config::get('mail');
+            $config = static::config()->get('mail');
         }
 
         if (true === $shared && isset(static::$instances[Mail::class])) {
@@ -344,11 +356,11 @@ class Services
             return static::$instances[Session::class];
         }
 
-        $config = Config::get('session');
+        $config = static::config()->get('session');
         $db     = null;
 
         if (Text::contains($config['handler'], [DatabaseSessionHandler::class, 'database'])) {
-            $group = $config['group'] ?? Config::get('database.connection');
+            $group = $config['group'] ?? static::config()->get('database.connection');
             $db    = DatabaseConfig::connect($group);
 
             $driver = $db->getPlatform();
@@ -360,7 +372,7 @@ class Services
             }
         }
 
-        Cookie::setDefaults($cookies = Config::get('cookie'));
+        Cookie::setDefaults($cookies = static::config()->get('cookie'));
         $session = new Session($config, $cookies, Helpers::ipAddress());
         $session->setLogger(static::logger());
         $session->setDatabase($db);
@@ -381,7 +393,7 @@ class Services
             return static::$instances[FilesystemManager::class];
         }
 
-        return static::$instances[FilesystemManager::class] = new FilesystemManager(Config::get('filesystems'));
+        return static::$instances[FilesystemManager::class] = new FilesystemManager(static::config()->get('filesystems'));
     }
 
     /**

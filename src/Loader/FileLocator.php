@@ -17,6 +17,8 @@ use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 
 class FileLocator
 {
@@ -101,6 +103,71 @@ class FileLocator
         foreach ($includes as $path) {
             include_once $path;
         }
+    }
+
+	/**
+     * Charge un fichier d'aide en mémoire.
+     * Prend en charge les helpers d'espace de noms, à la fois dans et hors du répertoire 'helpers' d'un répertoire d'espace de noms.
+     */
+    public static function schema(string $name): Schema
+    {
+        static $loadedSchema = [];
+
+        $loader = Services::locator();
+
+		// Stockez nos versions de schame système et d'application afin que nous puissions contrôler l'ordre de chargement.
+		$systemSchema  = null;
+		$appSchema     = null;
+		$vendorSchema  = null;
+		
+		// Le fichier de schema qui sera finalement utiliser
+		$file = null;
+		
+		// Vérifiez si ce schama a déjà été chargé
+		if (in_array($name, $loadedSchema, true)) {
+            return $loadedSchema[$name];
+		}
+
+		// Si le fichier est dans un espace de noms, nous allons simplement saisir ce fichier et ne pas en rechercher d'autres
+		if (strpos($name, '\\') !== false) {
+			if (!empty($path = $loader->locateFile($name, 'schemas'))) {
+				$file = $path;
+			}
+		} else {
+			// Pas d'espaces de noms, donc recherchez dans tous les emplacements disponibles
+			$paths = $loader->search('schemas/' . $name);
+
+			foreach ($paths as $path) {
+				if (strpos($path, CONFIG_PATH . 'schemas' . DS) === 0) {
+					$appSchema = $path;
+				} elseif (strpos($path, SYST_PATH . 'Constants' . DS . 'schemas' . DS) === 0) {
+					$systemSchema = $path;
+				} else {
+					$vendorSchema = $path;
+				}
+			}
+
+			// Les schema des vendor sont prioritaire, ensuite vienne ceux de l'application
+			if (!empty($vendorSchema)) {
+				$file = $vendorSchema;
+			} else if (!empty($appSchema)) {
+				$file = $appSchema;
+			} else if (!empty($systemSchema)) {
+				$file = $systemSchema;
+			}
+        }
+
+		if (!empty($file)) {
+			$schema = require($file);
+		} else {
+			$schema = null;
+		}
+
+        if (empty($schema) || ! ($schema instanceof Schema)) {
+            $schema = Expect::mixed();
+        }
+
+        return $loadedSchema[$name] = $schema;
     }
 
     /**

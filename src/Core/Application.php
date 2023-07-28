@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Core;
 
-use BlitzPHP\Config\Config;
 use BlitzPHP\Container\Injector;
 use BlitzPHP\Debug\Whoops;
 use BlitzPHP\Exceptions\ExceptionInterface;
@@ -66,11 +65,6 @@ class Application
         self::configureExt();
 
         /**
-         * Initialise les configurations du systeme a partir des fichiers se trouvant dans /app/config
-         */
-        Config::init();
-
-        /**
          * On initialise le conteneur d'injection de dependences
          */
         Injector::init();
@@ -109,7 +103,7 @@ class Application
 
     private static function configureExt()
     {
-        $config = (object) Config::get('app');
+        $config = (object) config('app');
 
         // Définir les paramètres régionaux par défaut sur le serveur
         if (function_exists('locale_set_default')) {

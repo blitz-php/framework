@@ -120,15 +120,21 @@ if (! function_exists('config')) {
      *
      * @param mixed $value
      *
-     * @return mixed
+     * @return Config|mixed
      */
-    function config(string $config, $value = null, bool $force_set = false)
+    function config(?string $key = null, $value = null, bool $force_set = false)
     {
+		$config = Services::config();
+
+		if (empty($key)) {
+			return $config;
+		}
+
         if (! empty($value) || (empty($value) && true === $force_set)) {
-            Config::set($config, $value);
+            $config->set($key, $value);
         }
 
-        return Config::get($config);
+        return $config->get($key);
     }
 }
 

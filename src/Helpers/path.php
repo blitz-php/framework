@@ -221,7 +221,7 @@ if (! function_exists('config_path')) {
             $name = DS . ltrim($name, '/\\');
         }
 
-        return APP_PATH . 'config' . str_replace('/', DS, $name);
+        return CONFIG_PATH . str_replace('/', DS, $name);
     }
 }
 
