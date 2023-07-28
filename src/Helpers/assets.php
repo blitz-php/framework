@@ -444,3 +444,65 @@ if (! function_exists('videos_url')) {
         return $name;
     }
 }
+
+if (! function_exists('mix')) {
+    /**
+     * Obtenez le chemin d'accès à un fichier Mix versionné.
+     *
+     * @throws \Exception
+     */
+    function mix(string $path, string $manifestDirectory = ''): string
+    {
+        static $manifests = [];
+
+        $publicPath = trim(WEBROOT, '/\\');
+
+        if ($path[0] !== '/') {
+            $path = "/{$path}";
+        }
+
+        if ($manifestDirectory && $manifestDirectory[0] !== '/') {
+            $manifestDirectory = "/{$manifestDirectory}";
+        }
+
+        $config = (object) config('mix');
+
+        if (is_file($publicPath . $manifestDirectory . '/hot')) {
+            $url = rtrim(file_get_contents($publicPath . $manifestDirectory . '/hot'));
+
+            if (!empty($customUrl = $customUrl = $config->hot_proxy_url)) {
+                return $customUrl . $path;
+            }
+
+            if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
+                return explode(':', $url, 2)[1] . $path;
+            }
+
+            return "//localhost:3300{$path}";
+        }
+
+        $manifestPath = $publicPath . $manifestDirectory . '/mix-manifest.json';
+
+        if (!isset($manifests[$manifestPath])) {
+            if (!is_file($manifestPath)) {
+                throw new Exception('Le manifeste Mix n\'existe pas.');
+            }
+
+            $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
+        }
+
+        $manifest = $manifests[$manifestPath];
+
+        if (!isset($manifest[$path])) {
+            $exception = new Exception("Impossible de localiser le fichier Mix: {$path}.");
+
+            if (! BLITZ_DEBUG) {
+                return $path;
+            } else {
+                throw $exception;
+            }
+        }
+
+        return $config->url . $manifestDirectory . $manifest[$path];
+    }
+}
