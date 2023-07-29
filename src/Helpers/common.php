@@ -115,26 +115,28 @@ if (! function_exists('show404')) {
 }
 
 if (! function_exists('config')) {
-    /**
+   /**
      * GET/SET App config
      *
-     * @param mixed $value
-     *
-     * @return Config|mixed
+     * @return Config|mixed|void
      */
-    function config(?string $key = null, $value = null, bool $force_set = false)
+    function config(array|string|null $key = null, $default = null)
     {
 		$config = Services::config();
 
-		if (empty($key)) {
+		if (null === $key) {
 			return $config;
 		}
 
-        if (! empty($value) || (empty($value) && true === $force_set)) {
-            $config->set($key, $value);
+        if (is_string($key)) {
+            return $config->get($key, $default);
         }
-
-        return $config->get($key);
+        
+        foreach ($key as $k => $v) {
+            if (is_string($k)) {
+                $config->set($k, $v);
+            }
+        }
     }
 }
 
