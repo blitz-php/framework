@@ -223,7 +223,7 @@ class Console extends Application
         /**
          * @var Command $instance
          */
-        $instance = new $className($this, $logger);
+        $instance = Services::container()->make($className, ['app' => $this, 'logger' => $logger]);
 
         $command = new AhcCommand(
             $instance->name,

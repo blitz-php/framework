@@ -91,13 +91,6 @@ abstract class Command
     protected $arguments = [];
 
     /**
-     * Le Logger à utiliser
-     *
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * L'alias de la commande
      *
      * @var string
@@ -130,13 +123,6 @@ abstract class Command
      * ]`
      */
     protected $required = [];
-
-    /**
-     * Application Console
-     *
-     * @var Console
-     */
-    protected $app;
 
     /**
      * @var Interactor
@@ -173,10 +159,12 @@ abstract class Command
      */
     private array $_options = [];
 
-    public function __construct(Console $app, LoggerInterface $logger)
+	/**
+	 * @param Console $app Application Console
+	 * @param LoggerInterface $logger Le Logger à utiliser
+	 */
+    public function __construct(protected Console $app, protected LoggerInterface $logger)
     {
-        $this->app    = $app;
-        $this->logger = $logger;
         $this->initProps();
     }
 
