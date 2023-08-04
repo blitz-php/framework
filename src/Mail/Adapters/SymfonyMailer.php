@@ -158,7 +158,11 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function setEncryption(?string $encryption): self
     {
-        if (in_array($encryption, [null, static::ENCRYPTION_SSL, static::ENCRYPTION_TLS], true)) {
+        if ($encryption === static::ENCRYPTION_NONE) {
+			$encryption = null;
+		}
+		
+		if (in_array($encryption, [null, static::ENCRYPTION_SSL, static::ENCRYPTION_TLS], true)) {
             $this->encryption = $encryption;
         }
 

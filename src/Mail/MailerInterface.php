@@ -28,6 +28,7 @@ interface MailerInterface
     public const PROTOCOL_SMTP                      = 'smtp';
     public const ENCRYPTION_SSL                     = 'ssl';
     public const ENCRYPTION_TLS                     = 'tls';
+    public const ENCRYPTION_NONE                    = 'none';
     public const CHARSET_ASCII                      = 'us-ascii';
     public const CHARSET_ISO88591                   = 'iso-8859-1';
     public const CHARSET_UTF8                       = 'utf-8';

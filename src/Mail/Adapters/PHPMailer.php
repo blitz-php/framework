@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Mail\Adapters;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use PHPMailer\PHPMailer\PHPMailer as Mailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -164,6 +164,10 @@ class PHPMailer extends AbstractAdapter
      */
     public function setEncryption(?string $encryption): self
     {
+		if ($encryption === static::ENCRYPTION_NONE) {
+			$encryption = null;
+		}
+		
         if (in_array($encryption, [null, static::ENCRYPTION_SSL, static::ENCRYPTION_TLS], true)) {
             $this->mailer->SMTPSecure = $encryption;
         }
