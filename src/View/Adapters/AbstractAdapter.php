@@ -232,7 +232,9 @@ abstract class AbstractAdapter implements RendererInterface
         if (! is_file($file) && $this->locator instanceof Locator) {
             $file = $this->locator->locateFile($view, 'Views', empty($ext) ? 'php' : $ext);
         }
-
+		
+		$file = realpath($file);
+		
         // locateFile renverra une chaîne vide si le fichier est introuvable.
         if (! is_file($file)) {
             throw ViewException::invalidFile($view);
