@@ -24,7 +24,7 @@ class Command extends ConsoleCommand
     /**
      * @var string Groupe
      */
-    protected $group = 'Generators';
+    protected $group = 'Generateurs';
 
     /**
      * @var string Nom

@@ -24,7 +24,7 @@ class Seeder extends Command
     /**
      * {@inheritDoc}
      */
-    protected $group = 'Generators';
+    protected $group = 'Generateurs';
 
     /**
      * {@inheritDoc}

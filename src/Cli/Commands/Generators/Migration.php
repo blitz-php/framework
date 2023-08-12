@@ -25,7 +25,7 @@ class Migration extends Command
     /**
      * @var string Groupe
      */
-    protected $group = 'Generators';
+    protected $group = 'Generateurs';
 
     /**
      * @var string Nom
