@@ -14,7 +14,7 @@ namespace BlitzPHP\Router;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Support\Responsable;
-use BlitzPHP\Controllers\ApplicationController;
+use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Controllers\RestController;
 use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
@@ -918,16 +918,16 @@ class Dispatcher
                 }
 
                 if (is_string($_this->controller)) {
-                    if (strtoupper($request->getMethod()) === 'POST') {
-                        if (is_subclass_of($_this->controller, ApplicationController::class)) {
-                            return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
-                        }
+					if (strtoupper($request->getMethod()) === 'POST') {
                         if (is_subclass_of($_this->controller, RestController::class)) {
                             return $_this->formatResponse($response->withStatus($code), [
                                 'success' => false,
                                 'code'    => $code,
                                 'errors'  => $errors,
                             ]);
+                        }
+						if (is_subclass_of($_this->controller, BaseController::class)) {
+                            return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
                         }
                     }
                 } elseif (strtoupper($request->getMethod()) === 'POST') {

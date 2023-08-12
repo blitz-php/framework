@@ -202,6 +202,8 @@ final class RouteBuilder
     public function presenter(string $name, array $options = []): void
     {
         $this->collection->presenter($name, $this->attributes + $options);
+
+		$this->attributes = [];
     }
 
     /**
@@ -238,6 +240,8 @@ final class RouteBuilder
     public function resource(string $name, array $options = []): void
     {
         $this->collection->resource($name, $this->attributes + $options);
+
+		$this->attributes = [];
     }
 
     /**
@@ -284,6 +288,8 @@ final class RouteBuilder
     private function registerRoute(string $method, string $from, $to, array $options = []): self
     {
         $this->collection->{$method}($from, $to, $this->attributes + $options);
+
+		$this->attributes = [];
 
         return $this;
     }

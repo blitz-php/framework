@@ -752,39 +752,45 @@ class RouteCollection implements RouteCollectionInterface
             }
         }
 
+		$routeName = $name;
+		if (isset($options['as']) || isset($options['name'])) {
+			$routeName = trim($options['as'] ?? $options['name'], " .");
+			unset($options['name'], $options['as']);
+		}
+
         if (in_array('index', $methods, true)) {
             $this->get($name, $newName . '::index', $options + [
-				'as'  => $name . '.index',
+				'as' => $routeName . '.index',
 			]);
         }
         if (in_array('new', $methods, true)) {
             $this->get($name . '/new', $newName . '::new', $options + [
-				'as'  => $name . '.new',
+				'as' => $routeName . '.new',
 			]);
         }
         if (in_array('edit', $methods, true)) {
             $this->get($name . '/' . $id . '/edit', $newName . '::edit/$1', $options + [
-				'as'  => $name . '.edit',
+				'as' => $routeName . '.edit',
 			]);
         }
         if (in_array('show', $methods, true)) {
             $this->get($name . '/' . $id, $newName . '::show/$1', $options + [
-				'as'  => $name . '.show',
+				'as' => $routeName . '.show',
 			]);
         }
         if (in_array('create', $methods, true)) {
             $this->post($name, $newName . '::create', $options + [
-				'as'  => $name . '.create',
+				'as' => $routeName . '.create',
 			]);
         }
         if (in_array('update', $methods, true)) {
 			$this->match(['put', 'patch'], $name . '/' . $id, $newName . '::update/$1', $options + [
-				'as'  => $name . '.update',
+				'as' => $routeName . '.update',
 			]);
         }
         if (in_array('delete', $methods, true)) {
             $this->delete($name . '/' . $id, $newName . '::delete/$1', $options + [
-				'as'  => $name . '.delete',
+				'as' => $routeName . '.delete',
 			]);
         }
 
@@ -792,12 +798,12 @@ class RouteCollection implements RouteCollectionInterface
         if (isset($options['websafe'])) {
             if (in_array('delete', $methods, true)) {
                 $this->post($name . '/' . $id . '/delete', $newName . '::delete/$1', $options + [
-					'as'  => $name . '.websafe.delete',
+					'as' => $routeName . '.websafe.delete',
 				]);
             }
             if (in_array('update', $methods, true)) {
                 $this->post($name . '/' . $id, $newName . '::update/$1', $options + [
-					'as'  => $name . '.websafe.update',
+					'as' => $routeName . '.websafe.update',
 				]);
             }
         }
@@ -863,50 +869,56 @@ class RouteCollection implements RouteCollectionInterface
             }
         }
 
+		$routeName = $name;
+		if (isset($options['as']) || isset($options['name'])) {
+			$routeName = trim($options['as'] ?? $options['name'], " .");
+			unset($options['name'], $options['as']);
+		}
+
         if (in_array('index', $methods, true)) {
             $this->get($name, $newName . '::index', $options + [
-				'as' => $name . '.index',
+				'as' => $routeName . '.index',
 			]);
         }
         if (in_array('show', $methods, true)) {
             $this->get($name . '/show/' . $id, $newName . '::show/$1', $options + [
-				'as' => $name . '.view'
+				'as' => $routeName . '.view'
 			]);
 			$this->get($name . '/' . $id, $newName . '::show/$1', $options + [
-				'as' => $name . '.show'
+				'as' => $routeName . '.show'
 			]);
         }
         if (in_array('new', $methods, true)) {
             $this->get($name . '/new', $newName . '::new', $options + [
-				'as' => $name . '.new'
+				'as' => $routeName . '.new'
 			]);
         }
         if (in_array('create', $methods, true)) {
             $this->post($name . '/create', $newName . '::create', $options + [
-				'as' => $name . '.create'
+				'as' => $routeName . '.create'
 			]);
 			$this->post($name, $newName . '::create', $options + [
-				'as' => $name . '.store'
+				'as' => $routeName . '.store'
 			]);
         }
         if (in_array('edit', $methods, true)) {
             $this->get($name . '/edit/' . $id, $newName . '::edit/$1', $options + [
-				'as' => $name . '.edit'
+				'as' => $routeName . '.edit'
 			]);
         }
         if (in_array('update', $methods, true)) {
             $this->post($name . '/update/' . $id, $newName . '::update/$1', $options + [
-				'as' => $name . '.update',
+				'as' => $routeName . '.update',
 			]);
         }
         if (in_array('remove', $methods, true)) {
             $this->get($name . '/remove/' . $id, $newName . '::remove/$1', $options + [
-				'as' => $name . '.remove',
+				'as' => $routeName . '.remove',
 			]);
         }
         if (in_array('delete', $methods, true)) {
             $this->post($name . '/delete/' . $id, $newName . '::delete/$1', $options + [
-				'as' => $name . '.delete',
+				'as' => $routeName . '.delete',
 			]);
         }
         

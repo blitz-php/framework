@@ -448,24 +448,6 @@ if (! function_exists('mb_url_title')) {
     }
 }
 
-if (! function_exists('route')) {
-    /**
-     * Générez l'URL vers une route nommée.
-     * 
-     * @param mixed ...$params
-     *
-     * @throws RouterException
-     */
-    function route(string $name, ...$params): string
-    {
-        if (config('app.prefere-route-method') === 'url_to') {
-            return url_to($name, ...$params);
-        }
-
-        return link_to($name, ...$params);
-    }
-}
-
 if (! function_exists('url_to')) {
     /**
      * Obtenir l'URL complète et absolue d'une méthode de contrôleur
