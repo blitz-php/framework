@@ -37,7 +37,7 @@ use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
 use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
 use BlitzPHP\Session\Handlers\Database\Postgre as PostgreSessionHandler;
-use BlitzPHP\Session\Session;
+use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
@@ -350,10 +350,10 @@ class Services
     /**
      * Retourne le gestionnaire de session.
      */
-    public static function session(bool $shared = true): Session
+    public static function session(bool $shared = true): Store
     {
-        if (true === $shared && isset(static::$instances[Session::class])) {
-            return static::$instances[Session::class];
+        if (true === $shared && isset(static::$instances[Store::class])) {
+            return static::$instances[Store::class];
         }
 
         $config = static::config()->get('session');
@@ -373,7 +373,7 @@ class Services
         }
 
         Cookie::setDefaults($cookies = static::config()->get('cookie'));
-        $session = new Session($config, $cookies, Helpers::ipAddress());
+        $session = new Store($config, $cookies, Helpers::ipAddress());
         $session->setLogger(static::logger());
         $session->setDatabase($db);
 
@@ -381,7 +381,7 @@ class Services
             $session->start();
         }
 
-        return static::$instances[Session::class] = $session;
+        return static::$instances[Store::class] = $session;
     }
 
     /**
