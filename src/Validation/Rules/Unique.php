@@ -12,15 +12,62 @@
 namespace BlitzPHP\Validation\Rules;
 
 use BlitzPHP\Contracts\Database\ConnectionInterface;
+use BlitzPHP\Models\BaseEntity;
+use BlitzPHP\Wolke\Model;
 use Dimtrovich\Validation\Rules\AbstractRule;
 
 class Unique extends AbstractRule
 {
     protected $message        = ':attribute :value has been used';
-    protected $fillableParams = ['table', 'column', 'except'];
+    protected $fillableParams = ['table', 'column', 'ignore'];
+
+	/**
+     * The name of the ID column.
+     */
+    protected string $idColumn = 'id';
+
+	protected string $deletedAtColumn = '';
+
 
     public function __construct(protected ConnectionInterface $db)
     {
+    }
+
+	/**
+     * Ignore the given ID during the unique check.
+     */
+    public function ignore(mixed $id, ?string $idColumn = null): self
+    {
+		if (class_exists(Model::class) && $id instanceof BaseEntity) {
+            return $this->ignoreEntity($id, $idColumn);
+        }
+		
+        $this->params['ignore'] = $id;
+        $this->idColumn         = $idColumn ?? 'id';
+		
+
+        return $this;
+    }
+
+	/**
+     * Ignore the given model during the unique check.
+     */
+    public function ignoreEntity(BaseEntity $entity, ?string $idColumn = null): self
+    {
+		$this->idColumn         = $idColumn ?? $entity->getKeyName();
+        $this->params['ignore'] = $entity->{$this->idColumn};
+
+        return $this;
+    }
+
+	/**
+     * Ignore soft deleted models during the unique check.
+     */
+    public function withoutTrashed(string $deletedAtColumn = 'deleted_at'): self
+    {
+		$this->deletedAtColumn = $deletedAtColumn;
+
+        return $this;
     }
 
     public function check($value): bool
@@ -28,14 +75,19 @@ class Unique extends AbstractRule
         $this->requireParameters(['table']);
 
         $table  = $this->parameter('table');
-        $except = $this->parameter('except');
+        $ignore = $this->parameter('ignore');
         $column = $this->parameter('column');
         $column = $column ?: $this->getAttribute()->getKey();
 
-        if ($except && $except === $value) {
-            return true;
-        }
+		$builder = $this->db->table($table)->where($column, $value);
 
-        return $this->db->table($table)->where($column, $value)->count() === 0;
+		if ($ignore) {
+			$builder->where($this->idColumn . ' !=', $ignore);
+		}
+		if ('' !== $this->deletedAtColumn) {
+			$builder->where($this->deletedAtColumn . ' IS NULL');
+		}
+
+        return $builder->count() === 0;
     }
 }
