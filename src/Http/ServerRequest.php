@@ -17,7 +17,7 @@ use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Filesystem\Files\UploadedFile;
 use BlitzPHP\Session\Cookie\CookieCollection;
-use BlitzPHP\Session\Session;
+use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
@@ -151,7 +151,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Instance d'un objet Session relative à cette requête
      *
-     * @var Session
+     * @var Store
      */
     protected $session;
 
@@ -328,7 +328,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Renvoie l'instance de l'objet Session pour cette requête
      */
-    public function session(): Session
+    public function session(): Store
     {
         return $this->session;
     }

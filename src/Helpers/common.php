@@ -367,7 +367,7 @@ if (! function_exists('redirection')) {
      */
     function redirection(string $uri = '', string $method = 'location', ?int $code = 302)
     {
-        $response = redirect()->to($uri, $code, $method);
+        $response = redirect()->to($uri, $code, [], null, $method);
 
         Services::emitter()->emitHeaders($response);
 
@@ -401,9 +401,9 @@ if (! function_exists('back')) {
     /**
      * Retourne a la page precedente
      */
-    function back(?int $code = null, string $method = 'auto'): Redirection
+    function back(int $code = 302, array $headers = [], $fallback = false): Redirection
     {
-        return redirect()->back($code, $method);
+        return redirect()->back($code, $headers, $fallback);
     }
 }
 
