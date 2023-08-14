@@ -17,7 +17,7 @@ use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Load;
-use BlitzPHP\Session\Session;
+use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
 use BlitzPHP\Utilities\Support\Invader;
@@ -397,6 +397,16 @@ if (! function_exists('redirect')) {
     }
 }
 
+if (! function_exists('back')) {
+    /**
+     * Retourne a la page precedente
+     */
+    function back(?int $code = null, string $method = 'auto'): Redirection
+    {
+        return redirect()->back($code, $method);
+    }
+}
+
 if (! function_exists('link_to')) {
     /**
      * Étant donné une chaîne de contrôleur/méthode et tous les paramètres,
@@ -597,7 +607,7 @@ if (! function_exists('session')) {
      *    session()->set('foo', 'bar');
      *    $foo = session('bar');
      *
-     * @return array|bool|float|int|object|Session|string|null
+     * @return array|bool|float|int|object|Store|string|null
      */
     function session(?string $val = null)
     {

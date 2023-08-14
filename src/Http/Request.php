@@ -80,7 +80,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function getBaseUrl(): string
     {
-        return trim(Config::get('app.base_url'), '/');
+        return trim(config()->get('app.base_url'), '/');
     }
 
     /**
@@ -292,6 +292,11 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     {
         return $this->all();
     }
+
+	public function getScheme(): string
+	{
+		return $this->getUri()->getScheme();
+	}
 
     /**
      * {@inheritDoc}

@@ -14,6 +14,7 @@ use BlitzPHP\Core\App;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
+use BlitzPHP\Http\UrlGenerator;
 use BlitzPHP\Utilities\Helpers;
 
 /**
@@ -105,15 +106,10 @@ if (! function_exists('previous_url')) {
      */
     function previous_url(bool $returnObject = false)
     {
-        // Récupérez d'abord la session, si nous l'avons,
-        // car c'est plus fiable et plus sûr.
-        // Sinon, récupérez une version épurée de $_SERVER.
-        $referer = $_SESSION['_blitz_previous_url'] ?? null;
-        if (false === filter_var($referer, FILTER_VALIDATE_URL)) {
-            $referer = Services::request()->getServer('HTTP_REFERER', FILTER_SANITIZE_URL);
-        }
+		/** @var UrlGenerator $generator */
+		$generator = service(UrlGenerator::class);
 
-        $referer ??= site_url('/');
+		$referer = $generator->previous();
 
         return $returnObject ? Services::uri($referer) : $referer;
     }

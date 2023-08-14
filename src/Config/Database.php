@@ -11,9 +11,9 @@
 
 namespace BlitzPHP\Config;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Database\Database as Db;
-use BlitzPHP\Loader\Services;
 use InvalidArgumentException;
 
 /**

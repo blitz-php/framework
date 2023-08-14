@@ -48,13 +48,9 @@ class Redirection extends Response
      */
     public function route(string $route, array $params = [], int $code = 302, string $method = 'auto'): self
     {
-        $route = Services::routes()->reverseRoute($route, ...$params);
+        $url = Services::factory(UrlGenerator::class)->route($route, $params, true);
 
-        if (! $route) {
-            throw HttpException::invalidRedirectRoute($route);
-        }
-
-        return $this->redirect(site_url($route), $method, $code);
+        return $this->redirect($url, $method, $code);
     }
 
     /**
@@ -65,8 +61,6 @@ class Redirection extends Response
      */
     public function back(?int $code = null, string $method = 'auto'): self
     {
-        Services::session();
-
         return $this->redirect(previous_url(), $method, $code);
     }
 

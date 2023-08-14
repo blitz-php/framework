@@ -759,15 +759,13 @@ class Dispatcher
             $uri = Services::uri($uri, false);
         }
 
-        if (isset($_SESSION)) {
-            $_SESSION['_blitz_previous_url'] = Uri::createURIString(
-                $uri->getScheme(),
-                $uri->getAuthority(),
-                $uri->getPath(),
-                $uri->getQuery(),
-                $uri->getFragment()
-            );
-        }
+		Services::session()->setPreviousUrl(Uri::createURIString(
+			$uri->getScheme(),
+			$uri->getAuthority(),
+			$uri->getPath(),
+			$uri->getQuery(),
+			$uri->getFragment()
+		));
     }
 
     /**
@@ -917,6 +915,7 @@ class Dispatcher
                     $errors = [$e->getMessage()];
                 }
 
+				
                 if (is_string($_this->controller)) {
 					if (strtoupper($request->getMethod()) === 'POST') {
                         if (is_subclass_of($_this->controller, RestController::class)) {
