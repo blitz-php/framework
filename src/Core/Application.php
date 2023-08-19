@@ -12,6 +12,7 @@
 namespace BlitzPHP\Core;
 
 use BlitzPHP\Container\Injector;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Debug\Whoops;
 use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Loader\DotEnv;
@@ -79,7 +80,7 @@ class Application
 
     public function run(bool $return_response = false)
     {
-        return Dispatcher::init($return_response);
+		return Services::singleton(Dispatcher::class)->run(null, $return_response);
     }
 
     /**

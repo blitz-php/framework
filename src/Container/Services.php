@@ -15,7 +15,7 @@ use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Cache\Cache;
 use BlitzPHP\Config\Config;
-use BlitzPHP\Config\Database as DatabaseConfig;
+use BlitzPHP\Db\ConnectionResolver;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
@@ -361,7 +361,7 @@ class Services
 
         if (Text::contains($config['handler'], [DatabaseSessionHandler::class, 'database'])) {
             $group = $config['group'] ?? static::config()->get('database.connection');
-            $db    = DatabaseConfig::connect($group);
+            $db    = static::singleton(ConnectionResolver::class)->connection($group);
 
             $driver = $db->getPlatform();
 

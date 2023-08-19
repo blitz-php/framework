@@ -12,12 +12,14 @@
 namespace BlitzPHP\Router;
 
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Support\Responsable;
 use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Controllers\RestController;
 use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
+use BlitzPHP\Event\EventDiscover;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
@@ -26,7 +28,6 @@ use BlitzPHP\Http\Middleware;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
-use BlitzPHP\Traits\SingletonTrait;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\View;
 use Closure;
@@ -37,8 +38,6 @@ use stdClass;
 
 class Dispatcher
 {
-    use SingletonTrait;
-
     /**
      * Heure de démarrage de l'application.
      *
@@ -134,15 +133,10 @@ class Dispatcher
     /**
      * Constructor.
      */
-    private function __construct()
+    public function __construct(protected EventManagerInterface $event)
     {
         $this->startTime = microtime(true);
         $this->config    = (object) config('app');
-    }
-
-    public static function init(bool $returnResponse = false)
-    {
-        return self::instance()->run(null, $returnResponse);
     }
 
     /**
@@ -150,7 +144,7 @@ class Dispatcher
      */
     public static function getMethod(): ?string
     {
-        $method = self::instance()->method;
+        $method = Services::singleton(self::class)->method;
         if (empty($method)) {
             $method = Services::routes()->getDefaultMethod();
         }
@@ -167,12 +161,12 @@ class Dispatcher
     {
         $routes = Services::routes();
 
-        $controller = self::instance()->controller;
+        $controller = Services::singleton(self::class)->controller;
         if (empty($controller)) {
             $controller = $routes->getDefaultController();
         }
 
-        if (! $fullName && is_string($controller)) {
+		if (! $fullName && is_string($controller)) {
             $controller = str_replace($routes->getDefaultNamespace(), '', $controller);
         }
 
@@ -208,12 +202,9 @@ class Dispatcher
         /**
          * Init event manager
          */
-        $events_file = CONFIG_PATH . 'events.php';
-        if (file_exists($events_file)) {
-            require_once $events_file;
-        }
+		Services::singleton(EventDiscover::class)->discove();
 
-        Services::event()->trigger('pre_system');
+		$this->event->trigger('pre_system');
 
         // Recherche une page en cache. L'exécution s'arrêtera
         // si la page a été mise en cache.
@@ -286,7 +277,7 @@ class Dispatcher
         }
 
         // Y a-t-il un événement post-système ?
-        Services::event()->trigger('post_system');
+        $this->event->trigger('post_system');
 
         return $this->response;
     }
@@ -882,32 +873,30 @@ class Dispatcher
 
     private function bootApp(): callable
     {
-        $_this = $this;
-
-        return static function (ServerRequestInterface $request, ResponseInterface $response, callable $next) use ($_this): ResponseInterface {
+        return function (ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface {
             try {
-                $returned = $_this->startController($request, $response);
+                $returned = $this->startController($request, $response);
 
                 // Closure controller has run in startController().
-                if (! is_callable($_this->controller)) {
-                    $controller = $_this->createController($request, $response);
+                if (! is_callable($this->controller)) {
+                    $controller = $this->createController($request, $response);
 
-                    if (! method_exists($controller, '_remap') && ! is_callable([$controller, $_this->method], false)) {
-                        throw PageNotFoundException::methodNotFound($_this->method);
+                    if (! method_exists($controller, '_remap') && ! is_callable([$controller, $this->method], false)) {
+                        throw PageNotFoundException::methodNotFound($this->method);
                     }
 
                     // Is there a "post_controller_constructor" event?
-                    Services::event()->trigger('post_controller_constructor');
+                    $this->event->trigger('post_controller_constructor');
 
-                    $returned = $_this->runController($controller);
+                    $returned = $this->runController($controller);
                 } else {
-                    $_this->timer->stop('controller_constructor');
-                    $_this->timer->stop('controller');
+                    $this->timer->stop('controller_constructor');
+                    $this->timer->stop('controller');
                 }
 
-                Services::event()->trigger('post_system');
+                $this->event->trigger('post_system');
 
-                return $_this->formatResponse($response, $returned);
+                return $this->formatResponse($response, $returned);
             } catch (ValidationException $e) {
                 $code   = $e->getCode();
                 $errors = $e->getErrors();
@@ -916,16 +905,16 @@ class Dispatcher
                 }
 
 				
-                if (is_string($_this->controller)) {
+                if (is_string($this->controller)) {
 					if (strtoupper($request->getMethod()) === 'POST') {
-                        if (is_subclass_of($_this->controller, RestController::class)) {
-                            return $_this->formatResponse($response->withStatus($code), [
+                        if (is_subclass_of($this->controller, RestController::class)) {
+                            return $this->formatResponse($response->withStatus($code), [
                                 'success' => false,
                                 'code'    => $code,
                                 'errors'  => $errors,
                             ]);
                         }
-						if (is_subclass_of($_this->controller, BaseController::class)) {
+						if (is_subclass_of($this->controller, BaseController::class)) {
                             return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
                         }
                     }
