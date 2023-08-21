@@ -13,7 +13,7 @@ namespace BlitzPHP\Core;
 
 use BlitzPHP\Container\Injector;
 use BlitzPHP\Container\Services;
-use BlitzPHP\Debug\Whoops;
+use BlitzPHP\Debug\Debugger;
 use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Loader\DotEnv;
 use BlitzPHP\Router\Dispatcher;
@@ -61,6 +61,11 @@ class Application
         DotEnv::init(ROOTPATH);
 
         /**
+         * Lance la capture des exceptions et erreurs
+         */
+        Debugger::init();
+
+        /**
          * On configure quelques extensions
          */
         self::configureExt();
@@ -69,11 +74,6 @@ class Application
          * On initialise le conteneur d'injection de dependences
          */
         Injector::init();
-
-        /**
-         * Lance la capture des exceptions et erreurs
-         */
-        Whoops::init();
 
         return $this;
     }
@@ -135,9 +135,7 @@ class Application
 
         if (extension_loaded('mbstring')) {
             define('MB_ENABLED', true);
-            // mbstring.internal_encoding est obsolète à partir de PHP 5.6
-            // et son utilisation déclenche des messages E_DEPRECATED.
-            @ini_set('mbstring.internal_encoding', $charset);
+            mb_internal_encoding($charset);
             // Ceci est requis pour que mb_convert_encoding() supprime les caractères invalides.
             // C'est utilisé par CI_Utf8, mais c'est aussi fait pour la cohérence avec iconv.
             mb_substitute_character('none');
@@ -149,9 +147,6 @@ class Application
         // Les constantes prédéfinies d'iconv sont "fortement déconseillées".
         if (extension_loaded('iconv')) {
             define('ICONV_ENABLED', true);
-            // iconv.internal_encoding est obsolète à partir de PHP 5.6
-            // et son utilisation déclenche des messages E_DEPRECATED.
-            @ini_set('iconv.internal_encoding', $charset);
         } else {
             define('ICONV_ENABLED', false);
         }

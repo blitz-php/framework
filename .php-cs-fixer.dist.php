@@ -21,18 +21,13 @@ $finder = Finder::create()
     ->files()
     ->in([
         __DIR__ . '/src',
-        // __DIR__ . '/tests',
-        // __DIR__ . '/utils',
+        __DIR__ . '/spec',
     ])
-    // ->exclude(['ThirdParty'])
     ->notName('#Foobar.php$#')
     ->append([
         __FILE__,
         __DIR__ . '/.php-cs-fixer.no-header.php',
         __DIR__ . '/.php-cs-fixer.user-guide.php',
-        // __DIR__ . '/rector.php',
-        // __DIR__ . '/spark',
-        // __DIR__ . '/user_guide_src/renumerate.php',
     ]);
 
 $overrides = [
