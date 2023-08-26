@@ -344,7 +344,7 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Restitue le contenu d'une section.
      */
-    public function show(string $sectionName)
+    public function show(string $sectionName, bool $preserve = false)
     {
         if (! isset($this->sections[$sectionName])) {
             echo '';
@@ -366,7 +366,10 @@ class NativeAdapter extends AbstractAdapter
 
         foreach ($this->sections[$sectionName] as $key => $contents) {
             echo $contents;
-            unset($this->sections[$sectionName][$key]);
+
+            if (false === $preserve) {
+                unset($this->sections[$sectionName][$key]);
+            }
         }
 
         echo $end;

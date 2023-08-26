@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\View;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\View\Adapters\BladeAdapter;
 use BlitzPHP\View\Adapters\LatteAdapter;
 use BlitzPHP\View\Adapters\NativeAdapter;
