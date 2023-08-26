@@ -11,8 +11,10 @@
 
 namespace BlitzPHP\Router;
 
+use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
+use BlitzPHP\Contracts\Http\ResponsableInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Support\Responsable;
 use BlitzPHP\Controllers\BaseController;
@@ -35,7 +37,12 @@ use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use stdClass;
+use Throwable;
 
+/**
+ * Cette classe est la porte d'entree du framework. Elle analyse la requete,
+ * recherche la route correspondante et invoque le bon controleurm puis renvoie la reponse.
+ */
 class Dispatcher
 {
     /**
@@ -114,21 +121,23 @@ class Dispatcher
     protected $output;
 
     /**
-     * Délai d'expiration du cache
-     */
-    protected static int $cacheTTL = 0;
-
-    /**
      * Chemin de requête à utiliser.
      *
      * @var string
+	 * 
+	 * @deprecated No longer used.
      */
     protected $path;
 
     /**
-     * Indique s'il faut renvoyer l'objet Response ou envoyer la réponse.
+     * Application output buffering level
      */
-    protected bool $returnResponse = false;
+    protected int $bufferLevel = 0;
+
+	/**
+     * Web Page Caching
+     */
+    protected ResponseCache $pageCache;
 
     /**
      * Constructor.
@@ -137,6 +146,10 @@ class Dispatcher
     {
         $this->startTime = microtime(true);
         $this->config    = (object) config('app');
+
+		$this->pageCache = Services::factory(ResponseCache::class, [
+			'cacheQueryString' => config('cache.cache_query_string')
+		]);
     }
 
     /**
@@ -188,7 +201,8 @@ class Dispatcher
      */
     public function run(?RouteCollectionInterface $routes = null, bool $returnResponse = false)
     {
-        $this->returnResponse = $returnResponse;
+        $this->pageCache->setTtl(0);
+        $this->bufferLevel = ob_get_level();
 
         $this->startBenchmark();
 
@@ -197,60 +211,53 @@ class Dispatcher
 
         $this->initMiddlewareQueue();
 
-        $this->forceSecureAccess();
+		try {
+            $this->response = $this->handleRequest($routes, config('cache'));
+        } catch (ResponsableInterface|RedirectException $e) {
+            $this->outputBufferingEnd();
+            if ($e instanceof RedirectException) {
+                $e = new RedirectException($e->getMessage(), $e->getCode(), $e);
+            }
 
-        /**
+            $this->response = $e->getResponse();
+        } catch (PageNotFoundException $e) {
+            $this->response = $this->display404errors($e);
+        } catch (Throwable $e) {
+            $this->outputBufferingEnd();
+
+            throw $e;
+        }
+
+        if ($returnResponse) {
+            return $this->response;
+        }
+
+        $this->sendResponse();
+    }
+
+    /**
+     * Gère la logique de requête principale et déclenche le contrôleur.
+     *
+     * @throws PageNotFoundException
+     * @throws RedirectException
+     */
+    protected function handleRequest(?RouteCollectionInterface $routes = null, ?array $cacheConfig = null): ResponseInterface
+    {
+		$this->forceSecureAccess();
+
+		/**
          * Init event manager
          */
 		Services::singleton(EventDiscover::class)->discove();
 
 		$this->event->trigger('pre_system');
 
-        // Recherche une page en cache. L'exécution s'arrêtera
-        // si la page a été mise en cache.
-        $response = $this->displayCache();
-        if ($response instanceof ResponseInterface) {
-            if ($this->returnResponse) {
-                return $response;
-            }
-
-            return $this->emitResponse($response);
+		// Check for a cached page. 
+		// Execution will stop if the page has been cached.
+        if (($response = $this->displayCache($cacheConfig)) instanceof ResponseInterface) {
+            return $response;
         }
 
-        try {
-            return $this->handleRequest($routes);
-        } catch (RedirectException $e) {
-            Services::logger()->info('REDIRECTED ROUTE at ' . $e->getMessage());
-
-            // Si la route est une route de "redirection", elle lance
-            // l'exception avec le $to comme message
-            // $this->response->redirect(base_url($e->getMessage()), 'auto', $e->getCode());
-            $this->response = $this->response->withHeader('Location', base_url($e->getMessage()), 'auto', $e->getCode());
-
-            $this->sendResponse();
-
-            $this->callExit(EXIT_SUCCESS);
-
-            return;
-        } catch (PageNotFoundException $e) {
-            $return = $this->display404errors($e);
-
-            if ($return instanceof ResponseInterface) {
-                return $return;
-            }
-        }
-    }
-
-    /**
-     * Gère la logique de requête principale et déclenche le contrôleur.
-     *
-     * @return mixed|ResponseInterface
-     *
-     * @throws PageNotFoundException
-     * @throws RedirectException
-     */
-    protected function handleRequest(?RouteCollectionInterface $routes = null)
-    {
         $routeMiddlewares = (array) $this->dispatchRoutes($routes);
 
         // Le bootstrap dans un middleware
@@ -271,10 +278,6 @@ class Dispatcher
          * Emission de la reponse
          */
         $this->gatherOutput($this->middleware->handle($this->request));
-
-        if (! $this->returnResponse) {
-            $this->sendResponse();
-        }
 
         // Y a-t-il un événement post-système ?
         $this->event->trigger('post_system');
@@ -378,63 +381,18 @@ class Dispatcher
      *
      * @throws FrameworkException
      */
-    public function displayCache()
+    public function displayCache(?array $config = null)
     {
-        if ($cachedResponse = Services::cache()->read($this->generateCacheName())) {
-            $cachedResponse = unserialize($cachedResponse);
-            if (! is_array($cachedResponse) || ! isset($cachedResponse['output']) || ! isset($cachedResponse['headers'])) {
-                throw new FrameworkException('Erreur lors de la désérialisation du cache de page');
-            }
-
-            $headers = $cachedResponse['headers'];
-            $output  = $cachedResponse['output'];
-
-            // Effacer tous les en-têtes par défaut
-            foreach (array_keys($this->response->getHeaders()) as $key) {
-                $this->response = $this->response->withoutHeader($key);
-            }
-
-            // Définir les en-têtes mis en cache
-            foreach ($headers as $name => $value) {
-                $this->response = $this->response->withHeader($name, $value);
-            }
+		if ($cachedResponse = $this->pageCache->get($this->request, $this->response)) {
+            $this->response = $cachedResponse;
 
             $this->totalTime = $this->timer->getElapsedTime('total_execution');
-            $output          = $this->displayPerformanceMetrics($output);
-
-            return $this->response->withBody(to_stream($output));
+            $output          = $this->displayPerformanceMetrics($cachedResponse->getBody());
+        
+			return $this->response->withBody(to_stream($output));
         }
 
         return false;
-    }
-
-    /**
-     * Indique à l'application que la sortie finale doit être mise en cache.
-     */
-    public static function cache(int $time)
-    {
-        static::$cacheTTL = $time;
-    }
-
-    /**
-     * Met en cache la réponse complète de la requête actuelle. Pour utiliser
-     * la mise en cache pleine page pour des performances très élevées.
-     *
-     * @return mixed
-     */
-    protected function cachePage()
-    {
-        $headers = [];
-
-        foreach (array_keys($this->response->getHeaders()) as $header) {
-            $headers[$header] = $this->response->getHeaderLine($header);
-        }
-
-        return Services::cache()->write(
-            $this->generateCacheName(),
-            serialize(['headers' => $headers, 'output' => $this->output]),
-            static::$cacheTTL
-        );
     }
 
     /**
@@ -446,18 +404,6 @@ class Dispatcher
             'startTime' => $this->startTime,
             'totalTime' => $this->totalTime,
         ];
-    }
-
-    /**
-     * Génère le nom du cache à utiliser pour notre mise en cache pleine page.
-     */
-    protected function generateCacheName(): string
-    {
-        $uri = $this->request->getUri();
-
-        $name = Uri::createURIString($uri->getScheme(), $uri->getAuthority(), $uri->getPath());
-
-        return md5($name);
     }
 
     /**
@@ -495,7 +441,8 @@ class Dispatcher
         $this->timer->stop('bootstrap');
         $this->timer->start('routing');
 
-        ob_start();
+        $this->outputBufferingStart();
+
         $this->controller = $this->router->handle($path ?: '/');
         $this->method     = $this->router->methodName();
 
@@ -525,19 +472,6 @@ class Dispatcher
             : $this->request->getUri()->getPath();
 
         return $this->path = preg_replace('#^' . App::getUri()->getPath() . '#i', '', $path);
-    }
-
-    /**
-     * Permet de définir le chemin de la requête depuis l'extérieur de la classe,
-     * au lieu de compter sur CLIRequest ou IncomingRequest pour le chemin.
-     *
-     * Ceci est principalement utilisé par la console.
-     */
-    public function setPath(string $path): self
-    {
-        $this->path = $path;
-
-        return $this;
     }
 
     /**
@@ -653,28 +587,15 @@ class Dispatcher
             unset($override);
 
             $this->gatherOutput($returned);
-            if ($this->returnResponse) {
-                return $this->response;
-            }
-            $this->emitResponse();
-
-            return $returned;
+           
+			return $this->response;
         }
 
         // Affiche l'erreur 404
         $this->response = $this->response->withStatus($e->getCode());
 
-        if (! on_test()) {
-            // @codeCoverageIgnoreStart
-            if (ob_get_level() > 0) {
-                ob_end_flush();
-            }
-            // @codeCoverageIgnoreEnd
-        }
-        // Lors des tests, l'un est pour phpunit, l'autre pour le cas de test.
-        elseif (ob_get_level() > 2) {
-            ob_end_flush(); // @codeCoverageIgnore
-        }
+        echo $this->outputBufferingEnd();
+        flush();
 
         throw PageNotFoundException::pageNotFound(! on_prod() || is_cli() ? $e->getMessage() : '');
     }
@@ -687,12 +608,7 @@ class Dispatcher
      */
     protected function gatherOutput($returned = null)
     {
-        $this->output = ob_get_contents();
-        // Si la mise en mémoire tampon n'est pas nulle.
-        // Nettoyer (effacer) le tampon de sortie et désactiver le tampon de sortie
-        if (ob_get_length()) {
-            ob_end_clean();
-        }
+        $this->output = $this->outputBufferingEnd();
 
         // Si le contrôleur a renvoyé un objet de réponse,
         // nous devons en saisir le corps pour qu'il puisse
@@ -707,14 +623,6 @@ class Dispatcher
         if (is_string($returned)) {
             $this->output .= $returned;
         }
-
-        // Mettez-le en cache sans remplacer les mesures de performances
-        // afin que nous puissions avoir des mises à jour de vitesse en direct en cours de route.
-        if (static::$cacheTTL > 0) {
-            $this->cachePage();
-        }
-
-        $this->output = $this->displayPerformanceMetrics($this->output);
 
         $this->response = $this->response->withBody(to_stream($this->output));
     }
@@ -818,18 +726,6 @@ class Dispatcher
     }
 
     /**
-     * Quitte l'application en définissant le code de sortie pour les applications basées sur CLI
-     * qui pourrait regarder.
-     *
-     * Fabriqué dans une méthode distincte afin qu'il puisse être simulé pendant les tests
-     * sans réellement arrêter l'exécution du script.
-     */
-    protected function callExit(int $code)
-    {
-        exit($code); // @codeCoverageIgnore
-    }
-
-    /**
      * Initialise le gestionnaire de middleware
      */
     protected function initMiddlewareQueue(): void
@@ -848,6 +744,25 @@ class Dispatcher
         }
 
         $this->middleware->prepend($this->spoofRequestMethod());
+    }
+
+	protected function outputBufferingStart(): void
+    {
+        $this->bufferLevel = ob_get_level();
+       
+		ob_start();
+    }
+
+    protected function outputBufferingEnd(): string
+    {
+        $buffer = '';
+
+        while (ob_get_level() > $this->bufferLevel) {
+            $buffer .= ob_get_contents();
+            ob_end_clean();
+        }
+
+        return $buffer;
     }
 
     /**
@@ -885,7 +800,7 @@ class Dispatcher
                         throw PageNotFoundException::methodNotFound($this->method);
                     }
 
-                    // Is there a "post_controller_constructor" event?
+                    // Y'a t-il un evenement "post_controller_constructor"
                     $this->event->trigger('post_controller_constructor');
 
                     $returned = $this->runController($controller);
@@ -904,7 +819,6 @@ class Dispatcher
                     $errors = [$e->getMessage()];
                 }
 
-				
                 if (is_string($this->controller)) {
 					if (strtoupper($request->getMethod()) === 'POST') {
                         if (is_subclass_of($this->controller, RestController::class)) {
