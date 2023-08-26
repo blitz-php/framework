@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Http;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Middlewares\BaseMiddleware;
 use BlitzPHP\Middlewares\BodyParser;
 use BlitzPHP\Middlewares\Cors;
@@ -50,6 +50,14 @@ class Middleware implements RequestHandlerInterface
 
     /**
      * Ajoute un alias de middleware
+     */
+    public function alias(string $alias, callable|object|string $middleware): self
+    {
+		return $this->aliases([$alias => $middleware]);
+    }
+
+    /**
+     * Ajoute des alias de middlewares
      */
     public function aliases(array $aliases): self
     {
@@ -203,7 +211,11 @@ class Middleware implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        ['middleware' => $middleware, 'options' => $options] = $this->getMiddleware();
+		if (empty($processing = $this->getMiddleware())) {
+			return $this->response;
+		}
+
+        ['middleware' => $middleware, 'options' => $options] = $processing;
 
         if (empty($middleware)) {
             return $this->response;
@@ -239,15 +251,13 @@ class Middleware implements RequestHandlerInterface
      */
     private function makeMiddleware($middleware)
     {
-        if (is_string($middleware)) {
-            if (array_key_exists($middleware, $this->aliases)) {
-                $middleware = $this->aliases[$middleware];
-            }
-
-            $middleware = Services::container()->get($middleware);
+        if (is_string($middleware) && array_key_exists($middleware, $this->aliases)) {
+			$middleware = $this->aliases[$middleware];
         }
-
-        return $middleware;
+		
+		return is_string($middleware)
+			? Services::container()->get($middleware)
+			: $middleware;
     }
 
     /**

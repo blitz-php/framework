@@ -261,7 +261,8 @@ class Dispatcher
         $routeMiddlewares = (array) $this->dispatchRoutes($routes);
 
         // Le bootstrap dans un middleware
-        $this->middleware->append($this->bootApp());
+		$this->middleware->alias('blitz', $this->bootApp());
+        $this->middleware->append('blitz');
 
         /**
          * Ajouter des middlewares de routes
