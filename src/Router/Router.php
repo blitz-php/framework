@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Router;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\AutoRouterInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Router\RouterInterface;
@@ -38,10 +39,8 @@ class Router implements RouterInterface
     /**
      * Sous-répertoire contenant la classe de contrôleur demandée.
      * Principalement utilisé par 'autoRoute'.
-     *
-     * @var string|null
      */
-    protected $directory;
+    protected ?string $directory = null;
 
     /**
      * Le nom de la classe contrôleur
@@ -74,17 +73,13 @@ class Router implements RouterInterface
 
     /**
      * Les routes trouvées pour la requête courrante
-     *
-     * @var array|null
      */
-    protected $matchedRoute;
+    protected ?array $matchedRoute = null;
 
     /**
      * Les options de la route matchée.
-     *
-     * @var array|null
      */
-    protected $matchedRouteOptions;
+    protected ?array $matchedRouteOptions = null;
 
     /**
      * Le locale (langue) qui a été detectée dans la route.
@@ -115,28 +110,19 @@ class Router implements RouterInterface
         $this->setController($this->collection->getDefaultController());
         $this->setMethod($this->collection->getDefaultMethod());
 
-        $this->collection->setHTTPVerb($request->getMethod() ?? strtolower($_SERVER['REQUEST_METHOD']));
+        $this->collection->setHTTPVerb($request->getMethod() ?? $_SERVER['REQUEST_METHOD']);
 
         $this->translateURIDashes = $this->collection->shouldTranslateURIDashes();
 
         if ($this->collection->shouldAutoRoute()) {
             $this->autoRouter = new AutoRouter(
-                $this->collection->getRegisteredControllers('cli'),
+                $this->collection->getRegisteredControllers('*'),
                 $this->collection->getDefaultNamespace(),
                 $this->collection->getDefaultController(),
                 $this->collection->getDefaultMethod(),
-                $this->translateURIDashes,
-                $this->collection->getHTTPVerb()
+                $this->translateURIDashes
             );
         }
-    }
-
-    /**
-     * @deprecated
-     */
-    public function init(RouteCollectionInterface $routes, ServerRequestInterface $request)
-    {
-        return $this;
     }
 
     /**
@@ -160,20 +146,26 @@ class Router implements RouterInterface
             if ($this->collection->isFiltered($this->matchedRoute[0])) {
                 $this->middlewaresInfo = $this->collection->getFiltersForRoute($this->matchedRoute[0]);
             }
-
-            return $this->controllerName();
+			
+			// met a jour le routeur dans le conteneur car permet notament de recupere les bonnes 
+			// info du routing (route actuelle, controleur et methode mappés)
+			Services::set(static::class, $this);
+            
+			return $this->controllerName();
         }
 
         // Toujours là ? Ensuite, nous pouvons essayer de faire correspondre l'URI avec
         // Contrôleurs/répertoires, mais l'application peut ne pas
         // vouloir ceci, comme dans le cas des API.
         if (! $this->collection->shouldAutoRoute()) {
-            $verb = strtolower($this->collection->getHTTPVerb());
-
-            throw new PageNotFoundException("Impossible de trouver une route pour '{$verb}: {$uri}'.");
+            throw new PageNotFoundException("Impossible de trouver une route pour '{$this->collection->getHTTPVerb()}: {$uri}'.");
         }
 
         $this->autoRoute($uri);
+
+		// met a jour le routeur dans le conteneur car permet notament de recupere les bonnes 
+		// info du routing (route actuelle, controleur et methode mappés)
+		Services::set(static::class, $this);
 
         return $this->controllerName();
     }
@@ -443,27 +435,7 @@ class Router implements RouterInterface
     public function autoRoute(string $uri)
     {
         [$this->directory, $this->controller, $this->method, $this->params]
-            = $this->autoRouter->getRoute($uri);
-    }
-
-    /**
-     * Définit le sous-répertoire dans lequel se trouve le contrôleur.
-     *
-     * @param bool $validate si vrai, vérifie que $dir se compose uniquement de segments conformes à PSR4
-     *
-     * @deprecated Cette méthode sera retirée
-     */
-    public function setDirectory(?string $dir = null, bool $append = false, bool $validate = true)
-    {
-        if (empty($dir)) {
-            $this->directory = null;
-
-            return;
-        }
-
-        if ($this->autoRouter instanceof AutoRouter) {
-            $this->autoRouter->setDirectory($dir, $append, $validate);
-        }
+            = $this->autoRouter->getRoute($uri, $this->collection->getHTTPVerb());
     }
 
     /**
@@ -478,8 +450,6 @@ class Router implements RouterInterface
     {
         // Si nous n'avons aucun segment - essayez le contrôleur par défaut ;
         if (empty($segments)) {
-            $this->setDefaultController();
-
             return;
         }
 
@@ -496,29 +466,6 @@ class Router implements RouterInterface
         array_shift($segments);
 
         $this->params = $segments;
-    }
-
-    /**
-     * Définit le contrôleur par défaut en fonction des informations définies dans RouteCollection.
-     */
-    protected function setDefaultController()
-    {
-        if (empty($this->controller)) {
-            throw RouterException::missingDefaultRoute();
-        }
-
-        // La méthode est-elle spécifiée ?
-        if (sscanf($this->controller, '%[^/]/%s', $class, $this->method) !== 2) {
-            $this->method = $this->collection->getDefaultMethod();
-        }
-
-        if (! is_file(CONTROLLER_PATH . $this->directory . $this->makeController($class) . '.php')) {
-            return;
-        }
-
-        $this->setController($class);
-
-        logger()->info('Utilisé le contrôleur par défaut.');
     }
 
     /**

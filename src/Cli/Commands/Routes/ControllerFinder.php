@@ -12,7 +12,7 @@
 namespace BlitzPHP\Cli\Commands\Routes;
 
 use BlitzPHP\Autoloader\Locator;
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 
 /**
  * Recherche tous les contrôleurs dans un namespace pour la liste des routes automatiques.
@@ -31,7 +31,6 @@ final class ControllerFinder
 
     /**
      * @return string[]
-     * @phpstan-return class-string[]
      */
     public function find(): array
     {
@@ -54,11 +53,10 @@ final class ControllerFinder
         $classes = [];
 
         foreach ($files as $file) {
-            if (\is_file($file)) {
+            if (is_file($file)) {
                 $classnameOrEmpty = $this->locator->getClassname($file);
 
                 if ($classnameOrEmpty !== '') {
-                    /** @phpstan-var class-string $classname */
                     $classname = $classnameOrEmpty;
 
                     $classes[] = $classname;

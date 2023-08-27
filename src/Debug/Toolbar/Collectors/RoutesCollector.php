@@ -12,7 +12,8 @@
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
 use BlitzPHP\Container\Services;
-use BlitzPHP\Router\Dispatcher;
+use BlitzPHP\Router\DefinedRouteCollector;
+use BlitzPHP\Router\Router;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -39,6 +40,16 @@ class RoutesCollector extends BaseCollector
      */
     protected string $title = 'Routes';
 
+	private DefinedRouteCollector $definedRouteCollector;
+	private Router $router;
+
+	public function __construct()
+	{
+		$rawRoutes                   = Services::routes(true);
+		$this->router                = Services::router($rawRoutes, null, true);
+		$this->definedRouteCollector = new DefinedRouteCollector($rawRoutes);
+	}
+
     /**
      * {@inheritDoc}
      *
@@ -46,26 +57,17 @@ class RoutesCollector extends BaseCollector
      */
     public function display(): array
     {
-        $rawRoutes = Services::routes(true);
-        $router    = Services::router($rawRoutes, null, true);
-
-        // Route correspondante
-        $route = $router->getMatchedRoute();
-
-        $controllerName = Dispatcher::getController();
-        $methodName     = Dispatcher::getMethod();
-
         // Récupère nos paramètres
         // Route sous forme de callback
-        if (is_callable($controllerName)) {
-            $method = new ReflectionFunction($controllerName);
+        if (is_callable($this->router->controllerName())) {
+            $method = new ReflectionFunction($this->router->controllerName());
         } else {
             try {
-                $method = new ReflectionMethod($controllerName, ! empty($methodName) ? $methodName : $router->methodName());
+                $method = new ReflectionMethod($this->router->controllerName(), $this->router->methodName());
             } catch (ReflectionException $e) {
                 // Si nous sommes ici, la méthode n'existe pas
                 // et est probablement calculé dans _remap.
-                $method = new ReflectionMethod($controllerName, '_remap');
+                $method = new ReflectionMethod($this->router->controllerName(), '_remap');
             }
         }
 
@@ -76,7 +78,7 @@ class RoutesCollector extends BaseCollector
         foreach ($rawParams as $key => $param) {
             $params[] = [
                 'name'  => '$' . $param->getName() . ' = ',
-                'value' => $router->params()[$key] ??
+                'value' => $this->router->params()[$key] ??
                     ' <empty> | default: '
                     . var_export(
                         $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null,
@@ -87,10 +89,10 @@ class RoutesCollector extends BaseCollector
 
         $matchedRoute = [
             [
-                'directory'  => $router->directory(),
-                'controller' => $router->controllerName(),
-                'method'     => $router->methodName(),
-                'paramCount' => count($router->params()),
+                'directory'  => $this->router->directory(),
+                'controller' => $this->router->controllerName(),
+                'method'     => $this->router->methodName(),
+                'paramCount' => count($this->router->params()),
                 'truePCount' => count($params),
                 'params'     => $params ?? [],
             ],
@@ -98,40 +100,17 @@ class RoutesCollector extends BaseCollector
 
         // Routes définies
         $routes  = [];
-        $methods = [
-            'get',
-            'head',
-            'post',
-            'patch',
-            'put',
-            'delete',
-            'options',
-            'trace',
-            'connect',
-            'cli',
-        ];
-
-        foreach ($methods as $method) {
-            $raw = $rawRoutes->getRoutes($method, true);
-
-            foreach ($raw as $route => $handler) {
-                $tab = [
-                    'method'  => strtoupper($method),
-                    'route'   => $route,
-                    'name'    => '',
-                    'handler' => '',
-                ];
-
-                // filtre pour les chaînes, car les callback ne sont pas affichables
-                if (is_string($handler)) {
-                    $tab['handler'] = $handler;
-                }
-                if (is_array($handler)) {
-                    $tab['handler'] = is_string($handler['handler']) ? $handler['handler'] : 'Closure';
-                    $tab['name']    = $handler['name'];
-                }
-                $routes[] = $tab;
-            }
+		
+		foreach ($this->definedRouteCollector->collect(false) as $route) {
+            // filtre pour les chaînes, car les rappels ne sont pas affichable
+			if ($route['handler'] !== '(Closure)') {
+				$routes[] = [
+					'method'  => strtoupper($route['method']),
+					'route'   => $route['route'],
+					'name'    => $route['name'],
+					'handler' => $route['handler'],
+				];
+			}
         }
 
         return [
@@ -145,9 +124,15 @@ class RoutesCollector extends BaseCollector
      */
     public function getBadgeValue(): int
     {
-        $rawRoutes = Services::routes(true);
+		$count = 0;
+		
+		foreach ($this->definedRouteCollector->collect(false) as $route) {
+            if ($route['handler'] !== '(Closure)') {
+				$count++;
+			}
+        }
 
-        return count($rawRoutes->getRoutes());
+		return $count;
     }
 
     /**

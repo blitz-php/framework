@@ -33,6 +33,7 @@ final class SampleURIGenerator
         'num'      => '123',
         'alpha'    => 'abc',
         'hash'     => 'abc_123',
+        'slug'     => 'abc-123',
     ];
 
     public function __construct(?RouteCollection $routes = null)

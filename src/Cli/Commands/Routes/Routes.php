@@ -13,8 +13,8 @@ namespace BlitzPHP\Cli\Commands\Routes;
 
 use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Router\DefinedRouteCollector;
 use BlitzPHP\Utilities\Helpers;
-use Closure;
 
 /**
  * Répertorie toutes les routes.
@@ -49,7 +49,8 @@ class Routes extends Command
      * @var array<string, string>
      */
     protected $options = [
-        '-h' => 'Trier par gestionnaire..',
+		'-h'     => 'Trier par gestionnaire.',
+		'--host' => 'Spécifiez nom d\'hôte dans la demande URI.',
     ];
 
     /**
@@ -58,6 +59,7 @@ class Routes extends Command
     public function execute(array $params)
     {
         $sortByHandler = $this->option('h', false);
+        $host          = $this->option('host');
 
         $collection = Services::routes()->loadRoutes();
         $methods    = [
@@ -73,50 +75,52 @@ class Routes extends Command
             'cli',
         ];
 
-        $tbody               = [];
-        $uriGenerator        = new SampleURIGenerator($collection);
-        $middlewareCollector = new MiddlewareCollector();
+		$tbody                 = [];
+		$uriGenerator          = new SampleURIGenerator($collection);
+		$middlewareCollector   = new MiddlewareCollector();
+		$definedRouteCollector = new DefinedRouteCollector($collection);
 
-        foreach ($methods as $method) {
-            $routes = $collection->getRoutes($method);
+		foreach ($definedRouteCollector->collect() as $route) {
+            $sampleUri = $uriGenerator->get($route['route']);
+			$filters   = $middlewareCollector->get($route['method'], $sampleUri);
 
-            foreach ($routes as $route => $handler) {
-                if (is_string($handler) || $handler instanceof Closure) {
-                    $sampleUri = $uriGenerator->get($route);
-                    $filters   = $middlewareCollector->get($method, $sampleUri);
+            $routeName = ($route['route'] === $route['name']) ? '»' : $route['name'];
 
-                    if ($handler instanceof Closure) {
-                        $handler = '(Closure)';
-                    }
-
-                    $routeName = $collection->getRoutesOptions($route)['as'] ?? '»';
-
-                    $tbody[] = [
-                        strtoupper($method),
-                        $route,
-                        $routeName,
-                        $handler,
-                        implode(' ', array_map([Helpers::class, 'classBasename'], $filters)),
-                    ];
-                }
-            }
+            $tbody[] = [
+                strtoupper($route['method']),
+                $route['route'],
+                $routeName,
+                $route['handler'],
+				implode(' ', array_map([Helpers::class, 'classBasename'], $filters)),
+            ];
         }
 
         if ($collection->shouldAutoRoute()) {
             $autoRouteCollector = new AutoRouteCollector(
                 $collection->getDefaultNamespace(),
                 $collection->getDefaultController(),
-                $collection->getDefaultMethod()
+                $collection->getDefaultMethod(),
+				$methods,
+				$collection->getRegisteredControllers('*')
             );
 
             $autoRoutes = $autoRouteCollector->get();
 
-            foreach ($autoRoutes as &$routes) {
-                // Il n'y a pas de méthode "auto", mais il est intentionnel de ne pas obtenir de middlewares de route.
-                $filters = $middlewareCollector->get('auto', $uriGenerator->get($routes[1]));
+			// Check for Module Routes.
+			if ([] !== $routingConfig = config('routing')) {
+				foreach ($routingConfig['module_routes'] as $uri => $namespace) {
+					$autoRouteCollector = new AutoRouteCollector(
+						$namespace,
+						$collection->getDefaultController(),
+						$collection->getDefaultMethod(),
+						$methods,
+						$collection->getRegisteredControllers('*'),
+						$uri
+					);
 
-                $routes[] = implode(' ', array_map([Helpers::class, 'classBasename'], $filters));
-            }
+					$autoRoutes = [...$autoRoutes, ...$autoRouteCollector->get()];
+				}
+			}
 
             $tbody = [...$tbody, ...$autoRoutes];
         }

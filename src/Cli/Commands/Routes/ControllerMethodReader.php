@@ -22,7 +22,7 @@ final class ControllerMethodReader
     /**
      * @param string $namespace Namespace par défaut
      */
-    public function __construct(private string $namespace)
+    public function __construct(private string $namespace, private array $httpMethods)
     {
     }
 
@@ -44,78 +44,95 @@ final class ControllerMethodReader
         $classShortname = $reflection->getShortName();
 
         $output     = [];
-        $uriByClass = $this->getUriByClass($classname);
-
-        if ($this->hasRemap($reflection)) {
-            $methodName = '_remap';
-
-            $routeWithoutController = $this->getRouteWithoutController(
-                $classShortname,
-                $defaultController,
-                $uriByClass,
-                $classname,
-                $methodName
-            );
-            $output = [...$output, ...$routeWithoutController];
-
-            $output[] = [
-                'route'   => $uriByClass . '[/...]',
-                'handler' => '\\' . $classname . '::' . $methodName,
-            ];
-
-            return $output;
-        }
+        $classInUri = $this->getUriByClass($classname);
 
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $methodName = $method->getName();
 
-            $route = $uriByClass . '/' . $methodName;
+			foreach ($this->httpMethods as $httpVerb) {
+                if (strpos($methodName, $httpVerb) === 0) {
+                    // Enleve le prefixe des verbes HTTP
+                    $methodInUri = lcfirst(substr($methodName, strlen($httpVerb)));
 
-            // Exclut BaseController et initialize
-            if (preg_match('#\AbaseController.*#', $route) === 1) {
-                continue;
+                    // Verifie si c'est la methode par defaut
+                    if ($methodInUri === $defaultMethod) {
+                        $routeForDefaultController = $this->getRouteForDefaultController(
+                            $classShortname,
+                            $defaultController,
+                            $classInUri,
+                            $classname,
+                            $methodName,
+                            $httpVerb,
+                            $method
+                        );
+
+                        if ($routeForDefaultController !== []) {
+                            // Le contrôleur est le contrôleur par défaut. 
+							// Il n'a qu'un itinéraire pour la méthode par défaut. 
+							// Les autres méthodes ne seront pas routées même si elles existent. 
+                            $output = [...$output, ...$routeForDefaultController];
+
+                            continue;
+                        }
+
+                        [$params, $routeParams] = $this->getParameters($method);
+
+                        // Route pour la methode par defaut
+                        $output[] = [
+                            'method'       => $httpVerb,
+                            'route'        => $classInUri,
+                            'route_params' => $routeParams,
+                            'handler'      => '\\' . $classname . '::' . $methodName,
+                            'params'       => $params,
+                        ];
+
+                        continue;
+                    }
+
+                    $route = $classInUri . '/' . $methodInUri;
+
+                    [$params, $routeParams] = $this->getParameters($method);
+
+                    // S'il s'agit du contrôleur par défaut, la méthode ne sera pas routée.
+                    if ($classShortname === $defaultController) {
+                        $route = 'x ' . $route;
+                    }
+
+                    $output[] = [
+                        'method'       => $httpVerb,
+                        'route'        => $route,
+                        'route_params' => $routeParams,
+                        'handler'      => '\\' . $classname . '::' . $methodName,
+                        'params'       => $params,
+                    ];
+                }
             }
-            if (preg_match('#.*/initialize\z#', $route) === 1) {
-                continue;
-            }
-
-            if ($methodName === $defaultMethod) {
-                $routeWithoutController = $this->getRouteWithoutController(
-                    $classShortname,
-                    $defaultController,
-                    $uriByClass,
-                    $classname,
-                    $methodName
-                );
-                $output = [...$output, ...$routeWithoutController];
-
-                $output[] = [
-                    'route'   => $uriByClass,
-                    'handler' => '\\' . $classname . '::' . $methodName,
-                ];
-            }
-
-            $output[] = [
-                'route'   => $route . '[/...]',
-                'handler' => '\\' . $classname . '::' . $methodName,
-            ];
         }
 
         return $output;
     }
 
-    /**
-     * Si la classe a une méthode _remap().
-     */
-    private function hasRemap(ReflectionClass $class): bool
+    private function getParameters(ReflectionMethod $method): array
     {
-        if ($class->hasMethod('_remap')) {
-            $remap = $class->getMethod('_remap');
+        $params      = [];
+        $routeParams = '';
+        $refParams   = $method->getParameters();
 
-            return $remap->isPublic();
+        foreach ($refParams as $param) {
+            $required = true;
+            if ($param->isOptional()) {
+                $required = false;
+
+                $routeParams .= '[/..]';
+            } else {
+                $routeParams .= '/..';
+            }
+
+            // [variable_name => required?]
+            $params[$param->getName()] = $required;
         }
 
-        return false;
+        return [$params, $routeParams];
     }
 
     /**
@@ -142,14 +159,18 @@ final class ControllerMethodReader
     }
 
     /**
-     * Obtient une route sans contrôleur par défaut.
+     * Obtient une route pour le contrôleur par défaut.
+     *
+     * @return array[]
      */
-    private function getRouteWithoutController(
+    private function getRouteForDefaultController(
         string $classShortname,
         string $defaultController,
         string $uriByClass,
         string $classname,
-        string $methodName
+        string $methodName,
+        string $httpVerb,
+        ReflectionMethod $method
     ): array {
         $output = [];
 
@@ -158,9 +179,18 @@ final class ControllerMethodReader
             $routeWithoutController = rtrim(preg_replace($pattern, '', $uriByClass), '/');
             $routeWithoutController = $routeWithoutController ?: '/';
 
+            [$params, $routeParams] = $this->getParameters($method);
+
+            if ($routeWithoutController === '/' && $routeParams !== '') {
+                $routeWithoutController = '';
+            }
+
             $output[] = [
-                'route'   => $routeWithoutController,
-                'handler' => '\\' . $classname . '::' . $methodName,
+                'method'       => $httpVerb,
+                'route'        => $routeWithoutController,
+                'route_params' => $routeParams,
+                'handler'      => '\\' . $classname . '::' . $methodName,
+                'params'       => $params,
             ];
         }
 

@@ -325,7 +325,10 @@ class Services
             return static::$instances[RouteCollection::class];
         }
 
-        return static::$instances[RouteCollection::class] = static::factory(RouteCollection::class);
+        return static::$instances[RouteCollection::class] = static::factory(RouteCollection::class, [
+			'routing' => (object) config('routing'),
+			'locator' => static::locator(),
+		]);
     }
 
     /**

@@ -12,13 +12,17 @@
 namespace BlitzPHP\Router;
 
 use BlitzPHP\Contracts\Router\AutoRouterInterface;
+use BlitzPHP\Exceptions\MethodNotFoundException;
 use BlitzPHP\Exceptions\PageNotFoundException;
+use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Routeur sécurisé pour le routage automatique
  *
- * @credit <a href="http://www.codeigniter.com">CodeIgniter 4.2 - CodeIgniter\Router\AutoRouterImproved</a>
+ * @credit <a href="http://www.codeigniter.com">CodeIgniter 4.4 - CodeIgniter\Router\AutoRouterImproved</a>
  */
 final class AutoRouter implements AutoRouterInterface
 {
@@ -39,162 +43,355 @@ final class AutoRouter implements AutoRouterInterface
     private string $method;
 
     /**
+     * Tableau de paramètres de la méthode du contrôleur.
+     *
+     * @var string[]
+     */
+    private array $params = [];
+
+    /**
+     * Namespace des controleurs
+     */
+    private string $namespace;
+
+    /**
+     * Segments de l'URI
+     *
+     * @var string[]
+     */
+    private array $segments = [];
+
+    /**
+     * Position du contrôleur dans les segments URI. 
+	 * Null pour le contrôleur par défaut. 
+     */
+    private ?int $controllerPos = null;
+
+    /**
+     * Position de la méthode dans les segments URI. 
+	 * Null pour la méthode par défaut. 
+     */
+    private ?int $methodPos = null;
+
+    /**
+     * Position du premier Paramètre dans les segments URI. 
+	 * Null pour les paramètres non definis. 
+     */
+    private ?int $paramPos = null;
+
+    /**
      * Constructeur
      *
      * @param class-string[] $protectedControllers Liste des contrôleurs enregistrés pour le verbe CLI qui ne doivent pas être accessibles sur le Web.
      * @param string         $defaultNamespace     Espace de noms par défaut pour les contrôleurs.
+     * @param string         $defaultController     Nom du controleur par defaut.
+     * @param string         $defaultMethod     Nom de la methode par defaut.
      * @param bool           $translateURIDashes   Indique si les tirets dans les URI doivent être convertis en traits de soulignement lors de la détermination des noms de méthode.
-     * @param string         $httpVerb             Verbe HTTP pour la requête.
      */
     public function __construct(
         private array $protectedControllers,
-        private string $defaultNamespace,
-        string $defaultController,
-        string $defaultMethod,
-        private bool $translateURIDashes,
-        private string $httpVerb
+        string $namespace,
+        private string $defaultController,
+        private string $defaultMethod,
+        private bool $translateURIDashes
     ) {
-        $this->controller = $defaultController;
-        $this->method     = $defaultMethod;
+		$this->namespace = rtrim($namespace, '\\');
+        
+		// Definir les valeurs par defaut
+        $this->controller = $this->defaultController;
+    }
+
+    private function createSegments(string $uri): array
+    {
+        $segments = explode('/', $uri);
+        $segments = array_filter($segments, static fn ($segment) => $segment !== '');
+
+        // réindexer numériquement le tableau, en supprimant les lacunes
+        return array_values($segments);
     }
 
     /**
-     * Tente de faire correspondre un chemin d'URI avec les contrôleurs et
-     * les répertoires trouvés dans CONTROLLER_PATH, pour trouver une route correspondante.
+     * Recherchez le premier contrôleur correspondant au segment URI.
+     *
+     * S'il y a un contrôleur correspondant au premier segment, la recherche s'arrête là. 
+	 * Les segments restants sont des paramètres du contrôleur. 
+	 * 
+     * @return bool true si une classe de contrôleur est trouvée.
+     */
+    private function searchFirstController(): bool
+    {
+        $segments = $this->segments;
+
+        $controller = '\\' . $this->namespace;
+
+        $controllerPos = -1;
+
+        while ($segments !== []) {
+            $segment = array_shift($segments);
+            $controllerPos++;
+
+            $class = $this->translateURIDashes(ucfirst($segment));
+
+            // dès que nous rencontrons un segment qui n'est pas compatible PSR-4, arrêter la recherche
+            if (! $this->isValidSegment($class)) {
+                return false;
+            }
+
+            $controller .= '\\' . $class;
+
+            if (class_exists($controller)) {
+                $this->controller    = $controller;
+                $this->controllerPos = $controllerPos;
+
+                // Le premier élément peut être un nom de méthode.
+                $this->params = $segments;
+                if ($segments !== []) {
+                    $this->paramPos = $this->controllerPos + 1;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+	/**
+     * Recherchez le dernier contrôleur par défaut correspondant aux segments URI.
+     *
+     * @return bool true si une classe de contrôleur est trouvée.
+     */
+    private function searchLastDefaultController(): bool
+    {
+        $segments = $this->segments;
+
+        $segmentCount = count($this->segments);
+        $paramPos     = null;
+        $params       = [];
+
+        while ($segments !== []) {
+            if ($segmentCount > count($segments)) {
+                $paramPos = count($segments);
+            }
+
+            $namespaces = array_map(
+                fn ($segment) => $this->translateURIDashes(ucfirst($segment)),
+                $segments
+            );
+
+            $controller = '\\' . $this->namespace
+                . '\\' . implode('\\', $namespaces)
+                . '\\' . $this->defaultController;
+
+            if (class_exists($controller)) {
+                $this->controller = $controller;
+                $this->params     = $params;
+
+                if ($params !== []) {
+                    $this->paramPos = $paramPos;
+                }
+
+                return true;
+            }
+
+            // ajoutons le dernier élément dans $segments au début de $params.
+            array_unshift($params, array_pop($segments));
+        }
+
+        // Vérifiez le contrôleur par défaut dans le répertoire des contrôleurs.
+        $controller = '\\' . $this->namespace
+            . '\\' . $this->defaultController;
+
+        if (class_exists($controller)) {
+            $this->controller = $controller;
+            $this->params     = $params;
+
+            if ($params !== []) {
+                $this->paramPos = 0;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+	/**
+     * Recherche contrôleur, méthode et params dans l'URI.
      *
      * @return array [directory_name, controller_name, controller_method, params]
      */
-    public function getRoute(string $uri): array
+    public function getRoute(string $uri, string $httpVerb): array
     {
-        $segments = explode('/', $uri);
+		$httpVerb = strtolower($httpVerb);
 
-        $segments = $this->scanControllers($segments);
+		// Reinitialise les parametres de la methode du controleur.
+        $this->params = [];
 
-        // Si nous n'avons plus de segments - essayez le contrôleur par défaut ;
-        // AVERTISSEMENT : les répertoires sont déplacés hors du tableau de segments.
-        if (empty($segments)) {
-            // $this->setDefaultController();
-        }
-        // S'il n'est pas vide, le premier segment doit être le contrôleur
-        else {
-            $this->setController(array_shift($segments));
-        }
+        $defaultMethod = $httpVerb . ucfirst($this->defaultMethod);
+        $this->method  = $defaultMethod;
 
-        $controllerName = $this->controllerName();
+        $this->segments = $this->createSegments($uri);
 
-        if (! $this->isValidSegment($controllerName)) {
-            throw new PageNotFoundException($this->controller . ' is not a valid controller name');
-        }
-
-        // Utilise le nom de la méthode s'il existe.
-        // Si ce n'est pas le cas, ce n'est pas grave - le nom de la méthode par défaut
-        // a déjà été défini.
-        if (! empty($segments)) {
-            $this->setMethod(array_shift($segments) ?: $this->method);
+		//Verifier les routes de modules
+        if (
+            $this->segments !== []
+            && ($routingConfig = (object) config('routing'))
+            && array_key_exists($this->segments[0], $routingConfig->module_routes)
+        ) {
+            $uriSegment      = array_shift($this->segments);
+            $this->namespace = rtrim($routingConfig->module_routes[$uriSegment], '\\');
         }
 
-        // Empêcher l'accès à la méthode initController
-        if (strtolower($this->method) === 'initcontroller') {
-            throw PageNotFoundException::pageNotFound();
-        }
+		if ($this->searchFirstController()) {
+            // Le contrôleur a ete trouvé.
+            $baseControllerName = Helpers::classBasename($this->controller);
 
-        /** @var array $params An array of params to the controller method. */
-        $params = [];
-
-        if (! empty($segments)) {
-            $params = $segments;
-        }
-
-        // Assurez-vous que les routes enregistrées via $routes->cli() ne sont pas accessibles via le Web.
-        if ($this->httpVerb !== 'cli') {
-            $controller = '\\' . $this->defaultNamespace;
-
-            $controller .= $this->directory ? str_replace('/', '\\', $this->directory) : '';
-            $controller .= $controllerName;
-
-            $controller = strtolower($controller);
-
-            foreach ($this->protectedControllers as $controllerInRoute) {
-                if (! is_string($controllerInRoute)) {
-                    continue;
-                }
-                if (strtolower($controllerInRoute) !== $controller) {
-                    continue;
-                }
-
+            // Empêcher l'accès au chemin de contrôleur par défaut
+            if (strtolower($baseControllerName) === strtolower($this->defaultController)) {
                 throw new PageNotFoundException(
-                    'Impossible d\'accéder au contrôleur dans une route CLI. Controleur: ' . $controllerInRoute
+                    'Impossible d\'accéder au contrôleur par défaut "' . $this->controller . '" avec le nom du contrôleur comme chemin de l\'URI.'
+                );
+            }
+        } elseif ($this->searchLastDefaultController()) {
+            // Le controleur par defaut a ete trouve.
+            $baseControllerName = Helpers::classBasename($this->controller);
+        } else {
+            // Aucun controleur trouvé
+            throw new PageNotFoundException('Aucun contrôleur trouvé pour: ' . $uri);
+        }
+
+		// Le premier élément peut être un nom de méthode.
+        /** @var string[] $params */
+        $params = $this->params;
+
+        $methodParam = array_shift($params);
+
+        $method = '';
+        if ($methodParam !== null) {
+            $method = $httpVerb . ucfirst($this->translateURIDashes($methodParam));
+        }
+
+		if ($methodParam !== null && method_exists($this->controller, $method)) {
+            // Methode trouvee.
+            $this->method = $method;
+            $this->params = $params;
+
+            // Mise a jour des positions.
+            $this->methodPos = $this->paramPos;
+            if ($params === []) {
+                $this->paramPos = null;
+            }
+            if ($this->paramPos !== null) {
+                $this->paramPos++;
+            }
+
+            // Empêcher l'accès à la méthode du contrôleur par défaut
+            if (strtolower($baseControllerName) === strtolower($this->defaultController)) {
+                throw new PageNotFoundException(
+                    'Impossible d\'accéder au contrôleur par défaut "' . $this->controller . '::' . $this->method . '"'
+                );
+            }
+
+            // Empêcher l'accès au chemin de méthode par défaut
+            if (strtolower($this->method) === strtolower($defaultMethod)) {
+                throw new PageNotFoundException(
+                    'Impossible d\'accéder à la méthode par défaut "' . $this->method . '" avec le nom de méthode comme chemin d\'URI.'
+                );
+            }
+        } elseif (method_exists($this->controller, $defaultMethod)) {
+            // La methode par defaut a ete trouvée
+            $this->method = $defaultMethod;
+        } else {
+            // Aucune methode trouvee
+            throw PageNotFoundException::controllerNotFound($this->controller, $method);
+        }
+
+		// Vérifiez le contrôleur n'est pas défini dans les routes.
+        $this->protectDefinedRoutes();
+
+        // Assurez-vous que le contrôleur n'a pas la méthode _remap().
+        $this->checkRemap();
+
+        // Assurez-vous que les segments URI pour le contrôleur et la méthode 
+		// ne contiennent pas de soulignement lorsque $translateURIDashes est true.
+        $this->checkUnderscore($uri);
+
+        // Verifier le nombre de parametres
+        try {
+            $this->checkParameters($uri);
+        } catch (MethodNotFoundException $e) {
+            throw PageNotFoundException::controllerNotFound($this->controller, $this->method);
+        }
+
+        $this->setDirectory();
+        
+		return [$this->directory, $this->controllerName(), $this->methodName(), $this->params];
+    }
+
+    private function checkParameters(string $uri): void
+    {
+        try {
+            $refClass = new ReflectionClass($this->controller);
+        } catch (ReflectionException $e) {
+            throw PageNotFoundException::controllerNotFound($this->controller, $this->method);
+        }
+
+        try {
+            $refMethod = $refClass->getMethod($this->method);
+            $refParams = $refMethod->getParameters();
+        } catch (ReflectionException $e) {
+            throw new MethodNotFoundException();
+        }
+
+        if (! $refMethod->isPublic()) {
+            throw new MethodNotFoundException();
+        }
+
+        if (count($refParams) < count($this->params)) {
+            throw new PageNotFoundException(
+                'Le nombre de param dans l\'URI est supérieur aux paramètres de la méthode du contrôleur.'
+                . ' Handler:' . $this->controller . '::' . $this->method
+                . ', URI:' . $uri
+            );
+        }
+    }
+
+    private function checkRemap(): void
+    {
+        try {
+            $refClass = new ReflectionClass($this->controller);
+            $refClass->getMethod('_remap');
+
+            throw new PageNotFoundException(
+                'AutoRouterImproved ne prend pas en charge la methode `_remap()`.'
+                . ' Contrôleur:' . $this->controller
+            );
+        } catch (ReflectionException $e) {
+            // Ne rien faire
+        }
+    }
+
+    private function checkUnderscore(string $uri): void
+    {
+        if ($this->translateURIDashes === false) {
+            return;
+        }
+
+        $paramPos = $this->paramPos ?? count($this->segments);
+
+        for ($i = 0; $i < $paramPos; $i++) {
+            if (strpos($this->segments[$i], '_') !== false) {
+                throw new PageNotFoundException(
+                    'AutoRouterImproved interdit l\'accès à l\'URI'
+                    . ' contenant les undescore ("' . $this->segments[$i] . '")'
+                    . ' quand $translate_uri_dashes est activé.'
+                    . ' Veuillez utiliser les tiret.'
+                    . ' Handler:' . $this->controller . '::' . $this->method
+                    . ', URI:' . $uri
                 );
             }
         }
-
-        // Charge le fichier afin qu'il soit disponible.
-        if (is_file($file = CONTROLLER_PATH . $this->directory . $controllerName . '.php')) {
-            include_once $file;
-        }
-
-        // Assurez-vous que le contrôleur stocke le nom de classe complet
-        // Nous devons vérifier une longueur supérieure à 1, puisque par défaut ce sera '\'
-        if (strpos($this->controller, '\\') === false && strlen($this->defaultNamespace) > 1) {
-            $this->setController('\\' . ltrim(
-                str_replace(
-                    '/',
-                    '\\',
-                    $this->defaultNamespace . $this->directory . $controllerName
-                ),
-                '\\'
-            ));
-        }
-
-        return [$this->directory, $this->controllerName(), $this->methodName(), $params];
-    }
-
-    /**
-     * Scanne le répertoire du contrôleur, essayant de localiser un contrôleur correspondant aux segments d'URI fournis
-     *
-     * @param array $segments segments d'URI
-     *
-     * @return array renvoie un tableau des segments uri restants qui ne correspondent pas à un répertoire
-     */
-    private function scanControllers(array $segments): array
-    {
-        $segments = array_filter($segments, static fn ($segment) => $segment !== '');
-        // réindexe numériquement le tableau, supprimant les lacunes
-        $segments = array_values($segments);
-
-        // si une valeur de répertoire précédente a été définie, retournez simplement les segments et sortez d'ici
-        if (isset($this->directory)) {
-            return $segments;
-        }
-
-        // Parcourez nos segments et revenez dès qu'un contrôleur
-        // est trouvé ou lorsqu'un tel répertoire n'existe pas
-        $c = count($segments);
-
-        while ($c-- > 0) {
-            $segmentConvert = ucfirst(
-                $this->translateURIDashes ? str_replace('-', '_', $segments[0]) : $segments[0]
-            );
-            // dès que nous rencontrons un segment non conforme à PSR-4, arrêtons la recherche
-            if (! $this->isValidSegment($segmentConvert)) {
-                return $segments;
-            }
-
-            $test = CONTROLLER_PATH . $this->directory . $segmentConvert;
-
-            // tant que chaque segment n'est *pas* un fichier de contrôleur mais correspond à un répertoire, ajoutez-le à $this->répertoire
-            if (! is_file($test . '.php') && is_dir($test)) {
-                $this->setDirectory($segmentConvert, true, false);
-                array_shift($segments);
-
-                continue;
-            }
-
-            return $segments;
-        }
-
-        // Cela signifie que tous les segments étaient en fait des répertoires
-        return $segments;
     }
 
     /**
@@ -207,39 +404,56 @@ final class AutoRouter implements AutoRouterInterface
         return (bool) preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/', $segment);
     }
 
-    /**
-     * Définit le sous-répertoire dans lequel se trouve le contrôleur.
-     *
-     * @param bool $validate si vrai, vérifie que $dir se compose uniquement de segments conformes à PSR4
-     */
-    public function setDirectory(?string $dir = null, bool $append = false, bool $validate = true)
+    private function translateURIDashes(string $segment): string
     {
-        if (empty($dir)) {
-            $this->directory = null;
+        return $this->translateURIDashes
+            ? str_replace('-', '_', $segment)
+            : $segment;
+    }
 
-            return;
+    /**
+     * Obtenez le chemin du dossier du contrôleur et définissez-le sur la propriété.
+     */
+    private function setDirectory(): void
+    {
+        $segments = explode('\\', trim($this->controller, '\\'));
+
+        // Supprimer le court nom de classe.
+        array_pop($segments);
+
+        $namespaces = implode('\\', $segments);
+
+        $dir = str_replace(
+            '\\',
+            '/',
+            ltrim(substr($namespaces, strlen($this->namespace)), '\\')
+        );
+
+        if ($dir !== '') {
+            $this->directory = $dir . '/';
         }
+    }
 
-        if ($validate) {
-            $segments = explode('/', trim($dir, '/'));
+	private function protectDefinedRoutes(): void
+    {
+        $controller = strtolower($this->controller);
 
-            foreach ($segments as $segment) {
-                if (! $this->isValidSegment($segment)) {
-                    return;
-                }
+        foreach ($this->protectedControllers as $controllerInRoutes) {
+            $routeLowerCase = strtolower($controllerInRoutes);
+
+            if ($routeLowerCase === $controller) {
+                throw new PageNotFoundException(
+                    'Impossible d\'accéder à un contrôleur définie dans les routes. Contrôleur : ' . $controllerInRoutes
+                );
             }
-        }
-
-        if ($append !== true || empty($this->directory)) {
-            $this->directory = trim($dir, '/') . '/';
-        } else {
-            $this->directory .= trim($dir, '/') . '/';
         }
     }
 
     /**
      * Renvoie le nom du sous-répertoire dans lequel se trouve le contrôleur.
      * Relatif à CONTROLLER_PATH
+	 * 
+	 * @deprecated 1.0
      */
     public function directory(): string
     {
@@ -273,15 +487,9 @@ final class AutoRouter implements AutoRouterInterface
     }
 
     /**
-     * Modifie le nom du controleur
-     */
-    private function setController(string $name): void
-    {
-        $this->controller = $this->makeController($name);
-    }
-
-    /**
      * Construit un nom de contrôleur valide
+	 * 
+	 * @deprecated 1.0
      */
     public function makeController(string $name): string
     {
@@ -290,13 +498,5 @@ final class AutoRouter implements AutoRouterInterface
             '',
             ucfirst($name)
         ) . 'Controller';
-    }
-
-    /**
-     * Modifie le nom de la méthode
-     */
-    private function setMethod(string $name): void
-    {
-        $this->method = preg_replace('#' . config('app.url_suffix') . '$#i', '', $name);
     }
 }

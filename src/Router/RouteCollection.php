@@ -61,7 +61,7 @@ class RouteCollection implements RouteCollectionInterface
      *
      * Non utilisé ici. Valeur d'intercommunication pour la classe Routeur.
      */
-    protected bool $autoRoute = true;
+    protected bool $autoRoute = false;
 
     /**
      * Un appelable qui sera affiché
@@ -70,6 +70,11 @@ class RouteCollection implements RouteCollectionInterface
      * @var Closure|string
      */
     protected $override404;
+
+    /**
+     * Tableau de fichiers qui contiendrait les définitions de routes.
+     */
+    protected array $routeFiles = [];
 
     /**
      * Espaces réservés définis pouvant être utilisés.
@@ -102,6 +107,28 @@ class RouteCollection implements RouteCollectionInterface
      * ```
      */
     protected array $routes = [
+        '*'       => [],
+        'options' => [],
+        'get'     => [],
+        'head'    => [],
+        'post'    => [],
+        'put'     => [],
+        'delete'  => [],
+        'trace'   => [],
+        'connect' => [],
+        'cli'     => [],
+    ];
+
+    /**
+     * Tableau des noms des routes
+	 * 
+     * [
+     *     verb => [
+     *         routeName => routeKey(regex)
+     *     ],
+     * ]
+     */
+    protected array $routesNames = [
         '*'       => [],
         'options' => [],
         'get'     => [],
@@ -153,36 +180,23 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * Le nom du groupe de route courant
-     *
-     * @var string|null
      */
-    protected $group;
+    protected ?string $group = null;
 
     /**
      * Le sous domaine courant
-     *
-     * @var string|null
      */
-    protected $currentSubdomain;
+    protected ?string $currentSubdomain = null;
 
     /**
      * Stocke une copie des options actuelles en cours appliqué lors de la création.
-     *
-     * @var array|null
      */
-    protected $currentOptions;
+    protected ?array $currentOptions = null;
 
     /**
      * Un petit booster de performances.
      */
     protected bool $didDiscover = false;
-
-    /**
-     * Descripteur du localisateur de fichiers à utiliser.
-     *
-     * @var Locator
-     */
-    protected $locator;
 
     /**
      * Drapeau pour trier les routes par priorité.
@@ -206,11 +220,27 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * Constructor
+	 * 
+	 * @var Locator $locator Descripteur du localisateur de fichiers à utiliser.
      */
-    public function __construct()
+    public function __construct(protected Locator $locator, object $routing)
     {
-        $this->locator  = Services::locator();
         $this->httpHost = Services::request()->getEnv('HTTP_HOST');
+
+		// Configuration basée sur le fichier de config. Laissez le fichier routes substituer.
+        $this->defaultNamespace   = $routing->default_namespace ?: $this->defaultNamespace;
+        $this->defaultController  = $routing->default_controller ?: $this->defaultController;
+        $this->defaultMethod      = $routing->default_method ?: $this->defaultMethod;
+        $this->translateURIDashes = $routing->translate_uri_dashes ?: $this->translateURIDashes;
+        $this->override404        = $routing->override404 ?: $this->override404;
+        $this->autoRoute          = $routing->auto_route ?: $this->autoRoute;
+        $this->routeFiles         = $routing->route_files ?: $this->routeFiles;
+        $this->prioritize         = $routing->prioritize ?: $this->prioritize;
+
+		// Normaliser la chaîne de path dans le tableau routeFiles.
+        foreach ($this->routeFiles as $routeKey => $routesFile) {
+            $this->routeFiles[$routeKey] = realpath($routesFile) ?: $routesFile;
+        }
     }
 
     /**
@@ -224,10 +254,25 @@ class RouteCollection implements RouteCollectionInterface
             return $this;
         }
 
-        // Nous avons besoin de cette variable dans la portée locale pour que les fichiers de route puissent y accéder.
+        // Incluez le fichier routesFile s'il n'existe pas. 
+		// Ne conserver que pour les fins BC pour l'instant. 
+        $routeFiles = $this->routeFiles;
+        if (! in_array($routesFile, $routeFiles, true)) {
+            $routeFiles[] = $routesFile;
+        }
+		
+		// Nous avons besoin de cette variable dans la portée locale pour que les fichiers de route puissent y accéder.
         $routes = $this;
 
-        require $routesFile;
+		foreach ($routeFiles as $routesFile) {
+            if (! is_file($routesFile)) {
+				logger()->warning(sprintf('Fichier de route introuvable : "%s"', $routesFile));
+
+                continue;
+            }
+
+            require_once $routesFile;
+        }
 
         $this->discoverRoutes();
 
@@ -240,11 +285,14 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function resetRoutes()
     {
-        $this->routes = ['*' => []];
+        $this->routes = $this->routesNames = ['*' => []];
 
         foreach ($this->defaultHTTPMethods as $verb) {
-            $this->routes[$verb] = [];
+			$this->routes[$verb]      = [];
+			$this->routesNames[$verb] = [];
         }
+
+		$this->routesOptions = [];
 
         $this->prioritizeDetected = false;
         $this->didDiscover        = false;
@@ -347,14 +395,10 @@ class RouteCollection implements RouteCollectionInterface
         $routes = $this;
 
         $files    = $this->locator->search('Config/routes.php');
-        $excludes = [
-            APP_PATH . 'Config' . DS . 'routes.php',
-            SYST_PATH . 'Config' . DS . 'routes.php',
-        ];
-
+        
         foreach ($files as $file) {
             // N'incluez plus notre fichier principal...
-            if (in_array($file, $excludes, true)) {
+            if (in_array($file, $this->routeFiles, true)) {
                 continue;
             }
 
@@ -460,8 +504,7 @@ class RouteCollection implements RouteCollectionInterface
         if ($verb === '*') {
             foreach ($this->defaultHTTPMethods as $tmpVerb) {
                 foreach ($this->routes[$tmpVerb] as $route) {
-                    $routeKey   = key($route['route']);
-                    $controller = $this->getControllerName($route['route'][$routeKey]);
+                    $controller = $this->getControllerName($route['handler']);
                     if ($controller !== null) {
                         $controllers[] = $controller;
                     }
@@ -484,12 +527,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * {@inheritDoc}
      */
-    public function getRoutes(?string $verb = null, bool $withName = false): array
+    public function getRoutes(?string $verb = null, bool $includeWildcard = true): array
     {
         if (empty($verb)) {
             $verb = $this->getHTTPVerb();
         }
-        $verb = strtolower($verb);
 
         // Puisqu'il s'agit du point d'entrée du routeur,
         // prenez un moment pour faire toute découverte de route
@@ -497,24 +539,13 @@ class RouteCollection implements RouteCollectionInterface
         $this->discoverRoutes();
 
         $routes     = [];
-        $collection = [];
-
         if (isset($this->routes[$verb])) {
             // Conserve les itinéraires du verbe actuel au début afin qu'ils soient
             // mis en correspondance avant l'un des itinéraires génériques "add".
-            $collection = $this->routes[$verb] + ($this->routes['*'] ?? []);
+			$collection = $includeWildcard ? $this->routes[$verb] + ($this->routes['*'] ?? []) : $this->routes[$verb];
 
-            foreach ($collection as $name => $r) {
-                $key = key($r['route']);
-
-                if (! $withName) {
-                    $routes[$key] = $r['route'][$key];
-                } else {
-                    $routes[$key] = [
-                        'name'    => $name,
-                        'handler' => $r['route'][$key],
-                    ];
-                }
+		    foreach ($collection as $routeKey => $r) {
+                $routes[$routeKey] = $r['handler'];
             }
         }
 
@@ -558,7 +589,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setHTTPVerb(string $verb): self
     {
-        $this->HTTPVerb = $verb;
+        $this->HTTPVerb = strtolower($verb);
 
         return $this;
     }
@@ -599,42 +630,44 @@ class RouteCollection implements RouteCollectionInterface
     public function addRedirect(string $from, string $to, int $status = 302): self
     {
         // Utilisez le modèle de la route nommée s'il s'agit d'une route nommée.
-        if (array_key_exists($to, $this->routes['*'])) {
-            $to = $this->routes['*'][$to]['route'];
+        if (array_key_exists($to, $this->routesNames['*'])) {
+			$routeName  = $to;
+            $routeKey   = $this->routesNames['*'][$routeName];
+            $redirectTo = [$routeKey => $this->routes['*'][$routeKey]['handler']];
+
         } elseif (array_key_exists($to, $this->routes['get'])) {
-            $to = $this->routes['get'][$to]['route'];
+            $routeName  = $to;
+            $routeKey   = $this->routesNames['get'][$routeName];
+            $redirectTo = [$routeKey => $this->routes['get'][$routeKey]['handler']];
+        } else {
+            // La route nommee n'a pas ete trouvée
+            $redirectTo = $to;
         }
 
-        $this->create('*', $from, $to, ['redirect' => $status]);
+        $this->create('*', $from, $redirectTo, ['redirect' => $status]);
 
         return $this;
     }
 
     /**
      * {@inheritDoc}
+	 * 
+	 * @param string $routeKey cle de route ou route nommee
      */
-    public function isRedirect(string $from): bool
+    public function isRedirect(string $routeKey): bool
     {
-        foreach ($this->routes['*'] as $name => $route) {
-            // Est-ce une route nommée ?
-            if ($name === $from || key($route['route']) === $from) {
-                return isset($route['redirect']) && is_numeric($route['redirect']);
-            }
-        }
-
-        return false;
+		return isset($this->routes['*'][$routeKey]['redirect']);
     }
 
     /**
      * {@inheritDoc}
+	 * 
+	 * @param string $routeKey cle de route ou route nommee
      */
-    public function getRedirectCode(string $from): int
+    public function getRedirectCode(string $routeKey): int
     {
-        foreach ($this->routes['*'] as $name => $route) {
-            // Est-ce une route nommée ?
-            if ($name === $from || key($route['route']) === $from) {
-                return $route['redirect'] ?? 0;
-            }
+        if (isset($this->routes['*'][$routeKey]['redirect'])) {
+            return $this->routes['*'][$routeKey]['redirect'];
         }
 
         return 0;
@@ -1032,7 +1065,18 @@ class RouteCollection implements RouteCollectionInterface
         return $this;
     }
 
-    /**
+    
+	/**
+     * Spécifie une route qui n'est disponible que pour les requêtes GET et POST.
+     *
+     * @param array|Closure|string $to
+     */
+	public function form(string $from, $to, ?array $options = null): self
+	{
+		return $this->match(['GET', 'POST'], $from, $to, $options);
+	}
+	
+	/**
      * Spécifie une route qui n'est disponible que pour les requêtes de ligne de commande.
      *
      * @param array|Closure|string $to
@@ -1056,7 +1100,10 @@ class RouteCollection implements RouteCollectionInterface
             ->setOptions($options)
             ->render();
 
-        $this->create('get', $from, $to, $options);
+		$routeOptions = $options ?? [];
+		$routeOptions = array_merge($routeOptions, ['view' => $view]);
+
+		$this->create('get', $from, $to, $routeOptions);
 
         return $this;
     }
@@ -1079,9 +1126,11 @@ class RouteCollection implements RouteCollectionInterface
     public function reverseRoute(string $search, ...$params)
     {
         // Les routes nommées ont une priorité plus élevée.
-        foreach ($this->routes as $collection) {
+        foreach ($this->routesNames as $collection) {
             if (array_key_exists($search, $collection)) {
-                return $this->buildReverseRoute(key($collection[$search]['route']), $params);
+                $routeKey = $collection[$search];
+
+                return $this->buildReverseRoute($routeKey, $params);
             }
         }
 
@@ -1097,9 +1146,8 @@ class RouteCollection implements RouteCollectionInterface
         // Si ce n'est pas une route nommée, alors bouclez
         // toutes les routes pour trouver une correspondance.
         foreach ($this->routes as $collection) {
-            foreach ($collection as $route) {
-                $from = key($route['route']);
-                $to   = $route['route'][$from];
+            foreach ($collection as $routeKey => $route) {
+                $to = $route['handler'];
 
                 // on ignore les closures
                 if (! is_string($to)) {
@@ -1123,7 +1171,7 @@ class RouteCollection implements RouteCollectionInterface
                     continue;
                 }
 
-                return $this->buildReverseRoute($from, $params);
+                return $this->buildReverseRoute($routeKey, $params);
             }
         }
 
@@ -1166,21 +1214,21 @@ class RouteCollection implements RouteCollectionInterface
      * @param array $params Un ou plusieurs paramètres à transmettre à la route.
      *                      Le dernier paramètre vous permet de définir la locale.
      */
-    protected function buildReverseRoute(string $from, array $params): string
+    protected function buildReverseRoute(string $routeKey, array $params): string
     {
         $locale = null;
 
         // Retrouvez l'ensemble de nos rétro-références dans le parcours d'origine.
-        preg_match_all('/\(([^)]+)\)/', $from, $matches);
+        preg_match_all('/\(([^)]+)\)/', $routeKey, $matches);
 
         if (empty($matches[0])) {
-            if (strpos($from, '{locale}') !== false) {
+            if (strpos($routeKey, '{locale}') !== false) {
                 $locale = $params[0] ?? null;
             }
 
-            $from = $this->replaceLocale($from, $locale);
+            $routeKey = $this->replaceLocale($routeKey, $locale);
 
-            return '/' . ltrim($from, '/');
+            return '/' . ltrim($routeKey, '/');
         }
 
         // Les paramètres régionaux sont passés ?
@@ -1191,18 +1239,23 @@ class RouteCollection implements RouteCollectionInterface
 
         // Construisez notre chaîne résultante, en insérant les $params aux endroits appropriés.
         foreach ($matches[0] as $index => $pattern) {
+            if (! isset($params[$index])) {
+                throw new InvalidArgumentException(
+                    'Argument manquant pour "' . $pattern . '" dans la route "' . $routeKey . '".'
+                );
+            }
             if (! preg_match('#^' . $pattern . '$#u', $params[$index])) {
                 throw RouterException::invalidParameterType();
             }
 
             // Assurez-vous que le paramètre que nous insérons correspond au type de paramètre attendu.
-            $pos  = strpos($from, $pattern);
-            $from = substr_replace($from, $params[$index], $pos, strlen($pattern));
+            $pos      = strpos($routeKey, $pattern);
+            $routeKey = substr_replace($routeKey, $params[$index], $pos, strlen($pattern));
         }
 
-        $from = $this->replaceLocale($from, $locale);
+        $routeKey = $this->replaceLocale($routeKey, $locale);
 
-        return '/' . ltrim($from, '/');
+        return '/' . ltrim($routeKey, '/');
     }
 
     /**
@@ -1253,7 +1306,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Lors de la redirection vers une route nommée, $to est un tableau tel que `['zombies' => '\Zombies::index']`.
-        if (is_array($to) && count($to) === 2) {
+        if (is_array($to) && isset($to[0])) {
             $to = $this->processArrayCallableSyntax($from, $to);
         }
 
@@ -1306,10 +1359,12 @@ class RouteCollection implements RouteCollectionInterface
             }
         }
 
+		$routeKey = $from;
+
         // Remplacez nos espaces réservés de regex par la chose réelle
         // pour que le routeur n'ait pas besoin de savoir quoi que ce soit.
         foreach ($this->placeholders as $tag => $pattern) {
-            $from = str_ireplace(':' . $tag, $pattern, $from);
+            $from = str_ireplace(':' . $tag, $pattern, $routeKey);
         }
 
         // S'il s'agit d'une redirection, aucun traitement
@@ -1324,26 +1379,29 @@ class RouteCollection implements RouteCollectionInterface
             $to = '\\' . ltrim($to, '\\');
         }
 
-        $name = $this->formatRouteName($options['as'] ?? $from);
+        $name = $this->formatRouteName($options['as'] ?? $routeKey);
 
         // Ne remplacez aucun 'from' existant afin que les routes découvertes automatiquement
         // n'écrase pas les paramètres app/Config/Routes.
         // les routes manuelement définies doivent toujours être la "source de vérité".
         // cela ne fonctionne que parce que les routes découvertes sont ajoutées juste avant
         // pour tenter de router la requête.
-        if (isset($this->routes[$verb][$name]) && ! $overwrite) {
+        $routeKeyExists = isset($this->routes[$verb][$routeKey]);
+        if ((isset($this->routesNames[$verb][$name]) || $routeKeyExists) && ! $overwrite) {
             return;
         }
 
-        $this->routes[$verb][$name] = [
-            'route' => [$from => $to],
+		$this->routes[$verb][$routeKey] = [
+            'name'    => $name,
+            'handler' => $to,
+            'from'    => $from,
         ];
-
-        $this->routesOptions[$verb][$from] = $options;
+        $this->routesOptions[$verb][$routeKey] = $options;
+        $this->routesNames[$verb][$name]       = $routeKey;
 
         // C'est une redirection ?
         if (isset($options['redirect']) && is_numeric($options['redirect'])) {
-            $this->routes['*'][$name]['redirect'] = $options['redirect'];
+            $this->routes['*'][$routeKey]['redirect'] = $options['redirect'];
         }
     }
 
@@ -1371,7 +1429,7 @@ class RouteCollection implements RouteCollectionInterface
     private function checkSubdomains($subdomains): bool
     {
         // Les appels CLI ne peuvent pas être sur le sous-domaine.
-        if (! isset($_SERVER['HTTP_HOST'])) {
+        if (! isset($this->httpHost)) {
             return false;
         }
 
