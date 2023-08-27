@@ -15,7 +15,6 @@ use BlitzPHP\Container\Injector;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Debug\Debugger;
 use BlitzPHP\Exceptions\ExceptionInterface;
-use BlitzPHP\Loader\DotEnv;
 use BlitzPHP\Router\Dispatcher;
 use MirazMac\Requirements\Checker;
 use ReflectionException;
@@ -54,11 +53,6 @@ class Application
          * Verifie les exigences systeme
          */
         self::checkRequirements();
-
-        /**
-         * On initialise le parsing du fichier .env
-         */
-        DotEnv::init(ROOTPATH);
 
         /**
          * Lance la capture des exceptions et erreurs

@@ -143,22 +143,6 @@ class GenerateKey extends Command
             copy($baseEnv, $envFile);
         }
 
-        $oldFileContents = (string) file_get_contents($envFile);
-        $replacementKey  = "\nencryption.key = {$key}";
-
-        $dotenv = DotEnv::instance();
-
-        $append = true;
-        if (strpos($oldFileContents, 'encryption.key') === false) {
-            $append = file_put_contents($envFile, $replacementKey, FILE_APPEND) !== false;
-        } else {
-            $dotenv->update(['encryption.key' => $key], false);
-        }
-
-        if (! $append) {
-            return false;
-        }
-
-        return $dotenv->load();
+		return DotEnv::instance()->replace(['encryption.key' => $key]);
     }
 }

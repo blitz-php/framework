@@ -61,6 +61,35 @@ class DotEnv
         return true; // notifie de la reussite de l'operation
     }
 
+	/**
+     * Remplace les valeurs dans le fichiers .env
+	 * 
+	 * Si une valeur n'existe pas, elle est ajoutée au fichier
+     */
+	public function replace(array $data, bool $reload = true): bool
+	{	
+		$oldFileContents = (string) file_get_contents($this->path);
+
+		foreach ($data as $key => $value) {
+			$replacementKey  = "\n{$key} = {$value}";
+			if (strpos($oldFileContents, $key) === false) {
+				if (file_put_contents($this->path, $replacementKey, FILE_APPEND) === false) {
+					return false;
+				}
+				unset($data[$key]);
+			}
+		}
+
+		if ($data === []) {
+			if ($reload) {
+				return $this->load();
+			}
+			return true;
+		}
+
+		return $this->update($data, $reload);
+	}
+
     /**
      * Modifie les valeurs dans le fichiers .env
      */
