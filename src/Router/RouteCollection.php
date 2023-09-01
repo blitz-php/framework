@@ -87,6 +87,7 @@ class RouteCollection implements RouteCollectionInterface
         'alpha'    => '[a-zA-Z]+',
         'hash'     => '[^/]+',
         'slug'     => '[a-z0-9-]+',
+        'uuid'     => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
     ];
 
     /**
@@ -228,7 +229,7 @@ class RouteCollection implements RouteCollectionInterface
         $this->httpHost = Services::request()->getEnv('HTTP_HOST');
 
 		// Configuration basée sur le fichier de config. Laissez le fichier routes substituer.
-        $this->defaultNamespace   = $routing->default_namespace ?: $this->defaultNamespace;
+        $this->defaultNamespace   = rtrim($routing->default_namespace ?: $this->defaultNamespace, '\\') . '\\';
         $this->defaultController  = $routing->default_controller ?: $this->defaultController;
         $this->defaultMethod      = $routing->default_method ?: $this->defaultMethod;
         $this->translateURIDashes = $routing->translate_uri_dashes ?: $this->translateURIDashes;
@@ -1364,9 +1365,9 @@ class RouteCollection implements RouteCollectionInterface
         // Remplacez nos espaces réservés de regex par la chose réelle
         // pour que le routeur n'ait pas besoin de savoir quoi que ce soit.
         foreach ($this->placeholders as $tag => $pattern) {
-            $from = str_ireplace(':' . $tag, $pattern, $routeKey);
+            $routeKey = str_ireplace(':' . $tag, $pattern, $routeKey);
         }
-
+       
         // S'il s'agit d'une redirection, aucun traitement
         if (! isset($options['redirect']) && is_string($to)) {
             // Si aucun espace de noms n'est trouvé, ajouter l'espace de noms par défaut

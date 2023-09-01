@@ -191,10 +191,14 @@ class Router implements RouterInterface
             return $this->controller;
         }
 
+        $controller =  str_contains($this->controller, '\\')
+            ? $this->controller 
+            : trim($this->collection->getDefaultNamespace(), '\\') . '\\' . $this->controller;
+
         $controller = preg_replace(
             ['#(\_)?Controller$#i', '#' . config('app.url_suffix') . '$#i'],
             '',
-            ucfirst($this->controller)
+            ucfirst($controller)
         ) . 'Controller';
 
         return $this->translateURIDashes
