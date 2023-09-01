@@ -13,6 +13,7 @@ namespace BlitzPHP\Http;
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Session\Store;
 use Rakit\Validation\ErrorBag;
 
@@ -38,11 +39,16 @@ class Redirection extends Response
     }
 
     /**
-     * Create a new redirect response to the "home" route.
+     * Creer une redirection vers la route nommee "home" ou vers la page d'accueil.
      */
     public function home(int $status = StatusCode::FOUND): self
     {
-        return $this->to($this->generator->route('home'), $status);
+        try {
+            return $this->to($this->generator->route('home'), $status);
+        }
+        catch (HttpException) {
+            return $this->to('/', $status);
+        }
     }
 
     /**
