@@ -499,7 +499,7 @@ if (! function_exists('link_active')) {
         $current_url     = trim(current_url(false), '/');
         $current_section = trim(str_replace(trim(site_url(), '/'), '', $current_url), '/');
 
-        if ($current_section === $path) {
+        if ($current_section === $path || $current_url === $path) {
             return $active_class;
         }
 
