@@ -119,10 +119,16 @@ class Serve extends Command
         $this->writer->boldGreen('http://' . $host . ':' . $port, true);
         $this->write("Appuyez sur Control-C pour arrêter.\n", true);
 
+        // Définissez le chemin d’accès du contrôleur frontal sur Racine du document.
+        $docroot = escapeshellarg($this->rootDirectory);
+
+        // Imitez la fonctionnalité mod_rewrite d’Apache avec les paramètres utilisateur.
+        $rewrite = escapeshellarg(__DIR__ . '/rewrite.php');
+
         // Appelez le serveur Web intégré de PHP, en veillant à définir notre
         // chemin de base vers le dossier public et pour utiliser le fichier de réécriture
         // pour s'assurer que notre environnement est défini et qu'il simule le mod_rewrite de base.
-        passthru($php . ' -S ' . $host . ':' . $port . ' -t ' . escapeshellarg($this->rootDirectory), $status);
+        passthru($php . ' -S ' . $host . ':' . $port . ' -t ' . $docroot . ' ' . $rewrite, $status);
 
         if ($status && $this->portOffset < $this->tries) {
             $this->portOffset++;
