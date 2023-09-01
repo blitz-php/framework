@@ -58,9 +58,14 @@ defined('MIDDLEWARE_PATH') || define('MIDDLEWARE_PATH', APP_PATH . 'Middlewares'
 defined('MODEL_PATH') || define('MODEL_PATH', APP_PATH . 'Models' . DS);
 
 /**
- * Chemin  vers le dossier des ressources
+ * Chemin  vers le dossier des ressources applicative
  */
-defined('RESOURCE_PATH') || define('RESOURCE_PATH', APP_PATH . 'Resources' . DS);
+defined('APP_RESOURCE_PATH') || define('APP_RESOURCE_PATH', APP_PATH . 'Resources' . DS);
+
+/**
+ * Chemin  vers le dossier des ressources de base
+ */
+defined('RESOURCE_PATH') || define('RESOURCE_PATH', BASEPATH . 'resources' . DS);
 
 /**
  * Chemin vers le dossier des vues
@@ -90,7 +95,7 @@ defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', FRAMEWORK_STORAGE_PATH .
 /**
  * Chemin vers le dossier des traductions
  */
-defined('LANG_PATH') || define('LANG_PATH', RESOURCE_PATH . 'lang' . DS);
+defined('LANG_PATH') || define('LANG_PATH', APP_RESOURCE_PATH . 'lang' . DS);
 
 /**
  * Chemin vers le dossier des logs
@@ -120,7 +125,7 @@ if (! defined('DB_SEED_PATH')) {
     /**
      * Database seeds storage path
      */
-    define('DB_SEED_PATH', RESOURCE_PATH . 'database' . DS . 'seeds' . DS);
+    define('DB_SEED_PATH', APP_RESOURCE_PATH . 'database' . DS . 'seeds' . DS);
 }
 
 if (! defined('DB_DUMP_PATH')) {

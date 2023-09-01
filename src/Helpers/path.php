@@ -189,6 +189,24 @@ if (! function_exists('base_path')) {
     }
 }
 
+if (! function_exists('resource_path')) {
+    /**
+     * BASE RESOURCE PATH
+     *
+     * Renvoie le chemin absolu d'un fichier ressource de base
+     *
+     * @param string $name nom du fichier dont on veut avoir le chemin
+     */
+    function resource_path(string $name = ''): string
+    {
+        if (! empty($name)) {
+            $name = ltrim($name, '/\\');
+        }
+
+        return RESOURCE_PATH . str_replace('/', DS, $name);
+    }
+}
+
 if (! function_exists('class_path')) {
     /**
      * CLASS PATH
@@ -365,21 +383,21 @@ if (! function_exists('model_path')) {
     }
 }
 
-if (! function_exists('resource_path')) {
+if (! function_exists('app_resource_path')) {
     /**
-     * RESOURCE PATH
+     * APP RESOURCE PATH
      *
-     * Renvoie le chemin absolu d'un fichier ressource
+     * Renvoie le chemin absolu d'un fichier ressource applicative
      *
      * @param string $name nom du fichier dont on veut avoir le chemin
      */
-    function resource_path(string $name = ''): string
+    function app_resource_path(string $name = ''): string
     {
         if (! empty($name)) {
             $name = ltrim($name, '/\\');
         }
 
-        return RESOURCE_PATH . str_replace('/', DS, $name);
+        return APP_RESOURCE_PATH . str_replace('/', DS, $name);
     }
 }
 
