@@ -15,6 +15,7 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Formatter\Formatter;
 use DateTime;
 use DateTimeZone;
+use GuzzleHttp\Psr7\Utils;
 
 trait ResponseTrait
 {
@@ -105,5 +106,23 @@ trait ResponseTrait
         }
 
         return $this;
+    }
+
+    /**
+     * Renvoi une vue comme reponse
+     */
+    public function view(string $view, array $data = [], array|int $optionsOrStatus = StatusCode::OK): static
+    {
+        if (is_int($optionsOrStatus)) {
+            $status  = $optionsOrStatus;
+            $options = [];
+        } else{
+            $status = $optionsOrStatus['status'] ?? StatusCode::OK;
+            $options = array_filter($optionsOrStatus, fn($k) => $k !== 'status', ARRAY_FILTER_USE_KEY);
+        }
+
+        $viewContent = view($view, $data, $options)->get();
+
+        return $this->withStatus($status)->withBody(Utils::streamFor($viewContent));
     }
 }
