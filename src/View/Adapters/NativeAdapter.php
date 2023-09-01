@@ -265,7 +265,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function start(string $name, ?string $content = null)
     {
-        if (empty($content)) {
+        if (null === $content) {
             $this->sectionStack[] = $name;
 
             ob_start();
@@ -394,20 +394,7 @@ class NativeAdapter extends AbstractAdapter
         $view = str_replace(' ', '', $view);
 
         if ($view[0] !== '/') {
-            $current_dir = pathinfo($this->renderVars['file'] ?? '', PATHINFO_DIRNAME);
-            if (file_exists(rtrim($current_dir, DS) . DS . $view)) {
-                $view = rtrim($current_dir, DS) . DS . $view;
-            } elseif (file_exists(rtrim($current_dir, DS) . DS . 'partials' . DS . $view)) {
-                $view = rtrim($current_dir, DS) . DS . 'partials' . DS . $view;
-            } elseif (file_exists($this->viewPath . 'partials' . DS . $view)) {
-                $view = $this->viewPath . 'partials' . DS . $view;
-            } elseif (file_exists($this->viewPath . trim(dirname($current_dir), '/\\') . DS . $view)) {
-                $view = $this->viewPath . trim(dirname($current_dir), '/\\') . DS . $view;
-            } elseif (file_exists(VIEW_PATH . 'partials' . DS . $view)) {
-                $view = VIEW_PATH . 'partials' . DS . $view;
-            } elseif (file_exists(VIEW_PATH . trim(dirname($current_dir), '/\\') . DS . $view)) {
-                $view = VIEW_PATH . trim(dirname($current_dir), '/\\') . DS . $view;
-            }
+            $view = $this->retrievePartialPath($view);
         }
 
         return $this->addData($data)->render($view, $options, $saveData);
@@ -424,6 +411,96 @@ class NativeAdapter extends AbstractAdapter
     {
         return $this->insert($view, $data, $options, $saveData);
     }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition est remplie.
+     *
+     * @param mixed $saveData
+     */
+    public function insertWhen(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    {
+        if (is_callable($condition)) {
+            $condition = call_user_func($condition);
+        }
+
+        if (true === $condition) {
+            return $this->insert($view, $data, $options, $saveData);
+        }
+
+        return '';
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition est remplie.
+     *
+     * @alias self::insertWhen()
+     *
+     * @param mixed $saveData
+     */
+    public function includeWhen(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    {
+        return $this->insertWhen($condition, $view, $data, $options, $saveData);
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition n'est pas remplie.
+     * 
+     * @param mixed $saveData
+     */
+    public function insertUnless(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    {
+        if (is_callable($condition)) {
+            $condition = call_user_func($condition);
+        }
+
+        return $this->insertWhen(false === $condition, $view, $data, $options, $saveData);
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition n'est pas remplie.
+     *
+     * @alias self::insertUnless()
+     *
+     * @param mixed $saveData
+     */
+    public function includeUnless(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    {
+        return $this->insertUnless($condition, $view, $data, $options, $saveData);
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
+     *
+     * @alias self::insertIf()
+     *
+     * @param mixed $saveData
+     */
+    public function includeIf(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    {
+        return $this->insertIf($view, $data, $options, $saveData);
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
+     *
+     * @param mixed $saveData
+     */
+    public function insertIf(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    {
+        $view = preg_replace('#\.php$#i', '', $view) . '.php';
+        $view = str_replace(' ', '', $view);
+
+        if ($view[0] !== '/') {
+            $view = $this->retrievePartialPath($view);
+        }
+
+        if (is_file($view)) {
+            return $this->addData($data)->render($view, $options, $saveData);
+        }
+        
+        return '';
+    }
+
 
     /**
      * Ajoute un fichier css de librairie a la vue
@@ -550,5 +627,25 @@ class NativeAdapter extends AbstractAdapter
         if ($saveData) {
             $this->data = $this->tempData;
         }
+    }
+
+    private function retrievePartialPath(string $view): string
+    {
+        $current_dir = pathinfo($this->renderVars['file'] ?? '', PATHINFO_DIRNAME);
+        if (file_exists(rtrim($current_dir, DS) . DS . $view)) {
+            $view = rtrim($current_dir, DS) . DS . $view;
+        } elseif (file_exists(rtrim($current_dir, DS) . DS . 'partials' . DS . $view)) {
+            $view = rtrim($current_dir, DS) . DS . 'partials' . DS . $view;
+        } elseif (file_exists($this->viewPath . 'partials' . DS . $view)) {
+            $view = $this->viewPath . 'partials' . DS . $view;
+        } elseif (file_exists($this->viewPath . trim(dirname($current_dir), '/\\') . DS . $view)) {
+            $view = $this->viewPath . trim(dirname($current_dir), '/\\') . DS . $view;
+        } elseif (file_exists(VIEW_PATH . 'partials' . DS . $view)) {
+            $view = VIEW_PATH . 'partials' . DS . $view;
+        } elseif (file_exists(VIEW_PATH . trim(dirname($current_dir), '/\\') . DS . $view)) {
+            $view = VIEW_PATH . trim(dirname($current_dir), '/\\') . DS . $view;
+        }
+
+        return $view;
     }
 }

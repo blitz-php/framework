@@ -12,8 +12,8 @@
 namespace BlitzPHP\View\Adapters;
 
 use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ViewException;
-use BlitzPHP\Loader\Services;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\RendererInterface;
 
@@ -129,6 +129,20 @@ abstract class AbstractAdapter implements RendererInterface
         $this->data[$name] = $value;
 
         return $this;
+    }
+
+    /**
+     * Définit plusieurs éléments de données de vue à la fois.
+     */
+    public function with(array|string $key, mixed $value = null, ?string $context = null): self
+    {
+        if (is_array($key)) {
+            $context = $value;
+        } else {
+            $key = [$key => $value];
+        }
+
+        return $this->addData($key, $context);
     }
 
     /**
