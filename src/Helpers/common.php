@@ -21,9 +21,8 @@ use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
 use BlitzPHP\Utilities\Support\Invader;
-use Kint\Kint;
 
-// ================================= FONCTIONS D'ACCESSIBILITE ================================= //
+// ================================= FONCTIONS UTIILITAIRES ESSENTIELLES ================================= //
 
 if (! function_exists('env')) {
     /**
@@ -140,6 +139,89 @@ if (! function_exists('config')) {
     }
 }
 
+if (! function_exists('logger')) {
+    /**
+     * Une méthode de commodité pour les événements de journalisation via le système Log. 
+     * 
+     * Les niveaux de journal autorisés sont : 
+     *  - emergency
+     *  - alert
+     *  - critical
+     *  - error
+     *  - warning
+     *  - notice
+     *  - info
+     *  - debug
+     *
+     * @param int|string $level
+     *
+     * @return \BlitzPHP\Debug\Logger|mixed
+     */
+    function logger($level = null, ?string $message = null, array $context = [])
+    {
+        $logger = Services::logger();
+
+        if (! empty($level) && ! empty($message)) {
+            return $logger->log($level, $message, $context);
+        }
+
+        return $logger;
+    }
+}
+
+if (! function_exists('cache')) {
+    /**
+     * Une méthode pratique qui donne accès au cache
+     * objet. Si aucun paramètre n'est fourni, renverra l'objet,
+     * sinon, tentera de renvoyer la valeur mise en cache.
+     *
+     * Exemples:
+     *    cache()->set('foo', 'bar'); ou cache('foo', 'bar');
+     *    $foo = cache('bar');
+     *
+     * @param mixed|null $value
+     *
+     * @return \BlitzPHP\Cache\Cache|bool|mixed
+     */
+    function cache(?string $key = null, $value = null)
+    {
+        $cache = Services::cache();
+
+        if (empty($key)) {
+            return $cache;
+        }
+
+        if (empty($value)) {
+            return $cache->get($key);
+        }
+
+        return $cache->set($key, $value);
+    }
+}
+
+if (! function_exists('session')) {
+    /**
+     * Une méthode pratique pour accéder à l'instance de session, ou un élément qui a été défini dans la session.
+     *
+     * Exemples:
+     *    session()->set('foo', 'bar');
+     *    $foo = session('bar');
+     *
+     * @return array|bool|float|int|object|Store|string|null
+     */
+    function session(?string $val = null)
+    {
+        $session = Services::session();
+
+        // Vous retournez un seul element ?
+        if (is_string($val)) {
+            return $session->get($val);
+        }
+
+        return $session;
+    }
+}
+
 // =========================== FONCTIONS DE PREVENTION D'ATTAQUE =========================== //
 
 if (! function_exists('esc')) {
@@ -233,6 +315,44 @@ if (! function_exists('stringify_attributes')) {
 
 // ================================= FONCTIONS D'ENVIRONNEMENT D'EXECUTION ================================= //
 
+if (! function_exists('environment')) {
+    /**
+     * Renvoi l'environnement d'execution actuel ou determine si on est dans un environnement specifie
+     * 
+     * @return bool|string
+     */
+    function environment(array|string|null $env)
+    {
+        $current = env('ENVIRONMENT');
+        if (empty($current) || $current === 'auto') {
+            $current = config('app.environment');
+        }
+
+        if (empty($env)) {
+            return $current;
+        }
+
+        $envMap = [
+            'dev'         => 'development',
+            'local'       => 'development',
+            'prod'        => 'production',
+            'test'        => 'testing',
+            'stage'       => 'testing',
+            'staging'     => 'testing',
+        ];
+
+        $current = $envMap[$current] ?? $current;
+    
+        if (is_string($env)) {
+            $env = [$env];
+        }
+
+        $env = array_map(fn($k) => $envMap[$k] ?? $k, $env);
+
+        return in_array($current, $env, true);
+    }
+}
+
 if (! function_exists('on_dev')) {
     /**
      * Testez pour voir si nous sommes dans un environnement de développement.
@@ -243,9 +363,7 @@ if (! function_exists('on_dev')) {
             return false;
         }
 
-        $env = config('app.environment');
-
-        return in_array($env, ['dev', 'development'], true);
+        return environment(['dev', 'development', 'local']);
     }
 }
 
@@ -259,9 +377,7 @@ if (! function_exists('on_prod')) {
             return true;
         }
 
-        $env = config('app.environment');
-
-        return in_array($env, ['prod', 'production'], true);
+        return environment(['prod', 'production']);
     }
 }
 
@@ -271,9 +387,7 @@ if (! function_exists('on_test')) {
      */
     function on_test(): bool
     {
-        $env = config('app.environment');
-
-        return in_array($env, ['test', 'testing'], true);
+        return environment(['test', 'testing', 'stage', 'staging']);
     }
 }
 
@@ -486,42 +600,6 @@ if (! function_exists('old')) {
 
 // ================================= FONCTIONS DE DEBOGAGE ================================= //
 
-if (! function_exists('dd')) {
-    /**
-     * Prints a Kint debug report and exits.
-     *
-     * @param array ...$vars
-     *
-     * @codeCoverageIgnore Can't be tested ... exits
-     */
-    function dd(...$vars)
-    {
-        if (class_exists('\Kint\Kint')) {
-            Kint::$aliases[] = 'dd';
-            Kint::dump(...$vars);
-        }
-
-        exit;
-    }
-}
-
-if (! function_exists('dump')) {
-    /**
-     * Prints a Kint debug report and exits.
-     *
-     * @param array ...$vars
-     *
-     * @codeCoverageIgnore Can't be tested ... exits
-     */
-    function dump(...$vars)
-    {
-        if (class_exists('\Kint\Kint')) {
-            Kint::$aliases[] = 'dump';
-            Kint::dump(...$vars);
-        }
-    }
-}
-
 if (! function_exists('deprecationWarning')) {
     /**
      * Méthode d'assistance pour générer des avertissements d'obsolescence
@@ -535,90 +613,6 @@ if (! function_exists('deprecationWarning')) {
     function deprecation_warning(string $message, int $stackFrame = 1)
     {
         Helpers::deprecationWarning($message, $stackFrame);
-    }
-}
-
-if (! function_exists('logger')) {
-    /**
-     * A convenience/compatibility method for logging events through
-     * the Log system.
-     *
-     * Allowed log levels are:
-     *  - emergency
-     *  - alert
-     *  - critical
-     *  - error
-     *  - warning
-     *  - notice
-     *  - info
-     *  - debug
-     *
-     * @param int|string $level
-     *
-     * @return \BlitzPHP\Debug\Logger|mixed
-     */
-    function logger($level = null, ?string $message = null, array $context = [])
-    {
-        $logger = Services::logger();
-
-        if (! empty($level) && ! empty($message)) {
-            return $logger->log($level, $message, $context);
-        }
-
-        return $logger;
-    }
-}
-
-if (! function_exists('cache')) {
-    /**
-     * Une méthode pratique qui donne accès au cache
-     * objet. Si aucun paramètre n'est fourni, renverra l'objet,
-     * sinon, tentera de renvoyer la valeur mise en cache.
-     *
-     * Examples:
-     *    cache()->set('foo', 'bar'); or cache('foo', 'bar');
-     *    $foo = cache('bar');
-     *
-     * @param mixed|null $value
-     *
-     * @return \BlitzPHP\Cache\Cache|bool|mixed
-     */
-    function cache(?string $key = null, $value = null)
-    {
-        $cache = Services::cache();
-
-        if (empty($key)) {
-            return $cache;
-        }
-
-        if (empty($value)) {
-            return $cache->get($key);
-        }
-
-        return $cache->set($key, $value);
-    }
-}
-
-if (! function_exists('session')) {
-    /**
-     * Une méthode pratique pour accéder à l'instance de session, ou un élément qui a été défini dans la session.
-     *
-     * Exemples:
-     *    session()->set('foo', 'bar');
-     *    $foo = session('bar');
-     *
-     * @return array|bool|float|int|object|Store|string|null
-     */
-    function session(?string $val = null)
-    {
-        $session = Services::session();
-
-        // Vous retournez un seul element ?
-        if (is_string($val)) {
-            return $session->get($val);
-        }
-
-        return $session;
     }
 }
 
@@ -672,30 +666,6 @@ if (! function_exists('trigger_warning')) {
     function trigger_warning(string $message)
     {
         Helpers::triggerWarning($message);
-    }
-}
-
-if (! function_exists('vd')) {
-    /**
-     * Shortcut to ref, HTML mode
-     *
-     * @return string|void
-     */
-    function vd(...$params)
-    {
-        // return 	Helpers::r(...$params);
-    }
-}
-
-if (! function_exists('vdt')) {
-    /**
-     * Shortcut to ref, plain text mode
-     *
-     * @return string|void
-     */
-    function vdt(...$params)
-    {
-        // return 	Helpers::rt(...$params);
     }
 }
 
@@ -759,7 +729,7 @@ if (! function_exists('force_https')) {
     }
 }
 
-if (! function_exists('getTypeName')) {
+if (! function_exists('get_type_name')) {
     /**
      * Renvoie la classe d'objets ou le type var de ce n'est pas un objet
      *

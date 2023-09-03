@@ -13,6 +13,8 @@ use Kint\Kint;
 use Kint\Renderer\CliRenderer;
 use Kint\Renderer\RichRenderer;
 
+helper('kint');
+
 if (is_online()) {
     return;
 }
