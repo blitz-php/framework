@@ -1114,7 +1114,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function environment(string $env, Closure $callback): self
     {
-        if ($env === config('app.environment')) {
+        if (environment($env)) {
             $callback($this);
         }
 
@@ -1127,11 +1127,13 @@ class RouteCollection implements RouteCollectionInterface
     public function reverseRoute(string $search, ...$params)
     {
         // Les routes nommées ont une priorité plus élevée.
-        foreach ($this->routesNames as $collection) {
+        foreach ($this->routesNames as $verb => $collection) {
             if (array_key_exists($search, $collection)) {
                 $routeKey = $collection[$search];
 
-                return $this->buildReverseRoute($routeKey, $params);
+                $from = $this->routes[$verb][$routeKey]['from'];
+
+                return $this->buildReverseRoute($from, $params);
             }
         }
 
@@ -1147,8 +1149,9 @@ class RouteCollection implements RouteCollectionInterface
         // Si ce n'est pas une route nommée, alors bouclez
         // toutes les routes pour trouver une correspondance.
         foreach ($this->routes as $collection) {
-            foreach ($collection as $routeKey => $route) {
-                $to = $route['handler'];
+            foreach ($collection as $route) {
+                $to   = $route['handler'];
+                $from = $route['from'];
 
                 // on ignore les closures
                 if (! is_string($to)) {
@@ -1172,7 +1175,7 @@ class RouteCollection implements RouteCollectionInterface
                     continue;
                 }
 
-                return $this->buildReverseRoute($routeKey, $params);
+                return $this->buildReverseRoute($from, $params);
             }
         }
 
@@ -1215,21 +1218,21 @@ class RouteCollection implements RouteCollectionInterface
      * @param array $params Un ou plusieurs paramètres à transmettre à la route.
      *                      Le dernier paramètre vous permet de définir la locale.
      */
-    protected function buildReverseRoute(string $routeKey, array $params): string
+    protected function buildReverseRoute(string $from, array $params): string
     {
         $locale = null;
 
         // Retrouvez l'ensemble de nos rétro-références dans le parcours d'origine.
-        preg_match_all('/\(([^)]+)\)/', $routeKey, $matches);
+        preg_match_all('/\(([^)]+)\)/', $from, $matches);
 
         if (empty($matches[0])) {
-            if (strpos($routeKey, '{locale}') !== false) {
+            if (strpos($from, '{locale}') !== false) {
                 $locale = $params[0] ?? null;
             }
 
-            $routeKey = $this->replaceLocale($routeKey, $locale);
+            $from = $this->replaceLocale($from, $locale);
 
-            return '/' . ltrim($routeKey, '/');
+            return '/' . ltrim($from, '/');
         }
 
         // Les paramètres régionaux sont passés ?
@@ -1239,24 +1242,30 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Construisez notre chaîne résultante, en insérant les $params aux endroits appropriés.
-        foreach ($matches[0] as $index => $pattern) {
+        foreach ($matches[0] as $index => $placeholder) {
             if (! isset($params[$index])) {
                 throw new InvalidArgumentException(
-                    'Argument manquant pour "' . $pattern . '" dans la route "' . $routeKey . '".'
+                    'Argument manquant pour "' . $placeholder . '" dans la route "' . $from . '".'
                 );
             }
+
+            // Supprimez `(:` et `)` lorsque $placeholder est un espace réservé.
+            $placeholderName = substr($placeholder, 2, -1);
+            // ou peut-être que $placeholder n'est pas un espace réservé, mais une regex.
+            $pattern = $this->placeholders[$placeholderName] ?? $placeholder;
+
             if (! preg_match('#^' . $pattern . '$#u', $params[$index])) {
                 throw RouterException::invalidParameterType();
             }
 
             // Assurez-vous que le paramètre que nous insérons correspond au type de paramètre attendu.
-            $pos      = strpos($routeKey, $pattern);
-            $routeKey = substr_replace($routeKey, $params[$index], $pos, strlen($pattern));
+            $pos  = strpos($from, $placeholder);
+            $from = substr_replace($from, $params[$index], $pos, strlen($placeholder));
         }
 
-        $routeKey = $this->replaceLocale($routeKey, $locale);
+        $from = $this->replaceLocale($from, $locale);
 
-        return '/' . ltrim($routeKey, '/');
+        return '/' . ltrim($from, '/');
     }
 
     /**
