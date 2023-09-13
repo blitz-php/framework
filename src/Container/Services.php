@@ -14,8 +14,9 @@ namespace BlitzPHP\Container;
 use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Cache\Cache;
+use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Config\Config;
-use BlitzPHP\Db\ConnectionResolver;
+use BlitzPHP\Contracts\Database\ConnectionResolverInterface;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
@@ -29,7 +30,6 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
-use BlitzPHP\HttpClient\Request as ClientRequest;
 use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
@@ -42,7 +42,6 @@ use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\View\View;
-use DI\NotFoundException;
 use stdClass;
 
 /**
@@ -68,25 +67,21 @@ class Services
     protected static array $instances = [];
 
     /**
-     * Cache d'autres classe de que nous avons trouver via la methode discoverService.
+     * Cache d'autres classe de que nous avons trouver via la methode cacheService.
      */
     protected static array $services = [];
 
     /**
-     * @return Injector
+     * Avons-nous déjà découvert d'autres Services ?
      */
-    public static function injector()
-    {
-        return Injector::instance();
-    }
+    protected static bool $discovered = false;
 
     /**
-     * @return \DI\Container
+     * Un cache des noms de classes de services trouvés.
+     *
+     * @var array<string>
      */
-    public static function container()
-    {
-        return Injector::container();
-    }
+    private static array $serviceNames = [];
 
     /**
      * La classe Autoloader permet de charger les fichiers simplement.
@@ -100,7 +95,7 @@ class Services
         $config  = static::config()->get('autoload');
         $helpers = array_merge(['url'], ($config['helpers'] ?? []));
 
-        return static::$instances[Autoloader::class] = static::factory(Autoloader::class, compact('config', 'helpers'));
+        return static::$instances[Autoloader::class] = new Autoloader($config, $helpers);
     }
 
     /**
@@ -122,7 +117,7 @@ class Services
             return $instance->setConfig($config);
         }
 
-        return static::$instances[Cache::class] = static::factory(Cache::class, compact('config'));
+        return static::$instances[Cache::class] = new Cache($config);
     }
 
 	/**
@@ -138,6 +133,18 @@ class Services
 	}
 
     /**
+     * Conteneur d'injection de dependances
+     */
+    public static function container(bool $shared = true): Container
+    {
+        if (true === $shared && isset(static::$instances[Container::class])) {
+            return static::$instances[Container::class];
+        }
+		
+		return static::$instances[Container::class] = new Container();
+    }
+
+    /**
      * Émetteur de réponse au client
      */
     public static function emitter(bool $shared = true): ResponseEmitter
@@ -146,7 +153,7 @@ class Services
             return static::$instances[ResponseEmitter::class];
         }
 
-        return static::$instances[ResponseEmitter::class] = static::factory(ResponseEmitter::class);
+        return static::$instances[ResponseEmitter::class] = new ResponseEmitter();
     }
 
     /**
@@ -158,7 +165,7 @@ class Services
             return static::$instances[EventManager::class];
         }
 
-        return static::$instances[EventManager::class] = static::factory(EventManager::class);
+        return static::$instances[EventManager::class] = new EventManager();
     }
 
     /**
@@ -170,20 +177,7 @@ class Services
             return static::$instances[Filesystem::class];
         }
 
-        return static::$instances[Filesystem::class] = static::factory(Filesystem::class);
-    }
-
-    /**
-     * Le client HTTP fourni une interface simple pour interagir avec d'autres serveurs.
-     * Typiquement a traver des APIs.
-     */
-    public static function httpclient(?string $baseUrl = null, bool $shared = true): ClientRequest
-    {
-        if (true === $shared && isset(static::$instances[ClientRequest::class])) {
-            return static::$instances[ClientRequest::class]->baseUrl((string) $baseUrl);
-        }
-
-        return static::$instances[ClientRequest::class] = static::factory(ClientRequest::class, ['event' => static::event()])->baseUrl((string) $baseUrl);
+        return static::$instances[Filesystem::class] = new Filesystem();
     }
 
     /**
@@ -207,7 +201,7 @@ class Services
             return static::$instances[Translate::class]->setLocale($locale);
         }
 
-        return static::$instances[Translate::class] = static::factory(Translate::class, ['locale' => $locale, 'locator' => static::locator()]);
+        return static::$instances[Translate::class] = new Translate($locale, static::locator());
     }
 
     /**
@@ -220,7 +214,7 @@ class Services
             return static::$instances[Locator::class];
         }
 
-        return static::$instances[Locator::class] = static::factory(Locator::class, ['autoloader' => static::autoloader()]);
+        return static::$instances[Locator::class] = new Locator(static::autoloader());
     }
 
     /**
@@ -233,7 +227,7 @@ class Services
             return static::$instances[Logger::class];
         }
 
-        return static::$instances[Logger::class] = static::factory(Logger::class);
+        return static::$instances[Logger::class] = new Logger();
     }
 
     /**
@@ -255,7 +249,7 @@ class Services
             return $instance->merge($config);
         }
 
-        return static::$instances[Mail::class] = static::factory(Mail::class, compact('config'));
+        return static::$instances[Mail::class] = new Mail($config);
     }
 
     /**
@@ -276,7 +270,7 @@ class Services
             return $instance->setRequest($request);
         }
 
-        return static::$instances[Negotiator::class] = static::factory(Negotiator::class, compact('request'));
+        return static::$instances[Negotiator::class] = new Negotiator($request);
     }
 
     /**
@@ -300,7 +294,7 @@ class Services
             return static::$instances[Request::class];
         }
 
-        return static::$instances[Request::class] = static::factory(Request::class);
+        return static::$instances[Request::class] = new Request();
     }
 
     /**
@@ -312,7 +306,19 @@ class Services
             return static::$instances[Response::class];
         }
 
-        return static::$instances[Response::class] = static::factory(Response::class);
+        return static::$instances[Response::class] = new Response();
+    }
+    
+    /**
+     * CacheResponse
+     */
+    public static function responsecache(bool $shared = true): ResponseCache
+    {
+        if (true === $shared && isset(static::$instances[ResponseCache::class])) {
+            return static::$instances[ResponseCache::class];
+        }
+
+        return static::$instances[ResponseCache::class] = new ResponseCache(static::cache(), static::config()->get('cache.cache_query_string'));
     }
 
     /**
@@ -325,10 +331,7 @@ class Services
             return static::$instances[RouteCollection::class];
         }
 
-        return static::$instances[RouteCollection::class] = static::factory(RouteCollection::class, [
-			'routing' => (object) config('routing'),
-			'locator' => static::locator(),
-		]);
+        return static::$instances[RouteCollection::class] = new RouteCollection(static::locator(), (object) static::config()->get('routing'));
     }
 
     /**
@@ -337,9 +340,10 @@ class Services
      */
     public static function router(?RouteCollection $routes = null, ?ServerRequest $request = null, bool $shared = true): Router
     {
-        if (true === $shared) {
-            return static::singleton(Router::class);
+        if (true === $shared && isset(static::$instances[Router::class])) {
+            return static::$instances[Router::class];
         }
+
         if (empty($routes)) {
             $routes = static::routes(true);
         }
@@ -347,7 +351,7 @@ class Services
             $request = static::request(true);
         }
 
-        return static::factory(Router::class, compact('routes', 'request'));
+        return static::$instances[Router::class] = new Router($routes, $request);
     }
 
     /**
@@ -364,7 +368,7 @@ class Services
 
         if (Text::contains($config['handler'], [DatabaseSessionHandler::class, 'database'])) {
             $group = $config['group'] ?? static::config()->get('database.connection');
-            $db    = static::singleton(ConnectionResolver::class)->connection($group);
+            $db    = static::singleton(ConnectionResolverInterface::class)->connection($group);
 
             $driver = $db->getPlatform();
 
@@ -408,7 +412,7 @@ class Services
             return static::$instances[Timer::class];
         }
 
-        return static::$instances[Timer::class] = static::factory(Timer::class);
+        return static::$instances[Timer::class] = new Timer();
     }
 
     /**
@@ -422,7 +426,7 @@ class Services
 
         $config ??= (object) config('toolbar');
 
-        return static::$instances[Toolbar::class] = static::factory(Toolbar::class, compact('config'));
+        return static::$instances[Toolbar::class] = new Toolbar($config);
     }
 
     /**
@@ -434,7 +438,7 @@ class Services
             return static::$instances[Uri::class]->setURI($uri);
         }
 
-        return static::$instances[Uri::class] = static::factory(Uri::class, compact('uri'));
+        return static::$instances[Uri::class] = new Uri($uri);
     }
 
     /**
@@ -448,7 +452,7 @@ class Services
             return static::$instances[View::class];
         }
 
-        return static::$instances[View::class] = static::factory(View::class);
+        return static::$instances[View::class] = new View();
     }
 
     /**
@@ -458,11 +462,30 @@ class Services
      */
     public static function __callStatic(string $name, array $arguments)
     {
-        if (method_exists(static::class, $name)) {
-            return static::$name(...$arguments);
+        if (null === $service = static::serviceExists($name)) {
+            return static::discoverServices($name, $arguments);
         }
 
-        return static::discoverServices($name, $arguments);
+        return $service::$name(...$arguments);
+    }
+
+    /**
+     * Vérifiez si le service demandé est défini et renvoyez la classe déclarante.
+     * Renvoie null s'il n'est pas trouvé.
+     */
+    public static function serviceExists(string $name): ?string
+    {
+        static::cacheServices();
+        $services = array_merge(self::$serviceNames, [self::class]);
+        $name     = strtolower($name);
+
+        foreach ($services as $service) {
+            if (method_exists($service, $name)) {
+                return $service;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -472,50 +495,28 @@ class Services
      */
     protected static function discoverServices(string $name, array $arguments)
     {
-        $shared = array_pop($arguments);
-        if ($shared !== true) {
-            return static::discoverServiceFactory($name, $arguments);
-        }
-
-        return static::discoverServiceSingleton($name, ...$arguments);
-    }
-
-    /**
-     * Essaie d'obtenir un service à partir du conteneur
-     *
-     * @return mixed
-     */
-    private static function discoverServiceFactory(string $name, array $arguments)
-    {
-        try {
+        if (true !== array_pop($arguments)) {
             return static::factory($name, $arguments);
-        } catch (NotFoundException $e) {
-            try {
-                return static::factory($name . 'Service', $arguments);
-            } catch (NotFoundException $ex) {
-                throw $e;
-            }
         }
+        
+        return static::singleton($name, ...$arguments);
     }
 
-    /**
-     * Essaie de trouver un seul service
-     *
-     * @return mixed
-     */
-    private static function discoverServiceSingleton(string $name)
+    protected static function cacheServices(): void
     {
-        $arguments = func_get_args();
-        $name      = array_shift($arguments);
+        if (! static::$discovered) {
+            $locator = static::locator();
+            $files   = $locator->search('Config/Services');
 
-        try {
-            return static::singleton($name, ...$arguments);
-        } catch (NotFoundException $e) {
-            try {
-                return static::singleton($name . 'Service', ...$arguments);
-            } catch (NotFoundException $ex) {
-                throw $e;
+            // Obtenez des instances de toutes les classes de service et mettez-les en cache localement.
+            foreach ($files as $file) {
+                if (self::class !== $classname = $locator->getClassname($file)) {
+                    self::$serviceNames[] = $classname;
+                    static::$services[]   = new $classname();
+                }
             }
+            
+            static::$discovered = true;
         }
     }
 
@@ -533,7 +534,7 @@ class Services
             if (! empty($arguments)) {
                 static::$instances[$name] = static::factory($name, $arguments);
             } else {
-                static::$instances[$name] = static::injector()->get($name);
+                static::$instances[$name] = static::container()->get($name);
             }
         }
 
@@ -547,7 +548,7 @@ class Services
      */
     public static function factory(string $name, array $arguments = [])
     {
-        return static::injector()->make($name, $arguments);
+        return static::container()->make($name, $arguments);
     }
 
     /**

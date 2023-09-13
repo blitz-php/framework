@@ -163,7 +163,7 @@ abstract class BaseController
      */
     protected function cachePage(int $time)
     {
-        Dispatcher::cache($time);
+        Services::responsecache()->setTtl($time);
     }
 
     /**

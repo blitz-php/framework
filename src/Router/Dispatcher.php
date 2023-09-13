@@ -12,6 +12,7 @@
 namespace BlitzPHP\Router;
 
 use BlitzPHP\Cache\ResponseCache;
+use BlitzPHP\Container\Container;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Http\ResponsableInterface;
@@ -130,26 +131,24 @@ class Dispatcher
     protected $path;
 
     /**
-     * Application output buffering level
+     * Niveau de mise en mémoire tampon de sortie de l'application
      */
     protected int $bufferLevel = 0;
 
 	/**
-     * Web Page Caching
+     * Mise en cache des pages Web
      */
     protected ResponseCache $pageCache;
 
     /**
-     * Constructor.
+     * Constructeur.
      */
-    public function __construct(protected EventManagerInterface $event)
+    public function __construct(protected EventManagerInterface $event, protected Container $container)
     {
         $this->startTime = microtime(true);
         $this->config    = (object) config('app');
 
-		$this->pageCache = Services::factory(ResponseCache::class, [
-			'cacheQueryString' => config('cache.cache_query_string')
-		]);
+		$this->pageCache = Services::responsecache();
     }
 
     /**
@@ -501,7 +500,7 @@ class Dispatcher
             }
             array_push($sendParameters, $request, $response);
 
-            return Services::injector()->call($controller, $sendParameters);
+            return $this->container->call($controller, $sendParameters);
         }
 
         // Essayez de charger automatiquement la classe
@@ -522,7 +521,7 @@ class Dispatcher
         /**
          * @var \BlitzPHP\Controllers\BaseController
          */
-        $class = Services::injector()->get($this->controller);
+        $class = $this->container->get($this->controller);
 
         if (method_exists($class, 'initialize')) {
             $class->initialize($request, $response, Services::logger());
@@ -551,7 +550,7 @@ class Dispatcher
             $method = '_remap';
         }
 
-        $output = Services::injector()->call([$class, $method], (array) $params);
+        $output = $this->container->call([$class, $method], (array) $params);
 
         $this->timer->stop('controller');
 
@@ -731,10 +730,7 @@ class Dispatcher
      */
     protected function initMiddlewareQueue(): void
     {
-        $this->middleware = Services::injector()->make(Middleware::class, [
-            'response' => $this->response,
-            'path'     => $this->determinePath(),
-        ]);
+        $this->middleware = new Middleware($this->response, $this->determinePath());
 
         $middlewaresFile = CONFIG_PATH . 'middlewares.php';
         if (file_exists($middlewaresFile) && ! in_array($middlewaresFile, get_included_files(), true)) {

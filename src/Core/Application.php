@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Core;
 
-use BlitzPHP\Container\Injector;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Debug\Debugger;
 use BlitzPHP\Exceptions\ExceptionInterface;
@@ -67,7 +66,7 @@ class Application
         /**
          * On initialise le conteneur d'injection de dependences
          */
-        Injector::init();
+        Services::container()->initialize();
 
         return $this;
     }
