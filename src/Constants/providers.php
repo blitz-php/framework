@@ -11,8 +11,6 @@
 
 return [
     /** Interfaces */
-    BlitzPHP\Contracts\Database\ConnectionInterface::class         => fn () => BlitzPHP\Db\Database::connect(),
-    BlitzPHP\Contracts\Database\ConnectionResolverInterface::class => fn () => service(BlitzPHP\Db\ConnectionResolver::class),
     BlitzPHP\Contracts\Event\EventManagerInterface::class          => fn () => service('event'),
     BlitzPHP\Contracts\Router\RouteCollectionInterface::class      => fn () => service('routes'),
     BlitzPHP\Contracts\Session\SessionInterface::class             => fn () => service('session'),
