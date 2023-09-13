@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Validation;
 
-use BlitzPHP\Container\Injector;
+use BlitzPHP\Container\Services;
 use Dimtrovich\Validation\Validation as BaseValidation;
 
 class Validation extends BaseValidation
@@ -39,7 +39,7 @@ class Validation extends BaseValidation
                 $rule = $key;
             }
 
-            $this->addValidator($name, Injector::get($rule));
+            $this->addValidator($name, Services::container()->get($rule));
         }
     }
 }
