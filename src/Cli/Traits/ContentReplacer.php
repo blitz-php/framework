@@ -73,17 +73,17 @@ trait ContentReplacer
         if (file_exists($path)) {
             $overwrite = (bool) $this->option('f');
 
-            if (! $overwrite && ! $this->confirm("File '{$cleanPath}' already exists in destination. Overwrite?")) {
-                $this->error("Skipped {$cleanPath}. If you wish to overwrite, please use the '-f' option or reply 'y' to the prompt.");
+            if (! $overwrite && ! $this->confirm("Le fichier '{$cleanPath}' existe déjà dans la destination. Le remplacé?")) {
+                $this->error("{$cleanPath} sauté. Si vous souhaitez le remplacer, s'il vous plaît utiliser l'option '-f' ou répondre 'y' à l'invite.")->eol();
 
                 return;
             }
         }
 
         if (write_file($path, $content)) {
-            $this->success($cleanPath, true, 'Created:');
+            $this->success($cleanPath, true, 'Crée:')->eol();
         } else {
-            $this->error("Error creating {$cleanPath}.");
+            $this->error("Erreur de création: {$cleanPath}.")->eol();
         }
     }
 
@@ -107,12 +107,12 @@ trait ContentReplacer
         }
 
         if (write_file($path, $output)) {
-            $this->success($cleanPath, true, 'Updated:');
+            $this->success($cleanPath, true, 'Modifié:')->eol();
 
             return true;
         }
 
-        $this->error("Erreur lors de la mise à jour de {$cleanPath}.");
+        $this->error("Erreur lors de la mise à jour de {$cleanPath}.")->eol();
 
         return false;
     }
@@ -133,20 +133,20 @@ trait ContentReplacer
         $output = $this->_addContent($content, $code, $pattern, $replace);
 
         if ($output === true) {
-            $this->error("{$cleanPath} ignoré. Il a déjà été mis à jour.");
+            $this->error("{$cleanPath} ignoré. Il a déjà été mis à jour.")->eol();
 
             return;
         }
         if ($output === false) {
-            $this->error("Erreur lors de la vérification de {$cleanPath}.");
+            $this->error("Erreur lors de la vérification de {$cleanPath}.")->eol();
 
             return;
         }
 
         if (write_file($path, $output)) {
-            $this->success($cleanPath, true, 'Updated:');
+            $this->success($cleanPath, true, 'Modifié:')->eol();
         } else {
-            $this->error("Erreur lors de la mise à jour de {$cleanPath}.");
+            $this->error("Erreur lors de la mise à jour de {$cleanPath}.")->eol();
         }
     }
 
