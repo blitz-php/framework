@@ -91,6 +91,8 @@ class Middleware implements RequestHandlerInterface
      */
     public function append($middleware, array $options = []): self
     {
+        [$middleware, $options] = $this->getMiddlewareAndOptions($middleware, $options);
+
         $middleware          = $this->makeMiddleware($middleware);
         $this->middlewares[] = compact('middleware', 'options');
 
@@ -104,6 +106,8 @@ class Middleware implements RequestHandlerInterface
      */
     public function prepend($middleware, array $options = []): self
     {
+        [$middleware, $options] = $this->getMiddlewareAndOptions($middleware, $options);
+
         $middleware = $this->makeMiddleware($middleware);
         array_unshift($this->middlewares, compact('middleware', 'options'));
 
@@ -133,6 +137,8 @@ class Middleware implements RequestHandlerInterface
      */
     public function insertAt(int $index, $middleware, array $options = []): self
     {
+        [$middleware, $options] = $this->getMiddlewareAndOptions($middleware, $options);
+
         $middleware = $this->makeMiddleware($middleware);
         array_splice($this->middlewares, $index, 0, compact('middleware', 'options'));
 
@@ -233,7 +239,7 @@ class Middleware implements RequestHandlerInterface
 
         if ($middleware instanceof MiddlewareInterface) {
             if ($middleware instanceof BaseMiddleware) {
-                $middleware = $middleware->init($options + ['path' => $this->path]);
+                $middleware = $middleware->init($options + ['path' => $this->path])->fill($options);
             }
 
             return $middleware->process($request, $this);
@@ -274,6 +280,24 @@ class Middleware implements RequestHandlerInterface
         $this->index++;
 
         return $middleware;
+    }
+
+    /**
+     * Recupere les options d'un middlewares de type string
+     * 
+     * @param callable|object|string $middleware
+     */
+    private function getMiddlewareAndOptions($middleware, array $options = []): array 
+    {
+        if (is_string($middleware)) {
+            $parts = explode(':', $middleware);
+            $middleware = array_shift($parts);
+            if (isset($parts[0]) && is_string($parts[0])) {
+                $options = array_merge($options, explode(',', $parts[0]));
+            }
+        }
+        
+        return [$middleware, $options];
     }
 
     /**

@@ -21,6 +21,11 @@ abstract class BaseMiddleware implements MiddlewareInterface
      */
     protected array $arguments = [];
 
+    /** 
+     * Liste des arguments que peut avoir le middleware
+     */
+    protected array $fillable = [];
+
     /**
      * Chemin url de la requette actuelle
      */
@@ -38,6 +43,22 @@ abstract class BaseMiddleware implements MiddlewareInterface
             if (method_exists($this, $method)) {
                 call_user_func([$this, $method], $value);
             }
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @internal
+     */
+    public function fill(array $params): self
+    {
+        foreach ($this->fillable as $key) {
+            if (empty($params)) {
+                break;
+            }
+            $this->arguments[$key] = array_shift($params);
         }
 
         return $this;
