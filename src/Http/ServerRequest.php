@@ -766,9 +766,11 @@ class ServerRequest implements ServerRequestInterface
      */
     public function hasHeader($name): bool
     {
-        $name = $this->normalizeHeaderName($name);
+        if (isset($this->_environment[$this->normalizeHeaderName($name)])) {
+            return true;
+        }
 
-        return isset($this->_environment[$name]);
+        return [] !== $this->getHeader($name);
     }
 
     /**

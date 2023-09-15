@@ -689,7 +689,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function group(string $name, ...$params)
     {
-        $oldGroup   = $this->group;
+        $oldGroup   = $this->group ?? '';
         $oldOptions = $this->currentOptions;
 
         // Pour enregistrer une route, nous allons définir un indicateur afin que notre routeur
@@ -1321,6 +1321,11 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         $options = array_merge($this->currentOptions ?? [], $options ?? []);
+
+        if (is_string($to) && isset($options['controller'])) {
+            $to = str_replace($options['controller'] . '::', '', $to);
+            $to = str_replace($this->defaultNamespace, '', $options['controller']) . '::' . $to;
+        }
 
         // Détection de priorité de routage
         if (isset($options['priority'])) {

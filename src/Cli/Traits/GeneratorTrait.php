@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Cli\Traits;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 use BlitzPHP\View\Adapters\NativeAdapter;
 
 /**
@@ -188,6 +188,17 @@ trait GeneratorTrait
     }
 
     /**
+     * Formatte le nom de base du fichier avant de l'enregistrer.
+     *
+     * Utile pour les composants dont le nom de fichier doit etre dans un format particulier.
+     */
+
+    protected function formatFilename(string $namespace, string $class): string
+    {
+        return str_replace('\\', DS, trim(str_replace($namespace . '\\', '', $class), '\\'));
+    }
+
+    /**
      * Analyse le nom de la classe et vérifie s'il est déjà qualifié.
      */
     protected function qualifyClassName(): string
@@ -294,7 +305,7 @@ trait GeneratorTrait
         }
 
         $base = realpath($base) ?: $base;
-        $file = $base . DS . str_replace('\\', DS, trim(str_replace($namespace . '\\', '', $class), '\\')) . '.php';
+        $file = $base . DS . $this->formatFilename($namespace, $class) . '.php';
 
         return implode(DS, array_slice(explode(DS, $file), 0, -1)) . DS . $this->basename($file);
     }
