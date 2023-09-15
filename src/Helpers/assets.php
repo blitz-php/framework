@@ -67,14 +67,27 @@ if (! function_exists('lib_css_url')) {
      */
     function lib_css_url(string $name): string
     {
-        $name = explode('?', $name)[0];
-        $name = str_replace(site_url() . 'lib/', '', htmlspecialchars($name));
+        $name     = explode('?', $name)[0];
+        $site_url = site_url();
+        $name     = str_replace(
+            [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'], 
+            '', 
+            htmlspecialchars($name)
+        );
 
         if (is_localfile($name)) {
             $name .= (! preg_match('#\.css$#i', $name) ? '.css' : '');
-            $filename = WEBROOT . 'lib' . DS . $name;
+            $paths = ['lib', 'vendor', 'plugins'];
+        
+            foreach ($paths as $path) {
+                $filename = WEBROOT . $path . DS . $name;
 
-            return site_url() . 'lib/' . $name . ((file_exists($filename)) ? '?v=' . filemtime($filename) : '');
+                if (file_exists($filename)) {
+                    return $site_url . $path . '/' . $name . '?v=' . filemtime($filename);
+                }
+            }
+
+            return $site_url . 'lib/' . $name;
         }
 
         return $name . (! preg_match('#\.css$#i', $name) ? '.css' : '');
@@ -91,14 +104,27 @@ if (! function_exists('lib_js_url')) {
      */
     function lib_js_url(string $name): string
     {
-        $name = explode('?', $name)[0];
-        $name = str_replace(site_url() . 'lib/', '', htmlspecialchars($name));
+        $name     = explode('?', $name)[0];
+        $site_url = site_url();
+        $name     = str_replace(
+            [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'], 
+            '', 
+            htmlspecialchars($name)
+        );
 
         if (is_localfile($name)) {
             $name .= (! preg_match('#\.js$#i', $name) ? '.js' : '');
-            $filename = WEBROOT . 'lib' . DS . $name;
+            $paths = ['lib', 'vendor', 'plugins'];
+        
+            foreach ($paths as $path) {
+                $filename = WEBROOT . $path . DS . $name;
 
-            return site_url() . 'lib/' . $name . ((file_exists($filename)) ? '?v=' . filemtime($filename) : '');
+                if (file_exists($filename)) {
+                    return $site_url . $path . '/' . $name . '?v=' . filemtime($filename);
+                }
+            }
+
+            return $site_url . 'lib/' . $name;
         }
 
         return $name . (! preg_match('#\.js$#i', $name) ? '.js' : '');

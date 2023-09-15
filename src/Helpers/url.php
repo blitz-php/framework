@@ -494,8 +494,18 @@ if (! function_exists('link_active')) {
      * Lien actif dans la navbar
      * Un peut comme le router-active-link de vuejs
      */
-    function link_active(string $path, string $active_class = 'active', bool $exact = false): string
+    function link_active(array|string $path, string $active_class = 'active', bool $exact = false): string
     {
+        if (is_array($path)) {
+            foreach ($path as $p) {
+                if ($active_class === link_active($p, $active_class, $exact)) {
+                    return $active_class;
+                }
+            }
+
+            return '';
+        }
+        
         $current_url     = trim(current_url(false), '/');
         $current_section = trim(str_replace(trim(site_url(), '/'), '', $current_url), '/');
 

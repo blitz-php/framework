@@ -10,6 +10,7 @@
  */
 
 use BlitzPHP\Utilities\String\Inflector;
+use BlitzPHP\Utilities\String\Text;
 
 if (! function_exists('camelize')) {
     /**
@@ -297,7 +298,7 @@ if (! function_exists('pascalize')) {
      */
     function pascalize(string $string): string
     {
-        return ucfirst(camelize($string));
+        return Text::convertTo($string, 'pascalcase');
     }
 }
 

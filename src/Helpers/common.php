@@ -582,7 +582,7 @@ if (! function_exists('old')) {
      *
      * @return array|string|null
      */
-    function old(string $key, ?string $default = null, $escape = 'html')
+    function old(string $key, $default = null, $escape = 'html')
     {
         // Assurez-vous de charger la session
         if (session_status() === PHP_SESSION_NONE && ! on_test()) {
