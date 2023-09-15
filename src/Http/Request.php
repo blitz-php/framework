@@ -38,7 +38,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
             return $this->validation($rules, $messages)->safe();
         } catch (DimtrovichValidationException $e) {
             $th = new ValidationException($e->getMessage());
-            $th->setErrors([$e->getMessage()]);
+            $th->setErrors($e->getErrors());
 
             throw $th;
         }

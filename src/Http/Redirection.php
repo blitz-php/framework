@@ -15,7 +15,7 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Session\Store;
-use Rakit\Validation\ErrorBag;
+use BlitzPHP\Validation\ErrorBag;
 
 /**
  * Gérer une réponse de redirection
@@ -171,17 +171,15 @@ class Redirection extends Response
     public function withErrors(array|ErrorBag|string $errors, string $key = 'default'): self
     {
         if ($errors instanceof ErrorBag) {
-            $errors = $errors->all();
+            $errors = $errors->toArray();
         } elseif (is_string($errors)) {
             $errors = [$errors];
         }
 
         if (! empty($errors)) {
-            $_errors = $this->session->getFlashdata('errors') ?? [];
-            $this->session->setFlashdata(
-                'errors',
-                array_merge($_errors, [$key => $errors])
-            );
+            $this->session->flashErrors($errors, $key);
+
+            Services::viewer()->share('errors', new ErrorBag($errors));
         }
 
         return $this;

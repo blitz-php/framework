@@ -11,7 +11,9 @@
 
 namespace BlitzPHP\Validation;
 
+use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Validation\Rules\AbstractRule;
 use Dimtrovich\Validation\Validation as BaseValidation;
 
 class Validation extends BaseValidation
@@ -20,13 +22,13 @@ class Validation extends BaseValidation
     {
         parent::__construct(config('app.language'));
 
-        $this->registerRules([
-            Rules\Unique::class,
-        ]);
+        $this->discoverRules();
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @param array<AbstractRule> $rules
      */
     protected function registerRules(array $rules): void
     {
@@ -41,5 +43,40 @@ class Validation extends BaseValidation
 
             $this->addValidator($name, Services::container()->get($rule));
         }
+    }
+
+    /**
+     * Definie les fichiers qui pourront etre considerer comme regles de validations
+     *
+     * @return string[] Chemins absolus des fichiers
+     */
+    protected function files(Locator $locator): array
+    {
+        $files = array_merge(
+            $locator->listFiles('Rules/'), // Regles de l'application ou des fournisseurs
+            $locator->listFiles('Validation/Rules/') // Regles internes du framework
+        );
+
+        return array_unique($files);
+    }
+
+    /**
+     * Recherche toutes les regles de validation dans le framework et dans le code de l'utilisateur
+     * et collecte leurs instances pour fonctionner avec eux.
+     */
+    private function discoverRules()
+    {
+        $files = $this->files($locator = Services::locator());
+        $rules = [];
+
+        foreach ($files as $file) {
+            $className = $locator->getClassname($file);
+
+            if ($className !== '' && class_exists($className) && is_subclass_of($className, AbstractRule::class)) {
+                $rules[] = $className;
+            }
+        }
+
+        $this->registerRules($rules);
     }
 }

@@ -13,7 +13,6 @@ namespace BlitzPHP\Validation\Rules;
 
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Wolke\Model;
-use Dimtrovich\Validation\Rules\AbstractRule;
 
 class Unique extends AbstractRule
 {
