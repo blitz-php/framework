@@ -13,6 +13,7 @@ namespace BlitzPHP\View;
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
+use BlitzPHP\Validation\ErrorBag;
 use BlitzPHP\View\Adapters\BladeAdapter;
 use BlitzPHP\View\Adapters\LatteAdapter;
 use BlitzPHP\View\Adapters\NativeAdapter;
@@ -63,6 +64,13 @@ class View
     private $view;
 
     /**
+     * Données partagées à toutes les vues
+     *
+     * @var array
+     */
+    private static $shared = [];
+
+    /**
      * Constructeur
      */
     public function __construct()
@@ -75,6 +83,18 @@ class View
     public function __toString()
     {
         return $this->get();
+    }
+
+    /**
+     * Defini les données partagées entre plusieurs vues
+     */
+    public static function share(array|string $key, mixed $value = null): void
+    {
+        if (is_string($key)) {
+            $key = [$key => $value];
+        }
+
+        static::$shared = array_merge(static::$shared, $key);
     }
 
     /**
@@ -124,9 +144,31 @@ class View
      */
     public function addData(array $data = [], ?string $context = null): self
     {
+        unset($data['errors']);
+
+        $data = array_merge(static::$shared, $data);
+        
         $this->adapter->addData($data, $context);
 
+        if (! array_key_exists('errors', $this->getData())) {
+            $this->setValidationErrors();
+        }
+
         return $this;
+    }
+
+    /**
+     * Définit plusieurs éléments de données de vue à la fois.
+     */
+    public function with(array|string $key, mixed $value = null, ?string $context = null): self
+    {
+        if (is_array($key)) {
+            $context = $value;
+        } else {
+            $key = [$key => $value];
+        }
+
+        return $this->addData($key, $context);
     }
 
     /**
@@ -146,7 +188,15 @@ class View
      */
     public function setData(array $data, ?string $context = null): self
     {
+        unset($data['errors']);
+
+        $data = array_merge(static::$shared, $data);
+
         $this->adapter->setData($data, $context);
+
+        if (! array_key_exists('errors', $this->getData())) {
+            $this->setValidationErrors();
+        }
 
         return $this;
     }
@@ -231,5 +281,31 @@ class View
         }
 
         return true === $compress ? trim(preg_replace('/\s+/', ' ', $output)) : $output;
+    }
+
+    /**
+     * Defini les erreurs de validation pour la vue
+     */
+    private function setValidationErrors()
+    {
+        $errors = [];
+
+        if (null !== $e = session('errors')) {
+            if (is_array($e)) {
+                $errors = array_merge($errors, $e);
+            } else {
+                $errors['error'] = $e;
+            }
+        }
+
+        if (null !== $e = session('error')) {
+            if (is_array($e)) {
+                $errors = array_merge($errors, $e);
+            } else {
+                $errors['error'] = $e;
+            }
+        }
+
+        $this->adapter->addData(['errors' => new ErrorBag($errors)]);
     }
 }
