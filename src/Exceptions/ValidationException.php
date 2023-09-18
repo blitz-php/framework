@@ -12,7 +12,9 @@
 namespace BlitzPHP\Exceptions;
 
 use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Validation\ErrorBag;
 use Dimtrovich\Validation\Exceptions\ValidationException as BaseValidationException;
+use Rakit\Validation\ErrorBag as RakitErrorBag;
 
 class ValidationException extends BaseValidationException
 {
@@ -22,4 +24,14 @@ class ValidationException extends BaseValidationException
      * @var int
      */
     protected $code = StatusCode::BAD_REQUEST;
+
+    /**
+     * Set errors
+     */
+    public function setErrors(?RakitErrorBag $errors): self
+    {
+        $this->errors = new ErrorBag($errors->toArray());
+
+        return $this;
+    }
 }

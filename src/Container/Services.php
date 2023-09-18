@@ -24,12 +24,13 @@ use BlitzPHP\Event\EventManager;
 use BlitzPHP\Filesystem\Filesystem;
 use BlitzPHP\Filesystem\FilesystemManager;
 use BlitzPHP\Http\Negotiator;
-use BlitzPHP\HTTP\Redirection;
+use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
+use BlitzPHP\Http\UrlGenerator;
 use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
@@ -282,7 +283,7 @@ class Services
             return static::$instances[Redirection::class];
         }
 
-        return static::$instances[Redirection::class] = static::factory(Redirection::class);
+        return static::$instances[Redirection::class] = new Redirection(static::factory(UrlGenerator::class));
     }
 
     /**

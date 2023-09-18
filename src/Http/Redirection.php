@@ -173,13 +173,11 @@ class Redirection extends Response
         if ($errors instanceof ErrorBag) {
             $errors = $errors->toArray();
         } elseif (is_string($errors)) {
-            $errors = [$errors];
+            $errors = [$key => $errors];
         }
 
         if (! empty($errors)) {
-            $this->session->flashErrors($errors, $key);
-
-            Services::viewer()->share('errors', new ErrorBag($errors));
+            Services::viewer()->share('errors', new ErrorBag($this->session->flashErrors($errors, $key)));
         }
 
         return $this;

@@ -290,20 +290,24 @@ class View
     {
         $errors = [];
 
-        if (null !== $e = session('errors')) {
+        if (null !== $e = session()->getFlashdata('errors')) {
             if (is_array($e)) {
                 $errors = array_merge($errors, $e);
             } else {
                 $errors['error'] = $e;
             }
-        }
 
-        if (null !== $e = session('error')) {
+            session()->unmarkFlashdata('errors');
+        }
+        
+        if (null !== $e = session()->getFlashdata('error')) {
             if (is_array($e)) {
                 $errors = array_merge($errors, $e);
             } else {
                 $errors['error'] = $e;
             }
+
+            session()->unmarkFlashdata('error');
         }
 
         $this->adapter->addData(['errors' => new ErrorBag($errors)]);
