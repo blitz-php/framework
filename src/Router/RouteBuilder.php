@@ -14,6 +14,7 @@ namespace BlitzPHP\Router;
 use BadMethodCallException;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Utilities\Iterable\Arr;
+use BlitzPHP\Utilities\String\Text;
 use Closure;
 use InvalidArgumentException;
 
@@ -149,7 +150,48 @@ final class RouteBuilder
 
     public function form(string $from, $to, array $options = []): void
     {
-        $this->match(['get', 'post'], $from, $to, $options);
+        $options = $options + $this->attributes;
+        $this->attributes = [];
+
+        if (isset($options['unique'])) {
+            $this->match(['get', 'post'], $from, $to, $options);
+            return; 
+        }
+
+        $toGet = $toPost = $to;
+
+        if (is_string($to)) {
+            $parts = explode('::', $to);
+        } else if(is_array($to)) {
+            $parts = $to;
+        } else {
+            $parts = [];
+        }
+        
+        if (count($parts) == 2) { // Si on a defini le controleur et la methode
+            $controller = $parts[0];
+            $method     = $parts[1];
+        } else if (count($parts) == 1) {
+            // Si on est ici, ca veut dire 2 choses. 
+            // - Soit c'est la methode qui est definie (utilisateur d'un string)
+            // - Soit c'est le controleur qui est defini (utilisateur d'un array)
+                
+            if (is_array($to)) {
+                $controller = $parts[0];
+                $method     = $this->collection->getDefaultMethod();
+            } else {
+                $controller = '';
+                $method     = $parts[0];
+            }
+        }
+
+        if (isset($controller) && isset($method)) {
+            $toGet  = implode('::', array_filter([$controller, Text::camel('form_' . $method)]));
+            $toPost = implode('::', array_filter([$controller, Text::camel('process_' . $method)]));
+        }
+
+        $this->collection->get($from, $toGet, $options);
+        $this->collection->post($from, $toPost, $options);
     }
 
     /**
