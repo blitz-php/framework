@@ -301,8 +301,19 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * {@inheritDoc}
+     * 
+     * Utilisez `placeholder` a la place
      */
     public function addPlaceholder($placeholder, ?string $pattern = null): self
+    {
+        return $this->placeholder($placeholder, $pattern);
+    }
+
+    /**
+     * Enregistre une nouvelle contrainte auprès du système. 
+     * Les contraintes sont utilisées par les routes en tant qu'espaces réservés pour les expressions régulières afin de définir les parcours plus humains.
+     */
+    public function placeholder(array|string $placeholder, ?string $pattern = null): self
     {
         if (! is_array($placeholder)) {
             $placeholder = [$placeholder => $pattern];
@@ -366,8 +377,20 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * {@inheritDoc}
+     * 
+     * Utilisez self::fallback()
      */
     public function set404Override($callable = null): self
+    {
+        return $this->fallback($callable);
+    }
+
+    /**
+     * Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
+     *
+     * @param callable|null $callable
+     */
+    public function fallback($callable = null): self
     {
         $this->override404 = $callable;
 
@@ -620,15 +643,14 @@ class RouteCollection implements RouteCollectionInterface
     }
 
     /**
-     * Ajoute une redirection temporaire d'une route à une autre. Utilisé pour
-     * rediriger le trafic des anciennes routes inexistantes vers les nouvelles
-     * itinéraires déplacés.
+     * Ajoute une redirection temporaire d'une route à une autre. 
+     * Utilisé pour rediriger le trafic des anciennes routes inexistantes vers les nouvelles routes déplacés.
      *
      * @param string $from   Le modèle à comparer
      * @param string $to     Soit un nom de route ou un URI vers lequel rediriger
      * @param int    $status Le code d'état HTTP qui doit être renvoyé avec cette redirection
      */
-    public function addRedirect(string $from, string $to, int $status = 302): self
+    public function redirect(string $from, string $to, int $status = 302): self
     {
         // Utilisez le modèle de la route nommée s'il s'agit d'une route nommée.
         if (array_key_exists($to, $this->routesNames['*'])) {
@@ -648,6 +670,23 @@ class RouteCollection implements RouteCollectionInterface
         $this->create('*', $from, $redirectTo, ['redirect' => $status]);
 
         return $this;
+    }
+
+    /**
+     * Ajoute une redirection permanente d'une route à une autre. 
+     * Utilisé pour rediriger le trafic des anciennes routes inexistantes vers les nouvelles routes déplacés.
+     */
+    public function permanentRedirect(string $from, string $to): self
+    {
+        return $this->redirect($from, $to, 301);
+    }
+
+    /**
+     * @deprecated 0.9 Please use redirect() instead
+     */
+    public function addRedirect(string $from, string $to, int $status = 302): self
+    {
+        return $this->redirect($from, $to, $status);
     }
 
     /**
@@ -1378,7 +1417,7 @@ class RouteCollection implements RouteCollectionInterface
 
         // Remplacez nos espaces réservés de regex par la chose réelle
         // pour que le routeur n'ait pas besoin de savoir quoi que ce soit.
-        foreach ($this->placeholders as $tag => $pattern) {
+        foreach (($this->placeholders + ($options['where'] ?? [])) as $tag => $pattern) {
             $routeKey = str_ireplace(':' . $tag, $pattern, $routeKey);
         }
        

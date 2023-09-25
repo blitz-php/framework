@@ -18,7 +18,11 @@ use BlitzPHP\Router\RouteBuilder;
  * @method static void         configure(callable $callback(RouteBuilder $route))                         Configure les parametres de routing.
  * @method static void         add(string $from, array|callable|string $to, array $options = [])          Enregistre une seule route à la collection.
  * @method static RouteBuilder addPlaceholder($placeholder, ?string $pattern = null)                      Enregistre une nouvelle contrainte auprès du système.
+ * @method static RouteBuilder placeholder($placeholder, ?string $pattern = null)                      Enregistre une nouvelle contrainte auprès du système.
+ * @method static RouteBuilder where($placeholder, ?string $pattern = null)                      Enregistre une nouvelle contrainte auprès du système.
  * @method static RouteBuilder addRedirect(string $from, string $to, int $status = 302)                   Ajoute une redirection temporaire d'une route à une autre.
+ * @method static RouteBuilder redirect(string $from, string $to, int $status = 302)                   Ajoute une redirection temporaire d'une route à une autre.
+ * @method static RouteBuilder permanentRedirect(string $from, string $to)                   Ajoute une redirection permanente d'une route à une autre.
  * @method static RouteBuilder as(string $name)
  * @method static void         cli(string $from, array|callable|string $to, array $options = [])          Enregistre une route qui ne sera disponible que pour les requêtes de ligne de commande.
  * @method static RouteBuilder controller(string $controller)
@@ -44,6 +48,7 @@ use BlitzPHP\Router\RouteBuilder;
  * @method static void         put(string $from, array|callable|string $to, array $options = [])          Enregistre une route qui ne sera disponible que pour les requêtes PUT.
  * @method static void         resource(string $name, array $options = [])                                Crée une collection de routes basés sur HTTP-verb pour un contrôleur.
  * @method static RouteBuilder set404Override($callable = null)                                           Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
+ * @method static RouteBuilder fallback($callable = null)                                           Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
  * @method static RouteBuilder setAutoRoute(bool $value)                                                  Si TRUE, le système tentera de faire correspondre l'URI avec
  *                                                                                                        Contrôleurs en faisant correspondre chaque segment avec des dossiers/fichiers
  *                                                                                                        dans CONTROLLER_PATH, lorsqu'aucune correspondance n'a été trouvée pour les routes définies.

@@ -21,7 +21,10 @@ use InvalidArgumentException;
 /**
  * @method void  add(string $from, array|callable|string $to, array $options = [])     Enregistre une seule route à la collection.
  * @method $this addPlaceholder($placeholder, ?string $pattern = null)                 Enregistre une nouvelle contrainte auprès du système.
+ * @method $this placeholder($placeholder, ?string $pattern = null)                 Enregistre une nouvelle contrainte auprès du système.
  * @method $this addRedirect(string $from, string $to, int $status = 302)              Ajoute une redirection temporaire d'une route à une autre.
+ * @method $this redirect(string $from, string $to, int $status = 302)              Ajoute une redirection temporaire d'une route à une autre.
+ * @method $this permanentRedirect(string $from, string $to)              Ajoute une redirection permanente d'une route à une autre.
  * @method $this as(string $name)
  * @method void  cli(string $from, array|callable|string $to, array $options = [])     Enregistre une route qui ne sera disponible que pour les requêtes de ligne de commande.
  * @method $this controller(string $controller)
@@ -35,11 +38,12 @@ use InvalidArgumentException;
  * @method $this namespace(string $namespace)
  * @method void  options(string $from, array|callable|string $to, array $options = []) Enregistre une route qui ne sera disponible que pour les requêtes OPTIONS.
  * @method void  patch(string $from, array|callable|string $to, array $options = [])   Enregistre une route qui ne sera disponible que pour les requêtes PATCH.
- * @method $this placeholder(string $placeholder)
+ * @method $this where($placeholder, ?string $pattern = null)                 Enregistre une nouvelle contrainte auprès du système.
  * @method void  post(string $from, array|callable|string $to, array $options = [])    Enregistre une route qui ne sera disponible que pour les requêtes POST.
  * @method $this prefix(string $prefix)
  * @method $this priority(int $priority)
  * @method void  put(string $from, array|callable|string $to, array $options = [])     Enregistre une route qui ne sera disponible que pour les requêtes PUT.
+ * @method $this fallback($callable = null)                                      Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
  * @method $this set404Override($callable = null)                                      Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
  * @method $this setAutoRoute(bool $value)                                             Si TRUE, le système tentera de faire correspondre l'URI avec
  *                                                                                     Contrôleurs en faisant correspondre chaque segment avec des dossiers/fichiers
@@ -71,7 +75,7 @@ final class RouteBuilder
      */
     private array $allowedAttributes = [
         'as', 'controller', 'domain', 'hostname', 'middlewares', 'middleware',
-        'name', 'namespace', 'placeholder', 'prefix', 'priority', 'subdomain',
+        'name', 'namespace', 'where', 'prefix', 'priority', 'subdomain',
     ];
 
     /**
@@ -83,8 +87,9 @@ final class RouteBuilder
     ];
 
     private array $allowedMethods = [
-        'addPlaceholder', 'addRedirect',
-        'set404Override', 'setAutoRoute',
+        'addPlaceholder', 'placeholder', 
+        'addRedirect', 'redirect', 'permanentRedirect',
+        'set404Override', 'setAutoRoute', 'fallback',
         'setDefaultConstraint', 'setDefaultController', 'setDefaultMethod', 'setDefaultNamespace',
         'setTranslateURIDashes', 'setPrioritize',
     ];
