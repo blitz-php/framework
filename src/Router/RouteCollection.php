@@ -255,6 +255,11 @@ class RouteCollection implements RouteCollectionInterface
             return $this;
         }
 
+        // Normaliser la chaîne de chemin dans routesFile
+        if (false !== $realpath = realpath($routesFile)) {
+            $routesFile = $realpath;
+        }
+
         // Incluez le fichier routesFile s'il n'existe pas. 
 		// Ne conserver que pour les fins BC pour l'instant. 
         $routeFiles = $this->routeFiles;
