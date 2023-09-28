@@ -1140,10 +1140,10 @@ class RouteCollection implements RouteCollectionInterface
      * Spécifie une route qui n'affichera qu'une vue.
      * Ne fonctionne que pour les requêtes GET.
      */
-    public function view(string $from, string $view, ?array $options = null): self
+    public function view(string $from, string $view, array $options = []): self
     {
         $to = static fn (...$data) => Services::viewer()
-            ->setData(['segments' => $data], 'raw')
+            ->setData(['segments' => $data] + $options, 'raw')
             ->display($view)
             ->setOptions($options)
             ->render();
