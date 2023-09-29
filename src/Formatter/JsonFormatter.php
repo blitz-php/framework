@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Formatter;
 
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 
 /**
  * Formateur de données JSON
