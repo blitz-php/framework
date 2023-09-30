@@ -2,19 +2,19 @@
     <thead>
         <tr>
             <th>Action</th>
-            <th>Datetime</th>
-            <th>Status</th>
-            <th>Method</th>
+            <th>Date et heure</th>
+            <th>Statut</th>
+            <th>Méthode</th>
             <th>URL</th>
             <th>Content-Type</th>
-            <th>Is AJAX?</th>
+            <th>Requête AJAX?</th>
         </tr>
     </thead>
     <tbody>
     {files}
         <tr data-active="{active}">
         	<td class="debug-bar-width70p">
-            	<button class="ci-history-load" data-time="{time}">Load</button>
+            	<button class="ci-history-load" data-time="{time}">Chargé</button>
             </td>
             <td class="debug-bar-width190p">{datetime}</td>
             <td>{status}</td>

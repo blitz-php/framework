@@ -1,7 +1,7 @@
 <table>
     <tbody>
         <tr>
-            <td colspan="2" style="font-weight: bold; color:#DD4814">User Files ( {countUserFiles} )</td>
+            <td colspan="2" style="font-weight: bold; color:#c2bb44">Fichiers de l'application ( {countUserFiles} )</td>
         </tr>
     {userFiles}
         <tr>
@@ -10,7 +10,7 @@
         </tr>
     {/userFiles}
         <tr>
-            <td colspan="2" style="font-weight: bold; color:#DD4814">System Files ( {countCoreFiles} )</td>
+            <td colspan="2" style="font-weight: bold; color:#c2bb44">Fichiers système ( {countCoreFiles} )</td>
         </tr>
     {coreFiles}
         <tr class="muted">
@@ -19,7 +19,7 @@
         </tr>
     {/coreFiles}
         <tr>
-            <td colspan="2" style="font-weight: bold; color:#DD4814">BlitzPHP Components Files ( {countBlitzFiles} )</td>
+            <td colspan="2" style="font-weight: bold; color:#c2bb44">Fichiers des composants BlitzPHP ( {countBlitzFiles} )</td>
         </tr>
     {blitzFiles}
         <tr class="muted">
@@ -28,7 +28,7 @@
         </tr>
     {/blitzFiles}
         <tr>
-            <td colspan="2" style="font-weight: bold; color:#DD4814">Vendor Files ( {countVendorFiles} )</td>
+            <td colspan="2" style="font-weight: bold; color:#c2bb44">Fichiers des packages ( {countVendorFiles} )</td>
         </tr>
     {vendorFiles}
         <tr class="muted">

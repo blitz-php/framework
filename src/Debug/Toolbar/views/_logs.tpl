@@ -1,10 +1,10 @@
 { if $logs == [] }
-<p>Nothing was logged. If you were expecting logged items, ensure that LoggerConfig file has the correct threshold set.</p>
+<p>Rien n'a été enregistré. Si vous attendiez des éléments enregistrés, assurez-vous que le fichier app/Config/log.php a le seuil correct.</p>
 { else }
 <table>
     <thead>
         <tr>
-            <th>Severity</th>
+            <th>Gravité</th>
             <th>Message</th>
         </tr>
     </thead>

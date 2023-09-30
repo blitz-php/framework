@@ -1,22 +1,33 @@
-<h3>Matched Route</h3>
+<h3>Configurations</h3>
+
+<table>
+    <tbody>
+        <tr>
+            <td>Routage auto:</td>
+            <td>{autoRoute}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Route assortis</h3>
 
 <table>
     <tbody>
     {matchedRoute}
         <tr>
-            <td>Directory:</td>
+            <td>Répertoire:</td>
             <td>{directory}</td>
         </tr>
         <tr>
-            <td>Controller:</td>
+            <td>Contrôleur:</td>
             <td>{controller}</td>
         </tr>
         <tr>
-            <td>Method:</td>
+            <td>Méthode:</td>
             <td>{method}</td>
         </tr>
         <tr>
-            <td>Params:</td>
+            <td>Paramètres:</td>
             <td>{paramCount} / {truePCount}</td>
         </tr>
         {params}
@@ -30,15 +41,15 @@
 </table>
 
 
-<h3>Defined Routes</h3>
+<h3>Routes définies</h3>
 
 <table>
     <thead>
         <tr>
-            <th>Method</th>
+            <th>Méthode</th>
             <th>Route</th>
-            <th>Name</th>
-            <th>Handler</th>
+            <th>Nom</th>
+            <th>Gestionnaire</th>
         </tr>
     </thead>
     <tbody>

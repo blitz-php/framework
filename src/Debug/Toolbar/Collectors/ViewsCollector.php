@@ -12,6 +12,7 @@
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
 use BlitzPHP\Container\Services;
+use BlitzPHP\Validation\ErrorBag;
 use BlitzPHP\View\View;
 
 /**
@@ -44,7 +45,7 @@ class ViewsCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected string $title = 'Views';
+    protected string $title = 'Vues';
 
     /**
      * Instance du service de rendu
@@ -79,7 +80,7 @@ class ViewsCollector extends BaseCollector
 
         foreach ($rows as $info) {
             $data[] = [
-                'name'      => 'View: ' . $info['view'],
+                'name'      => 'Vue: ' . $info['view'],
                 'component' => 'Views',
                 'start'     => $info['start'],
                 'duration'  => $info['end'] - $info['start'],
@@ -95,7 +96,12 @@ class ViewsCollector extends BaseCollector
     public function getVarData(): array
     {
         return [
-            'View Data' => $this->viewer->getData(),
+            'Données de la vues' =>  array_filter($this->viewer->getData(), function($data) {
+                if ($data instanceof ErrorBag) {
+                    return false;
+                }
+                return true;
+            }),
         ];
     }
 

@@ -31,7 +31,7 @@ class FilesCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected string $title = 'Files';
+    protected string $title = 'Fichiers';
 
     /**
      * {@inheritDoc}

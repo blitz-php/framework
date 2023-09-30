@@ -38,7 +38,7 @@ class EventsCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected string $title = 'Events';
+    protected string $title = 'Evenements';
 
     /**
      * {@inheritDoc}

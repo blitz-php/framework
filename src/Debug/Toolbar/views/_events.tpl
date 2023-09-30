@@ -1,9 +1,9 @@
 <table>
     <thead>
         <tr>
-            <th class="debug-bar-width6r">Time</th>
-            <th>Event Name</th>
-            <th>Times Called</th>
+            <th class="debug-bar-width6r">Durée</th>
+            <th>Nom de l'évenement</th>
+            <th>Nombre d'exécution</th>
         </tr>
     </thead>
     <tbody>

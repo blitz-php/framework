@@ -42,12 +42,14 @@ class RoutesCollector extends BaseCollector
 
 	private DefinedRouteCollector $definedRouteCollector;
 	private Router $router;
+    private bool $isAutoRoute = false;
 
 	public function __construct()
 	{
-		$rawRoutes                   = Services::routes(true);
-		$this->router                = Services::router($rawRoutes, null, true);
-		$this->definedRouteCollector = new DefinedRouteCollector($rawRoutes);
+        $rawRoutes                   = Services::routes(true);
+        $this->router                = Services::router($rawRoutes, null, true);
+        $this->definedRouteCollector = new DefinedRouteCollector($rawRoutes);
+        $this->isAutoRoute           = $rawRoutes->shouldAutoRoute();
 	}
 
     /**
@@ -116,6 +118,7 @@ class RoutesCollector extends BaseCollector
         return [
             'matchedRoute' => $matchedRoute,
             'routes'       => $routes,
+            'autoRoute' => $this->isAutoRoute ? 'Activé' : 'Désactivé',
         ];
     }
 

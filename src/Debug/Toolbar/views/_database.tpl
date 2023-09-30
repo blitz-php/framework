@@ -1,9 +1,9 @@
 <table>
     <thead>
         <tr>
-            <th class="debug-bar-width6r">Time</th>
-            <th>Query String</th>
-            <th>Affected rows</th>
+            <th class="debug-bar-width6r">Durée</th>
+            <th>Requête</th>
+            <th>Lignes affectées</th>
         </tr>
     </thead>
     <tbody>

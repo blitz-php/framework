@@ -38,7 +38,7 @@ class HistoryCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected string $title = 'History';
+    protected string $title = 'Historique';
 
     /**
      * Fichiers d'historique
@@ -84,7 +84,7 @@ class HistoryCollector extends BaseCollector
                     'status'      => $contents->vars->response->statusCode,
                     'method'      => $contents->method,
                     'url'         => $contents->url,
-                    'isAJAX'      => $contents->isAJAX ? 'Yes' : 'No',
+                    'isAJAX'      => $contents->isAJAX ? 'Oui' : 'Non',
                     'contentType' => $contents->vars->response->contentType,
                 ];
             }

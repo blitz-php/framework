@@ -47,6 +47,12 @@ abstract class BaseCollector
      * Utilisé pour nommer les choses dans la barre d'outils HTML.
      */
     protected string $title = '';
+ 
+    /**
+     * La 'cle' de ce Collector.
+     * Utilisé comme id.
+     */
+    protected string $key = '';
 
     /**
      * Obtient le titre du collecteur
@@ -58,6 +64,18 @@ abstract class BaseCollector
         }
 
         return $this->title;
+    }
+
+    /**
+     * Obtient la cle du collecteur
+     */
+    public function getKey(): string
+    {
+        if (empty($this->key)) {
+            $this->key = str_replace('Collector', '', basename(static::class));
+        }
+
+        return str_replace(' ', '-', strtolower($this->key));
     }
 
     /**
@@ -199,6 +217,7 @@ abstract class BaseCollector
         return [
             'title'           => $this->getTitle(),
             'titleSafe'       => $this->getTitle(true),
+            'key'             => $this->getKey(),
             'titleDetails'    => $this->getTitleDetails(),
             'display'         => $this->display(),
             'badgeValue'      => $this->getBadgeValue(),
