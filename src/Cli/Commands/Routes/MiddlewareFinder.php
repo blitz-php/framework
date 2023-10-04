@@ -12,6 +12,8 @@
 namespace BlitzPHP\Cli\Commands\Routes;
 
 use BlitzPHP\Container\Services;
+use BlitzPHP\Exceptions\PageNotFoundException;
+use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Router\Router;
 
 /**
@@ -33,8 +35,13 @@ final class MiddlewareFinder
      */
     public function find(string $uri): array
     {
-        $this->router->handle($uri);
-
-        return $this->router->getMiddlewares();
+        try {
+            $this->router->handle($uri);
+            return $this->router->getMiddlewares();
+        } catch (RedirectException $e) {
+            return [];
+        } catch (PageNotFoundException $e) {
+            return ['<unknown>'];
+        }
     }
 }
