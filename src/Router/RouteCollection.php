@@ -233,7 +233,7 @@ class RouteCollection implements RouteCollectionInterface
         $this->defaultController  = $routing->default_controller ?: $this->defaultController;
         $this->defaultMethod      = $routing->default_method ?: $this->defaultMethod;
         $this->translateURIDashes = $routing->translate_uri_dashes ?: $this->translateURIDashes;
-        $this->override404        = $routing->override404 ?: $this->override404;
+        $this->override404        = $routing->fallback ?: ($routing->override404 ?: $this->override404);
         $this->autoRoute          = $routing->auto_route ?: $this->autoRoute;
         $this->routeFiles         = $routing->route_files ?: $this->routeFiles;
         $this->prioritize         = $routing->prioritize ?: $this->prioritize;
