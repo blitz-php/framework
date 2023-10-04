@@ -249,6 +249,29 @@ class Middleware implements RequestHandlerInterface
     }
 
     /**
+     * Enregistre les middlewares definis dans le gestionnaire des middlewares
+     * 
+     * @internal
+     */
+    public function register(Request $request)
+    {
+        $config = (object) config('middlewares');
+
+        $this->aliases($config->aliases);
+
+        foreach ($config->globals as $middleware) {
+            $this->add($middleware);
+        }
+
+        if (is_callable($build = $config->build)) {
+            Services::container()->call($build, [
+                'request'    => $request,
+                'middleware' => $this
+            ]);
+        }
+    }
+
+    /**
      * Fabrique un middleware
      *
      * @param callable|object|string $middleware

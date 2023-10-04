@@ -732,14 +732,7 @@ class Dispatcher
     {
         $this->middleware = new Middleware($this->response, $this->determinePath());
 
-        $middlewaresFile = CONFIG_PATH . 'middlewares.php';
-        if (file_exists($middlewaresFile) && ! in_array($middlewaresFile, get_included_files(), true)) {
-            $middleware = require $middlewaresFile;
-            if (is_callable($middleware)) {
-                $middleware($this->middleware, $this->request);
-            }
-        }
-
+        $this->middleware->register($this->request);
         $this->middleware->prepend($this->spoofRequestMethod());
     }
 
