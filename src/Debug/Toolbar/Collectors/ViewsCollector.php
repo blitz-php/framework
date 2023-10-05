@@ -56,8 +56,6 @@ class ViewsCollector extends BaseCollector
 
     /**
      * Compteur de vues
-     *
-     * @var array
      */
     protected array $views = [];
 
@@ -96,11 +94,8 @@ class ViewsCollector extends BaseCollector
     public function getVarData(): array
     {
         return [
-            'Données de la vues' =>  array_filter($this->viewer->getData(), function($data) {
-                if ($data instanceof ErrorBag) {
-                    return false;
-                }
-                return true;
+            'Données de la vues' => array_filter($this->viewer->getData(), function ($data) {
+                return ! ($data instanceof ErrorBag);
             }),
         ];
     }

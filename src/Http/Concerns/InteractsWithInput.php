@@ -32,7 +32,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function server(?string $key = null, string|array|null $default = null)
+    public function server(?string $key = null, null|array|string $default = null)
     {
         return Arr::get($this->_environment, $key, $default);
     }
@@ -42,7 +42,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function header(?string $key = null, string|array|null $default = null)
+    public function header(?string $key = null, null|array|string $default = null)
     {
         if (null === $key) {
             return $this->getHeaders();
@@ -72,7 +72,7 @@ trait InteractsWithInput
     /**
      * Déterminez si la demande contient une clé d'élément d'entrée donnée.
      */
-    public function exists(string|array $key): bool
+    public function exists(array|string $key): bool
     {
         return $this->has($key);
     }
@@ -80,7 +80,7 @@ trait InteractsWithInput
     /**
      *Déterminez si la demande contient une clé d'élément d'entrée donnée.
      */
-    public function has(string|array $key): bool
+    public function has(array|string $key): bool
     {
         $keys = is_array($key) ? $key : func_get_args();
 
@@ -98,7 +98,7 @@ trait InteractsWithInput
     /**
      * Déterminez si la demande contient l'une des entrées données.
      */
-    public function hasAny(string|array $keys): bool
+    public function hasAny(array|string $keys): bool
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
@@ -128,7 +128,7 @@ trait InteractsWithInput
     /**
      * Déterminez si la requête contient une valeur non vide pour un élément d'entrée.
      */
-    public function filled(string|array $key): bool
+    public function filled(array|string $key): bool
     {
         $keys = is_array($key) ? $key : func_get_args();
 
@@ -144,7 +144,7 @@ trait InteractsWithInput
     /**
      * Déterminez si la requête contient une valeur vide pour un élément d'entrée.
      */
-    public function isNotFilled(string|array $key): bool
+    public function isNotFilled(array|string $key): bool
     {
         $keys = is_array($key) ? $key : func_get_args();
 
@@ -160,7 +160,7 @@ trait InteractsWithInput
     /**
      * Determine if the request contains a non-empty value for any of the given inputs.
      */
-    public function anyFilled(string|array $keys): bool
+    public function anyFilled(array|string $keys): bool
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
@@ -194,7 +194,7 @@ trait InteractsWithInput
     /**
      * Déterminez s'il manque une clé d'élément d'entrée donnée dans la requête.
      */
-    public function missing(string|array $key): bool
+    public function missing(array|string $key): bool
     {
         $keys = is_array($key) ? $key : func_get_args();
 
@@ -353,7 +353,7 @@ trait InteractsWithInput
     /**
      * Récupérer l'entrée de la requête sous forme de collection.
      */
-    public function collect(array|string|null $key = null): Collection
+    public function collect(null|array|string $key = null): Collection
     {
         return collect(is_array($key) ? $this->only($key) : $this->data($key));
     }
@@ -403,7 +403,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function query(?string $key = null, string|array|null $default = null)
+    public function query(?string $key = null, null|array|string $default = null)
     {
         return $this->getQuery($key, $default);
     }
@@ -413,7 +413,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function post(?string $key = null, string|array|null $default = null)
+    public function post(?string $key = null, null|array|string $default = null)
     {
         if ($key === null) {
             return $this->data;
@@ -435,7 +435,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function cookie(?string $key = null, string|array|null $default = null)
+    public function cookie(?string $key = null, null|array|string $default = null)
     {
         if (null === $key) {
             return $this->getCookieParams();

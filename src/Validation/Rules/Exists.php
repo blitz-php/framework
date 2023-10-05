@@ -18,7 +18,6 @@ class Exists extends AbstractRule
     protected $message        = ':attribute :value do not exist';
     protected $fillableParams = ['table', 'column'];
 
-
     public function __construct(protected ConnectionInterface $db)
     {
     }
@@ -31,7 +30,7 @@ class Exists extends AbstractRule
         $column = $this->parameter('column');
         $column = $column ?: $this->getAttribute()->getKey();
 
-		$builder = $this->db->table($table)->where($column, $value);
+        $builder = $this->db->table($table)->where($column, $value);
 
         return $builder->count() > 0;
     }

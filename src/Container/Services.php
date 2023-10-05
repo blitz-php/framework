@@ -122,17 +122,17 @@ class Services
         return static::$instances[Cache::class] = new Cache($config);
     }
 
-	/**
-	 * La clase Config offre une api fluide por gerer les configurations de l'application
-	 */
-	public static function config(bool $shared = true): Config
-	{
-		if (true === $shared && isset(static::$instances[Config::class])) {
+    /**
+     * La clase Config offre une api fluide por gerer les configurations de l'application
+     */
+    public static function config(bool $shared = true): Config
+    {
+        if (true === $shared && isset(static::$instances[Config::class])) {
             return static::$instances[Config::class];
         }
-		
-		return static::$instances[Config::class] = new Config();
-	}
+
+        return static::$instances[Config::class] = new Config();
+    }
 
     /**
      * Conteneur d'injection de dependances
@@ -142,8 +142,8 @@ class Services
         if (true === $shared && isset(static::$instances[Container::class])) {
             return static::$instances[Container::class];
         }
-		
-		return static::$instances[Container::class] = new Container();
+
+        return static::$instances[Container::class] = new Container();
     }
 
     /**
@@ -184,7 +184,7 @@ class Services
 
     /**
      * Responsable du chargement des traductions des chaînes de langue.
-     * 
+     *
      * @deprecated 0.9 use translators instead
      */
     public static function language(?string $locale = null, bool $shared = true): Translate
@@ -208,7 +208,7 @@ class Services
     /**
      * La classe Logger est une classe Logging compatible PSR-3 qui prend en charge
      * plusieurs gestionnaires qui traitent la journalisation réelle.
-     * 
+     *
      * @return Logger
      */
     public static function logger(bool $shared = true): LoggerInterface
@@ -298,7 +298,7 @@ class Services
 
         return static::$instances[Response::class] = new Response();
     }
-    
+
     /**
      * CacheResponse
      */
@@ -442,7 +442,7 @@ class Services
 
         return static::$instances[Translate::class] = new Translate($locale, static::locator());
     }
-    
+
     /**
      * La classe URI fournit un moyen de modéliser et de manipuler les URI.
      */
@@ -512,7 +512,7 @@ class Services
         if (true !== array_pop($arguments)) {
             return static::factory($name, $arguments);
         }
-        
+
         return static::singleton($name, ...$arguments);
     }
 
@@ -529,7 +529,7 @@ class Services
                     static::$services[]   = new $classname();
                 }
             }
-            
+
             static::$discovered = true;
         }
     }

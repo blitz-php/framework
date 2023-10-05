@@ -19,25 +19,27 @@ use Psr\Container\ContainerInterface;
 
 /**
  * Conteneur d’injection de dépendances.
- * 
- * @method mixed make(string $name, array $parameters = []) Construire une entrée du conteneur par son nom.
- *                                                          Cette méthode se comporte comme singleton() sauf qu'elle résout à nouveau l'entrée à chaque fois.
- *                                                          Par exemple, si l'entrée est une classe, une nouvelle instance sera créée à chaque fois.
- *                                                          Cette méthode fait que le conteneur se comporte comme une usine.
  *
- *                                                          @param array  $parameters Paramètres facultatifs à utiliser pour construire l'entrée. 
- *                                                                                    Utilisez ceci pour forcer des paramètres spécifiques à des valeurs spécifiques. 
- *                                                                                    Les paramètres non définis dans ce tableau seront résolus en utilisant le conteneur.
  * @method mixed call(array|callable|string $callable, array $parameters = []) Appelez la fonction donnée en utilisant les paramètres donnés.
  *                                                                             Les paramètres manquants seront résolus à partir du conteneur.
- *                                                        
- *                                                          @param array  $parameters Paramètres à utiliser. 
- *                                                                                    Peut être indexé par les noms de paramètre ou non indexé (même ordre que les paramètres).
- *                                                                                    Le tableau peut également contenir des définitions DI, par ex. DI\get().
+ *
+ * @param array $parameters Paramètres facultatifs à utiliser pour construire l'entrée.
+ *                          Utilisez ceci pour forcer des paramètres spécifiques à des valeurs spécifiques.
+ *                          Les paramètres non définis dans ce tableau seront résolus en utilisant le conteneur.
+ *
  * @method string debugEntry(string $name) Obtenir les informations de débogage de l'entrée.
- * @method object injectOn(object $instance) Injectez toutes les dépendances sur une instance existante.
- * @method void set(string $name, mixed $value) Définissez un objet ou une valeur dans le conteneur.
- * @method array getKnownEntryNames() Obtenez des entrées de conteneur définies.
+ *
+ * @param array $parameters Paramètres à utiliser.
+ *                          Peut être indexé par les noms de paramètre ou non indexé (même ordre que les paramètres).
+ *                          Le tableau peut également contenir des définitions DI, par ex. DI\get().
+ *
+ * @method array  getKnownEntryNames()                       Obtenez des entrées de conteneur définies.
+ * @method object injectOn(object $instance)                 Injectez toutes les dépendances sur une instance existante.
+ * @method void   set(string $name, mixed $value)            Définissez un objet ou une valeur dans le conteneur.
+ * @method mixed  make(string $name, array $parameters = []) Construire une entrée du conteneur par son nom.
+ *                                                           Cette méthode se comporte comme singleton() sauf qu'elle résout à nouveau l'entrée à chaque fois.
+ *                                                           Par exemple, si l'entrée est une classe, une nouvelle instance sera créée à chaque fois.
+ *                                                           Cette méthode fait que le conteneur se comporte comme une usine.
  */
 class Container implements ContainerInterface
 {
@@ -45,14 +47,14 @@ class Container implements ContainerInterface
 
     /**
      * Providers deja charges (cache)
-     * 
+     *
      * @var AbstractProvider[]
      */
     private static array $providers = [];
-    
+
     /**
      * Noms des providers deja charges (cache)
-     * 
+     *
      * @var array<class-string<AbstractProvider>>
      */
     private static array $providerNames = [];
@@ -114,7 +116,7 @@ class Container implements ContainerInterface
     /**
      * Defini plusieurs elements au conteneur sous forme de factory
      * L'element qui existera déjà sera remplacé par la correspondance du tableau
-     * 
+     *
      * @param array<string, Closure> $keys
      */
     public function merge(array $keys): void
@@ -129,7 +131,7 @@ class Container implements ContainerInterface
     /**
      * Defini plusieurs elements au conteneur sous forme de factory
      * L'element qui existera déjà sera ignoré
-     * 
+     *
      * @param array<string, Closure> $keys
      */
     public function mergeIf(array $keys): void
@@ -140,17 +142,20 @@ class Container implements ContainerInterface
             }
         }
     }
-    
+
     /**
      * Verifie qu'une entree a été explicitement définie dans le conteneur
      */
-    public function bound(string $key): bool 
+    public function bound(string $key): bool
     {
         return in_array($key, $this->getKnownEntryNames(), true);
     }
 
     /**
      * Methode magique pour acceder aux methodes de php-di
+     *
+     * @param mixed $name
+     * @param mixed $arguments
      */
     public function __call($name, $arguments)
     {
@@ -160,10 +165,10 @@ class Container implements ContainerInterface
 
         throw new BadMethodCallException('Methode "' . $name . '" non definie');
     }
-    
+
     /**
      * Initialise le conteneur et injecte les services providers.
-     * 
+     *
      * @internal
      */
     public function initialize()
@@ -180,7 +185,7 @@ class Container implements ContainerInterface
             if (extension_loaded('apcu')) {
                 $builder->enableDefinitionCache(str_replace([' ', '/', '\\', '.'], '', APP_PATH));
             }
-            
+
             $builder->enableCompilation(FRAMEWORK_STORAGE_PATH . 'cache');
         }
 
@@ -193,7 +198,7 @@ class Container implements ContainerInterface
         $this->container = $builder->build();
 
         $this->registryProviders();
-        
+
         $this->initialized = true;
     }
 
@@ -204,7 +209,7 @@ class Container implements ContainerInterface
     {
         foreach (self::$providerNames as $classname) {
             $provider = $this->container->make($classname, [
-                'container' => $this
+                'container' => $this,
             ]);
             $this->container->call([$provider, 'register']);
             static::$providers[] = $provider;
@@ -226,14 +231,14 @@ class Container implements ContainerInterface
                 $locator->listFiles('Providers/'),
             );
 
-            $appProviders  = array_filter($files, fn($name) => str_starts_with($name, APP_PATH));
-            $systProviders = array_filter($files, fn($name) => str_starts_with($name, SYST_PATH));
+            $appProviders  = array_filter($files, fn ($name) => str_starts_with($name, APP_PATH));
+            $systProviders = array_filter($files, fn ($name) => str_starts_with($name, SYST_PATH));
             $files         = array_diff($files, $appProviders, $systProviders);
 
             $files = [
                 ...$files, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
                 ...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors sont les
-                ...$appProviders // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
+                ...$appProviders, // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
             ];
 
             // Obtenez des instances de toutes les classes de providers et mettez-les en cache localement.
@@ -242,7 +247,7 @@ class Container implements ContainerInterface
                     self::$providerNames[] = $classname;
                 }
             }
-            
+
             static::$discovered = true;
         }
     }

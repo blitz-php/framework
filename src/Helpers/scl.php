@@ -647,7 +647,7 @@ function scl_crypt($str, $key, $action = 'encrypt')
     }
 
     return ($action === 'encrypt') ? base64_encode($return) : $return;
-      // On renvoie la chaine encrypter ou decrypter
+    // On renvoie la chaine encrypter ou decrypter
 }
 
 /**
@@ -765,7 +765,6 @@ function scl_include($file, $data = [], $exception = false)
     } elseif ($exception) {
         exit('SCL EXCEPTION : The file &laquo; <b>' . $file . '</b> &raquo; don\'t exist !');
     }
-
 }
 
 /**
@@ -849,10 +848,7 @@ function scl_debug($var, $style = false)
         }
     }
     echo '</pre>';
-
 }
-
-// -------------------------------------------------------------------------
 
 /**
  * ------- FUNCTION SCL_BYTE2SIZE()   --------
@@ -982,14 +978,15 @@ function scl_splitInt($nbr, $pas = 3, $separateur = ' ')
     while ($lenght > $pas) {
         // On coupe le nombre après 3 ($pas) chiffres à partir de debut et on le stocke dans $return
         $return .= substr($nbr, 0, $pas) . $separateur;
-        $nbr    = substr($nbr, $pas); // On enleve les 3 ($pas) premier chiffres du nombre
-        $lenght = $lenght - $pas; // Le nombre de chiffr du nombre diminue donc de 3 ($pas)
+        $nbr = substr($nbr, $pas); // On enleve les 3 ($pas) premier chiffres du nombre
+        $lenght -= $pas; // Le nombre de chiffr du nombre diminue donc de 3 ($pas)
     }
     if ($nbr !== '') {
         $return .= $nbr;
     } else {
         $return = substr($return, 0, strlen($return) - 1);
     }
+
     // On inverse encore le nombre pour revenir à la valeur initiale et on le retourne
     return strrev($return) . '' . $virgule;
 }

@@ -25,49 +25,49 @@ class Config
      */
     private static array $loaded = [];
 
-	/**
-	 * Drapeau permettant de savoir si la config a deja ete initialiser
-	 */
-	private static bool $initialized = false;
+    /**
+     * Drapeau permettant de savoir si la config a deja ete initialiser
+     */
+    private static bool $initialized = false;
 
-	private Configurator $configurator;
+    private Configurator $configurator;
 
     public function __construct()
     {
-		$this->configurator = new Configurator();
-		$this->initialize();
+        $this->configurator = new Configurator();
+        $this->initialize();
     }
 
-	/**
+    /**
      * Détermine si une clé de configuration existe.
      */
-	public function exists(string $key): bool
-	{
-		if (! $this->configurator->exists($key)) {
-			$config = explode('.', $key);
-        	$this->load($config[0]);
+    public function exists(string $key): bool
+    {
+        if (! $this->configurator->exists($key)) {
+            $config = explode('.', $key);
+            $this->load($config[0]);
 
-        	return $this->configurator->exists(implode('.', $config));
-		}
+            return $this->configurator->exists(implode('.', $config));
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
+    /**
      * Détermine s'il y'a une clé de configuration.
      */
-	public function has(string $key): bool
-	{
-		return $this->exists($key);
-	}
+    public function has(string $key): bool
+    {
+        return $this->exists($key);
+    }
 
-	/**
+    /**
      * Détermine s'il manque une clé de configuration.
      */
-	public function missing(string $key): bool
-	{
-		return ! $this->exists($key);
-	}
+    public function missing(string $key): bool
+    {
+        return ! $this->exists($key);
+    }
 
     /**
      * Renvoyer une configuration de l'application
@@ -80,21 +80,23 @@ class Config
             return $this->configurator->get($key);
         }
 
-		if (func_num_args() > 1) {
-			return $default;
-		}
-		
-		$path = explode('.', $key);
+        if (func_num_args() > 1) {
+            return $default;
+        }
 
-		throw ConfigException::notFound(implode(' » ', $path));
-	}
+        $path = explode('.', $key);
+
+        throw ConfigException::notFound(implode(' » ', $path));
+    }
 
     /**
      * Définir une configuration de l'application
+     *
+     * @param mixed $value
      */
     public function set(string $key, $value)
     {
-       $this->configurator->set($key, $value);
+        $this->configurator->set($key, $value);
     }
 
     /**
@@ -132,8 +134,8 @@ class Config
                 $schema = self::schema($config);
             }
 
-			$this->configurator->addSchema($config, $schema, false);
-			$this->configurator->merge([$config => (array) $configurations]);
+            $this->configurator->addSchema($config, $schema, false);
+            $this->configurator->merge([$config => (array) $configurations]);
 
             self::$loaded[$config] = $file;
         }
@@ -163,17 +165,17 @@ class Config
     {
         $path = preg_replace('#\.php$#', '', $path);
 
-		if (file_exists($file = CONFIG_PATH . $path . '.php')) {
-			return $file;
-		}
+        if (file_exists($file = CONFIG_PATH . $path . '.php')) {
+            return $file;
+        }
 
-		$paths = Services::locator()->search('Config/' . $path);
+        $paths = Services::locator()->search('Config/' . $path);
 
-		if (isset($paths[0]) && file_exists($path[0])) {
-			return $paths[0];
-		}
-		
-		return '';
+        if (isset($paths[0]) && file_exists($path[0])) {
+            return $paths[0];
+        }
+
+        return '';
     }
 
     /**
@@ -203,12 +205,12 @@ class Config
      */
     private function initialize()
     {
-		if (self::$initialized) {
-			return;
-		}
-		
-		$this->load(['app']);
-        
+        if (self::$initialized) {
+            return;
+        }
+
+        $this->load(['app']);
+
         ini_set('log_errors', 1);
         ini_set('error_log', LOG_PATH . 'blitz-logs');
 
@@ -216,7 +218,7 @@ class Config
         $this->initializeEnvironment();
         $this->initializeDebugbar();
 
-		self::$initialized = true;
+        self::$initialized = true;
     }
 
     /**
@@ -225,7 +227,7 @@ class Config
     private function initializeURL()
     {
         $config = $this->get('app.base_url', 'auto');
-        
+
         if ($config === 'auto' || empty($config)) {
             $config = rtrim(str_replace('\\', '/', Helpers::findBaseUrl()), '/');
         }
@@ -277,7 +279,7 @@ class Config
     private function initializeDebugbar()
     {
         $config = $this->get('app.show_debugbar', 'auto');
-        
+
         if (! in_array($config, ['auto', true, false], true)) {
             self::exceptBadConfigValue('show_debugbar', ['auto', true, false], 'app');
         }

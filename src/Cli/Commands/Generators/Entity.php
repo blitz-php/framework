@@ -47,7 +47,7 @@ class Entity extends Command
      * @var array Options
      */
     protected $options = [
-        '--namespace' => ['Définit l\'espace de noms racine. Par défaut : "APP_NAMESPACE".', APP_NAMESPACE],
+        '--namespace' => ["Définit l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--suffix'    => 'Ajouter le titre du composant au nom de la classe (par exemple, User => UserEntity).',
         '--force'     => 'Forcer à écraser le fichier existant.',
     ];

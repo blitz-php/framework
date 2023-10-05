@@ -125,8 +125,8 @@ class Dispatcher
      * Chemin de requête à utiliser.
      *
      * @var string
-	 * 
-	 * @deprecated No longer used.
+     *
+     * @deprecated No longer used.
      */
     protected $path;
 
@@ -135,7 +135,7 @@ class Dispatcher
      */
     protected int $bufferLevel = 0;
 
-	/**
+    /**
      * Mise en cache des pages Web
      */
     protected ResponseCache $pageCache;
@@ -148,7 +148,7 @@ class Dispatcher
         $this->startTime = microtime(true);
         $this->config    = (object) config('app');
 
-		$this->pageCache = Services::responsecache();
+        $this->pageCache = Services::responsecache();
     }
 
     /**
@@ -178,7 +178,7 @@ class Dispatcher
             $controller = $routes->getDefaultController();
         }
 
-		if (! $fullName && is_string($controller)) {
+        if (! $fullName && is_string($controller)) {
             $controller = str_replace($routes->getDefaultNamespace(), '', $controller);
         }
 
@@ -210,9 +210,9 @@ class Dispatcher
 
         $this->initMiddlewareQueue();
 
-		try {
+        try {
             $this->response = $this->handleRequest($routes, config('cache'));
-        } catch (ResponsableInterface|RedirectException $e) {
+        } catch (RedirectException|ResponsableInterface $e) {
             $this->outputBufferingEnd();
             if ($e instanceof RedirectException) {
                 $e = new RedirectException($e->getMessage(), $e->getCode(), $e);
@@ -242,17 +242,17 @@ class Dispatcher
      */
     protected function handleRequest(?RouteCollectionInterface $routes = null, ?array $cacheConfig = null): ResponseInterface
     {
-		$this->forceSecureAccess();
+        $this->forceSecureAccess();
 
-		/**
+        /**
          * Init event manager
          */
-		Services::singleton(EventDiscover::class)->discove();
+        Services::singleton(EventDiscover::class)->discove();
 
-		$this->event->trigger('pre_system');
+        $this->event->trigger('pre_system');
 
-		// Check for a cached page. 
-		// Execution will stop if the page has been cached.
+        // Check for a cached page.
+        // Execution will stop if the page has been cached.
         if (($response = $this->displayCache($cacheConfig)) instanceof ResponseInterface) {
             return $response;
         }
@@ -260,7 +260,7 @@ class Dispatcher
         $routeMiddlewares = (array) $this->dispatchRoutes($routes);
 
         // Le bootstrap dans un middleware
-		$this->middleware->alias('blitz', $this->bootApp());
+        $this->middleware->alias('blitz', $this->bootApp());
         $this->middleware->append('blitz');
 
         /**
@@ -383,13 +383,13 @@ class Dispatcher
      */
     public function displayCache(?array $config = null)
     {
-		if ($cachedResponse = $this->pageCache->get($this->request, $this->response)) {
+        if ($cachedResponse = $this->pageCache->get($this->request, $this->response)) {
             $this->response = $cachedResponse;
 
             $this->totalTime = $this->timer->getElapsedTime('total_execution');
             $output          = $this->displayPerformanceMetrics($cachedResponse->getBody());
-        
-			return $this->response->withBody(to_stream($output));
+
+            return $this->response->withBody(to_stream($output));
         }
 
         return false;
@@ -587,8 +587,8 @@ class Dispatcher
             unset($override);
 
             $this->gatherOutput($returned);
-           
-			return $this->response;
+
+            return $this->response;
         }
 
         // Affiche l'erreur 404
@@ -649,7 +649,7 @@ class Dispatcher
         }
 
         // Ignorer les reponses non-HTML
-        if (strpos($this->response->getHeaderLine('Content-Type'), 'text/html') === false) {
+        if (! str_contains($this->response->getHeaderLine('Content-Type'), 'text/html')) {
             return;
         }
 
@@ -658,13 +658,13 @@ class Dispatcher
             $uri = Services::uri($uri, false);
         }
 
-		Services::session()->setPreviousUrl(Uri::createURIString(
-			$uri->getScheme(),
-			$uri->getAuthority(),
-			$uri->getPath(),
-			$uri->getQuery(),
-			$uri->getFragment()
-		));
+        Services::session()->setPreviousUrl(Uri::createURIString(
+            $uri->getScheme(),
+            $uri->getAuthority(),
+            $uri->getPath(),
+            $uri->getQuery(),
+            $uri->getFragment()
+        ));
     }
 
     /**
@@ -696,9 +696,9 @@ class Dispatcher
             return $returned;
         }
 
-		if ($returned instanceof Responsable) {
-			return $returned->toResponse($this->request);
-		}
+        if ($returned instanceof Responsable) {
+            return $returned->toResponse($this->request);
+        }
 
         if (is_object($returned)) {
             if (method_exists($returned, '__toString')) {
@@ -736,11 +736,11 @@ class Dispatcher
         $this->middleware->prepend($this->spoofRequestMethod());
     }
 
-	protected function outputBufferingStart(): void
+    protected function outputBufferingStart(): void
     {
         $this->bufferLevel = ob_get_level();
-       
-		ob_start();
+
+        ob_start();
     }
 
     protected function outputBufferingEnd(): string
@@ -803,13 +803,13 @@ class Dispatcher
 
                 return $this->formatResponse($response, $returned);
             } catch (ValidationException $e) {
-                $code   = $e->getCode();
+                $code = $e->getCode();
                 if (empty($errors = $e->getErrors())) {
                     $errors = [$e->getMessage()];
                 }
 
                 if (is_string($this->controller)) {
-					if (strtoupper($request->getMethod()) === 'POST') {
+                    if (strtoupper($request->getMethod()) === 'POST') {
                         if (is_subclass_of($this->controller, RestController::class)) {
                             return $this->formatResponse($response->withStatus($code), [
                                 'success' => false,
@@ -817,7 +817,7 @@ class Dispatcher
                                 'errors'  => $errors,
                             ]);
                         }
-						if (is_subclass_of($this->controller, BaseController::class)) {
+                        if (is_subclass_of($this->controller, BaseController::class)) {
                             return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
                         }
                     }

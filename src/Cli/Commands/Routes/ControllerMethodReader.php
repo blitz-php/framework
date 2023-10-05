@@ -49,8 +49,8 @@ final class ControllerMethodReader
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             $methodName = $method->getName();
 
-			foreach ($this->httpMethods as $httpVerb) {
-                if (strpos($methodName, $httpVerb) === 0) {
+            foreach ($this->httpMethods as $httpVerb) {
+                if (str_starts_with($methodName, $httpVerb)) {
                     // Enleve le prefixe des verbes HTTP
                     $methodInUri = lcfirst(substr($methodName, strlen($httpVerb)));
 
@@ -67,9 +67,9 @@ final class ControllerMethodReader
                         );
 
                         if ($routeForDefaultController !== []) {
-                            // Le contrôleur est le contrôleur par défaut. 
-							// Il n'a qu'un itinéraire pour la méthode par défaut. 
-							// Les autres méthodes ne seront pas routées même si elles existent. 
+                            // Le contrôleur est le contrôleur par défaut.
+                            // Il n'a qu'un itinéraire pour la méthode par défaut.
+                            // Les autres méthodes ne seront pas routées même si elles existent.
                             $output = [...$output, ...$routeForDefaultController];
 
                             continue;

@@ -20,19 +20,21 @@ class ErrorBag extends DimtrovichErrorBag
      */
     public function get(string $key, string $format = ':message'): array
     {
-        list($key, $ruleName) = $this->parsekey($key);
-        $results = [];
+        [$key, $ruleName] = $this->parsekey($key);
+        $results          = [];
         if ($this->isWildcardKey($key)) {
             $messages = $this->filterMessagesForWildcardKey($key, $ruleName);
+
             foreach ($messages as $explicitKey => $keyMessages) {
                 foreach ($keyMessages as $rule => $message) {
                     $results[$explicitKey][$rule] = $this->formatMessage($message, $format);
                 }
             }
         } else {
-            $keyMessages = isset($this->messages[$key])? $this->messages[$key] : [];
+            $keyMessages = $this->messages[$key] ?? [];
+
             foreach ((array) $keyMessages as $rule => $message) {
-                if ($ruleName and $ruleName != $rule) {
+                if ($ruleName && $ruleName !== $rule) {
                     continue;
                 }
                 $results[$rule] = $this->formatMessage($message, $format);
@@ -50,32 +52,36 @@ class ErrorBag extends DimtrovichErrorBag
         $messages = $this->messages;
 
         $results = [];
+
         foreach ($messages as $key => $keyMessages) {
             foreach ((array) $keyMessages as $message) {
                 $results[] = $this->formatMessage($message, $format);
             }
         }
+
         return $results;
     }
 
     /**
      * Filtrer les messages avec une clé générique
+     *
+     * @param mixed|null $ruleName
      */
     protected function filterMessagesForWildcardKey(string $key, $ruleName = null): array
     {
         $messages = $this->messages;
-        $pattern = preg_quote($key, '#');
-        $pattern = str_replace('\*', '.*', $pattern);
+        $pattern  = preg_quote($key, '#');
+        $pattern  = str_replace('\*', '.*', $pattern);
 
         $filteredMessages = [];
 
         foreach ($messages as $k => $keyMessages) {
-            if ((bool) preg_match('#^'.$pattern.'\z#u', $k) === false) {
+            if ((bool) preg_match('#^' . $pattern . '\z#u', $k) === false) {
                 continue;
             }
 
             foreach ((array) $keyMessages as $rule => $message) {
-                if ($ruleName and $rule != $ruleName) {
+                if ($ruleName && $rule !== $ruleName) {
                     continue;
                 }
                 $filteredMessages[$k][$rule] = $message;

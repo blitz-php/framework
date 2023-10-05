@@ -62,20 +62,20 @@ final class AutoRouter implements AutoRouterInterface
     private array $segments = [];
 
     /**
-     * Position du contrôleur dans les segments URI. 
-	 * Null pour le contrôleur par défaut. 
+     * Position du contrôleur dans les segments URI.
+     * Null pour le contrôleur par défaut.
      */
     private ?int $controllerPos = null;
 
     /**
-     * Position de la méthode dans les segments URI. 
-	 * Null pour la méthode par défaut. 
+     * Position de la méthode dans les segments URI.
+     * Null pour la méthode par défaut.
      */
     private ?int $methodPos = null;
 
     /**
-     * Position du premier Paramètre dans les segments URI. 
-	 * Null pour les paramètres non definis. 
+     * Position du premier Paramètre dans les segments URI.
+     * Null pour les paramètres non definis.
      */
     private ?int $paramPos = null;
 
@@ -84,8 +84,8 @@ final class AutoRouter implements AutoRouterInterface
      *
      * @param class-string[] $protectedControllers Liste des contrôleurs enregistrés pour le verbe CLI qui ne doivent pas être accessibles sur le Web.
      * @param string         $defaultNamespace     Espace de noms par défaut pour les contrôleurs.
-     * @param string         $defaultController     Nom du controleur par defaut.
-     * @param string         $defaultMethod     Nom de la methode par defaut.
+     * @param string         $defaultController    Nom du controleur par defaut.
+     * @param string         $defaultMethod        Nom de la methode par defaut.
      * @param bool           $translateURIDashes   Indique si les tirets dans les URI doivent être convertis en traits de soulignement lors de la détermination des noms de méthode.
      */
     public function __construct(
@@ -95,9 +95,9 @@ final class AutoRouter implements AutoRouterInterface
         private string $defaultMethod,
         private bool $translateURIDashes
     ) {
-		$this->namespace = rtrim($namespace, '\\');
-        
-		// Definir les valeurs par defaut
+        $this->namespace = rtrim($namespace, '\\');
+
+        // Definir les valeurs par defaut
         $this->controller = $this->defaultController;
     }
 
@@ -113,9 +113,9 @@ final class AutoRouter implements AutoRouterInterface
     /**
      * Recherchez le premier contrôleur correspondant au segment URI.
      *
-     * S'il y a un contrôleur correspondant au premier segment, la recherche s'arrête là. 
-	 * Les segments restants sont des paramètres du contrôleur. 
-	 * 
+     * S'il y a un contrôleur correspondant au premier segment, la recherche s'arrête là.
+     * Les segments restants sont des paramètres du contrôleur.
+     *
      * @return bool true si une classe de contrôleur est trouvée.
      */
     private function searchFirstController(): bool
@@ -156,7 +156,7 @@ final class AutoRouter implements AutoRouterInterface
         return false;
     }
 
-	/**
+    /**
      * Recherchez le dernier contrôleur par défaut correspondant aux segments URI.
      *
      * @return bool true si une classe de contrôleur est trouvée.
@@ -216,16 +216,16 @@ final class AutoRouter implements AutoRouterInterface
         return false;
     }
 
-	/**
+    /**
      * Recherche contrôleur, méthode et params dans l'URI.
      *
      * @return array [directory_name, controller_name, controller_method, params]
      */
     public function getRoute(string $uri, string $httpVerb): array
     {
-		$httpVerb = strtolower($httpVerb);
+        $httpVerb = strtolower($httpVerb);
 
-		// Reinitialise les parametres de la methode du controleur.
+        // Reinitialise les parametres de la methode du controleur.
         $this->params = [];
 
         $defaultMethod = $httpVerb . ucfirst($this->defaultMethod);
@@ -233,7 +233,7 @@ final class AutoRouter implements AutoRouterInterface
 
         $this->segments = $this->createSegments($uri);
 
-		//Verifier les routes de modules
+        // Verifier les routes de modules
         if (
             $this->segments !== []
             && ($routingConfig = (object) config('routing'))
@@ -243,7 +243,7 @@ final class AutoRouter implements AutoRouterInterface
             $this->namespace = rtrim($routingConfig->module_routes[$uriSegment], '\\');
         }
 
-		if ($this->searchFirstController()) {
+        if ($this->searchFirstController()) {
             // Le contrôleur a ete trouvé.
             $baseControllerName = Helpers::classBasename($this->controller);
 
@@ -261,7 +261,7 @@ final class AutoRouter implements AutoRouterInterface
             throw new PageNotFoundException('Aucun contrôleur trouvé pour: ' . $uri);
         }
 
-		// Le premier élément peut être un nom de méthode.
+        // Le premier élément peut être un nom de méthode.
         /** @var string[] $params */
         $params = $this->params;
 
@@ -272,7 +272,7 @@ final class AutoRouter implements AutoRouterInterface
             $method = $httpVerb . ucfirst($this->translateURIDashes($methodParam));
         }
 
-		if ($methodParam !== null && method_exists($this->controller, $method)) {
+        if ($methodParam !== null && method_exists($this->controller, $method)) {
             // Methode trouvee.
             $this->method = $method;
             $this->params = $params;
@@ -307,14 +307,14 @@ final class AutoRouter implements AutoRouterInterface
             throw PageNotFoundException::controllerNotFound($this->controller, $method);
         }
 
-		// Vérifiez le contrôleur n'est pas défini dans les routes.
+        // Vérifiez le contrôleur n'est pas défini dans les routes.
         $this->protectDefinedRoutes();
 
         // Assurez-vous que le contrôleur n'a pas la méthode _remap().
         $this->checkRemap();
 
-        // Assurez-vous que les segments URI pour le contrôleur et la méthode 
-		// ne contiennent pas de soulignement lorsque $translateURIDashes est true.
+        // Assurez-vous que les segments URI pour le contrôleur et la méthode
+        // ne contiennent pas de soulignement lorsque $translateURIDashes est true.
         $this->checkUnderscore($uri);
 
         // Verifier le nombre de parametres
@@ -325,8 +325,8 @@ final class AutoRouter implements AutoRouterInterface
         }
 
         $this->setDirectory();
-        
-		return [$this->directory, $this->controllerName(), $this->methodName(), $this->params];
+
+        return [$this->directory, $this->controllerName(), $this->methodName(), $this->params];
     }
 
     private function checkParameters(string $uri): void
@@ -381,7 +381,7 @@ final class AutoRouter implements AutoRouterInterface
         $paramPos = $this->paramPos ?? count($this->segments);
 
         for ($i = 0; $i < $paramPos; $i++) {
-            if (strpos($this->segments[$i], '_') !== false) {
+            if (str_contains($this->segments[$i], '_')) {
                 throw new PageNotFoundException(
                     'AutoRouterImproved interdit l\'accès à l\'URI'
                     . ' contenant les undescore ("' . $this->segments[$i] . '")'
@@ -434,7 +434,7 @@ final class AutoRouter implements AutoRouterInterface
         }
     }
 
-	private function protectDefinedRoutes(): void
+    private function protectDefinedRoutes(): void
     {
         $controller = strtolower($this->controller);
 
@@ -452,8 +452,8 @@ final class AutoRouter implements AutoRouterInterface
     /**
      * Renvoie le nom du sous-répertoire dans lequel se trouve le contrôleur.
      * Relatif à CONTROLLER_PATH
-	 * 
-	 * @deprecated 1.0
+     *
+     * @deprecated 1.0
      */
     public function directory(): string
     {
@@ -488,8 +488,8 @@ final class AutoRouter implements AutoRouterInterface
 
     /**
      * Construit un nom de contrôleur valide
-	 * 
-	 * @deprecated 1.0
+     *
+     * @deprecated 1.0
      */
     public function makeController(string $name): string
     {

@@ -15,7 +15,6 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
-use BlitzPHP\Router\Dispatcher;
 use BlitzPHP\Validation\Validation;
 use Dimtrovich\Validation\ValidatedInput;
 use Psr\Http\Message\ResponseInterface;

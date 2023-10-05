@@ -164,10 +164,10 @@ class PHPMailer extends AbstractAdapter
      */
     public function setEncryption(?string $encryption): self
     {
-		if ($encryption === static::ENCRYPTION_NONE) {
-			$encryption = null;
-		}
-		
+        if ($encryption === static::ENCRYPTION_NONE) {
+            $encryption = null;
+        }
+
         if (in_array($encryption, [null, static::ENCRYPTION_SSL, static::ENCRYPTION_TLS], true)) {
             $this->mailer->SMTPSecure = $encryption;
         }

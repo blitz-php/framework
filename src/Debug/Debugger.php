@@ -76,7 +76,7 @@ class Debugger
 
     /**
      * Initialisation du debugger a travers spatie/ignition
-     * 
+     *
      * @todo customisation du debugger et log des erreurs
      */
     private static function initIgnition()

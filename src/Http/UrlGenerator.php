@@ -23,9 +23,9 @@ use Closure;
 /**
  * @credit <a href="http://laravel.com">Laravel - \Illuminate\Routing\UrlGenerator</a>
  */
-class UrlGenerator 
+class UrlGenerator
 {
-	use Macroable;
+    use Macroable;
 
     /**
      * The forced URL root.
@@ -69,28 +69,29 @@ class UrlGenerator
     /**
      * The callback to use to format hosts.
      *
-     * @var \Closure
+     * @var Closure
      */
     protected $formatHostUsing;
 
     /**
      * The callback to use to format paths.
      *
-     * @var \Closure
+     * @var Closure
      */
     protected $formatPathUsing;
 
     /**
      * Create a new URL Generator instance.
      *
-     * @param  RouteCollectionInterface  $routes The route collection.
-     * @param  Request  $request  The request instance.
-     * @param  string|null  $assetRoot The asset root URL.
+     * @param RouteCollectionInterface $routes    The route collection.
+     * @param Request                  $request   The request instance.
+     * @param string|null              $assetRoot The asset root URL.
+     *
      * @return void
      */
     public function __construct(protected RouteCollectionInterface $routes, protected Request $request, protected ?string $assetRoot = null)
     {
-		$this->setRequest($request);
+        $this->setRequest($request);
     }
 
     /**
@@ -112,7 +113,7 @@ class UrlGenerator
     /**
      * Get the URL for the previous request.
      *
-     * @param  mixed  $fallback
+     * @param mixed $fallback
      */
     public function previous($fallback = false): string
     {
@@ -122,7 +123,8 @@ class UrlGenerator
 
         if ($url) {
             return $url;
-        } elseif ($fallback) {
+        }
+        if ($fallback) {
             return $this->to($fallback);
         }
 
@@ -151,8 +153,12 @@ class UrlGenerator
             return $path;
         }
 
-        $tail = implode('/', array_map(
-            'rawurlencode', (array) $this->formatParameters($extra))
+        $tail = implode(
+            '/',
+            array_map(
+                'rawurlencode',
+                (array) $this->formatParameters($extra)
+            )
         );
 
         // Once we have the scheme we will compile the "tail" by collapsing the values
@@ -163,8 +169,9 @@ class UrlGenerator
         [$path, $query] = $this->extractQueryString($path);
 
         return $this->format(
-            $root, '/'.trim($path.'/'.$tail, '/')
-        ).$query;
+            $root,
+            '/' . trim($path . '/' . $tail, '/')
+        ) . $query;
     }
 
     /**
@@ -189,7 +196,7 @@ class UrlGenerator
         // for asset paths, but only for routes to endpoints in the application.
         $root = $this->assetRoot ?: $this->formatRoot($this->formatScheme($secure));
 
-        return $this->removeIndex($root).'/'.trim($path, '/');
+        return $this->removeIndex($root) . '/' . trim($path, '/');
     }
 
     /**
@@ -210,7 +217,7 @@ class UrlGenerator
         // for asset paths, but only for routes to endpoints in the application.
         $root = $this->formatRoot($this->formatScheme($secure), $root);
 
-        return $this->removeIndex($root).'/'.trim($path, '/');
+        return $this->removeIndex($root) . '/' . trim($path, '/');
     }
 
     /**
@@ -220,7 +227,7 @@ class UrlGenerator
     {
         $i = 'index.php';
 
-        return Text::contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
+        return Text::contains($root, $i) ? str_replace('/' . $i, '', $root) : $root;
     }
 
     /**
@@ -233,7 +240,7 @@ class UrlGenerator
         }
 
         if (null === $this->cachedScheme) {
-            $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme().'://';
+            $this->cachedScheme = $this->forceScheme ?: $this->request->getScheme() . '://';
         }
 
         return $this->cachedScheme;
@@ -241,29 +248,26 @@ class UrlGenerator
 
     /**
      * Get the URL to a named route.
-	 * 
-     * @return string|false
+     *
+     * @return false|string
      */
     public function route(string $name, array $parameters = [], bool $absolute = true)
     {
-		$route = $this->routes->reverseRoute($name, ...$parameters);
+        $route = $this->routes->reverseRoute($name, ...$parameters);
 
         if (! $route) {
             throw HttpException::invalidRedirectRoute($route);
         }
 
-		return $absolute ? site_url($route) : $route;
+        return $absolute ? site_url($route) : $route;
     }
-	
 
     /**
      * Format the array of URL parameters.
      */
     public function formatParameters(mixed $parameters): array
     {
-        $parameters = Arr::wrap($parameters);
-
-        return $parameters;
+        return Arr::wrap($parameters);
     }
 
     /**
@@ -286,8 +290,8 @@ class UrlGenerator
      */
     public function formatRoot(string $scheme, ?string $root = null): string
     {
-        if (is_null($root)) {
-            if (is_null($this->cachedRoot)) {
+        if (null === $root) {
+            if (null === $this->cachedRoot) {
                 $this->cachedRoot = $this->forcedRoot ?: $this->request->root();
             }
 
@@ -296,30 +300,31 @@ class UrlGenerator
 
         $start = Text::startsWith($root, 'http://') ? 'http://' : 'https://';
 
-        return preg_replace('~'.$start.'~', $scheme, $root, 1);
+        return preg_replace('~' . $start . '~', $scheme, $root, 1);
     }
 
     /**
      * Format the given URL segments into a single URL.
      *
-     * @param  string  $root
-     * @param  string  $path
-     * @param  \Illuminate\Routing\Route|null  $route
+     * @param string                         $root
+     * @param string                         $path
+     * @param \Illuminate\Routing\Route|null $route
+     *
      * @return string
      */
     public function format($root, $path, $route = null)
     {
-        $path = '/'.trim($path, '/');
+        $path = '/' . trim($path, '/');
 
         if ($this->formatHostUsing) {
-            $root = call_user_func($this->formatHostUsing, $root, $route);
+            $root = ($this->formatHostUsing)($root, $route);
         }
 
         if ($this->formatPathUsing) {
-            $path = call_user_func($this->formatPathUsing, $path, $route);
+            $path = ($this->formatPathUsing)($path, $route);
         }
 
-        return trim($root.$path, '/');
+        return trim($root . $path, '/');
     }
 
     /**
@@ -341,7 +346,7 @@ class UrlGenerator
     {
         $this->cachedScheme = null;
 
-        $this->forceScheme = $scheme ? $scheme.'://' : null;
+        $this->forceScheme = $scheme ? $scheme . '://' : null;
     }
 
     /**
@@ -357,7 +362,6 @@ class UrlGenerator
     /**
      * Set a callback to be used to format the host of generated URLs.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function formatHostUsing(Closure $callback)
@@ -370,7 +374,6 @@ class UrlGenerator
     /**
      * Set a callback to be used to format the path of generated URLs.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function formatPathUsing(Closure $callback)
@@ -383,13 +386,11 @@ class UrlGenerator
     /**
      * Get the path formatter being used by the URL generator.
      *
-     * @return \Closure
+     * @return Closure
      */
     public function pathFormatter()
     {
-        return $this->formatPathUsing ?: function ($path) {
-            return $path;
-        };
+        return $this->formatPathUsing ?: fn ($path) => $path;
     }
 
     /**
@@ -407,10 +408,10 @@ class UrlGenerator
     {
         $this->request = $request;
 
-        $this->cachedRoot = null;
+        $this->cachedRoot   = null;
         $this->cachedScheme = null;
 
-		return $this;
+        return $this;
     }
 
     /**
@@ -429,16 +430,15 @@ class UrlGenerator
     protected function getSession(): ?Store
     {
         if ($this->sessionResolver) {
-            return call_user_func($this->sessionResolver);
+            return ($this->sessionResolver)();
         }
 
-		return Services::session();
+        return Services::session();
     }
 
     /**
      * Set the session resolver for the generator.
      *
-     * @param  callable  $sessionResolver
      * @return $this
      */
     public function setSessionResolver(callable $sessionResolver)
@@ -451,7 +451,6 @@ class UrlGenerator
     /**
      * Set the encryption key resolver.
      *
-     * @param  callable  $keyResolver
      * @return $this
      */
     public function setKeyResolver(callable $keyResolver)
@@ -464,7 +463,8 @@ class UrlGenerator
     /**
      * Set the root controller namespace.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
+     *
      * @return $this
      */
     public function setRootControllerNamespace($rootNamespace)

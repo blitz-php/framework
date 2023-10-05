@@ -71,9 +71,6 @@ class Parser extends NativeAdapter
      *
      * Parses pseudo-variables contained in the specified template view,
      * replacing them with any data that has already been set.
-     *
-     * @param array $options
-     * @param bool  $saveData
      */
     public function render(string $view, ?array $options = null, ?bool $saveData = null): string
     {
@@ -132,9 +129,6 @@ class Parser extends NativeAdapter
      *
      * Parses pseudo-variables contained in the specified string,
      * replacing them with any data that has already been set.
-     *
-     * @param array $options
-     * @param bool  $saveData
      */
     public function renderString(string $template, ?array $options = null, ?bool $saveData = null): string
     {
@@ -493,7 +487,7 @@ class Parser extends NativeAdapter
         // Replace the content in the template
         return preg_replace_callback($pattern, function ($matches) use ($content, $escape) {
             // Check for {! !} syntax to not escape this one.
-            if (strpos($matches[0], '{!') === 0 && substr($matches[0], -2) === '!}') {
+            if (str_starts_with($matches[0], '{!') && substr($matches[0], -2) === '!}') {
                 $escape = false;
             }
 
@@ -538,11 +532,11 @@ class Parser extends NativeAdapter
             }
         }
         // No pipes, then we know we need to escape
-        elseif (strpos($key, '|') === false) {
+        elseif (! str_contains($key, '|')) {
             $escape = 'html';
         }
         // If there's a `noescape` then we're definitely false.
-        elseif (strpos($key, 'noescape') !== false) {
+        elseif (str_contains($key, 'noescape')) {
             $escape = false;
         }
         // If no `esc` filter is found, then we'll need to add one.

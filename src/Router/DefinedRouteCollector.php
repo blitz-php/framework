@@ -20,10 +20,10 @@ final class DefinedRouteCollector
 {
     private RouteCollection $routeCollection;
 
-	/**
-	 * Routes deja collectees (pour eviter de faire la meme chose plusieurs fois)
-	 */
-	private array $cachedRoutes = [];
+    /**
+     * Routes deja collectees (pour eviter de faire la meme chose plusieurs fois)
+     */
+    private array $cachedRoutes = [];
 
     public function __construct(RouteCollection $routes)
     {
@@ -35,9 +35,9 @@ final class DefinedRouteCollector
      */
     public function collect(bool $reset = true): array
     {
-		if (! $reset && $this->cachedRoutes !== []) {
-			return $this->cachedRoutes;
-		}
+        if (! $reset && $this->cachedRoutes !== []) {
+            return $this->cachedRoutes;
+        }
 
         $methods = [
             'get',
@@ -52,12 +52,12 @@ final class DefinedRouteCollector
             'cli',
         ];
 
-		$definedRoutes = [];
+        $definedRoutes = [];
 
         foreach ($methods as $method) {
             $routes = $this->routeCollection->getRoutes($method);
 
-			foreach ($routes as $route => $handler) {
+            foreach ($routes as $route => $handler) {
                 if (is_string($handler) || $handler instanceof Closure) {
                     if ($handler instanceof Closure) {
                         $view = $this->routeCollection->getRoutesOptions($route, $method)['view'] ?? false;
@@ -67,7 +67,7 @@ final class DefinedRouteCollector
 
                     $routeName = $this->routeCollection->getRoutesOptions($route, $method)['as'] ?? $route;
 
-					$definedRoutes[] = [
+                    $definedRoutes[] = [
                         'method'  => $method,
                         'route'   => $route,
                         'name'    => $routeName,
@@ -77,6 +77,6 @@ final class DefinedRouteCollector
             }
         }
 
-		return $this->cachedRoutes = $definedRoutes;
+        return $this->cachedRoutes = $definedRoutes;
     }
 }

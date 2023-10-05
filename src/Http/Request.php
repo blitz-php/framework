@@ -12,7 +12,6 @@
 namespace BlitzPHP\Http;
 
 use ArrayAccess;
-use BlitzPHP\Config\Config;
 use BlitzPHP\Contracts\Session\SessionInterface;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Exceptions\ValidationException;
@@ -293,10 +292,10 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
         return $this->all();
     }
 
-	public function getScheme(): string
-	{
-		return $this->getUri()->getScheme();
-	}
+    public function getScheme(): string
+    {
+        return $this->getUri()->getScheme();
+    }
 
     /**
      * {@inheritDoc}

@@ -45,8 +45,7 @@ class Redirection extends Response
     {
         try {
             return $this->to($this->generator->route('home'), $status);
-        }
-        catch (HttpException) {
+        } catch (HttpException) {
             return $this->to('/', $status);
         }
     }
@@ -61,10 +60,10 @@ class Redirection extends Response
     public function to(string $uri, ?int $code = null, array $headers = [], ?bool $secure = null, string $method = 'auto'): self
     {
         $uri = $this->generator->to($uri, [], $secure);
-        
+
         // Si cela semble être une URL relative, alors convertissez-la en URL complète
         // pour une meilleure sécurité.
-        if (strpos($uri, 'http') !== 0) {
+        if (! str_starts_with($uri, 'http')) {
             $uri = site_url($uri);
         }
 
@@ -101,6 +100,9 @@ class Redirection extends Response
      *
      * Example:
      *  return redirect()->back();
+     *
+     * @param mixed $status
+     * @param mixed $fallback
      */
     public function back($status = StatusCode::FOUND, array $headers = [], $fallback = false): self
     {
@@ -137,7 +139,7 @@ class Redirection extends Response
      * Create a new redirect response.
      */
     protected function createRedirect(string $uri, ?int $code = null, array $headers = [], string $method = 'auto'): self
-    {      
+    {
         $instance = $this->redirect($uri, $method, $code);
 
         foreach ($headers as $key => $value) {

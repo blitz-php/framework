@@ -143,6 +143,6 @@ class GenerateKey extends Command
             copy($baseEnv, $envFile);
         }
 
-		return DotEnv::instance()->replace(['encryption.key' => $key]);
+        return DotEnv::instance()->replace(['encryption.key' => $key]);
     }
 }

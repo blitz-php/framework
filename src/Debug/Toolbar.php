@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Debug;
 
-use BlitzPHP\Core\Application;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Core\Application;
 use BlitzPHP\Debug\Toolbar\Collectors\BaseCollector;
 use BlitzPHP\Debug\Toolbar\Collectors\Config;
 use BlitzPHP\Debug\Toolbar\Collectors\HistoryCollector;
@@ -388,7 +388,7 @@ class Toolbar
         $time = sprintf('%.6f', Date::now()->format('U.u'));
 
         if (! is_dir($this->debugPath)) {
-            mkdir($this->debugPath, 0777);
+            mkdir($this->debugPath, 0o777);
         }
 
         $this->writeFile($this->debugPath . '/debugbar_' . $time . '.json', $data, 'w+');
@@ -397,7 +397,7 @@ class Toolbar
 
         // Les formats non HTML ne doivent pas inclure la barre de débogage,
         // puis nous envoyons des en-têtes indiquant où trouver les données de débogage pour cette réponse
-        if ($request->isAJAX() || strpos($format, 'html') === false) {
+        if ($request->isAJAX() || ! str_contains($format, 'html')) {
             return $response
                 ->withHeader('Debugbar-Time', "{$time}")
                 ->withHeader('Debugbar-Link', site_url("?debugbar_time={$time}"));
@@ -419,13 +419,13 @@ class Toolbar
 
         $responseContent = $response->getBody()->getContents();
 
-        if (strpos($responseContent, '<head>') !== false) {
+        if (str_contains($responseContent, '<head>')) {
             $responseContent = preg_replace('/<head>/', '<head>' . $style, $responseContent, 1);
         } else {
             $responseContent .= $style;
         }
 
-        if (strpos($responseContent, '</body>') !== false) {
+        if (str_contains($responseContent, '</body>')) {
             $responseContent = preg_replace('/<\/body>/', '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>blitzphpDebugBar.init();</script></body>', $responseContent, 1);
         } else {
             $responseContent .= '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>blitzphpDebugBar.init();</script>';
@@ -471,10 +471,10 @@ class Toolbar
             // Négociation du type de contenu pour formater la sortie
             $format = $request->negotiate('media', ['text/html', 'application/json', 'application/xml']);
             $format = explode('/', $format)[1];
-            
+
             $filename = 'debugbar_' . $debugbarTime;
             $filename = $this->debugPath . DS . $filename . '.json';
-            
+
             if (is_file($filename)) {
                 // Affiche la barre d'outils si elle existe
                 return $this->format($debugbarTime, file_get_contents($filename), $format);
@@ -491,8 +491,8 @@ class Toolbar
 
     /**
      * Formatte la sortie
-     * 
-     * @param double $debugbar_time
+     *
+     * @param float $debugbar_time
      */
     protected function format($debugbar_time, string $data, string $format = 'html'): string
     {

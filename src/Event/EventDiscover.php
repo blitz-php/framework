@@ -21,25 +21,25 @@ use BlitzPHP\Contracts\Event\EventManagerInterface;
  */
 class EventDiscover
 {
-	protected Locator $locator;
+    protected Locator $locator;
 
-	public function __construct(protected EventManagerInterface $event)
-	{
-		$this->locator = Services::locator();
-	}
+    public function __construct(protected EventManagerInterface $event)
+    {
+        $this->locator = Services::locator();
+    }
 
-	public function discove()
-	{
-		$files = $this->locator->listFiles('Events/');
+    public function discove()
+    {
+        $files = $this->locator->listFiles('Events/');
 
-		foreach ($files as $file) {
+        foreach ($files as $file) {
             $className = $this->locator->getClassname($file);
 
             if ($className === '' || ! class_exists($className) || ! is_a($className, EventListenerInterface::class, true)) {
                 continue;
             }
 
-			Services::factory($className)->listen($this->event);
+            Services::factory($className)->listen($this->event);
         }
-	}
+    }
 }

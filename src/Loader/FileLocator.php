@@ -57,7 +57,7 @@ class FileLocator
             }
 
             // Si le fichier est dans un espace de noms, nous allons simplement saisir ce fichier et ne pas en rechercher d'autres
-            if (strpos($filename, '\\') !== false) {
+            if (str_contains($filename, '\\')) {
                 $path = $loader->locateFile($filename, 'Helpers');
 
                 if (empty($path)) {
@@ -71,9 +71,9 @@ class FileLocator
                 $paths = $loader->search('Helpers/' . $filename);
 
                 foreach ($paths as $path) {
-                    if (strpos($path, APP_PATH . 'Helpers' . DS) === 0) {
+                    if (str_starts_with($path, APP_PATH . 'Helpers' . DS)) {
                         $appHelper = $path;
-                    } elseif (strpos($path, SYST_PATH . 'Helpers' . DS) === 0) {
+                    } elseif (str_starts_with($path, SYST_PATH . 'Helpers' . DS)) {
                         $systemHelper = $path;
                     } else {
                         $localIncludes[] = $path;
@@ -104,7 +104,7 @@ class FileLocator
         }
     }
 
-	/**
+    /**
      * Charge un fichier d'aide en mémoire.
      * Prend en charge les helpers d'espace de noms, à la fois dans et hors du répertoire 'helpers' d'un répertoire d'espace de noms.
      */
@@ -114,53 +114,53 @@ class FileLocator
 
         $loader = Services::locator();
 
-		// Stockez nos versions de schame système et d'application afin que nous puissions contrôler l'ordre de chargement.
-		$systemSchema  = null;
-		$appSchema     = null;
-		$vendorSchema  = null;
-		
-		// Le fichier de schema qui sera finalement utiliser
-		$file = null;
-		
-		// Vérifiez si ce schama a déjà été chargé
-		if (in_array($name, $loadedSchema, true)) {
+        // Stockez nos versions de schame système et d'application afin que nous puissions contrôler l'ordre de chargement.
+        $systemSchema = null;
+        $appSchema    = null;
+        $vendorSchema = null;
+
+        // Le fichier de schema qui sera finalement utiliser
+        $file = null;
+
+        // Vérifiez si ce schama a déjà été chargé
+        if (in_array($name, $loadedSchema, true)) {
             return $loadedSchema[$name];
-		}
-
-		// Si le fichier est dans un espace de noms, nous allons simplement saisir ce fichier et ne pas en rechercher d'autres
-		if (strpos($name, '\\') !== false) {
-			if (!empty($path = $loader->locateFile($name, 'schemas'))) {
-				$file = $path;
-			}
-		} else {
-			// Pas d'espaces de noms, donc recherchez dans tous les emplacements disponibles
-			$paths = $loader->search('schemas/' . $name);
-
-			foreach ($paths as $path) {
-				if (strpos($path, CONFIG_PATH . 'schemas' . DS) === 0) {
-					$appSchema = $path;
-				} elseif (strpos($path, SYST_PATH . 'Constants' . DS . 'schemas' . DS) === 0) {
-					$systemSchema = $path;
-				} else {
-					$vendorSchema = $path;
-				}
-			}
-
-			// Les schema des vendor sont prioritaire, ensuite vienne ceux de l'application
-			if (!empty($vendorSchema)) {
-				$file = $vendorSchema;
-			} else if (!empty($appSchema)) {
-				$file = $appSchema;
-			} else if (!empty($systemSchema)) {
-				$file = $systemSchema;
-			}
         }
 
-		if (!empty($file)) {
-			$schema = require($file);
-		} else {
-			$schema = null;
-		}
+        // Si le fichier est dans un espace de noms, nous allons simplement saisir ce fichier et ne pas en rechercher d'autres
+        if (str_contains($name, '\\')) {
+            if (! empty($path = $loader->locateFile($name, 'schemas'))) {
+                $file = $path;
+            }
+        } else {
+            // Pas d'espaces de noms, donc recherchez dans tous les emplacements disponibles
+            $paths = $loader->search('schemas/' . $name);
+
+            foreach ($paths as $path) {
+                if (str_starts_with($path, CONFIG_PATH . 'schemas' . DS)) {
+                    $appSchema = $path;
+                } elseif (str_starts_with($path, SYST_PATH . 'Constants' . DS . 'schemas' . DS)) {
+                    $systemSchema = $path;
+                } else {
+                    $vendorSchema = $path;
+                }
+            }
+
+            // Les schema des vendor sont prioritaire, ensuite vienne ceux de l'application
+            if (! empty($vendorSchema)) {
+                $file = $vendorSchema;
+            } elseif (! empty($appSchema)) {
+                $file = $appSchema;
+            } elseif (! empty($systemSchema)) {
+                $file = $systemSchema;
+            }
+        }
+
+        if (! empty($file)) {
+            $schema = require $file;
+        } else {
+            $schema = null;
+        }
 
         if (empty($schema) || ! ($schema instanceof Schema)) {
             $schema = Expect::mixed();
@@ -222,6 +222,6 @@ class FileLocator
             return true;
         }
 
-        return strpos($name, APP_NAMESPACE) === 0;
+        return str_starts_with($name, APP_NAMESPACE);
     }
 }

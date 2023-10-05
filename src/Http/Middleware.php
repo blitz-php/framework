@@ -53,7 +53,7 @@ class Middleware implements RequestHandlerInterface
      */
     public function alias(string $alias, callable|object|string $middleware): self
     {
-		return $this->aliases([$alias => $middleware]);
+        return $this->aliases([$alias => $middleware]);
     }
 
     /**
@@ -217,9 +217,9 @@ class Middleware implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-		if (empty($processing = $this->getMiddleware())) {
-			return $this->response;
-		}
+        if (empty($processing = $this->getMiddleware())) {
+            return $this->response;
+        }
 
         ['middleware' => $middleware, 'options' => $options] = $processing;
 
@@ -250,7 +250,7 @@ class Middleware implements RequestHandlerInterface
 
     /**
      * Enregistre les middlewares definis dans le gestionnaire des middlewares
-     * 
+     *
      * @internal
      */
     public function register(Request $request)
@@ -266,7 +266,7 @@ class Middleware implements RequestHandlerInterface
         if (is_callable($build = $config->build)) {
             Services::container()->call($build, [
                 'request'    => $request,
-                'middleware' => $this
+                'middleware' => $this,
             ]);
         }
     }
@@ -281,12 +281,12 @@ class Middleware implements RequestHandlerInterface
     private function makeMiddleware($middleware)
     {
         if (is_string($middleware) && array_key_exists($middleware, $this->aliases)) {
-			$middleware = $this->aliases[$middleware];
+            $middleware = $this->aliases[$middleware];
         }
-		
-		return is_string($middleware)
-			? Services::container()->get($middleware)
-			: $middleware;
+
+        return is_string($middleware)
+            ? Services::container()->get($middleware)
+            : $middleware;
     }
 
     /**
@@ -307,19 +307,19 @@ class Middleware implements RequestHandlerInterface
 
     /**
      * Recupere les options d'un middlewares de type string
-     * 
+     *
      * @param callable|object|string $middleware
      */
-    private function getMiddlewareAndOptions($middleware, array $options = []): array 
+    private function getMiddlewareAndOptions($middleware, array $options = []): array
     {
         if (is_string($middleware)) {
-            $parts = explode(':', $middleware);
+            $parts      = explode(':', $middleware);
             $middleware = array_shift($parts);
             if (isset($parts[0]) && is_string($parts[0])) {
                 $options = array_merge($options, explode(',', $parts[0]));
             }
         }
-        
+
         return [$middleware, $options];
     }
 

@@ -18,5 +18,4 @@ return Expect::structure([
     'view_path'        => Expect::string()->default(SYST_PATH . 'Debug' . DS . 'Toolbar' . DS . 'Views'),
     'max_queries'      => Expect::int()->default(100),
     'show_debugbar'    => Expect::bool()->default(true),
-
 ])->otherItems();

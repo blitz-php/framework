@@ -50,7 +50,7 @@ class MiddlewareCheck extends Command
      */
     public function execute(array $params)
     {
-		$method = strtolower($this->argument('method', ''));
+        $method = strtolower($this->argument('method', ''));
         $route  = $this->argument('route', '');
 
         if (empty($route) || empty($method)) {
@@ -71,19 +71,19 @@ class MiddlewareCheck extends Command
 
         // PageNotFoundException
         if ($middlewares === ['<unknown>']) {
-            $this->fail("Impossible de trouver une route: ") .
-			$this->colorize('"' . strtoupper($method) . ' ' . $route . '"', 'black');
+            $this->fail('Impossible de trouver une route: ') .
+            $this->colorize('"' . strtoupper($method) . ' ' . $route . '"', 'black');
 
             return EXIT_ERROR;
         }
 
-		$this->table([
-			[
-				'Methode' => strtoupper($method),
-				'Route' => $route,
-				'Middlewares' => implode(' ', $middlewares),
-			]
-		]);
+        $this->table([
+            [
+                'Methode'     => strtoupper($method),
+                'Route'       => $route,
+                'Middlewares' => implode(' ', $middlewares),
+            ],
+        ]);
 
         return EXIT_SUCCESS;
     }

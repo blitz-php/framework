@@ -147,7 +147,7 @@ class View
         unset($data['errors']);
 
         $data = array_merge(static::$shared, $data);
-        
+
         $this->adapter->addData($data, $context);
 
         if (! array_key_exists('errors', $this->getData())) {
@@ -299,7 +299,7 @@ class View
 
             session()->unmarkFlashdata('errors');
         }
-        
+
         if (null !== $e = session()->getFlashdata('error')) {
             if (is_array($e)) {
                 $errors = array_merge($errors, $e);

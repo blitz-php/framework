@@ -23,5 +23,4 @@ return Expect::structure([
     'supported_locales'            => Expect::listOf('string')->default(['fr', 'en']),
     'timezone'                     => Expect::anyOf(...DateTimeZone::listIdentifiers())->default('UTC'),
     'index_page'                   => Expect::string()->default(''),
-
 ])->otherItems();

@@ -300,7 +300,7 @@ class ServerRequest implements ServerRequestInterface
             $config['url'] = '/' . $config['url'];
         }
 
-        if (strpos($config['url'], '?') !== false) {
+        if (str_contains($config['url'], '?')) {
             [$config['url'], $config['environment']['QUERY_STRING']] = explode('?', $config['url']);
 
             parse_str($config['environment']['QUERY_STRING'], $queryArgs);
@@ -397,9 +397,9 @@ class ServerRequest implements ServerRequestInterface
 
         $base = /* Configure::read('App.fullBaseUrl') . */ $this->webroot;
         if (! empty($ref) && ! empty($base)) {
-            if ($local && strpos($ref, $base) === 0) {
+            if ($local && str_starts_with($ref, $base)) {
                 $ref = substr($ref, strlen($base));
-                if ($ref === '' || strpos($ref, '//') === 0) {
+                if ($ref === '' || str_starts_with($ref, '//')) {
                     $ref = '/';
                 }
                 if ($ref[0] !== '/') {
@@ -425,7 +425,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function __call(string $name, array $params)
     {
-        if (strpos($name, 'is') === 0) {
+        if (str_starts_with($name, 'is')) {
             $type = strtolower(substr($name, 2));
 
             array_unshift($params, $type);
@@ -467,7 +467,7 @@ class ServerRequest implements ServerRequestInterface
             return $this->_is($type, $args);
         }
 
-        return $this->_detectorCache[$type] = $this->_detectorCache[$type] ?? $this->_is($type, $args);
+        return $this->_detectorCache[$type] ??= $this->_is($type, $args);
     }
 
     /**
@@ -741,10 +741,10 @@ class ServerRequest implements ServerRequestInterface
 
         foreach ($this->_environment as $key => $value) {
             $name = null;
-            if (strpos($key, 'HTTP_') === 0) {
+            if (str_starts_with($key, 'HTTP_')) {
                 $name = substr($key, 5);
             }
-            if (strpos($key, 'CONTENT_') === 0) {
+            if (str_starts_with($key, 'CONTENT_')) {
                 $name = $key;
             }
             if ($name !== null) {
@@ -1903,7 +1903,7 @@ class ServerRequest implements ServerRequestInterface
             $data = $_POST;
         } elseif (
             in_array($method, ['PUT', 'DELETE', 'PATCH'], true)
-            && strpos($this->contentType() ?? '', 'application/x-www-form-urlencoded') === 0
+            && str_starts_with($this->contentType() ?? '', 'application/x-www-form-urlencoded')
         ) {
             $data = $this->input();
             parse_str($data, $data);
@@ -1951,7 +1951,7 @@ class ServerRequest implements ServerRequestInterface
         $unsetUrl = '/' . str_replace(['.', ' '], '_', urldecode($this->url));
         unset($query[$unsetUrl], $query[$this->base . $unsetUrl]);
 
-        if (strpos($this->url, '?') !== false) {
+        if (str_contains($this->url, '?')) {
             [, $querystr] = explode('?', $this->url);
             parse_str($querystr, $queryArgs);
             $query += $queryArgs;

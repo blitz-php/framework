@@ -75,7 +75,7 @@ if (! function_exists('trace')) {
         }
 
         Kint::$aliases[] = 'trace';
-        
+
         return Kint::trace();
     }
 }

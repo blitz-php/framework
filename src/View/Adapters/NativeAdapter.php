@@ -420,7 +420,7 @@ class NativeAdapter extends AbstractAdapter
     public function insertWhen(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
     {
         if (is_callable($condition)) {
-            $condition = call_user_func($condition);
+            $condition = $condition();
         }
 
         if (true === $condition) {
@@ -444,13 +444,13 @@ class NativeAdapter extends AbstractAdapter
 
     /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition n'est pas remplie.
-     * 
+     *
      * @param mixed $saveData
      */
     public function insertUnless(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
     {
         if (is_callable($condition)) {
-            $condition = call_user_func($condition);
+            $condition = $condition();
         }
 
         return $this->insertWhen(false === $condition, $view, $data, $options, $saveData);
@@ -497,10 +497,9 @@ class NativeAdapter extends AbstractAdapter
         if (is_file($view)) {
             return $this->addData($data)->render($view, $options, $saveData);
         }
-        
+
         return '';
     }
-
 
     /**
      * Ajoute un fichier css de librairie a la vue

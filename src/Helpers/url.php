@@ -106,10 +106,10 @@ if (! function_exists('previous_url')) {
      */
     function previous_url(bool $returnObject = false)
     {
-		/** @var UrlGenerator $generator */
-		$generator = service(UrlGenerator::class);
+        /** @var UrlGenerator $generator */
+        $generator = service(UrlGenerator::class);
 
-		$referer = $generator->previous();
+        $referer = $generator->previous();
 
         return $returnObject ? Services::uri($referer) : $referer;
     }
@@ -505,7 +505,7 @@ if (! function_exists('link_active')) {
 
             return '';
         }
-        
+
         $current_url     = trim(current_url(false), '/');
         $current_section = trim(str_replace(trim(site_url(), '/'), '', $current_url), '/');
 

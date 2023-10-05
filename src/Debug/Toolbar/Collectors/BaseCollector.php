@@ -47,7 +47,7 @@ abstract class BaseCollector
      * Utilisé pour nommer les choses dans la barre d'outils HTML.
      */
     protected string $title = '';
- 
+
     /**
      * La 'cle' de ce Collector.
      * Utilisé comme id.

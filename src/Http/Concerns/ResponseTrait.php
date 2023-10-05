@@ -116,9 +116,9 @@ trait ResponseTrait
         if (is_int($optionsOrStatus)) {
             $status  = $optionsOrStatus;
             $options = [];
-        } else{
-            $status = $optionsOrStatus['status'] ?? StatusCode::OK;
-            $options = array_filter($optionsOrStatus, fn($k) => $k !== 'status', ARRAY_FILTER_USE_KEY);
+        } else {
+            $status  = $optionsOrStatus['status'] ?? StatusCode::OK;
+            $options = array_filter($optionsOrStatus, fn ($k) => $k !== 'status', ARRAY_FILTER_USE_KEY);
         }
 
         $viewContent = view($view, $data, $options)->get();

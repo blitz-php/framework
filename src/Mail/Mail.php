@@ -340,7 +340,7 @@ class Mail implements MailerInterface
         $path = '';
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du parametre "view_base"
-        if (strpos($view, '\\') === false) {
+        if (! str_contains($view, '\\')) {
             $path = $this->config['view_dir'] ?? '';
             if (! empty($path)) {
                 $path .= '/';

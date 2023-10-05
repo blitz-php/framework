@@ -144,7 +144,7 @@ trait GeneratorTrait
         $dir = dirname($target);
 
         if (! is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            mkdir($dir, 0o755, true);
         }
 
         helper('filesystem');
@@ -192,7 +192,6 @@ trait GeneratorTrait
      *
      * Utile pour les composants dont le nom de fichier doit etre dans un format particulier.
      */
-
     protected function formatFilename(string $namespace, string $class): string
     {
         return str_replace('\\', DS, trim(str_replace($namespace . '\\', '', $class), '\\'));

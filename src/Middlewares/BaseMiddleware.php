@@ -21,7 +21,7 @@ abstract class BaseMiddleware implements MiddlewareInterface
      */
     protected array $arguments = [];
 
-    /** 
+    /**
      * Liste des arguments que peut avoir le middleware
      */
     protected array $fillable = [];
@@ -47,7 +47,6 @@ abstract class BaseMiddleware implements MiddlewareInterface
 
         return $this;
     }
-
 
     /**
      * @internal

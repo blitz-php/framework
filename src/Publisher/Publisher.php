@@ -155,7 +155,7 @@ class Publisher extends FileCollection
 
         // Assurez-vous que la destination est autorisée
         foreach (array_keys($this->restrictions) as $directory) {
-            if (strpos($this->destination, $directory) === 0) {
+            if (str_starts_with($this->destination, $directory)) {
                 return;
             }
         }
@@ -218,7 +218,7 @@ class Publisher extends FileCollection
     {
         if ($this->scratch === null) {
             $this->scratch = rtrim(sys_get_temp_dir(), DS) . DS . bin2hex(random_bytes(6)) . DS;
-            mkdir($this->scratch, 0700);
+            mkdir($this->scratch, 0o700);
             $this->scratch = realpath($this->scratch) ? realpath($this->scratch) . DS
                 : $this->scratch;
         }
@@ -447,7 +447,7 @@ class Publisher extends FileCollection
     {
         // Vérifiez qu'il s'agit d'un fichier autorisé pour sa destination
         foreach ($this->restrictions as $directory => $pattern) {
-            if (strpos($to, $directory) === 0 && self::matchFiles([$to], $pattern) === []) {
+            if (str_starts_with($to, $directory) && self::matchFiles([$to], $pattern) === []) {
                 throw PublisherException::fileNotAllowed($from, $directory, $pattern);
             }
         }
@@ -482,7 +482,7 @@ class Publisher extends FileCollection
 
         // Assurez-vous que le répertoire existe
         if (! is_dir($directory = pathinfo($to, PATHINFO_DIRNAME))) {
-            mkdir($directory, 0775, true);
+            mkdir($directory, 0o775, true);
         }
 
         // Autoriser copy() à générer des erreurs

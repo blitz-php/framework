@@ -526,12 +526,12 @@ class Uri implements UriInterface
      */
     public function setQuery(string $query): self
     {
-        if (strpos($query, '#') !== false) {
+        if (str_contains($query, '#')) {
             throw new FrameworkException('La chaine de requete est mal formée');
         }
 
         // Ne peut pas avoir de début ?
-        if (! empty($query) && strpos($query, '?') === 0) {
+        if (! empty($query) && str_starts_with($query, '?')) {
             $query = substr($query, 1);
         }
 
@@ -645,10 +645,10 @@ class Uri implements UriInterface
         $path = $this->removeDotSegments($path);
 
         // Correction de certains cas de bord de barre oblique...
-        if (strpos($orig, './') === 0) {
+        if (str_starts_with($orig, './')) {
             $path = '/' . $path;
         }
-        if (strpos($orig, '../') === 0) {
+        if (str_starts_with($orig, '../')) {
             $path = '/' . $path;
         }
 
@@ -742,7 +742,7 @@ class Uri implements UriInterface
                     $transformed->setQuery($this->getQuery());
                 }
             } else {
-                if (strpos($relative->getPath(), '/') === 0) {
+                if (str_starts_with($relative->getPath(), '/')) {
                     $transformed->setPath($relative->getPath());
                 } else {
                     $transformed->setPath($this->mergePaths($this, $relative));
@@ -822,7 +822,7 @@ class Uri implements UriInterface
 
         if ($output !== '/') {
             // Ajouter une barre oblique au début si nécessaire
-            if (strpos($path, '/') === 0) {
+            if (str_starts_with($path, '/')) {
                 $output = '/' . $output;
             }
 

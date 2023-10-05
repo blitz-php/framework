@@ -19,19 +19,18 @@ use BlitzPHP\Utilities\Helpers;
 final class AutoRouteCollector
 {
     /**
-     * @param string $namespace Namespace dans lequel on recherche
-	 * @param array<class-string> $protectedControllers Liste des contrôleurs dans les routes définis qui ne doivent pas être consultés via Auto-Routing.
-	 * @param string $prefix Préfixe URI pour Module Routing
+     * @param string              $namespace            Namespace dans lequel on recherche
+     * @param array<class-string> $protectedControllers Liste des contrôleurs dans les routes définis qui ne doivent pas être consultés via Auto-Routing.
+     * @param string              $prefix               Préfixe URI pour Module Routing
      */
     public function __construct(
-		private string $namespace, 
-		private string $defaultController, 
-		private string $defaultMethod,
-		private array $httpMethods,
+        private string $namespace,
+        private string $defaultController,
+        private string $defaultMethod,
+        private array $httpMethods,
         private array $protectedControllers,
         private string $prefix = ''
-	)
-    {
+    ) {
     }
 
     /**
@@ -50,18 +49,18 @@ final class AutoRouteCollector
             if (in_array('\\' . $class, $this->protectedControllers, true)) {
                 continue;
             }
-			
-			$routes = $reader->read(
+
+            $routes = $reader->read(
                 $class,
                 $this->defaultController,
                 $this->defaultMethod
             );
 
-			if ($routes === []) {
+            if ($routes === []) {
                 continue;
             }
 
-			$routes = $this->addMiddlewares($routes);
+            $routes = $this->addMiddlewares($routes);
 
             foreach ($routes as $item) {
                 $route = $item['route'] . $item['route_params'];
@@ -72,13 +71,13 @@ final class AutoRouteCollector
                 } elseif ($this->prefix !== '') {
                     $route = $this->prefix . '/' . $route;
                 }
-				
-				$tbody[] = [
+
+                $tbody[] = [
                     strtoupper($item['method']) . '(auto)',
                     $route,
                     '',
                     $item['handler'],
-					'',
+                    '',
                 ];
             }
         }

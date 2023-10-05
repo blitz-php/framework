@@ -40,17 +40,17 @@ class RoutesCollector extends BaseCollector
      */
     protected string $title = 'Routes';
 
-	private DefinedRouteCollector $definedRouteCollector;
-	private Router $router;
+    private DefinedRouteCollector $definedRouteCollector;
+    private Router $router;
     private bool $isAutoRoute = false;
 
-	public function __construct()
-	{
+    public function __construct()
+    {
         $rawRoutes                   = Services::routes(true);
         $this->router                = Services::router($rawRoutes, null, true);
         $this->definedRouteCollector = new DefinedRouteCollector($rawRoutes);
         $this->isAutoRoute           = $rawRoutes->shouldAutoRoute();
-	}
+    }
 
     /**
      * {@inheritDoc}
@@ -101,24 +101,24 @@ class RoutesCollector extends BaseCollector
         ];
 
         // Routes définies
-        $routes  = [];
-		
-		foreach ($this->definedRouteCollector->collect(false) as $route) {
+        $routes = [];
+
+        foreach ($this->definedRouteCollector->collect(false) as $route) {
             // filtre pour les chaînes, car les rappels ne sont pas affichable
-			if ($route['handler'] !== '(Closure)') {
-				$routes[] = [
-					'method'  => strtoupper($route['method']),
-					'route'   => $route['route'],
-					'name'    => $route['name'],
-					'handler' => $route['handler'],
-				];
-			}
+            if ($route['handler'] !== '(Closure)') {
+                $routes[] = [
+                    'method'  => strtoupper($route['method']),
+                    'route'   => $route['route'],
+                    'name'    => $route['name'],
+                    'handler' => $route['handler'],
+                ];
+            }
         }
 
         return [
             'matchedRoute' => $matchedRoute,
             'routes'       => $routes,
-            'autoRoute' => $this->isAutoRoute ? 'Activé' : 'Désactivé',
+            'autoRoute'    => $this->isAutoRoute ? 'Activé' : 'Désactivé',
         ];
     }
 
@@ -127,15 +127,15 @@ class RoutesCollector extends BaseCollector
      */
     public function getBadgeValue(): int
     {
-		$count = 0;
-		
-		foreach ($this->definedRouteCollector->collect(false) as $route) {
+        $count = 0;
+
+        foreach ($this->definedRouteCollector->collect(false) as $route) {
             if ($route['handler'] !== '(Closure)') {
-				$count++;
-			}
+                $count++;
+            }
         }
 
-		return $count;
+        return $count;
     }
 
     /**

@@ -12,9 +12,9 @@
 /*
  * Règles de réécriture du serveur de développement PHP de BlitzPHP
  *
- * Ce script fonctionne avec la commande CLI serve pour aider à exécuter un serveur de développement transparent basé sur le serveur de développement intégré de PHP. 
+ * Ce script fonctionne avec la commande CLI serve pour aider à exécuter un serveur de développement transparent basé sur le serveur de développement intégré de PHP.
  * Ce fichier essaie simplement d’imiter la fonctionnalité mod_rewrite d’Apache afin que le site fonctionne normalement.
- * 
+ *
  * @credit <a href="https://codeigniter.com">CodeIgniter</a>
  */
 

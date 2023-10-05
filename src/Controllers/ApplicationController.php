@@ -43,7 +43,7 @@ class ApplicationController extends BaseController
         $path = '';
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
-        if (strpos($view, '\\') === false) {
+        if (! str_contains($view, '\\')) {
             $reflection                                      = new ReflectionClass(static::class);
             ['dirname' => $dirname, 'filename' => $filename] = pathinfo($reflection->getFileName());
             $dirname                                         = str_ireplace('Controllers', 'Views', $dirname);
@@ -89,7 +89,7 @@ class ApplicationController extends BaseController
      *
      * @param mixed $value
      */
-    final protected function addData(string|array $key, $value = null): self
+    final protected function addData(array|string $key, $value = null): self
     {
         $data = $key;
 

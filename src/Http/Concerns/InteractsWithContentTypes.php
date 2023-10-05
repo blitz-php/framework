@@ -47,7 +47,7 @@ trait InteractsWithContentTypes
     /**
      * Renvoie le type de contenu le plus approprié à partir du tableau donné en fonction de la négociation de contenu.
      */
-    public function prefers(string|array $contentTypes): ?string
+    public function prefers(array|string $contentTypes): ?string
     {
         $accepts = $this->getAcceptableContentTypes();
 

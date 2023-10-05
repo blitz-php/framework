@@ -49,7 +49,7 @@ class HistoryCollector extends BaseCollector
      * Spécifiez la limite de temps et le nombre de fichiers pour l'historique de débogage.
      *
      * @param string $current Heure actuelle de l'historique
-     * @param int $limit   Fichiers d'historique max.
+     * @param int    $limit   Fichiers d'historique max.
      */
     public function setFiles(string $current, int $limit = 20)
     {
@@ -75,7 +75,7 @@ class HistoryCollector extends BaseCollector
             if (json_last_error() === JSON_ERROR_NONE) {
                 preg_match('/debugbar_(.*)\.json$/s', $filename, $time);
                 $time = sprintf('%.6f', $time[1] ?? 0);
-                
+
                 // Fichiers de la barre de débogage affichés dans History Collector
                 $files[] = [
                     'time'        => $time,

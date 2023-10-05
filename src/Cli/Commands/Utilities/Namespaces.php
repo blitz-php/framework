@@ -15,8 +15,8 @@ use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Container\Services;
 
 /**
- * Répertorie les namespace dans Config\autoload.php avec le chemin d'accès du serveur complet. 
- * Vous aide à vérifier que vous avez la configuration des namespaces correctement. 
+ * Répertorie les namespace dans Config\autoload.php avec le chemin d'accès du serveur complet.
+ * Vous aide à vérifier que vous avez la configuration des namespaces correctement.
  */
 class Namespaces extends Command
 {
@@ -25,7 +25,7 @@ class Namespaces extends Command
      */
     protected $group = 'BlitzPHP';
 
-	/**
+    /**
      * @var string Nom
      */
     protected $name = 'namespaces';
@@ -51,21 +51,21 @@ class Namespaces extends Command
     {
         $m = (int) $this->option('m', 60);
 
-        $tbody = true === $this->option('b') 
-			? $this->outputBlitzNamespaces($m) 
-			: $this->outputAllNamespaces($m);
+        $tbody = true === $this->option('b')
+            ? $this->outputBlitzNamespaces($m)
+            : $this->outputAllNamespaces($m);
 
-		$table = [];
+        $table = [];
 
-		foreach ($tbody as $namespace) {
-			$table[] = [
-				'Namespace' => $namespace[0],
-				'Chemin'    => $namespace[1],
-				'Trouvé?'   => $namespace[2] ? 'Oui' : 'Manque',
-			];
-		}
+        foreach ($tbody as $namespace) {
+            $table[] = [
+                'Namespace' => $namespace[0],
+                'Chemin'    => $namespace[1],
+                'Trouvé?'   => $namespace[2] ? 'Oui' : 'Manque',
+            ];
+        }
 
-		$this->table($table);
+        $this->table($table);
     }
 
     private function outputAllNamespaces(int $maxLength): array
@@ -85,7 +85,7 @@ class Namespaces extends Command
                 $tbody[] = [
                     $ns,
                     $pathOutput,
-                    is_dir($path)
+                    is_dir($path),
                 ];
             }
         }

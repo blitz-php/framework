@@ -19,51 +19,49 @@ class Unique extends AbstractRule
     protected $message        = ':attribute :value has been used';
     protected $fillableParams = ['table', 'column', 'ignore'];
 
-	/**
+    /**
      * The name of the ID column.
      */
     protected string $idColumn = 'id';
 
-	protected string $deletedAtColumn = '';
-
+    protected string $deletedAtColumn = '';
 
     public function __construct(protected ConnectionInterface $db)
     {
     }
 
-	/**
+    /**
      * Ignore the given ID during the unique check.
      */
     public function ignore(mixed $id, ?string $idColumn = null): self
     {
-		if (class_exists(Model::class) && $id instanceof Model) {
+        if (class_exists(Model::class) && $id instanceof Model) {
             return $this->ignoreModel($id, $idColumn);
         }
-		
+
         $this->params['ignore'] = $id;
         $this->idColumn         = $idColumn ?? 'id';
-		
 
         return $this;
     }
 
-	/**
+    /**
      * Ignore the given model during the unique check.
      */
     public function ignoreModel(Model $entity, ?string $idColumn = null): self
     {
-		$this->idColumn         = $idColumn ?? $entity->getKeyName();
+        $this->idColumn         = $idColumn ?? $entity->getKeyName();
         $this->params['ignore'] = $entity->{$this->idColumn};
 
         return $this;
     }
 
-	/**
+    /**
      * Ignore soft deleted models during the unique check.
      */
     public function withoutTrashed(string $deletedAtColumn = 'deleted_at'): self
     {
-		$this->deletedAtColumn = $deletedAtColumn;
+        $this->deletedAtColumn = $deletedAtColumn;
 
         return $this;
     }
@@ -77,14 +75,14 @@ class Unique extends AbstractRule
         $column = $this->parameter('column');
         $column = $column ?: $this->getAttribute()->getKey();
 
-		$builder = $this->db->table($table)->where($column, $value);
+        $builder = $this->db->table($table)->where($column, $value);
 
-		if ($ignore) {
-			$builder->where($this->idColumn . ' !=', $ignore);
-		}
-		if ('' !== $this->deletedAtColumn) {
-			$builder->where($this->deletedAtColumn . ' IS NULL');
-		}
+        if ($ignore) {
+            $builder->where($this->idColumn . ' !=', $ignore);
+        }
+        if ('' !== $this->deletedAtColumn) {
+            $builder->where($this->deletedAtColumn . ' IS NULL');
+        }
 
         return $builder->count() === 0;
     }

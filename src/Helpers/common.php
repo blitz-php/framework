@@ -66,7 +66,7 @@ if (! function_exists('model')) {
      *
      * @return T
      */
-    function model(string|array $name, ?ConnectionInterface &$conn = null)
+    function model(array|string $name, ?ConnectionInterface &$conn = null)
     {
         return Load::model($name, $conn);
     }
@@ -114,23 +114,25 @@ if (! function_exists('show404')) {
 }
 
 if (! function_exists('config')) {
-   /**
+    /**
      * GET/SET App config
+     *
+     * @param mixed|null $default
      *
      * @return Config|mixed|void
      */
-    function config(array|string|null $key = null, $default = null)
+    function config(null|array|string $key = null, $default = null)
     {
-		$config = Services::config();
+        $config = Services::config();
 
-		if (null === $key) {
-			return $config;
-		}
+        if (null === $key) {
+            return $config;
+        }
 
         if (is_string($key)) {
             return $config->get($key, $default);
         }
-        
+
         foreach ($key as $k => $v) {
             if (is_string($k)) {
                 $config->set($k, $v);
@@ -141,9 +143,9 @@ if (! function_exists('config')) {
 
 if (! function_exists('logger')) {
     /**
-     * Une méthode de commodité pour les événements de journalisation via le système Log. 
-     * 
-     * Les niveaux de journal autorisés sont : 
+     * Une méthode de commodité pour les événements de journalisation via le système Log.
+     *
+     * Les niveaux de journal autorisés sont :
      *  - emergency
      *  - alert
      *  - critical
@@ -318,10 +320,10 @@ if (! function_exists('stringify_attributes')) {
 if (! function_exists('environment')) {
     /**
      * Renvoi l'environnement d'execution actuel ou determine si on est dans un environnement specifie
-     * 
+     *
      * @return bool|string
      */
-    function environment(array|string|null $env)
+    function environment(null|array|string $env)
     {
         $current = env('ENVIRONMENT');
         if (empty($current) || $current === 'auto') {
@@ -333,21 +335,21 @@ if (! function_exists('environment')) {
         }
 
         $envMap = [
-            'dev'         => 'development',
-            'local'       => 'development',
-            'prod'        => 'production',
-            'test'        => 'testing',
-            'stage'       => 'testing',
-            'staging'     => 'testing',
+            'dev'     => 'development',
+            'local'   => 'development',
+            'prod'    => 'production',
+            'test'    => 'testing',
+            'stage'   => 'testing',
+            'staging' => 'testing',
         ];
 
         $current = $envMap[$current] ?? $current;
-    
+
         if (is_string($env)) {
             $env = [$env];
         }
 
-        $env = array_map(fn($k) => $envMap[$k] ?? $k, $env);
+        $env = array_map(fn ($k) => $envMap[$k] ?? $k, $env);
 
         return in_array($current, $env, true);
     }
@@ -514,6 +516,8 @@ if (! function_exists('redirect')) {
 if (! function_exists('back')) {
     /**
      * Retourne a la page precedente
+     *
+     * @param mixed $fallback
      */
     function back(int $code = 302, array $headers = [], $fallback = false): Redirection
     {
@@ -552,19 +556,19 @@ if (! function_exists('clean_path')) {
         $path = realpath($path) ?: $path;
 
         switch (true) {
-            case strpos($path, APP_PATH) === 0:
+            case str_starts_with($path, APP_PATH)  :
                 return 'APP_PATH' . DS . substr($path, strlen(APP_PATH));
 
-            case strpos($path, SYST_PATH) === 0:
+            case str_starts_with($path, SYST_PATH)  :
                 return 'SYST_PATH' . DS . substr($path, strlen(SYST_PATH));
-            
-            case defined('VENDOR_PATH') && strpos($path, VENDOR_PATH . 'blitz-php' . DS) === 0:
+
+            case defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH . 'blitz-php' . DS)  :
                 return 'BLITZ_PATH' . DS . substr($path, strlen(VENDOR_PATH . 'blitz-php' . DS));
 
-            case defined('VENDOR_PATH') && strpos($path, VENDOR_PATH) === 0:
+            case defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH)  :
                 return 'VENDOR_PATH' . DS . substr($path, strlen(VENDOR_PATH));
 
-            case strpos($path, ROOTPATH) === 0:
+            case str_starts_with($path, ROOTPATH)  :
                 return 'ROOTPATH' . DS . substr($path, strlen(ROOTPATH));
 
             default:
@@ -578,6 +582,7 @@ if (! function_exists('old')) {
      * Fournit l'accès à "entrée ancienne" qui a été définie dans la session lors d'un redirect()-withInput().
      *
      * @param false|string $escape
+     * @param mixed|null   $default
      * @phpstan-param false|'attr'|'css'|'html'|'js'|'raw'|'url' $escape
      *
      * @return array|string|null
@@ -708,7 +713,7 @@ if (! function_exists('force_https')) {
 
         $baseURL = base_url();
 
-        if (strpos($baseURL, 'http://') === 0) {
+        if (str_starts_with($baseURL, 'http://')) {
             $baseURL = (string) substr($baseURL, strlen('http://'));
         }
 
@@ -892,8 +897,6 @@ if (! function_exists('to_stream')) {
      * @param array                                                                                    $options  Additional options
      *
      * @uses GuzzleHttp\Psr7\stream_for
-     *
-     * @return \Psr\Http\Message\StreamInterface
      *
      * @throws \InvalidArgumentException si l'argument $resource n'est pas valide.
      */

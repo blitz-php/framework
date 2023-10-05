@@ -82,9 +82,9 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      */
     public function setMethods(?array $methods): self
     {
-		if (is_array($methods)) {
-			$this->methods = $methods;
-		}
+        if (is_array($methods)) {
+            $this->methods = $methods;
+        }
 
         return $this;
     }

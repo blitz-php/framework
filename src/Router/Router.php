@@ -146,12 +146,12 @@ class Router implements RouterInterface
             if ($this->collection->isFiltered($this->matchedRoute[0])) {
                 $this->middlewaresInfo = $this->collection->getFiltersForRoute($this->matchedRoute[0]);
             }
-			
-			// met a jour le routeur dans le conteneur car permet notament de recupere les bonnes 
-			// info du routing (route actuelle, controleur et methode mappés)
-			Services::set(static::class, $this);
-            
-			return $this->controllerName();
+
+            // met a jour le routeur dans le conteneur car permet notament de recupere les bonnes
+            // info du routing (route actuelle, controleur et methode mappés)
+            Services::set(static::class, $this);
+
+            return $this->controllerName();
         }
 
         // Toujours là ? Ensuite, nous pouvons essayer de faire correspondre l'URI avec
@@ -163,9 +163,9 @@ class Router implements RouterInterface
 
         $this->autoRoute($uri);
 
-		// met a jour le routeur dans le conteneur car permet notament de recupere les bonnes 
-		// info du routing (route actuelle, controleur et methode mappés)
-		Services::set(static::class, $this);
+        // met a jour le routeur dans le conteneur car permet notament de recupere les bonnes
+        // info du routing (route actuelle, controleur et methode mappés)
+        Services::set(static::class, $this);
 
         return $this->controllerName();
     }
@@ -191,8 +191,8 @@ class Router implements RouterInterface
             return $this->controller;
         }
 
-        $controller =  str_contains($this->controller, '\\')
-            ? $this->controller 
+        $controller = str_contains($this->controller, '\\')
+            ? $this->controller
             : trim($this->collection->getDefaultNamespace(), '\\') . '\\' . $this->controller;
 
         $controller = preg_replace(
@@ -346,7 +346,7 @@ class Router implements RouterInterface
             $matchedKey = $routeKey;
 
             // A-t-on affaire à une locale ?
-            if (strpos($routeKey, '{locale}') !== false) {
+            if (str_contains($routeKey, '{locale}')) {
                 $routeKey = str_replace('{locale}', '[^/]+', $routeKey);
             }
 
@@ -367,7 +367,7 @@ class Router implements RouterInterface
                     );
                 }
                 // Stocke nos paramètres régionaux afin que l'objet CodeIgniter puisse l'affecter à la requête.
-                if (strpos($matchedKey, '{locale}') !== false) {
+                if (str_contains($matchedKey, '{locale}')) {
                     preg_match(
                         '#^' . str_replace('{locale}', '(?<locale>[^/]+)', $matchedKey) . '$#u',
                         $uri,
@@ -407,13 +407,13 @@ class Router implements RouterInterface
                 [$controller] = explode('::', $handler);
 
                 // Vérifie `/` dans le nom du contrôleur
-                if (strpos($controller, '/') !== false) {
+                if (str_contains($controller, '/')) {
                     throw RouterException::invalidControllerName($handler);
                 }
 
-                if (strpos($handler, '$') !== false && strpos($routeKey, '(') !== false) {
+                if (str_contains($handler, '$') && str_contains($routeKey, '(')) {
                     // Vérifie le contrôleur dynamique
-                    if (strpos($controller, '$') !== false) {
+                    if (str_contains($controller, '$')) {
                         throw RouterException::dynamicController($handler);
                     }
 

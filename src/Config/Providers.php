@@ -1,4 +1,13 @@
-<?php 
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
 
 namespace BlitzPHP\Config;
 
@@ -13,8 +22,8 @@ class Providers extends AbstractProvider
             self::classes(),
         );
     }
-    
-    /** 
+
+    /**
      * Enregistre les interfaces
      */
     private static function interfaces(): array
@@ -32,8 +41,8 @@ class Providers extends AbstractProvider
         ];
     }
 
-    /** 
-     * Enregistre les classes concretes definies comme services 
+    /**
+     * Enregistre les classes concretes definies comme services
      */
     private static function classes(): array
     {

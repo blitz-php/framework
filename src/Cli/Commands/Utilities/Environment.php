@@ -44,8 +44,8 @@ final class Environment extends Command
     ];
 
     /**
-     * Valeurs autorisées pour l'environnement. 
-	 * Tester le travail est exclu puisque klinge ne fonctionnera pas sur elle.
+     * Valeurs autorisées pour l'environnement.
+     * Tester le travail est exclu puisque klinge ne fonctionnera pas sur elle.
      *
      * @var array<int, string>
      */
@@ -61,7 +61,7 @@ final class Environment extends Command
     {
         if (null === $env = $this->argument('environment')) {
             $this->write('Votre environnement est actuellement défini comme: ');
-			$this->ok(config('app.environment'))->eol();
+            $this->ok(config('app.environment'))->eol();
 
             return;
         }
@@ -113,6 +113,6 @@ final class Environment extends Command
             copy($baseEnv, $envFile);
         }
 
-		return DotEnv::instance()->replace(['ENVIRONMENT' => $newEnv]);
+        return DotEnv::instance()->replace(['ENVIRONMENT' => $newEnv]);
     }
 }

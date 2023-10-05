@@ -81,10 +81,10 @@ return function (array $paths, string $paths_config_file, bool $is_cli) {
      */
     require_once SYST_PATH . 'Helpers' . DS . 'common.php';
 
-	/**
-	 * On initialise le parsing du fichier .env
-	 */
-	DotEnv::init(ROOTPATH);
+    /**
+     * On initialise le parsing du fichier .env
+     */
+    DotEnv::init(ROOTPATH);
 
     // Initialise et enregistre le loader avec la pile SPL autoloader.
     Services::autoloader()->initialize()->register();

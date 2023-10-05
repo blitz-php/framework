@@ -30,7 +30,7 @@ class RedirectException extends Exception implements ResponsableInterface
      */
     protected $code = 302;
 
-	protected ?ResponseInterface $response = null;
+    protected ?ResponseInterface $response = null;
 
     /**
      * @param ResponseInterface|string $message Response object or a string containing a relative URI.

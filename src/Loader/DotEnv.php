@@ -61,34 +61,35 @@ class DotEnv
         return true; // notifie de la reussite de l'operation
     }
 
-	/**
+    /**
      * Remplace les valeurs dans le fichiers .env
-	 * 
-	 * Si une valeur n'existe pas, elle est ajoutée au fichier
+     *
+     * Si une valeur n'existe pas, elle est ajoutée au fichier
      */
-	public function replace(array $data, bool $reload = true): bool
-	{	
-		$oldFileContents = (string) file_get_contents($this->path);
+    public function replace(array $data, bool $reload = true): bool
+    {
+        $oldFileContents = (string) file_get_contents($this->path);
 
-		foreach ($data as $key => $value) {
-			$replacementKey  = "\n{$key} = {$value}";
-			if (strpos($oldFileContents, $key) === false) {
-				if (file_put_contents($this->path, $replacementKey, FILE_APPEND) === false) {
-					return false;
-				}
-				unset($data[$key]);
-			}
-		}
+        foreach ($data as $key => $value) {
+            $replacementKey = "\n{$key} = {$value}";
+            if (! str_contains($oldFileContents, $key)) {
+                if (file_put_contents($this->path, $replacementKey, FILE_APPEND) === false) {
+                    return false;
+                }
+                unset($data[$key]);
+            }
+        }
 
-		if ($data === []) {
-			if ($reload) {
-				return $this->load();
-			}
-			return true;
-		}
+        if ($data === []) {
+            if ($reload) {
+                return $this->load();
+            }
 
-		return $this->update($data, $reload);
-	}
+            return true;
+        }
+
+        return $this->update($data, $reload);
+    }
 
     /**
      * Modifie les valeurs dans le fichiers .env
@@ -153,12 +154,12 @@ class DotEnv
 
         foreach ($lines as $line) {
             // C'est un commentaire?
-            if (strpos(trim($line), '#') === 0) {
+            if (str_starts_with(trim($line), '#')) {
                 continue;
             }
 
             // S'il y a un signe égal, alors nous savons que nous affectons une variable.
-            if (strpos($line, '=') !== false) {
+            if (str_contains($line, '=')) {
                 [$name, $value] = $this->normaliseVariable($line);
                 $vars[$name]    = $value;
             }
@@ -192,7 +193,7 @@ class DotEnv
     public function normaliseVariable(string $name, string $value = ''): array
     {
         // Divisez notre chaîne composée en ses parties.
-        if (strpos($name, '=') !== false) {
+        if (str_contains($name, '=')) {
             [$name, $value] = explode('=', $name, 2);
         }
 
@@ -274,7 +275,7 @@ class DotEnv
      */
     protected function resolveNestedVariables(string $value): string
     {
-        if (strpos($value, '$') !== false) {
+        if (str_contains($value, '$')) {
             $loader = $this;
 
             $value = preg_replace_callback(

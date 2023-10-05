@@ -49,8 +49,8 @@ class Routes extends Command
      * @var array<string, string>
      */
     protected $options = [
-		'-h'     => 'Trier par gestionnaire.',
-		'--host' => 'Spécifiez nom d\'hôte dans la demande URI.',
+        '-h'     => 'Trier par gestionnaire.',
+        '--host' => 'Spécifiez nom d\'hôte dans la demande URI.',
     ];
 
     /**
@@ -75,14 +75,14 @@ class Routes extends Command
             'cli',
         ];
 
-		$tbody                 = [];
-		$uriGenerator          = new SampleURIGenerator($collection);
-		$middlewareCollector   = new MiddlewareCollector();
-		$definedRouteCollector = new DefinedRouteCollector($collection);
+        $tbody                 = [];
+        $uriGenerator          = new SampleURIGenerator($collection);
+        $middlewareCollector   = new MiddlewareCollector();
+        $definedRouteCollector = new DefinedRouteCollector($collection);
 
-		foreach ($definedRouteCollector->collect() as $route) {
+        foreach ($definedRouteCollector->collect() as $route) {
             $sampleUri = $uriGenerator->get($route['route']);
-			$filters   = $middlewareCollector->get($route['method'], $sampleUri);
+            $filters   = $middlewareCollector->get($route['method'], $sampleUri);
 
             $routeName = ($route['route'] === $route['name']) ? '»' : $route['name'];
 
@@ -91,7 +91,7 @@ class Routes extends Command
                 $route['route'],
                 $routeName,
                 $route['handler'],
-				implode(' ', array_map([Helpers::class, 'classBasename'], $filters)),
+                implode(' ', array_map([Helpers::class, 'classBasename'], $filters)),
             ];
         }
 
@@ -100,27 +100,27 @@ class Routes extends Command
                 $collection->getDefaultNamespace(),
                 $collection->getDefaultController(),
                 $collection->getDefaultMethod(),
-				$methods,
-				$collection->getRegisteredControllers('*')
+                $methods,
+                $collection->getRegisteredControllers('*')
             );
 
             $autoRoutes = $autoRouteCollector->get();
 
-			// Check for Module Routes.
-			if ([] !== $routingConfig = config('routing')) {
-				foreach ($routingConfig['module_routes'] as $uri => $namespace) {
-					$autoRouteCollector = new AutoRouteCollector(
-						$namespace,
-						$collection->getDefaultController(),
-						$collection->getDefaultMethod(),
-						$methods,
-						$collection->getRegisteredControllers('*'),
-						$uri
-					);
+            // Check for Module Routes.
+            if ([] !== $routingConfig = config('routing')) {
+                foreach ($routingConfig['module_routes'] as $uri => $namespace) {
+                    $autoRouteCollector = new AutoRouteCollector(
+                        $namespace,
+                        $collection->getDefaultController(),
+                        $collection->getDefaultMethod(),
+                        $methods,
+                        $collection->getRegisteredControllers('*'),
+                        $uri
+                    );
 
-					$autoRoutes = [...$autoRoutes, ...$autoRouteCollector->get()];
-				}
-			}
+                    $autoRoutes = [...$autoRoutes, ...$autoRouteCollector->get()];
+                }
+            }
 
             $tbody = [...$tbody, ...$autoRoutes];
         }

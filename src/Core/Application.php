@@ -73,7 +73,7 @@ class Application
 
     public function run(bool $return_response = false)
     {
-		return Services::singleton(Dispatcher::class)->run(null, $return_response);
+        return Services::singleton(Dispatcher::class)->run(null, $return_response);
     }
 
     /**

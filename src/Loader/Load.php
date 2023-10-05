@@ -36,7 +36,7 @@ class Load
      * @throws InvalidArgumentException
      * @throws LoadException
      */
-    public static function helper(string|array $helpers)
+    public static function helper(array|string $helpers)
     {
         if (empty($helpers)) {
             throw new LoadException('Veuillez specifier le helper à charger');
@@ -56,7 +56,7 @@ class Load
      *
      * @throws LoadException
      */
-    public static function model(string|array $model, ?ConnectionInterface $connection = null)
+    public static function model(array|string $model, ?ConnectionInterface $connection = null)
     {
         if (empty($model)) {
             throw new LoadException('Veuillez specifier le modele à charger');

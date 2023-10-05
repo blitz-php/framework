@@ -24,11 +24,8 @@ abstract class AbstractProvider
         return [];
     }
 
-    /**
-     * 
-     */
     public function register(): void
     {
-        // à implementer par les classes filles        
+        // à implementer par les classes filles
     }
 }

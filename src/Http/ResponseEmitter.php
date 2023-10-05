@@ -205,7 +205,7 @@ class ResponseEmitter
                 continue;
             }
 
-            if (strpos($cookie, '";"') !== false) {
+            if (str_contains($cookie, '";"')) {
                 $cookie = str_replace('";"', '{__cookie_replace__}', $cookie);
                 $parts  = str_replace('{__cookie_replace__}', '";"', explode(';', $cookie));
             } else {
@@ -224,7 +224,7 @@ class ResponseEmitter
             ];
 
             foreach ($parts as $part) {
-                if (strpos($part, '=') !== false) {
+                if (str_contains($part, '=')) {
                     [$key, $value] = explode('=', $part);
                 } else {
                     $key   = $part;

@@ -159,10 +159,10 @@ abstract class Command
      */
     private array $_options = [];
 
-	/**
-	 * @param Console $app Application Console
-	 * @param LoggerInterface $logger Le Logger à utiliser
-	 */
+    /**
+     * @param Console         $app    Application Console
+     * @param LoggerInterface $logger Le Logger à utiliser
+     */
     public function __construct(protected Console $app, protected LoggerInterface $logger)
     {
         $this->initProps();
@@ -225,8 +225,6 @@ abstract class Command
 
     /**
      * Recupere la valeur d'une option lors de l'execution de la commande
-     *
-     * @param mixed $default
      */
     final protected function option(string $name, mixed $default = null): mixed
     {

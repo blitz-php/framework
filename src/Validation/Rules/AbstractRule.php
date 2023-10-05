@@ -15,10 +15,9 @@ use Dimtrovich\Validation\Rules\AbstractRule as BaseRule;
 
 /**
  * Cette classe permet juste de charger les regles compatibles blitz
- * 
+ *
  * Toutes les regles doivent l'implementer pour etre prise en compte
  */
 abstract class AbstractRule extends BaseRule
 {
-
 }

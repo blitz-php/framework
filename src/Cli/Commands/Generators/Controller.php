@@ -56,8 +56,8 @@ class Controller extends Command
      */
     protected $options = [
         '--bare'      => 'S\'étend de BlitzPHP\Controllers\BaseController au lieu de AppController.',
-        '--restful'   => 'S\'étend à partir d\'une ressource RESTful, Options : [controller, presenter]. Par défaut : "controller".',
-        '--namespace' => ['Définissez l\'espace de noms racine. Par défaut : "APP_NAMESPACE".', APP_NAMESPACE],
+        '--restful'   => "S'étend à partir d'une ressource RESTful, Options\u{a0}: [controller, presenter]. Par défaut\u{a0}: \"controller\".",
+        '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--suffix'    => ['Ajoutez le titre du composant au nom de la classe (par exemple, User => UserController).', true],
         '--force'     => 'Forcer l\'écrasement du fichier existant.',
     ];

@@ -24,8 +24,6 @@ class Negotiator
 
     /**
      * Constructor
-     *
-     * @param ServerRequest $request
      */
     public function __construct(?ServerRequest $request = null)
     {

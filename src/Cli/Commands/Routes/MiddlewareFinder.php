@@ -37,6 +37,7 @@ final class MiddlewareFinder
     {
         try {
             $this->router->handle($uri);
+
             return $this->router->getMiddlewares();
         } catch (RedirectException $e) {
             return [];

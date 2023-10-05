@@ -70,15 +70,15 @@ if (! function_exists('lib_css_url')) {
         $name     = explode('?', $name)[0];
         $site_url = site_url();
         $name     = str_replace(
-            [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'], 
-            '', 
+            [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'],
+            '',
             htmlspecialchars($name)
         );
 
         if (is_localfile($name)) {
             $name .= (! preg_match('#\.css$#i', $name) ? '.css' : '');
             $paths = ['lib', 'vendor', 'plugins'];
-        
+
             foreach ($paths as $path) {
                 $filename = WEBROOT . $path . DS . $name;
 
@@ -107,15 +107,15 @@ if (! function_exists('lib_js_url')) {
         $name     = explode('?', $name)[0];
         $site_url = site_url();
         $name     = str_replace(
-            [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'], 
-            '', 
+            [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'],
+            '',
             htmlspecialchars($name)
         );
 
         if (is_localfile($name)) {
             $name .= (! preg_match('#\.js$#i', $name) ? '.js' : '');
             $paths = ['lib', 'vendor', 'plugins'];
-        
+
             foreach ($paths as $path) {
                 $filename = WEBROOT . $path . DS . $name;
 
@@ -496,11 +496,11 @@ if (! function_exists('mix')) {
         if (is_file($publicPath . $manifestDirectory . '/hot')) {
             $url = rtrim(file_get_contents($publicPath . $manifestDirectory . '/hot'));
 
-            if (!empty($customUrl = $customUrl = $config->hot_proxy_url)) {
+            if (! empty($customUrl = $customUrl = $config->hot_proxy_url)) {
                 return $customUrl . $path;
             }
 
-            if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
+            if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
                 return explode(':', $url, 2)[1] . $path;
             }
 
@@ -509,8 +509,8 @@ if (! function_exists('mix')) {
 
         $manifestPath = $publicPath . $manifestDirectory . '/mix-manifest.json';
 
-        if (!isset($manifests[$manifestPath])) {
-            if (!is_file($manifestPath)) {
+        if (! isset($manifests[$manifestPath])) {
+            if (! is_file($manifestPath)) {
                 throw new Exception('Le manifeste Mix n\'existe pas.');
             }
 
@@ -519,14 +519,14 @@ if (! function_exists('mix')) {
 
         $manifest = $manifests[$manifestPath];
 
-        if (!isset($manifest[$path])) {
+        if (! isset($manifest[$path])) {
             $exception = new Exception("Impossible de localiser le fichier Mix: {$path}.");
 
             if (! BLITZ_DEBUG) {
                 return $path;
-            } else {
-                throw $exception;
             }
+
+            throw $exception;
         }
 
         return $config->url . $manifestDirectory . $manifest[$path];

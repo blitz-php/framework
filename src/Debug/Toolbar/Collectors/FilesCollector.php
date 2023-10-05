@@ -55,17 +55,17 @@ class FilesCollector extends BaseCollector
         foreach ($rawFiles as $file) {
             $path = clean_path($file);
 
-            if (strpos($path, 'SYST_PATH') !== false) {
+            if (str_contains($path, 'SYST_PATH')) {
                 $coreFiles[] = [
                     'name' => basename($file),
                     'path' => $path,
                 ];
-            } elseif (strpos($path, 'BLITZ_PATH') !== false) {
+            } elseif (str_contains($path, 'BLITZ_PATH')) {
                 $blitzFiles[] = [
                     'name' => basename($file),
                     'path' => $path,
                 ];
-            } elseif (strpos($path, 'VENDOR_PATH') !== false) {
+            } elseif (str_contains($path, 'VENDOR_PATH')) {
                 $vendorFiles[] = [
                     'name' => basename($file),
                     'path' => $path,

@@ -27,7 +27,7 @@ class Validation extends BaseValidation
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @param array<AbstractRule> $rules
      */
     protected function registerRules(array $rules): void

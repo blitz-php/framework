@@ -67,7 +67,7 @@ trait ContentReplacer
         $directory = dirname($path);
 
         if (! is_dir($directory)) {
-            mkdir($directory, 0777, true);
+            mkdir($directory, 0o777, true);
         }
 
         if (file_exists($path)) {
