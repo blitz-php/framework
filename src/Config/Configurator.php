@@ -12,6 +12,7 @@
 namespace BlitzPHP\Config;
 
 use BlitzPHP\Exceptions\ConfigException;
+use BlitzPHP\Exceptions\UnknownOptionException;
 use Dflydev\DotAccessData\Data;
 use Dflydev\DotAccessData\Exception\DataException;
 use Dflydev\DotAccessData\Exception\InvalidPathException;

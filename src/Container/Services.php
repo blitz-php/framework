@@ -43,6 +43,7 @@ use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\View\View;
+use Psr\Log\LoggerInterface;
 use stdClass;
 
 /**
@@ -183,26 +184,12 @@ class Services
 
     /**
      * Responsable du chargement des traductions des chaînes de langue.
+     * 
+     * @deprecated 0.9 use translators instead
      */
     public static function language(?string $locale = null, bool $shared = true): Translate
     {
-        if (empty($locale)) {
-            if (empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
-                $config = static::config()->get('app');
-
-                if (empty($locale = static::negotiator()->language($config['supported_locales']))) {
-                    $locale = $config['language'];
-                }
-
-                static::$instances[Translate::class . 'locale'] = $locale;
-            }
-        }
-
-        if (true === $shared && isset(static::$instances[Translate::class])) {
-            return static::$instances[Translate::class]->setLocale($locale);
-        }
-
-        return static::$instances[Translate::class] = new Translate($locale, static::locator());
+        return static::translator($locale, $shared);
     }
 
     /**
@@ -221,8 +208,10 @@ class Services
     /**
      * La classe Logger est une classe Logging compatible PSR-3 qui prend en charge
      * plusieurs gestionnaires qui traitent la journalisation réelle.
+     * 
+     * @return Logger
      */
-    public static function logger(bool $shared = true): Logger
+    public static function logger(bool $shared = true): LoggerInterface
     {
         if ($shared && isset(static::$instances[Logger::class])) {
             return static::$instances[Logger::class];
@@ -430,6 +419,30 @@ class Services
         return static::$instances[Toolbar::class] = new Toolbar($config);
     }
 
+    /**
+     * Responsable du chargement des traductions des chaînes de langue.
+     */
+    public static function translator(?string $locale = null, bool $shared = true): Translate
+    {
+        if (empty($locale)) {
+            if (empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
+                $config = static::config()->get('app');
+
+                if (empty($locale = static::negotiator()->language($config['supported_locales']))) {
+                    $locale = $config['language'];
+                }
+
+                static::$instances[Translate::class . 'locale'] = $locale;
+            }
+        }
+
+        if (true === $shared && isset(static::$instances[Translate::class])) {
+            return static::$instances[Translate::class]->setLocale($locale);
+        }
+
+        return static::$instances[Translate::class] = new Translate($locale, static::locator());
+    }
+    
     /**
      * La classe URI fournit un moyen de modéliser et de manipuler les URI.
      */

@@ -12,6 +12,7 @@
 namespace BlitzPHP\Container;
 
 use BadMethodCallException;
+use Closure;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
@@ -36,7 +37,6 @@ use Psr\Container\ContainerInterface;
  * @method string debugEntry(string $name) Obtenir les informations de débogage de l'entrée.
  * @method object injectOn(object $instance) Injectez toutes les dépendances sur une instance existante.
  * @method void set(string $name, mixed $value) Définissez un objet ou une valeur dans le conteneur.
- * @method void add(string $name, mixed $value) Définissez un objet ou une valeur dans le conteneur.
  * @method array getKnownEntryNames() Obtenez des entrées de conteneur définies.
  */
 class Container implements ContainerInterface
@@ -45,15 +45,22 @@ class Container implements ContainerInterface
 
     /**
      * Providers deja charges (cache)
+     * 
+     * @var AbstractProvider[]
      */
     private static array $providers = [];
+    
+    /**
+     * Noms des providers deja charges (cache)
+     * 
+     * @var array<class-string<AbstractProvider>>
+     */
+    private static array $providerNames = [];
 
     /**
-     * methodes aliases 
+     * Avons-nous déjà découvert les fournisseurs ?
      */
-    private static array $alias = [
-        'add' => 'set'
-    ];
+    private static bool $discovered = false;
 
     /**
      * Drapeau pour determiner si le conteneur est deja initialiser
@@ -82,12 +89,71 @@ class Container implements ContainerInterface
         return $this->container->has($name);
     }
 
+    /**
+     * Defini un element au conteneur sous forme de factory
+     * Si l'element existe déjà, il sera remplacé
+     */
+    public function add(string $key, Closure $callback): void
+    {
+        $this->container->set($key, $callback);
+
+        $this->container->set(self::class, $this);
+    }
+
+    /**
+     * Defini un element au conteneur sous forme de factory
+     * Si l'element existe déjà, il sera ignoré
+     */
+    public function addIf(string $key, Closure $callback): void
+    {
+        if (! $this->has($key)) {
+            $this->add($key, $callback);
+        }
+    }
+
+    /**
+     * Defini plusieurs elements au conteneur sous forme de factory
+     * L'element qui existera déjà sera remplacé par la correspondance du tableau
+     * 
+     * @param array<string, Closure> $keys
+     */
+    public function merge(array $keys): void
+    {
+        foreach ($keys as $key => $callback) {
+            if ($callback instanceof Closure) {
+                $this->add($key, $callback);
+            }
+        }
+    }
+
+    /**
+     * Defini plusieurs elements au conteneur sous forme de factory
+     * L'element qui existera déjà sera ignoré
+     * 
+     * @param array<string, Closure> $keys
+     */
+    public function mergeIf(array $keys): void
+    {
+        foreach ($keys as $key => $callback) {
+            if ($callback instanceof Closure) {
+                $this->addIf($key, $callback);
+            }
+        }
+    }
+    
+    /**
+     * Verifie qu'une entree a été explicitement définie dans le conteneur
+     */
+    public function bound(string $key): bool 
+    {
+        return in_array($key, $this->getKnownEntryNames(), true);
+    }
+
+    /**
+     * Methode magique pour acceder aux methodes de php-di
+     */
     public function __call($name, $arguments)
     {
-        if (isset(self::$alias[$name])) {
-            $name = self::$alias[$name];
-        }
-
         if (method_exists($this->container, $name)) {
             return call_user_func_array([$this->container, $name], $arguments);
         }
@@ -95,6 +161,11 @@ class Container implements ContainerInterface
         throw new BadMethodCallException('Methode "' . $name . '" non definie');
     }
     
+    /**
+     * Initialise le conteneur et injecte les services providers.
+     * 
+     * @internal
+     */
     public function initialize()
     {
         if ($this->initialized) {
@@ -113,62 +184,66 @@ class Container implements ContainerInterface
             $builder->enableCompilation(FRAMEWORK_STORAGE_PATH . 'cache');
         }
 
-        $builder->addDefinitions(...self::providers());
+        $this->discoveProviders();
+
+        foreach (self::$providerNames as $provider) {
+            $builder->addDefinitions($provider::definitions());
+        }
 
         $this->container = $builder->build();
 
-        $this->set(self::class, $this);
-        $this->set(ContainerInterface::class, $this);
-
+        $this->registryProviders();
+        
         $this->initialized = true;
     }
 
     /**
-     * Recupere toutes les definitions des services à injecter dans le container
+     * Enregistre les provider dans le conteneur
      */
-    public static function providers(): array
+    private function registryProviders(): void
     {
-        if (! empty(static::$providers)) {
-            return static::$providers;
+        foreach (self::$providerNames as $classname) {
+            $provider = $this->container->make($classname, [
+                'container' => $this
+            ]);
+            $this->container->call([$provider, 'register']);
+            static::$providers[] = $provider;
         }
 
-        $providers = [];
+        $this->set(self::class, $this);
+        $this->set(ContainerInterface::class, $this);
+    }
 
-        $loader = Services::locator();
+    /**
+     * Recherche tous les fournisseurs disponibles et les charge en cache
+     */
+    private function discoveProviders(): void
+    {
+        if (! static::$discovered) {
+            $locator = Services::locator();
+            $files   = array_merge(
+                $locator->search('Config/Providers'),
+                $locator->listFiles('Providers/'),
+            );
 
-        // Stockez nos versions de providers système et d'application afin que nous puissions contrôler l'ordre de chargement.
-        $systemProvider = null;
-        $appProvider    = null;
-        $localIncludes  = [];
+            $appProviders  = array_filter($files, fn($name) => str_starts_with($name, APP_PATH));
+            $systProviders = array_filter($files, fn($name) => str_starts_with($name, SYST_PATH));
+            $files         = array_diff($files, $appProviders, $systProviders);
 
-        $paths = array_merge(
-            $loader->search('Constants/providers'), // providers system
-            $loader->search('Config/providers') // providers de l'application ou des fournisseurs
-        );
+            $files = [
+                ...$files, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
+                ...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors sont les
+                ...$appProviders // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
+            ];
 
-        foreach ($paths as $path) {
-            if (strpos($path, APP_PATH . 'Config' . DS) === 0) {
-                $appProvider = $path;
-            } elseif (strpos($path, SYST_PATH . 'Constants' . DS) === 0) {
-                $systemProvider = $path;
-            } else {
-                $localIncludes[] = $path;
+            // Obtenez des instances de toutes les classes de providers et mettez-les en cache localement.
+            foreach ($files as $file) {
+                if (is_a($classname = $locator->getClassname($file), AbstractProvider::class, true)) {
+                    self::$providerNames[] = $classname;
+                }
             }
+            
+            static::$discovered = true;
         }
-
-        // Les providers par défaut du système doivent être ajouté en premier pour que les autres puisse les surcharger
-        if (! empty($systemProvider)) {
-            $providers[] = $systemProvider;
-        }
-
-        // Tous les providers avec espace de noms sont ajoutés ensuite
-        $providers = [...$providers, ...$localIncludes];
-
-        // Enfin ceux de l'application doivent remplacer tous les autres
-        if (! empty($appProvider)) {
-            $providers[] = $appProvider;
-        }
-
-        return static::$providers = $providers;
     }
 }

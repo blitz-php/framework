@@ -770,7 +770,7 @@ if (! function_exists('lang')) {
      */
     function lang(string $line, array $args = [], ?string $locale = null): string
     {
-        return Services::language($locale)->getLine($line, $args);
+        return Services::translator($locale)->getLine($line, $args);
     }
 }
 
