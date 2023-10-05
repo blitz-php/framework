@@ -804,8 +804,7 @@ class Dispatcher
                 return $this->formatResponse($response, $returned);
             } catch (ValidationException $e) {
                 $code   = $e->getCode();
-                $errors = $e->getErrors();
-                if (empty($errors)) {
+                if (empty($errors = $e->getErrors())) {
                     $errors = [$e->getMessage()];
                 }
 

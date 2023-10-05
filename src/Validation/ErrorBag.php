@@ -11,25 +11,12 @@
 
 namespace BlitzPHP\Validation;
 
-use Rakit\Validation\ErrorBag as RakitErrorBag;
+use Dimtrovich\Validation\ErrorBag as DimtrovichErrorBag;
 
-class ErrorBag extends RakitErrorBag
+class ErrorBag extends DimtrovichErrorBag
 {
     /**
-     * Renvoie les erreurs de validation d'une cle sous forme de chaine
-     */
-    public function line(string $key, string $separator = ', ', string $format = ':message'): ?string
-    {
-        if ([] === $errors = $this->get($key, $format)) {
-            return null;
-        }
-
-        return join($separator, $errors);
-    }
-
-    /**
-     * Get messages from given key, can be use custom format
-     *
+     * Obtenir des messages à partir d'une clé donnée, peut être utilisé dans un format personnalisé
      */
     public function get(string $key, string $format = ':message'): array
     {
@@ -56,7 +43,7 @@ class ErrorBag extends RakitErrorBag
     }
 
     /**
-     * Get all messages
+     * Obtenir tous les messages
      */
     public function all(string $format = ':message'): array
     {
@@ -72,7 +59,7 @@ class ErrorBag extends RakitErrorBag
     }
 
     /**
-     * Filter messages with wildcard key
+     * Filtrer les messages avec une clé générique
      */
     protected function filterMessagesForWildcardKey(string $key, $ruleName = null): array
     {
