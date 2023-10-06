@@ -43,7 +43,7 @@ abstract class Command
      *
      * @var string
      */
-    protected $group;
+    protected $group = '';
 
     /**
      * Le nom de la commande
@@ -64,7 +64,7 @@ abstract class Command
      *
      * @var string
      */
-    protected $description;
+    protected $description = '';
 
     /**
      * la description des options de la commande
