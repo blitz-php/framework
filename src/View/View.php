@@ -277,11 +277,16 @@ class View
 
     /**
      * Compresse le code html d'une vue
-     *
-     * @param bool|string $compress
      */
-    protected function compressView(string $output, $compress = 'auto'): string
+    protected function compressView(string $output, bool|callable|string $compress = 'auto'): string
     {
+        $compress = $compress === 'auto' ? ($this->options['compress_output'] ?? 'auto') : $compress;
+        $compress = $compress === 'auto' ? ($this->config['compress_output'] ?? 'auto') : $compress;
+
+        if (is_callable($compress)) {
+            $compress = Services::container()->call($compress);
+        }
+        
         if ($compress === 'auto') {
             $compress = is_online();
         }

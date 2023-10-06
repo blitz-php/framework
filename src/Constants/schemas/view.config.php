@@ -13,7 +13,7 @@ use Nette\Schema\Expect;
 
 return Expect::structure([
     'active_adapter'  => Expect::string()->default('native'),
-    'compress_output' => Expect::anyOf(true, false, 'auto')->default('auto'),
+    'compress_output' => Expect::type('bool|closure|string')->default('auto'),
     'view_base'       => Expect::string()->default(VIEW_PATH),
     'debug'           => Expect::anyOf(true, false, 'auto')->default('auto'),
     'shared'          => Expect::type('closure')->required()->default(fn() => []),
