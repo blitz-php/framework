@@ -253,7 +253,7 @@ class View
 
         $this->adapter = new self::$validAdapters[$adapter](
             $config,
-            Services::locator(),
+            $config['view_path_locator'] ?? Services::locator(),
             $debug
         );
 

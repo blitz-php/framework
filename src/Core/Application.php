@@ -54,11 +54,6 @@ class Application
         self::checkRequirements();
 
         /**
-         * Lance la capture des exceptions et erreurs
-         */
-        Debugger::init();
-
-        /**
          * On configure quelques extensions
          */
         self::configureExt();
@@ -67,6 +62,11 @@ class Application
          * On initialise le conteneur d'injection de dependences
          */
         Services::container()->initialize();
+
+        /**
+         * Lance la capture des exceptions et erreurs
+         */
+        Debugger::init();
 
         return $this;
     }

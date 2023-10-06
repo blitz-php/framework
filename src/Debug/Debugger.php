@@ -11,17 +11,8 @@
 
 namespace BlitzPHP\Debug;
 
-use BlitzPHP\Container\Services;
 use Spatie\Ignition\Ignition;
-use Throwable;
-use Whoops\Exception\Inspector;
-use Whoops\Handler\Handler;
-use Whoops\Handler\JsonResponseHandler;
-use Whoops\Handler\PlainTextHandler;
-use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
-use Whoops\RunInterface;
-use Whoops\Util\Misc;
 
 /**
  * Capture et affiche les erreurs et exceptions via whoops
@@ -37,39 +28,26 @@ class Debugger
      */
     public static function init()
     {
-        if (class_exists(Run::class)) {
-            return self::initWhoops();
-        }
+        $config = config('exceptions');
+
         if (class_exists(Ignition::class)) {
-            return self::initIgnition();
+            return self::initIgnition($config);
+        }
+        if (class_exists(Run::class)) {
+            return self::initWhoops($config);
         }
     }
 
     /**
      * Initialisation du debugger a travers filp/Whoops
      */
-    private static function initWhoops()
+    private static function initWhoops(array $config)
     {
         $debugger = new Run();
-
-        if (! is_online()) {
-            if (Misc::isCommandLine()) {
-                $debugger->pushHandler(new PlainTextHandler());
-            } elseif (Misc::isAjaxRequest()) {
-                $debugger->pushHandler(new JsonResponseHandler());
-            } else {
-                $debugger->pushHandler(new PrettyPageHandler());
-            }
-        }
-
-        /**
-         * On log toutes les erreurs
-         */
-        $debugger->pushHandler(static function (Throwable $exception, Inspector $inspector, RunInterface $run) {
-            Services::logger()->error($exception);
-
-            return Handler::DONE;
-        });
+        
+        $debugger = ExceptionManager::registerWhoopsHandler($debugger, $config);
+        $debugger = ExceptionManager::registerHttpErrors($debugger, $config);    
+        $debugger = ExceptionManager::registerAppHandlers($debugger, $config); 
 
         $debugger->register();
     }
@@ -79,7 +57,7 @@ class Debugger
      *
      * @todo customisation du debugger et log des erreurs
      */
-    private static function initIgnition()
+    private static function initIgnition(array $config)
     {
         $debugger = Ignition::make();
 
