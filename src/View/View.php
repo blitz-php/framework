@@ -21,6 +21,7 @@ use BlitzPHP\View\Adapters\NativeAdapter;
 use BlitzPHP\View\Adapters\PlatesAdapter;
 use BlitzPHP\View\Adapters\SmartyAdapter;
 use BlitzPHP\View\Adapters\TwigAdapter;
+use Closure;
 
 class View
 {
@@ -77,7 +78,7 @@ class View
     public function __construct()
     {
         $this->config = config('view');
-
+        static::share($this->config['shared']);
         $this->setAdapter($this->config['active_adapter'] ?? 'native');
     }
 
@@ -89,8 +90,11 @@ class View
     /**
      * Defini les données partagées entre plusieurs vues
      */
-    public static function share(array|string $key, mixed $value = null): void
+    public static function share(array|string|Closure $key, mixed $value = null): void
     {
+        if ($key instanceof Closure) {
+            $key = Services::container()->call($key);
+        }
         if (is_string($key)) {
             $key = [$key => $value];
         }
