@@ -11,12 +11,17 @@
 
 namespace BlitzPHP\Config;
 
+use BlitzPHP\Autoloader\Autoloader;
+use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Utilities\Helpers;
+use BlitzPHP\Utilities\Iterable\Arr;
 use InvalidArgumentException;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
+use ReflectionClass;
+use ReflectionMethod;
 
 class Config
 {
@@ -24,6 +29,13 @@ class Config
      * Fichier de configuration déjà chargé
      */
     private static array $loaded = [];
+
+	/**
+	 * Different registrars decouverts.
+	 * 
+	 * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
+	 */
+	private static array $registrars = [];
 
     /**
      * Drapeau permettant de savoir si la config a deja ete initialiser
@@ -130,12 +142,14 @@ class Config
                 $configurations = (array) require $file;
             }
 
+			$configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations);
+
             if (empty($schema)) {
                 $schema = self::schema($config);
             }
 
             $this->configurator->addSchema($config, $schema, false);
-            $this->configurator->merge([$config => (array) $configurations]);
+            $this->configurator->merge([$config => $configurations]);
 
             self::$loaded[$config] = $file;
         }
@@ -209,6 +223,7 @@ class Config
             return;
         }
 
+		$this->loadRegistrar();
         $this->load(['app']);
 
         ini_set('log_errors', 1);
@@ -220,6 +235,36 @@ class Config
 
         self::$initialized = true;
     }
+
+	/**
+	 * Charges les registrars disponible pour l'application.
+	 * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
+	 */
+	private function loadRegistrar() 
+	{
+		$autoloader = new Autoloader(['psr4' => [APP_NAMESPACE => APP_PATH]]);
+		$locator    = new Locator($autoloader->initialize());
+
+		$registrarsFiles = $locator->search('Config/Registrar.php');
+
+		foreach ($registrarsFiles as $file) {
+			$class   = new ReflectionClass($locator->getClassname($file));
+			$methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
+
+			foreach ($methods as $method) {
+				if (!($method->isPublic() && $method->isStatic())) {
+					continue;
+				}
+
+				if (!is_array($result = $method->invoke(null))) {
+					continue;
+				}
+
+				$name                    = $method->getName();
+				self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
+			}
+		}
+	}
 
     /**
      * Initialise l'URL
