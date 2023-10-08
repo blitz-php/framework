@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Loader\Filesystem;
+use BlitzPHP\Container\Services;
 
 if (! function_exists('directory_map')) {
     /**
@@ -25,7 +25,7 @@ if (! function_exists('directory_map')) {
      */
     function directory_map(string $sourceDir, int $directoryDepth = 0, bool $hidden = false): array
     {
-        return Filesystem::directories($sourceDir, $directoryDepth, $hidden);
+        return Services::fs()->directories($sourceDir, $directoryDepth, $hidden);
     }
 }
 
@@ -38,7 +38,7 @@ if (! function_exists('directory_mirror')) {
      */
     function directory_mirror(string $originDir, string $targetDir, bool $overwrite = true): bool
     {
-        return Filesystem::copyDirectory($originDir, $targetDir, $overwrite);
+        return Services::fs()->copyDirectory($originDir, $targetDir, $overwrite);
     }
 }
 
