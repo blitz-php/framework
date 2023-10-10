@@ -287,13 +287,13 @@ class Config
     {
         $environment = $config = $this->get('app.environment');
 
-        if ($config === 'auto') {
-            $config = is_online() ? 'production' : 'development';
-        } elseif ($config === 'dev') {
-            $config = 'development';
-        } elseif ($config === 'prod') {
-            $config = 'production';
-        }
+        $config = match($config) {
+            'auto'  => is_online() ? 'production' : 'development',
+            'dev'   => 'development',
+            'prod'  => 'production',
+            'test'  => 'testing',
+            default => $config,
+        };
 
         if ($config !== $environment) {
             $this->set('app.environment', $config);
@@ -305,14 +305,14 @@ class Config
                 ini_set('display_errors', 1);
                 break;
 
-            case 'test':
+            case 'testing':
             case 'production':
                 ini_set('display_errors', 0);
                 error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
                 break;
 
             default:
-                self::exceptBadConfigValue('environment', ['development', 'production', 'test', 'auto'], 'app');
+                self::exceptBadConfigValue('environment', ['development', 'production', 'testing', 'auto'], 'app');
         }
 
         defined('BLITZ_DEBUG') || define('BLITZ_DEBUG', $config !== 'production');

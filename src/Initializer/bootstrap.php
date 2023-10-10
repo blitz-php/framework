@@ -16,7 +16,10 @@ use BlitzPHP\Loader\DotEnv;
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 // Se rassurer que le dossier courant pointe sur le dossier du front controller
-chdir(WEBROOT);
+if (!defined('TEST_PATH')) {
+    // On doit aussi verifier qu'on n'est pas en phase de test, sinon khalan ne trouvera pas le dossier des specs
+    chdir(WEBROOT);
+}
 
 return function (array $paths, string $paths_config_file, bool $is_cli) {
     // Le chemin d'accès vers le dossier de l'application

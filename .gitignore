@@ -108,3 +108,9 @@ nb-configuration.xml
 codeclimate.json
 coveralls.json
 clover.xml
+
+# Blitz
+**/logs/**
+**/debugbar/**
+**/cache/**
+**/storage/framework/session
