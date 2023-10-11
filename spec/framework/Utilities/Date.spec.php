@@ -228,13 +228,13 @@ describe('Utilities / Date', function () {
         });
 
         it('createFromTimeLocalized', function () {
-            $date = Date::createFromTime(10, 03, 05, 'Europe/London');
+            $date = Date::createFromTime(10, 0o3, 0o5, 'Europe/London');
 
             expect(date('Y-m-d 10:03:05'))->toBe($date->toDateTimeString());
         });
 
         it('createFromTimeEvening', function () {
-            $date = Date::createFromTime(20, 03, 05);
+            $date = Date::createFromTime(20, 0o3, 0o5);
 
             expect(date('Y-m-d 20:03:05'))->toBe($date->toDateTimeString());
         });

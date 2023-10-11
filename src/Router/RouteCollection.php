@@ -1174,7 +1174,7 @@ class RouteCollection implements RouteCollectionInterface
         if ($search === '') {
             return false;
         }
-        
+
         // Les routes nommées ont une priorité plus élevée.
         foreach ($this->routesNames as $verb => $collection) {
             if (array_key_exists($search, $collection)) {

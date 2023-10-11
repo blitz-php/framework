@@ -30,12 +30,12 @@ class Config
      */
     private static array $loaded = [];
 
-	/**
-	 * Different registrars decouverts.
-	 * 
-	 * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
-	 */
-	private static array $registrars = [];
+    /**
+     * Different registrars decouverts.
+     *
+     * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
+     */
+    private static array $registrars = [];
 
     /**
      * Drapeau permettant de savoir si la config a deja ete initialiser
@@ -142,7 +142,7 @@ class Config
                 $configurations = (array) require $file;
             }
 
-			$configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations);
+            $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations);
 
             if (empty($schema)) {
                 $schema = self::schema($config);
@@ -223,7 +223,7 @@ class Config
             return;
         }
 
-		$this->loadRegistrar();
+        $this->loadRegistrar();
         $this->load(['app']);
 
         ini_set('log_errors', 1);
@@ -236,35 +236,35 @@ class Config
         self::$initialized = true;
     }
 
-	/**
-	 * Charges les registrars disponible pour l'application.
-	 * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
-	 */
-	private function loadRegistrar() 
-	{
-		$autoloader = new Autoloader(['psr4' => [APP_NAMESPACE => APP_PATH]]);
-		$locator    = new Locator($autoloader->initialize());
+    /**
+     * Charges les registrars disponible pour l'application.
+     * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
+     */
+    private function loadRegistrar()
+    {
+        $autoloader = new Autoloader(['psr4' => [APP_NAMESPACE => APP_PATH]]);
+        $locator    = new Locator($autoloader->initialize());
 
-		$registrarsFiles = $locator->search('Config/Registrar.php');
+        $registrarsFiles = $locator->search('Config/Registrar.php');
 
-		foreach ($registrarsFiles as $file) {
-			$class   = new ReflectionClass($locator->getClassname($file));
-			$methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
+        foreach ($registrarsFiles as $file) {
+            $class   = new ReflectionClass($locator->getClassname($file));
+            $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
 
-			foreach ($methods as $method) {
-				if (!($method->isPublic() && $method->isStatic())) {
-					continue;
-				}
+            foreach ($methods as $method) {
+                if (! ($method->isPublic() && $method->isStatic())) {
+                    continue;
+                }
 
-				if (!is_array($result = $method->invoke(null))) {
-					continue;
-				}
+                if (! is_array($result = $method->invoke(null))) {
+                    continue;
+                }
 
-				$name                    = $method->getName();
-				self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
-			}
-		}
-	}
+                $name                    = $method->getName();
+                self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
+            }
+        }
+    }
 
     /**
      * Initialise l'URL
@@ -287,7 +287,7 @@ class Config
     {
         $environment = $config = $this->get('app.environment');
 
-        $config = match($config) {
+        $config = match ($config) {
             'auto'  => is_online() ? 'production' : 'development',
             'dev'   => 'development',
             'prod'  => 'production',

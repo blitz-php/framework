@@ -2,6 +2,7 @@ Blitz PHP Framework
 ==============
 
 [![Kahlan](https://github.com/blitz-php/framework/workflows/Kahlan/badge.svg)](https://github.com/blitz-php/framework/actions/workflows/test-kahlan.yml)
+[![Coding Standards](https://github.com/blitz-php/framework/actions/workflows/test-coding-standards.yml/badge.svg)](https://github.com/blitz-php/framework/actions/workflows/test-coding-standards.yml)
 [![Quality Score](https://img.shields.io/scrutinizer/g/blitz-php/framework.svg?style=flat-square)](https://scrutinizer-ci.com/g/blitz-php/framework)
 [![Build Status](https://scrutinizer-ci.com/g/blitz-php/framework/badges/build.png?b=main)](https://scrutinizer-ci.com/g/blitz-php/framework/build-status/main)
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/blitz-php/framework/badges/code-intelligence.svg?b=main)](https://scrutinizer-ci.com/code-intelligence)

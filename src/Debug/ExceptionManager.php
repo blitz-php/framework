@@ -35,25 +35,25 @@ class ExceptionManager
      */
     public static function registerHttpErrors(Run $debugger, array $config): Run
     {
-        return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use($config) {
+        return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config) {
             if (true === $config['log']) {
                 if (! in_array($exception->getCode(), $config['ignore_codes'], true)) {
                     Services::logger()->error($exception);
                 }
             }
 
-            $files = array_map(fn(SplFileInfo $file) => $file->getFilenameWithoutExtension(), Services::fs()->files($config['error_view_path']));
+            $files = array_map(fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), Services::fs()->files($config['error_view_path']));
 
-            if (in_array((string)$exception->getCode(), $files, true)) {
+            if (in_array((string) $exception->getCode(), $files, true)) {
                 $view = new View();
                 $view->setAdapter(config('view.active_adapter', 'native'), ['view_path_locator' => $config['error_view_path']])
-                    ->display((string)$exception->getCode())
+                    ->display((string) $exception->getCode())
                     ->setData(['message' => $exception->getMessage()])
                     ->render();
-                    
+
                 return Handler::QUIT;
-            }     
-            
+            }
+
             return Handler::DONE;
         });
     }
@@ -63,12 +63,10 @@ class ExceptionManager
      */
     public static function registerAppHandlers(Run $debugger, array $config): Run
     {
-
         foreach ($config['handlers'] ?? [] as $handler) {
-            
             if (is_callable($handler)) {
                 $debugger->pushHandler($handler);
-            } else if(is_string($handler) && class_exists($handler)) {
+            } elseif (is_string($handler) && class_exists($handler)) {
                 $class = Services::container()->make($handler);
                 if (is_callable($class) || $class instanceof HandlerInterface) {
                     $debugger->pushHandler($class);
@@ -92,7 +90,7 @@ class ExceptionManager
             if (Misc::isAjaxRequest()) {
                 $debugger->pushHandler(new JsonResponseHandler());
             } else {
-                $handler = new PrettyPageHandler(); 
+                $handler = new PrettyPageHandler();
 
                 $handler->setEditor($config['editor'] ?: PrettyPageHandler::EDITOR_VSCODE);
                 $handler->setPageTitle($config['title'] ?: $handler->getPageTitle());
@@ -107,15 +105,14 @@ class ExceptionManager
                     } elseif (is_callable($data)) {
                         $handler->addDataTableCallback($label, $data);
                     }
-                }                
-                
+                }
+
                 $debugger->pushHandler($handler);
             }
         }
 
         return $debugger;
     }
-
 
     /**
      * Enregistre les elements blacklisté dans l'affichage du rapport d'erreur
@@ -130,13 +127,13 @@ class ExceptionManager
             }
 
             $name = strtoupper($name);
-            
+
             if ($key !== '*') {
                 foreach (explode(',', $key) as $k) {
                     $handler->blacklist($name, $k);
                 }
             } else {
-                $values = match($name) {
+                $values = match ($name) {
                     '_GET'     => $_GET,
                     '_POST'    => $_POST,
                     '_COOKIE'  => $_COOKIE,
@@ -146,6 +143,7 @@ class ExceptionManager
                     '_SESSION' => $_SESSION ?? [],
                     default    => [],
                 };
+
                 foreach ($values as $key => $value) {
                     $handler->blacklist($name, $key);
                 }

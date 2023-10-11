@@ -11,7 +11,6 @@ build:
             coverage:
                 file: 'clover.xml'
                 format: 'clover'
-            use_website_config: true
     tests: true
 
 filter:

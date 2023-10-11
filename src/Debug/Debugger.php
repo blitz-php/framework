@@ -44,10 +44,10 @@ class Debugger
     private static function initWhoops(array $config)
     {
         $debugger = new Run();
-        
+
         $debugger = ExceptionManager::registerWhoopsHandler($debugger, $config);
-        $debugger = ExceptionManager::registerHttpErrors($debugger, $config);    
-        $debugger = ExceptionManager::registerAppHandlers($debugger, $config); 
+        $debugger = ExceptionManager::registerHttpErrors($debugger, $config);
+        $debugger = ExceptionManager::registerAppHandlers($debugger, $config);
 
         $debugger->register();
     }

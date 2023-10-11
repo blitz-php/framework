@@ -90,7 +90,7 @@ class View
     /**
      * Defini les données partagées entre plusieurs vues
      */
-    public static function share(array|string|Closure $key, mixed $value = null): void
+    public static function share(array|Closure|string $key, mixed $value = null): void
     {
         if ($key instanceof Closure) {
             $key = Services::container()->call($key);
@@ -286,7 +286,7 @@ class View
         if (is_callable($compress)) {
             $compress = Services::container()->call($compress);
         }
-        
+
         if ($compress === 'auto') {
             $compress = is_online();
         }
@@ -300,7 +300,7 @@ class View
     protected function decorate(string $output): string
     {
         foreach ($this->config['decorators'] as $decorator) {
-            if (!is_subclass_of($decorator, ViewDecoratorInterface::class)) {
+            if (! is_subclass_of($decorator, ViewDecoratorInterface::class)) {
                 throw ViewException::invalidDecorator($decorator);
             }
 

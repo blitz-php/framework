@@ -16,7 +16,7 @@ return Expect::structure([
     'compress_output' => Expect::type('bool|closure|string')->default('auto'),
     'view_base'       => Expect::string()->default(VIEW_PATH),
     'debug'           => Expect::anyOf(true, false, 'auto')->default('auto'),
-    'shared'          => Expect::type('closure')->required()->default(fn() => []),
+    'shared'          => Expect::type('closure')->required()->default(fn () => []),
     'decorators'      => Expect::listOf('string')->required()->default([]),
     'adapters'        => Expect::arrayOf('array', 'string')->required(),
 ])->otherItems();

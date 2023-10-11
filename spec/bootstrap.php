@@ -22,12 +22,13 @@ defined('DEBUG') || define('DEBUG', true);
 defined('DS')    || define('DS', DIRECTORY_SEPARATOR);
 
 // Souvent, ces constantes sont prédéfinis, mais interroger la structure actuelle du répertoire comme un repli
-defined('HOME_PATH') || define('HOME_PATH', realpath(rtrim(getcwd(), '\\/ ')) . DS);
-defined('VENDOR_PATH') || define('VENDOR_PATH', realpath(HOME_PATH . 'vendor') . DS);
+defined('HOME_PATH')     || define('HOME_PATH', realpath(rtrim(getcwd(), '\\/ ')) . DS);
+defined('VENDOR_PATH')   || define('VENDOR_PATH', realpath(HOME_PATH . 'vendor') . DS);
 defined('COMPOSER_PATH') || define('COMPOSER_PATH', realpath(VENDOR_PATH . 'autoload.php'));
 if (! is_file(COMPOSER_PATH)) {
     echo 'Votre fichier autoload de Composer ne semble pas être défini correctement. ';
     echo 'Veuillez ouvrir le fichier suivant et pour corriger: "' . __FILE__ . '"';
+
     exit(3); // EXIT_CONFIG
 }
 require_once COMPOSER_PATH;
@@ -49,11 +50,11 @@ define('BASE_URL', $_SERVER['app.baseURL']);
 /**
  * Chargement du fichier responsable du demarrage du systeme
  */
-$bootstrap = require_once SYST_PATH . 'Initializer' . DS. 'bootstrap.php';
+$bootstrap = require_once SYST_PATH . 'Initializer' . DS . 'bootstrap.php';
 
 /**
  * Lancement de l'application
- * 
+ *
  * Maintenant que tout est ok, on peut exeecuter l'application
  */
 $bootstrap(['app' => APP_PATH, 'storage' => STORAGE_PATH], __FILE__, true);

@@ -16,7 +16,7 @@ use BlitzPHP\Loader\DotEnv;
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
 // Se rassurer que le dossier courant pointe sur le dossier du front controller
-if (!defined('TEST_PATH')) {
+if (! defined('TEST_PATH')) {
     // On doit aussi verifier qu'on n'est pas en phase de test, sinon khalan ne trouvera pas le dossier des specs
     chdir(WEBROOT);
 }
