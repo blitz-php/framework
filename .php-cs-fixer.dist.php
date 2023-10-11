@@ -26,8 +26,6 @@ $finder = Finder::create()
     ->notName('#Foobar.php$#')
     ->append([
         __FILE__,
-        __DIR__ . '/.php-cs-fixer.no-header.php',
-        __DIR__ . '/.php-cs-fixer.user-guide.php',
     ]);
 
 $overrides = [
