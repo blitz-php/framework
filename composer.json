@@ -33,7 +33,7 @@
         "jawira/case-converter": "^3.5",
         "kint-php/kint": "^5.0.1",
         "mirazmac/php-requirements-checker": "^0.2.0",
-        "monolog/monolog": "^2.6",
+        "monolog/monolog": "^2.6 || ^3.0",
         "nette/schema": "^1.2",
         "php-di/php-di": "^7.0",
         "psr/http-server-middleware": "^1.0"
