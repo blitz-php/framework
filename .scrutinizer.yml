@@ -10,9 +10,9 @@ build:
         override:
           - php-scrutinizer-run
           -
-            command: 'vendor/bin/kahlan --reporter=verbose --clover=clover.xml'
+            command: 'vendor/bin/kahlan --reporter=verbose --clover=scrutinizer.xml'
             coverage:
-                file: 'clover.xml'
+                file: 'scrutinizer.xml'
                 format: 'clover'
     tests: true
 
