@@ -16,6 +16,7 @@ use BlitzPHP\Formatter\Formatter;
 use DateTime;
 use DateTimeZone;
 use GuzzleHttp\Psr7\Utils;
+use InvalidArgumentException;
 
 trait ResponseTrait
 {

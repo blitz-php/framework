@@ -59,10 +59,10 @@ if (! function_exists('base_url')) {
     function base_url($relativePath = '', ?string $scheme = null): string
     {
         $index_page = index_page();
-        config('app.index_page', '', true);
-
+        config()->set('app.index_page', '');
+        
         $url = rtrim(site_url($relativePath, $scheme), '/');
-        config('app.index_page', $index_page, true);
+        config()->set('app.index_page', $index_page);
 
         return $url;
     }
@@ -282,6 +282,8 @@ if (! function_exists('safe_mailto')) {
             } else {
                 if (empty($temp)) {
                     $count = ($ordinal < 224) ? 2 : 3;
+                } else {
+                    $count = 0;
                 }
 
                 $temp[] = $ordinal;
@@ -438,9 +440,9 @@ if (! function_exists('mb_url_title')) {
      */
     function mb_url_title(string $str, string $separator = '-', bool $lowercase = false): string
     {
-        helper('text');
+        helper('scl');
 
-        return url_title(convert_accented_characters($str), $separator, $lowercase);
+        return url_title(scl_moveSpecialChar($str), $separator, $lowercase);
     }
 }
 

@@ -99,7 +99,7 @@ class View
             $key = [$key => $value];
         }
 
-        static::$shared = array_merge(static::$shared, $key);
+        self::$shared = array_merge(self::$shared, $key);
     }
 
     /**
@@ -152,7 +152,7 @@ class View
     {
         unset($data['errors']);
 
-        $data = array_merge(static::$shared, $data);
+        $data = array_merge(self::$shared, $data);
 
         $this->adapter->addData($data, $context);
 
@@ -196,7 +196,7 @@ class View
     {
         unset($data['errors']);
 
-        $data = array_merge(static::$shared, $data);
+        $data = array_merge(self::$shared, $data);
 
         $this->adapter->setData($data, $context);
 
@@ -317,24 +317,27 @@ class View
     {
         $errors = [];
 
-        if (null !== $e = session()->getFlashdata('errors')) {
+        /** @var \BlitzPHP\Session\Store $session */
+        $session = session();
+
+        if (null !== $e = $session->getFlashdata('errors')) {
             if (is_array($e)) {
                 $errors = array_merge($errors, $e);
             } else {
                 $errors['error'] = $e;
             }
 
-            session()->unmarkFlashdata('errors');
+            $session->unmarkFlashdata('errors');
         }
 
-        if (null !== $e = session()->getFlashdata('error')) {
+        if (null !== $e = $session->getFlashdata('error')) {
             if (is_array($e)) {
                 $errors = array_merge($errors, $e);
             } else {
                 $errors['error'] = $e;
             }
 
-            session()->unmarkFlashdata('error');
+            $session->unmarkFlashdata('error');
         }
 
         $this->adapter->addData(['errors' => new ErrorBag($errors)]);

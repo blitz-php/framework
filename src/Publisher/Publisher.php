@@ -299,7 +299,7 @@ class Publisher extends FileCollection
         $file = $this->getScratch() . basename((new Uri($uri))->getPath());
 
         // Obtenez le contenu et écrivez-le dans l'espace de travail
-        write_file($file, Services::httpclient()->get($uri)->body());
+        write_file($file, service('httpclient')->get($uri)->body());
 
         return $this->addFile($file);
     }

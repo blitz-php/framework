@@ -71,7 +71,7 @@ class MiddlewareCheck extends Command
 
         // PageNotFoundException
         if ($middlewares === ['<unknown>']) {
-            $this->fail('Impossible de trouver une route: ') .
+            $this->fail('Impossible de trouver une route: ');
             $this->colorize('"' . strtoupper($method) . ' ' . $route . '"', 'black');
 
             return EXIT_ERROR;

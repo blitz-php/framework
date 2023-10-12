@@ -33,7 +33,6 @@ class Load
     /**
      * Charge un fichier d'aide
      *
-     * @throws InvalidArgumentException
      * @throws LoadException
      */
     public static function helper(array|string $helpers)

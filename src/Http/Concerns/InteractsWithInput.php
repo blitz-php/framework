@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Http\Concerns;
 
-use BlitzPHP\Http\UploadedFile;
+use BlitzPHP\Filesystem\Files\UploadedFile;
 use BlitzPHP\Utilities\Date;
 use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\Iterable\Collection;

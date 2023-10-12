@@ -46,7 +46,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * Cree un validateur avec les donnees de la requete actuelle
      */
-    protected function validation(array $rules, array $messages = []): Validation
+    public function validation(array $rules, array $messages = []): Validation
     {
         return Validator::make($this->all(), $rules, $messages);
     }
@@ -196,7 +196,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function ajax(): bool
     {
-        return $this->isAjax();
+        return $this->is('ajax');
     }
 
     /**

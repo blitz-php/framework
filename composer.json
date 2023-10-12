@@ -40,6 +40,7 @@
     },
     "require-dev": {
         "blitz-php/coding-standard": "^1.3",
+        "filp/whoops": "^2.15",
         "kahlan/kahlan": "^5.2",
         "phpstan/phpstan": "^1.10.2",
         "scrutinizer/ocular": "^1.8.1"
@@ -86,8 +87,7 @@
     },
     "suggest": {
         "ext-ftp": "Required to use the Flysystem FTP driver.",
-        "fakerphp/faker": "Required to make seed of database (^1.9.1).",
-        "filp/whoops": "Required for friendly error pages in development (^2.14.3)."
+        "fakerphp/faker": "Required to make seed of database (^1.9.1)."
     },
     "prefer-stable": true,
     "config": {

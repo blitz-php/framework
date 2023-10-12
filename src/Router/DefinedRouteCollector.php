@@ -31,7 +31,7 @@ final class DefinedRouteCollector
     }
 
     /**
-     * @phpstan-return Generator<array{method: string, route: string, name: string, handler: string}>
+     * Collecte les routes enregistrees
      */
     public function collect(bool $reset = true): array
     {

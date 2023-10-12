@@ -212,7 +212,7 @@ class Container implements ContainerInterface
                 'container' => $this,
             ]);
             $this->container->call([$provider, 'register']);
-            static::$providers[] = $provider;
+            self::$providers[] = $provider;
         }
 
         $this->set(self::class, $this);
@@ -224,7 +224,7 @@ class Container implements ContainerInterface
      */
     private function discoveProviders(): void
     {
-        if (! static::$discovered) {
+        if (! self::$discovered) {
             $locator = Services::locator();
             $files   = array_merge(
                 $locator->search('Config/Providers'),
@@ -248,7 +248,7 @@ class Container implements ContainerInterface
                 }
             }
 
-            static::$discovered = true;
+            self::$discovered = true;
         }
     }
 }

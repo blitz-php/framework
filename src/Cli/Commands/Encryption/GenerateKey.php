@@ -134,8 +134,9 @@ class GenerateKey extends Command
 
         if (! is_file($envFile)) {
             if (! is_file($baseEnv)) {
-                $this->writer->warn('Both default shipped `.env.example` file and custom `.env` are missing.');
-                $this->write('Here\'s your new key instead: ' . $this->writer->warn($key), true);
+                $this->writer->warn('Le fichier `.env.example` livré par défaut et le fichier `.env` personnalisé sont manquants.');
+                $this->eol()->write('Voici votre nouvelle clé à la place: ');
+                $this->writer->warn($key, true);
 
                 return false;
             }

@@ -26,6 +26,7 @@ if (! function_exists('number_to_size')) {
     {
         // Strip any formatting & ensure numeric input
         try {
+            // @phpstan-ignore-next-line
             $num = 0 + str_replace(',', '', $num);
         } catch (ErrorException $ee) {
             return false;
@@ -77,6 +78,7 @@ if (! function_exists('number_to_amount')) {
     {
         // Strip any formatting & ensure numeric input
         try {
+            // @phpstan-ignore-next-line
             $num = 0 + str_replace(',', '', $num);
         } catch (ErrorException $ee) {
             return false;

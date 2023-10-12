@@ -222,7 +222,7 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Constructor
      *
-     * @var Locator Descripteur du localisateur de fichiers à utiliser.
+     * @param Locator $locator Descripteur du localisateur de fichiers à utiliser.
      */
     public function __construct(protected Locator $locator, object $routing)
     {
@@ -732,13 +732,13 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function group(string $name, ...$params)
     {
-        $oldGroup   = $this->group ?? '';
+        $oldGroup   = $this->group ?: '';
         $oldOptions = $this->currentOptions;
 
         // Pour enregistrer une route, nous allons définir un indicateur afin que notre routeur
         // donc il verra le nom du groupe.
         // Si le nom du groupe est vide, nous continuons à utiliser le nom du groupe précédemment construit.
-        $this->group = implode('/', array_unique(explode('/', $name ? (rtrim($oldGroup ?? '', '/') . '/' . ltrim($name, '/')) : $oldGroup)));
+        $this->group = implode('/', array_unique(explode('/', $name ? (rtrim($oldGroup, '/') . '/' . ltrim($name, '/')) : $oldGroup)));
 
         $callback = array_pop($params);
 
@@ -1146,8 +1146,7 @@ class RouteCollection implements RouteCollectionInterface
             ->setOptions($options)
             ->render();
 
-        $routeOptions = $options ?? [];
-        $routeOptions = array_merge($routeOptions, ['view' => $view]);
+        $routeOptions = array_merge($options, ['view' => $view]);
 
         $this->create('get', $from, $to, $routeOptions);
 

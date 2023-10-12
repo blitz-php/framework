@@ -19,6 +19,7 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Traits\Http\ApiResponseTrait;
 use BlitzPHP\Utilities\Jwt;
+use Exception;
 use mindplay\annotations\IAnnotation;
 use Psr\Http\Message\ResponseInterface;
 use stdClass;
@@ -86,7 +87,7 @@ class RestController extends BaseController
 
         // Appel de la méthode du contrôleur et passage des arguments
         try {
-            $instance = Services::injector()->get($class);
+            $instance = Services::container()->get($class);
             $instance->initialize($this->request, $this->response, $this->logger);
 
             $instance = $this->_execAnnotations($instance, AnnotationReader::fromClass($instance));
@@ -99,7 +100,7 @@ class RestController extends BaseController
 
             $instance->payload = $this->payload;
 
-            $response = Services::injector()->call([$instance, $method], (array) $params);
+            $response = Services::container()->call([$instance, $method], (array) $params);
 
             if ($response instanceof ResponseInterface) {
                 return $response;

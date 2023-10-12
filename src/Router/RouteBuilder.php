@@ -243,7 +243,7 @@ final class RouteBuilder
      *      POST        /photos/delete/{id} delete          suppression de l'objet photo spécifié
      *
      * @param string     $name    Le nom du contrôleur vers lequel router.
-     * @param array|null $options Une liste des façons possibles de personnaliser le routage.
+     * @param array $options Une liste des façons possibles de personnaliser le routage.
      */
     public function presenter(string $name, array $options = []): void
     {
@@ -281,7 +281,7 @@ final class RouteBuilder
      *      POST        /photos/{id}        update
      *
      * @param string     $name    Le nom de la ressource/du contrôleur vers lequel router.
-     * @param array|null $options Une liste des façons possibles de personnaliser le routage.
+     * @param array $options Une liste des façons possibles de personnaliser le routage.
      */
     public function resource(string $name, array $options = []): void
     {

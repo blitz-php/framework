@@ -18,7 +18,9 @@ use BlitzPHP\Contracts\Router\RouterInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\RouterException;
+use BlitzPHP\Http\Request;
 use BlitzPHP\Utilities\String\Text;
+use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -100,8 +102,6 @@ class Router implements RouterInterface
 
     /**
      * @param Request $request
-     *
-     * @return self
      */
     public function __construct(RouteCollectionInterface $routes, ServerRequestInterface $request)
     {
@@ -183,7 +183,7 @@ class Router implements RouterInterface
     /**
      * Renvoie le nom du contrôleur matché
      *
-     * @return closure|string
+     * @return Closure|string
      */
     public function controllerName()
     {
@@ -203,7 +203,7 @@ class Router implements RouterInterface
 
         return $this->translateURIDashes
             ? str_replace('-', '_', trim($controller, '/\\'))
-            : Text::toPascalCase($controller);
+            : Text::convertTo($controller, 'pascal');
     }
 
     /**

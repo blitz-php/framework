@@ -20,6 +20,7 @@ use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
+use Closure;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
 use GuzzleHttp\Psr7\Stream;
 use InvalidArgumentException;
@@ -36,10 +37,8 @@ class ServerRequest implements ServerRequestInterface
 {
     /**
      * Tableau de paramètres analysés à partir de l'URL.
-     *
-     * @var array
      */
-    protected $params = [
+    protected array $params = [
         'plugin'     => null,
         'controller' => null,
         'action'     => null,
@@ -50,60 +49,50 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Tableau de données POST. Contiendra des données de formulaire ainsi que des fichiers téléchargés.
      * Dans les requêtes PUT/PATCH/DELETE, cette propriété contiendra les données encodées du formulaire.
-     *
-     * @var array|object|null
      */
-    protected $data = [];
+    protected array|object|null $data = [];
 
     /**
      * Tableau d'arguments de chaîne de requête
-     *
-     * @var array
      */
-    protected $query = [];
+    protected array $query = [];
 
     /**
      * Tableau de données de cookie.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $cookies = [];
+    protected array $cookies = [];
 
     /**
      * Tableau de données d'environnement.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $_environment = [];
+    protected array $_environment = [];
 
     /**
      * Chemin de l'URL de base.
-     *
-     * @var string
      */
-    protected $base;
+    protected string $base;
 
     /**
      * segment de chemin webroot pour la demande.
-     *
-     * @var string
      */
-    protected $webroot = '/';
+    protected string $webroot = '/';
 
     /**
      * S'il faut faire confiance aux en-têtes HTTP_X définis par la plupart des équilibreurs de charge.
      * Défini sur vrai uniquement si votre application s'exécute derrière des équilibreurs de charge/proxies que vous contrôlez.
-     *
-     * @var bool
      */
-    public $trustProxy = false;
+    public bool $trustProxy = false;
 
     /**
      * Liste des proxys de confiance
      *
-     * @var array<string>
+     * @var string[]
      */
-    protected $trustedProxies = [];
+    protected array $trustedProxies = [];
 
     /**
      * Les détecteurs intégrés utilisés avec `is()` peuvent être modifiés avec `addDetector()`.
@@ -111,9 +100,9 @@ class ServerRequest implements ServerRequestInterface
      * Il existe plusieurs façons de spécifier un détecteur, voir `addDetector()` pour
      * les différents formats et façons de définir des détecteurs.
      *
-     * @var array<array|callable>
+     * @var array<array|Closure>
      */
-    protected static $_detectors = [
+    protected static array $_detectors = [
         'get'     => ['env' => 'REQUEST_METHOD', 'value' => 'GET'],
         'post'    => ['env' => 'REQUEST_METHOD', 'value' => 'POST'],
         'put'     => ['env' => 'REQUEST_METHOD', 'value' => 'PUT'],
@@ -121,6 +110,7 @@ class ServerRequest implements ServerRequestInterface
         'delete'  => ['env' => 'REQUEST_METHOD', 'value' => 'DELETE'],
         'head'    => ['env' => 'REQUEST_METHOD', 'value' => 'HEAD'],
         'options' => ['env' => 'REQUEST_METHOD', 'value' => 'OPTIONS'],
+        'https'   => ['env' => 'HTTPS', 'options' => [1, 'on']],
         'ssl'     => ['env' => 'HTTPS', 'options' => [1, 'on']],
         'ajax'    => ['env' => 'HTTP_X_REQUESTED_WITH', 'value' => 'XMLHttpRequest'],
         'json'    => ['accept' => ['application/json'], 'param' => '_ext', 'value' => 'json'],
@@ -130,72 +120,60 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Cache d'instance pour les résultats des appels is(something)
      *
-     * @var array
+     * @var array<string, bool>
      */
-    protected $_detectorCache = [];
+    protected array $_detectorCache = [];
 
     /**
      * Flux du corps de la requête. Contient php://input sauf si l'option constructeur `input` est utilisée.
-     *
-     * @var \Psr\Http\Message\StreamInterface
      */
-    protected $stream;
+    protected StreamInterface $stream;
 
     /**
      * instance Uri
-     *
-     * @var \Psr\Http\Message\UriInterface
      */
-    protected $uri;
+    protected UriInterface $uri;
 
     /**
      * Instance d'un objet Session relative à cette requête
-     *
-     * @var Store
      */
-    protected $session;
+    protected Store $session;
 
     /**
      * Stockez les attributs supplémentaires attachés à la requête.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $attributes = [];
+    protected array $attributes = [];
 
     /**
      * Une liste de propriétés émulées par les méthodes d'attribut PSR7.
      *
      * @var array<string>
      */
-    protected $emulatedAttributes = ['session', 'flash', 'webroot', 'base', 'params', 'here'];
+    protected array $emulatedAttributes = ['session', 'flash', 'webroot', 'base', 'params', 'here'];
 
     /**
      * Tableau de fichiers.
      *
      * @var UploadedFile[]
      */
-    protected $uploadedFiles = [];
+    protected array $uploadedFiles = [];
 
     /**
      * La version du protocole HTTP utilisée.
-     *
-     * @var string|null
      */
-    protected $protocol;
+    protected ?string $protocol = null;
 
     /**
      * La cible de la requête si elle est remplacée
-     *
-     * @var string|null
      */
-    protected $requestTarget;
+    protected ?string $requestTarget = null;
 
     /**
      * Negotiator
-     *
-     * @var Negotiator
      */
-    protected $negotiator;
+    protected Negotiator $negotiator;
 
     /**
      * Créer un nouvel objet de requête.
@@ -317,12 +295,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function contentType(): ?string
     {
-        $type = $this->getEnv('CONTENT_TYPE');
-        if ($type) {
-            return $type;
-        }
-
-        return $this->getEnv('HTTP_CONTENT_TYPE');
+        return $this->getEnv('CONTENT_TYPE') ?: $this->getEnv('HTTP_CONTENT_TYPE');
     }
 
     /**
@@ -375,6 +348,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $this->trustedProxies = $proxies;
         $this->trustProxy     = true;
+        $this->uri            = $this->uri->withScheme($this->scheme());
     }
 
     /**
@@ -395,25 +369,28 @@ class ServerRequest implements ServerRequestInterface
     {
         $ref = $this->getEnv('HTTP_REFERER');
 
-        $base = /* Configure::read('App.fullBaseUrl') . */ $this->webroot;
-        if (! empty($ref) && ! empty($base)) {
-            if ($local && str_starts_with($ref, $base)) {
-                $ref = substr($ref, strlen($base));
-                if ($ref === '' || str_starts_with($ref, '//')) {
-                    $ref = '/';
-                }
-                if ($ref[0] !== '/') {
-                    $ref = '/' . $ref;
-                }
+        $base = config('app.base_url') . $this->webroot;
+        if (empty($base) || empty($ref)) {
+            return null;
+        }
+        
+        if ($local && str_starts_with($ref, $base)) {
+            $ref = substr($ref, strlen($base));
+            if ($ref === '' || str_starts_with($ref, '//')) {
+                $ref = '/';
+            }
+            if ($ref[0] !== '/') {
+                $ref = '/' . $ref;
+            }
 
-                return $ref;
-            }
-            if (! $local) {
-                return $ref;
-            }
+            return $ref;
         }
 
-        return null;
+        if ($local) {
+            return null;
+        }
+        
+        return $ref;
     }
 
     /**
@@ -433,7 +410,7 @@ class ServerRequest implements ServerRequestInterface
             return $this->is(...$params);
         }
 
-        throw new BadMethodCallException(sprintf('Method "%s()" does not exist', $name));
+        throw new BadMethodCallException(sprintf('La méthode "%s()" n\'existe pas', $name));
     }
 
     /**
@@ -489,7 +466,7 @@ class ServerRequest implements ServerRequestInterface
     protected function _is(string $type, array $args): bool
     {
         $detect = static::$_detectors[$type];
-        if (is_callable($detect)) {
+        if ($detect instanceof Closure) {
             array_unshift($args, $this);
 
             return $detect(...$args);
@@ -539,7 +516,7 @@ class ServerRequest implements ServerRequestInterface
         foreach ($detect['header'] as $header => $value) {
             $header = $this->getEnv('http_' . $header);
             if ($header !== null) {
-                if (! is_string($value) && ! is_bool($value) && is_callable($value)) {
+                if ($value instanceof Closure) {
                     return $value($header);
                 }
 
@@ -697,14 +674,15 @@ class ServerRequest implements ServerRequestInterface
     public static function addDetector(string $name, $detector): void
     {
         $name = strtolower($name);
-        if (is_callable($detector)) {
+        if ($detector instanceof Closure) {
             static::$_detectors[$name] = $detector;
 
             return;
         }
         if (isset(static::$_detectors[$name], $detector['options'])) {
-            /** @psalm-suppress PossiblyInvalidArgument */
-            $detector = Arr::merge(static::$_detectors[$name], $detector);
+            /** @var array $data */
+            $data = static::$_detectors[$name];
+            $detector = Arr::merge($data, $detector);
         }
         static::$_detectors[$name] = $detector;
     }
@@ -764,7 +742,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
-    public function hasHeader($name): bool
+    public function hasHeader(string $name): bool
     {
         if (isset($this->_environment[$this->normalizeHeaderName($name)])) {
             return true;
@@ -786,7 +764,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
-    public function getHeader($name): array
+    public function getHeader(string $name): array
     {
         $name = $this->normalizeHeaderName($name);
         if (isset($this->_environment[$name])) {
@@ -805,7 +783,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
-    public function getHeaderLine($name): string
+    public function getHeaderLine(string $name): string
     {
         $value = $this->getHeader($name);
 
@@ -816,11 +794,10 @@ class ServerRequest implements ServerRequestInterface
      * Obtenez une demande modifiée avec l'en-tête fourni.
      *
      * @param array|string $value
-     * @param mixed        $name
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
-    public function withHeader($name, $value): self
+    public function withHeader(string $name, $value): static
     {
         $new                      = clone $this;
         $name                     = $this->normalizeHeaderName($name);
@@ -835,12 +812,11 @@ class ServerRequest implements ServerRequestInterface
      * Les valeurs d'en-tête existantes seront conservées. La valeur fournie
      * sera ajouté aux valeurs existantes.
      *
-     * @param string       $name
      * @param array|string $value
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
-    public function withAddedHeader($name, $value): self
+    public function withAddedHeader(string $name, $value): static
     {
         $new      = clone $this;
         $name     = $this->normalizeHeaderName($name);
@@ -858,10 +834,8 @@ class ServerRequest implements ServerRequestInterface
      * Obtenez une demande modifiée sans en-tête fourni.
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
-     *
-     * @param mixed $name
      */
-    public function withoutHeader($name): self
+    public function withoutHeader(string $name): static
     {
         $new  = clone $this;
         $name = $this->normalizeHeaderName($name);
@@ -892,19 +866,14 @@ class ServerRequest implements ServerRequestInterface
      * Mettez à jour la méthode de requête et obtenez une nouvelle instance.
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
-     *
-     * @param mixed $method
      */
-    public function withMethod($method): self
+    public function withMethod(string $method): static
     {
         $new = clone $this;
 
-        if (
-            ! is_string($method)
-            || ! preg_match('/^[!#$%&\'*+.^_`\|~0-9a-z-]+$/i', $method)
-        ) {
+        if (! preg_match('/^[!#$%&\'*+.^_`\|~0-9a-z-]+$/i', $method)) {
             throw new InvalidArgumentException(sprintf(
-                'Unsupported HTTP method "%s" provided',
+                'Méthode HTTP non prise en charge "%s" fournie',
                 $method
             ));
         }
@@ -944,7 +913,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
-    public function withQueryParams(array $query): self
+    public function withQueryParams(array $query): static
     {
         $new        = clone $this;
         $new->query = $query;
@@ -1223,11 +1192,10 @@ class ServerRequest implements ServerRequestInterface
         if ($name === null) {
             return $this->data;
         }
-        if (! is_array($this->data) && $name) {
+        if (! is_array($this->data)) {
             return $default;
         }
 
-        /** @psalm-suppress PossiblyNullArgument */
         return Arr::get($this->data, $name, $default);
     }
 
@@ -1266,7 +1234,7 @@ class ServerRequest implements ServerRequestInterface
      * Remplacez les cookies de la requête par ceux contenus dans
      * la CookieCollection fournie.
      */
-    public function withCookieCollection(CookieCollection $cookies): self
+    public function withCookieCollection(CookieCollection $cookies): static
     {
         $new    = clone $this;
         $values = [];
@@ -1294,7 +1262,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param array $cookies Les nouvelles données de cookie à utiliser.
      */
-    public function withCookieParams(array $cookies): self
+    public function withCookieParams(array $cookies): static
     {
         $new          = clone $this;
         $new->cookies = $cookies;
@@ -1324,7 +1292,7 @@ class ServerRequest implements ServerRequestInterface
      * @param array|object|null $data Les données de corps désérialisées. Cette volonté
      *                                être généralement dans un tableau ou un objet.
      */
-    public function withParsedBody($data): self
+    public function withParsedBody($data): static
     {
         $new       = clone $this;
         $new->data = $data;
@@ -1362,10 +1330,10 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param string $version Version du protocole HTTP
      */
-    public function withProtocolVersion($version): self
+    public function withProtocolVersion(string $version): static
     {
         if (! preg_match('/^(1\.[01]|2(\.[0])?)$/', $version)) {
-            throw new InvalidArgumentException("Unsupported protocol version '{$version}' provided");
+            throw new InvalidArgumentException(sprintf('Version de protocole `%s` non prise en charge fournie.', $version));
         }
         $new           = clone $this;
         $new->protocol = $version;
@@ -1399,7 +1367,7 @@ class ServerRequest implements ServerRequestInterface
      * Renvoie un objet de requête mis à jour. Cette méthode retourne
      * un *nouvel* objet de requête et ne mute pas la requête sur place.
      */
-    public function withEnv(string $key, string $value): self
+    public function withEnv(string $key, string $value): static
     {
         $new                     = clone $this;
         $new->_environment[$key] = $value;
@@ -1450,7 +1418,7 @@ class ServerRequest implements ServerRequestInterface
      * @param string $name  Le chemin séparé par des points où insérer $value.
      * @param mixed  $value
      */
-    public function withData(string $name, $value): self
+    public function withData(string $name, mixed $value): static
     {
         $copy = clone $this;
 
@@ -1469,7 +1437,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param string $name Le chemin séparé par des points à supprimer.
      */
-    public function withoutData(string $name): self
+    public function withoutData(string $name): static
     {
         $copy = clone $this;
 
@@ -1487,9 +1455,8 @@ class ServerRequest implements ServerRequestInterface
      * un *nouvel* objet de requête et ne mute pas la requête sur place.
      *
      * @param string $name  Le chemin séparé par des points où insérer $value.
-     * @param mixed  $value
      */
-    public function withParam(string $name, $value): self
+    public function withParam(string $name, mixed $value): static
     {
         $copy         = clone $this;
         $copy->params = Arr::insert($copy->params, $name, $value);
@@ -1499,10 +1466,8 @@ class ServerRequest implements ServerRequestInterface
 
     /**
      * Accédez en toute sécurité aux valeurs dans $this->params.
-     *
-     * @param mixed|null $default
      */
-    public function getParam(string $name, $default = null)
+    public function getParam(string $name, mixed $default = null)
     {
         return Arr::get($this->params, $name, $default);
     }
@@ -1513,7 +1478,7 @@ class ServerRequest implements ServerRequestInterface
      * @param string $name  Le nom de l'attribut.
      * @param mixed  $value La valeur de l'attribut.
      */
-    public function withAttribute($name, $value): self
+    public function withAttribute(string $name, mixed $value): static
     {
         $new = clone $this;
         if (in_array($name, $this->emulatedAttributes, true)) {
@@ -1532,12 +1497,12 @@ class ServerRequest implements ServerRequestInterface
      *
      * @throws InvalidArgumentException
      */
-    public function withoutAttribute($name): self
+    public function withoutAttribute(string $name): static
     {
         $new = clone $this;
         if (in_array($name, $this->emulatedAttributes, true)) {
             throw new InvalidArgumentException(
-                "You cannot unset '{$name}'. It is a required BlitzPHP attribute."
+                "Vous ne pouvez pas supprimer '{$name}'. C'est un attribut BlitzPHP obligatoire."
             );
         }
         unset($new->attributes[$name]);
@@ -1560,11 +1525,11 @@ class ServerRequest implements ServerRequestInterface
      * Lire un attribut de la requête ou obtenir la valeur par défaut
      *
      * @param string     $name    Le nom de l'attribut.
-     * @param mixed|null $default La valeur par défaut si l'attribut n'a pas été défini.
+     * @param mixed $default La valeur par défaut si l'attribut n'a pas été défini.
      *
      * @return mixed
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, mixed $default = null): mixed
     {
         if (in_array($name, $this->emulatedAttributes, true)) {
             if ($name === 'here') {
@@ -1639,7 +1604,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @throws InvalidArgumentException lorsque $files contient un objet invalide.
      */
-    public function withUploadedFiles(array $uploadedFiles): self
+    public function withUploadedFiles(array $uploadedFiles): static
     {
         $this->validateUploadedFiles($uploadedFiles, '');
         $new                = clone $this;
@@ -1666,7 +1631,7 @@ class ServerRequest implements ServerRequestInterface
             }
 
             if (! $file instanceof UploadedFileInterface) {
-                throw new InvalidArgumentException("Invalid file at '{$path}{$key}'");
+                throw new InvalidArgumentException("Fichier invalide à '{$path}{$key}'");
             }
         }
     }
@@ -1682,7 +1647,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Renvoie une instance avec le corps de message spécifié.
      */
-    public function withBody(StreamInterface $body): self
+    public function withBody(StreamInterface $body): static
     {
         $new         = clone $this;
         $new->stream = $body;
@@ -1706,7 +1671,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param bool $preserveHost Indique si l'hôte doit être conservé.
      */
-    public function withUri(UriInterface $uri, $preserveHost = false): self
+    public function withUri(UriInterface $uri, bool $preserveHost = false): static
     {
         $new      = clone $this;
         $new->uri = $uri;
@@ -1741,7 +1706,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function withRequestTarget($requestTarget): self
+    public function withRequestTarget(string $requestTarget): static
     {
         $new                = clone $this;
         $new->requestTarget = $requestTarget;
@@ -1819,7 +1784,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Définit la chaîne locale pour cette requête.
      */
-    public function withLocale(string $locale): self
+    public function withLocale(string $locale): static
     {
         $validLocales = config('app.supported_locales');
         // S'il ne s'agit pas d'un paramètre régional valide, définissez-le
@@ -1828,7 +1793,7 @@ class ServerRequest implements ServerRequestInterface
             $locale = config('app.language');
         }
 
-        Services::language()->setLocale($locale);
+        Services::translator()->setLocale($locale);
 
         return $this->withAttribute('locale', $locale);
     }
@@ -1844,7 +1809,7 @@ class ServerRequest implements ServerRequestInterface
             $locale = $this->getAttribute('lang');
         }
 
-        return $locale ?? Services::language()->getLocale();
+        return $locale ?? Services::translator()->getLocale();
     }
 
     /**
@@ -1947,12 +1912,13 @@ class ServerRequest implements ServerRequestInterface
             $q = $_GET;
         }
         $query = array_merge($q, $query);
+        $url   = (string) $this->uri;
 
-        $unsetUrl = '/' . str_replace(['.', ' '], '_', urldecode($this->url));
+        $unsetUrl = '/' . str_replace(['.', ' '], '_', urldecode($url));
         unset($query[$unsetUrl], $query[$this->base . $unsetUrl]);
 
-        if (str_contains($this->url, '?')) {
-            [, $querystr] = explode('?', $this->url);
+        if (str_contains($url, '?')) {
+            [, $querystr] = explode('?', $url);
             parse_str($querystr, $queryArgs);
             $query += $queryArgs;
         }

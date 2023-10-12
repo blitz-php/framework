@@ -83,8 +83,8 @@ abstract class BaseController
      */
     public function initialize(ServerRequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        $this->request  = $request; // @phpstan-ignore-line
-        $this->response = $response; // @phpstan-ignore-line
+        $this->request  = $request;
+        $this->response = $response;
         $this->logger   = $logger;
 
         Services::container()->set(Request::class, $request);

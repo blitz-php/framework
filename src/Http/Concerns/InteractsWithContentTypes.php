@@ -74,6 +74,8 @@ trait InteractsWithContentTypes
                 }
             }
         }
+
+        return null;
     }
 
     /**

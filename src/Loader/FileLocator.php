@@ -30,7 +30,7 @@ class FileLocator
      *   2. {namespace}/Helpers
      *   3. system/Helpers
      *
-     * @throws FileNotFoundException
+     * @throws LoadException
      */
     public static function helper(array|string $filenames)
     {
@@ -172,7 +172,7 @@ class FileLocator
     /**
      * Cree et renvoi un model donné
      *
-     * @template T of \BlitzPHP\Models\BaseModel
+     * @template T
      *
      * @param class-string<T> $model
      *

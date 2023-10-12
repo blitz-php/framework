@@ -34,6 +34,7 @@ use BlitzPHP\Http\Uri;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\View;
 use Closure;
+use Exception;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -542,7 +543,7 @@ class Dispatcher
     protected function runController($class)
     {
         // S'il s'agit d'une demande de console, utilisez les segments d'entrée comme paramètres
-        $params = defined('KLINGED') ? $this->request->getSegments() : $this->router->params();
+        $params = defined('KLINGED') ? [/*$this->request->getSegments()*/] : $this->router->params();
         $method = $this->method;
 
         if (method_exists($class, '_remap')) {
@@ -634,7 +635,7 @@ class Dispatcher
      *
      * Cela permet au fournisseur une détection plus sûre et plus fiable de la fonction previous_url().
      *
-     * @param \BlitzPHP\Http\URI|string $uri
+     * @param \BlitzPHP\Http\Uri|string $uri
      */
     public function storePreviousURL($uri)
     {

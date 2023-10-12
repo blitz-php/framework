@@ -209,7 +209,7 @@ class Console extends Application
     /**
      * Ajoute une commande à la console
      *
-     * @param string $commandName FQCN de la commande
+     * @param string $className FQCN de la commande
      */
     private function addCommand(string $className, ?Logger $logger = null)
     {
@@ -277,20 +277,23 @@ class Console extends Application
                 $version = $package[1] ?? null;
                 $package = $package[0];
 
+                /** @var \Ahc\Cli\IO\Interactor $io */
+                $io = $console->io();
+
                 if (! InstalledVersions::isInstalled($package)) {
-                    $console->io()->info('Cette commande nécessite le package "' . $package . '" mais vous ne l\'avez pas', true);
-                    if (! $console->io()->confirm('Voulez-vous l\'installer maintenant ?')) {
+                    $io->info('Cette commande nécessite le package "' . $package . '" mais vous ne l\'avez pas', true);
+                    if (! $io->confirm('Voulez-vous l\'installer maintenant ?')) {
                         return;
                     }
 
                     $package .= ($version !== null ? ":{$version}" : '');
-                    $console->io()->write('>> Installation de "' . $package . '" en cours', true);
-                    $console->io()->eol();
+                    $io->write('>> Installation de "' . $package . '" en cours', true);
+                    $io->eol();
 
                     chdir(ROOTPATH);
                     passthru('composer require ' . $package, $status);
 
-                    $console->io()->eol();
+                    $io->eol();
                 }
             }
 

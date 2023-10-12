@@ -194,8 +194,8 @@ class Redirection extends Response
     public function withInput(): self
     {
         return $this->with('_blitz_old_input', [
-            'get'  => $_GET ?? [],
-            'post' => $_POST ?? [],
+            'get'  => $_GET ?: [],
+            'post' => $_POST ?: [],
         ]);
     }
 

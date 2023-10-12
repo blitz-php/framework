@@ -60,7 +60,7 @@ if (! function_exists('model')) {
     /**
      * Simple maniere d'obtenir un modele.
      *
-     * @template T of BlitzPHP\Models\BaseModel
+     * @template T
      *
      * @param array<class-string<T>>|class-string<T> $name
      *
@@ -157,17 +157,17 @@ if (! function_exists('logger')) {
      *
      * @param int|string $level
      *
-     * @return \BlitzPHP\Debug\Logger|mixed
+     * @return \BlitzPHP\Debug\Logger|void
      */
     function logger($level = null, ?string $message = null, array $context = [])
     {
         $logger = Services::logger();
 
-        if (! empty($level) && ! empty($message)) {
-            return $logger->log($level, $message, $context);
+        if (empty($level) || empty($message)) {
+            return $logger;
         }
 
-        return $logger;
+        $logger->log($level, $message, $context);
     }
 }
 
@@ -277,10 +277,8 @@ if (! function_exists('purify')) {
      * Purifiez l'entrée à l'aide de la classe autonome HTMLPurifier.
      * Utilisez facilement plusieurs configurations de purificateur.
      *
-     * @param string|string[]
-     * @param false|string
-     * @param mixed $dirty_html
-     * @param mixed $config
+     * @param string|string[] $dirty_html
+     * @param false|string    $config
      *
      * @return string|string[]
      */
@@ -934,7 +932,7 @@ if (! function_exists('with')) {
      */
     function with($value, ?callable $callback = null): mixed
     {
-        Helpers::with($value, $callback);
+        return Helpers::with($value, $callback);
     }
 }
 

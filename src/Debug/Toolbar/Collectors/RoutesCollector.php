@@ -96,7 +96,7 @@ class RoutesCollector extends BaseCollector
                 'method'     => $this->router->methodName(),
                 'paramCount' => count($this->router->params()),
                 'truePCount' => count($params),
-                'params'     => $params ?? [],
+                'params'     => $params,
             ],
         ];
 

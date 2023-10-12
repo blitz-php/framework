@@ -34,6 +34,7 @@ use Psr\Log\LoggerInterface;
  * @property array           $required
  * @property string          $service
  * @property string          $usage
+ * @property string          $version
  */
 abstract class Command
 {

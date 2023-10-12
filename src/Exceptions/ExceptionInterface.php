@@ -11,12 +11,14 @@
 
 namespace BlitzPHP\Exceptions;
 
+use Throwable;
+
 /**
  * Fournit une interface au niveau du domaine pour une large capture
  * de toutes les exceptions liées au cadre.
  *
  * catch (\BlitzPHP\Exceptions\ExceptionInterface) { ... }
  */
-interface ExceptionInterface
+interface ExceptionInterface extends Throwable
 {
 }

@@ -1105,7 +1105,7 @@ class Response implements ResponseInterface
         }
 
         /** @psalm-suppress UndefinedInterfaceMethod */
-        return $result->setTimezone(new DateTimeZone('UTC')); // @phpstan-ignore-line
+        return $result->setTimezone(new DateTimeZone('UTC'));
     }
 
     /**
@@ -1425,7 +1425,7 @@ class Response implements ResponseInterface
             throw new LoadException('The requested file contains `..` and will not be read.');
         }
         if (! is_file($path)) {
-            $path = APP_PATH . $path;  // @phpstan-ignore-line
+            $path = APP_PATH . $path;
         }
 
         $file = new SplFileInfo($path);

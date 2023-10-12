@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Controllers;
 
+use Psr\Http\Message\ResponseInterface;
+
 /**
  * Un contrôleur extensible pour aider à fournir une interface utilisateur pour une ressource.
  */

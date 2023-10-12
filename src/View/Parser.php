@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\View;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\View\Adapters\NativeAdapter;
 use ParseError;
@@ -95,7 +96,7 @@ class Parser extends NativeAdapter
 
         if (! is_file($file)) {
             $fileOrig = $file;
-            $file     = $this->loader->locateFile($view, 'Views');
+            $file     = Services::locator()->locateFile($view, 'Views');
 
             // locateFile will return an empty string if the file cannot be found.
             if (empty($file)) {

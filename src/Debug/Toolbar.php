@@ -18,6 +18,7 @@ use BlitzPHP\Debug\Toolbar\Collectors\Config;
 use BlitzPHP\Debug\Toolbar\Collectors\HistoryCollector;
 use BlitzPHP\Formatter\JsonFormatter;
 use BlitzPHP\Formatter\XmlFormatter;
+use BlitzPHP\Http\Request;
 use BlitzPHP\Utilities\Date;
 use BlitzPHP\View\Parser;
 use Exception;
@@ -91,7 +92,7 @@ class Toolbar
         // Éléments de données utilisés dans la vue.
         $data['url']             = current_url();
         $data['method']          = strtoupper($request->getMethod());
-        $data['isAJAX']          = Services::request()->isAJAX();
+        $data['isAJAX']          = Services::request()->ajax();
         $data['startTime']       = $startTime;
         $data['totalTime']       = $totalTime * 1000;
         $data['totalMemory']     = number_format((memory_get_peak_usage()) / 1024 / 1024, 3);
@@ -363,6 +364,7 @@ class Toolbar
      */
     public function prepare(array $stats, ?RequestInterface $request = null, ?ResponseInterface $response = null): ResponseInterface
     {
+        /** @var Request $request */
         $request ??= Services::request();
         $response ??= Services::response();
 
@@ -397,7 +399,7 @@ class Toolbar
 
         // Les formats non HTML ne doivent pas inclure la barre de débogage,
         // puis nous envoyons des en-têtes indiquant où trouver les données de débogage pour cette réponse
-        if ($request->isAJAX() || ! str_contains($format, 'html')) {
+        if ($request->ajax() || ! str_contains($format, 'html')) {
             return $response
                 ->withHeader('Debugbar-Time', "{$time}")
                 ->withHeader('Debugbar-Link', site_url("?debugbar_time={$time}"));

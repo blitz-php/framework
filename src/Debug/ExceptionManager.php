@@ -139,7 +139,7 @@ class ExceptionManager
                     '_COOKIE'  => $_COOKIE,
                     '_SERVER'  => $_SERVER,
                     '_ENV'     => $_ENV,
-                    '_FILES'   => $_FILES ?? [],
+                    '_FILES'   => $_FILES ?: [],
                     '_SESSION' => $_SESSION ?? [],
                     default    => [],
                 };
