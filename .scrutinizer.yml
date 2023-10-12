@@ -28,8 +28,3 @@ coding_style:
       around_operators:
         bitwise: false
         concatenation: true
-
-tools:
-  external_code_coverage:
-    timeout: 600
-    runs: 3
