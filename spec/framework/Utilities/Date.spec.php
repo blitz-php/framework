@@ -11,11 +11,11 @@
 
 use BlitzPHP\Utilities\Date;
 
-describe('Utilities / Date', function () {
-    describe('Helper date', function () {
+describe('Utilities / Date', static function () {
+    describe('Helper date', static function () {
         helper('date');
 
-        it('Now() par défaut', function () {
+        it('Now() par défaut', static function () {
             Date::setTestNow('April 09, 2023');
 
             expect(now(null, false))->toBe(1_680_994_800);
@@ -23,7 +23,7 @@ describe('Utilities / Date', function () {
             Date::setTestNow();
         });
 
-        it('Now() specifique', function () {
+        it('Now() specifique', static function () {
             Date::setTestNow('April 09, 2023', 'America/Chicago');
 
             // Chicago should be two hours ahead of Vancouver
@@ -32,7 +32,7 @@ describe('Utilities / Date', function () {
             Date::setTestNow();
         });
 
-        it('Liste deroulante de timezone avec timezone par defaut', function () {
+        it('Liste deroulante de timezone avec timezone par defaut', static function () {
             $timezones = DateTimeZone::listIdentifiers();
 
             $expected = "<select name='timezone' class='custom-select'>\n";
@@ -47,7 +47,7 @@ describe('Utilities / Date', function () {
             expect($expected)->toBe(timezone_select('custom-select', 'Africa/Douala'));
         });
 
-        it('Liste deroulante de timezone avec regions geographique specifiee', function () {
+        it('Liste deroulante de timezone avec regions geographique specifiee', static function () {
             $spesificRegion = DateTimeZone::AFRICA;
             $timezones      = DateTimeZone::listIdentifiers($spesificRegion, null);
 
@@ -63,7 +63,7 @@ describe('Utilities / Date', function () {
             expect($expected)->toBe(timezone_select('custom-select', 'Africa/Douala', $spesificRegion));
         });
 
-        it('Liste deroulante de timezone par pays specifie', function () {
+        it('Liste deroulante de timezone par pays specifie', static function () {
             $spesificRegion = DateTimeZone::PER_COUNTRY;
             $country        = 'CM';
             $timezones      = DateTimeZone::listIdentifiers($spesificRegion, $country);
@@ -81,8 +81,8 @@ describe('Utilities / Date', function () {
         });
     });
 
-    describe('Date', function () {
-        it('Date', function () {
+    describe('Date', static function () {
+        it('Date', static function () {
             $formatter = new IntlDateFormatter(
                 'en_US',
                 IntlDateFormatter::SHORT,
@@ -97,7 +97,7 @@ describe('Utilities / Date', function () {
             expect($formatter->format($date))->toBe($date->toDateTimeString());
         });
 
-        it('Date avec timezone', function () {
+        it('Date avec timezone', static function () {
             $formatter = new IntlDateFormatter(
                 'en_US',
                 IntlDateFormatter::SHORT,
@@ -112,7 +112,7 @@ describe('Utilities / Date', function () {
             expect($formatter->format($date))->toBe($date->toDateTimeString());
         });
 
-        it('Date avec timezone et langue', function () {
+        it('Date avec timezone et langue', static function () {
             $formatter = new IntlDateFormatter(
                 'fr_FR',
                 IntlDateFormatter::SHORT,
@@ -127,7 +127,7 @@ describe('Utilities / Date', function () {
             expect($formatter->format($date))->toBe($date->toDateTimeString());
         });
 
-        it('Date avec datetimezone', function () {
+        it('Date avec datetimezone', static function () {
             $formatter = new IntlDateFormatter(
                 'fr_FR',
                 IntlDateFormatter::SHORT,
@@ -142,7 +142,7 @@ describe('Utilities / Date', function () {
             expect($formatter->format($date))->toBe($date->toDateTimeString());
         });
 
-        it('toDateTime', function () {
+        it('toDateTime', static function () {
             $date = new Date();
 
             $obj = $date->toDateTime();
@@ -150,7 +150,7 @@ describe('Utilities / Date', function () {
             expect($obj)->toBeAnInstanceOf(DateTime::class);
         });
 
-        it('now', function () {
+        it('now', static function () {
             $date  = Date::now();
             $date1 = new DateTime();
 
@@ -158,7 +158,7 @@ describe('Utilities / Date', function () {
             expect($date->getTimestamp())->toBe($date1->getTimestamp());
         });
 
-        it('parse', function () {
+        it('parse', static function () {
             $date  = Date::parse('next Tuesday', 'America/Chicago');
             $date1 = new DateTime('now', new DateTimeZone('America/Chicago'));
             $date1->modify('next Tuesday');
@@ -166,7 +166,7 @@ describe('Utilities / Date', function () {
             expect($date->getTimestamp())->toBe($date1->getTimestamp());
         });
 
-        it('ToDateTimeString', function () {
+        it('ToDateTimeString', static function () {
             $date = Date::parse('2017-01-12 00:00');
             expect('2017-01-12 00:00:00')->toBe($date->toDateTimeString());
 
@@ -174,7 +174,7 @@ describe('Utilities / Date', function () {
             expect('2017-01-12 00:00:00')->toBe($date->toDateTimeString());
         });
 
-        it('ToDateTimeStringWithTimeZone', function () {
+        it('ToDateTimeStringWithTimeZone', static function () {
             $date   = Date::parse('2017-01-12 00:00', 'Europe/London');
             $expect = new DateTime('2017-01-12', new DateTimeZone('Europe/London'));
 
@@ -182,58 +182,58 @@ describe('Utilities / Date', function () {
         });
     });
 
-    describe('Date relatives', function () {
-        it('Today', function () {
+    describe('Date relatives', static function () {
+        it('Today', static function () {
             $date = Date::today();
 
             expect(date('Y-m-d 00:00:00'))->toBe($date->toDateTimeString());
         });
 
-        it('TodayLocalized', function () {
+        it('TodayLocalized', static function () {
             $date = Date::today('Europe/London');
 
             expect(date('Y-m-d 00:00:00'))->toBe($date->toDateTimeString());
         });
 
-        it('Yesterday', function () {
+        it('Yesterday', static function () {
             $date = Date::yesterday();
 
             expect(date('Y-m-d 00:00:00', strtotime('-1 day')))->toBe($date->toDateTimeString());
         });
 
-        it('Tomorrow', function () {
+        it('Tomorrow', static function () {
             $date = Date::tomorrow();
 
             expect(date('Y-m-d 00:00:00', strtotime('+1 day')))->toBe($date->toDateTimeString());
         });
     });
 
-    describe('Creations', function () {
-        it('CreateFromDate', function () {
+    describe('Creations', static function () {
+        it('CreateFromDate', static function () {
             $date = Date::createFromDate(2017, 0o3, 0o5);
 
             expect(date('Y-m-d 00:00:00', strtotime('2017-03-05 00:00:00')))->toBe($date->toDateTimeString());
         });
 
-        it('CreateFromDateLocalized', function () {
+        it('CreateFromDateLocalized', static function () {
             $date = Date::createFromDate(2017, 0o3, 0o5, 'Europe/London');
 
             expect(date('Y-m-d 00:00:00', strtotime('2017-03-05 00:00:00')))->toBe($date->toDateTimeString());
         });
 
-        it('createFromTime', function () {
+        it('createFromTime', static function () {
             $date = Date::createFromTime(10, 0o3, 0o5);
 
             expect(date('Y-m-d 10:03:05'))->toBe($date->toDateTimeString());
         });
 
-        it('createFromTimeLocalized', function () {
+        it('createFromTimeLocalized', static function () {
             $date = Date::createFromTime(10, 0o3, 0o5, 'Europe/London');
 
             expect(date('Y-m-d 10:03:05'))->toBe($date->toDateTimeString());
         });
 
-        it('createFromTimeEvening', function () {
+        it('createFromTimeEvening', static function () {
             $date = Date::createFromTime(20, 0o3, 0o5);
 
             expect(date('Y-m-d 20:03:05'))->toBe($date->toDateTimeString());

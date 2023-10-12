@@ -271,7 +271,7 @@ class Console extends Application
         }
 
         $console = $this;
-        $action  = function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
+        $action  = static function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
             foreach ($instance->required as $package) {
                 $package = explode(':', $package);
                 $version = $package[1] ?? null;
@@ -325,7 +325,7 @@ class Console extends Application
 
     private function registerException(Logger $logger)
     {
-        $this->onException(function (Throwable $e, int $exitCode) use ($logger) {
+        $this->onException(static function (Throwable $e, int $exitCode) use ($logger) {
             $logger->error((string) $e, ['exitCode' => $exitCode, 'klinge' => true]);
 
             throw new CLIException($e->getMessage(), $exitCode, $e);

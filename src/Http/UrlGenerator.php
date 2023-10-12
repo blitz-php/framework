@@ -390,7 +390,7 @@ class UrlGenerator
      */
     public function pathFormatter()
     {
-        return $this->formatPathUsing ?: fn ($path) => $path;
+        return $this->formatPathUsing ?: static fn ($path) => $path;
     }
 
     /**

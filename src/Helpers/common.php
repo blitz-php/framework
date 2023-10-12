@@ -349,7 +349,7 @@ if (! function_exists('environment')) {
             $env = [$env];
         }
 
-        $env = array_map(fn ($k) => $envMap[$k] ?? $k, $env);
+        $env = array_map(static fn ($k) => $envMap[$k] ?? $k, $env);
 
         return in_array($current, $env, true);
     }

@@ -55,7 +55,7 @@ describe('Router', function () {
         it('Zéro comme chemin URI', function () {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(function () use ($router) {
+            expect(static function () use ($router) {
                 $router->handle('0');
             })->toThrow(new PageNotFoundException());
         });
@@ -159,7 +159,7 @@ describe('Router', function () {
         it(': Message d\'exception quand la route n\'existe pas', function () {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(function () use ($router) {
+            expect(static function () use ($router) {
                 $router->handle('url/not-exists');
             })->toThrow(new PageNotFoundException("Impossible de trouver une route pour 'get: url/not-exists'."));
         });
@@ -190,7 +190,7 @@ describe('Router', function () {
         it(': Route avec barre oblique dans le nom du contrôleur', function () {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(function () use ($router) {
+            expect(static function () use ($router) {
                 $router->handle('admin/admins/edit/1');
             })->toThrow(new RouterException('The namespace delimiter is a backslash (\), not a slash (/). Route handler: \App/Admin/Admins::edit_show/$1'));
         });
@@ -207,7 +207,7 @@ describe('Router', function () {
         it(': Routage avec contrôleur dynamique', function () {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(function () use ($router) {
+            expect(static function () use ($router) {
                 $router->handle('en/zoo/bar');
             })->toThrow(new RouterException('A dynamic controller is not allowed for security reasons. Route handler: \$2::$3/$1'));
         });

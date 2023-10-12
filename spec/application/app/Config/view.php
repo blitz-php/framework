@@ -14,7 +14,7 @@ return [
     'compress_output' => 'auto',
     'view_base'       => VIEW_PATH,
     'debug'           => 'auto',
-    'shared'          => fn (): array => [],
+    'shared'          => static fn (): array => [],
     'decorators'      => [],
     'adapters'        => ['native' => ['extension' => 'php', 'save_data' => true]],
 ];

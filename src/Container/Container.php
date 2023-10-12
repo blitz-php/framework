@@ -231,8 +231,8 @@ class Container implements ContainerInterface
                 $locator->listFiles('Providers/'),
             );
 
-            $appProviders  = array_filter($files, fn ($name) => str_starts_with($name, APP_PATH));
-            $systProviders = array_filter($files, fn ($name) => str_starts_with($name, SYST_PATH));
+            $appProviders  = array_filter($files, static fn ($name) => str_starts_with($name, APP_PATH));
+            $systProviders = array_filter($files, static fn ($name) => str_starts_with($name, SYST_PATH));
             $files         = array_diff($files, $appProviders, $systProviders);
 
             $files = [

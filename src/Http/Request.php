@@ -157,7 +157,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     {
         $segments = explode('/', $this->decodedPath());
 
-        return array_values(array_filter($segments, fn ($value) => $value !== ''));
+        return array_values(array_filter($segments, static fn ($value) => $value !== ''));
     }
 
     /**
@@ -180,7 +180,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     {
         $url = $this->fullUrl();
 
-        return collect($patterns)->contains(fn ($pattern) => Text::is($pattern, $url));
+        return collect($patterns)->contains(static fn ($pattern) => Text::is($pattern, $url));
     }
 
     /**

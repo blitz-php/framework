@@ -32,7 +32,7 @@ class PHPMailer extends AbstractAdapter
     public function __construct(bool $debug = false)
     {
         $this->mailer              = new Mailer();
-        $this->mailer->Debugoutput = function ($str, $level) {
+        $this->mailer->Debugoutput = static function ($str, $level) {
             Services::logger()->info('[Mail][' . $level . ']: ' . $str);
         };
 

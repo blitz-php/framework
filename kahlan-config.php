@@ -7,20 +7,16 @@ use Kahlan\Reporter\Coverage\Exporter\Clover;
 
 $commandLine = $this->commandLine();
 $commandLine->option('ff', 'default', 1);
-$commandLine->option('coverage', 'default', 3);
 $commandLine->option('coverage-scrutinizer', 'default', 'scrutinizer.xml');
 
 Filters::apply($this, 'reporting', function($next) {
 
-    // Get the reporter called `'coverage'` from the list of reporters
     $reporter = $this->reporters()->get('coverage');
 
-    // Abort if no coverage is available.
     if (!$reporter || !$this->commandLine()->exists('coverage-scrutinizer')) {
         return $next();
     }
 
-    // Use the `Coveralls` class to write the JSON coverage into a file
     Clover::write([
         'collector' => $reporter,
         'file' => $this->commandLine()->get('coverage-scrutinizer'),
