@@ -236,7 +236,7 @@ class RestController extends BaseController
 
         try {
             return Jwt::encode($data, $config);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->respondInternalError($e->getMessage());
         }
     }

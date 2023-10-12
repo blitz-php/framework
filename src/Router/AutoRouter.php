@@ -84,7 +84,7 @@ final class AutoRouter implements AutoRouterInterface
      * Constructeur
      *
      * @param class-string[] $protectedControllers Liste des contrôleurs enregistrés pour le verbe CLI qui ne doivent pas être accessibles sur le Web.
-     * @param string         $namespace     Espace de noms par défaut pour les contrôleurs.
+     * @param string         $namespace            Espace de noms par défaut pour les contrôleurs.
      * @param string         $defaultController    Nom du controleur par defaut.
      * @param string         $defaultMethod        Nom de la methode par defaut.
      * @param bool           $translateURIDashes   Indique si les tirets dans les URI doivent être convertis en traits de soulignement lors de la détermination des noms de méthode.

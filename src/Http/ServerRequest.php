@@ -50,7 +50,7 @@ class ServerRequest implements ServerRequestInterface
      * Tableau de données POST. Contiendra des données de formulaire ainsi que des fichiers téléchargés.
      * Dans les requêtes PUT/PATCH/DELETE, cette propriété contiendra les données encodées du formulaire.
      */
-    protected array|object|null $data = [];
+    protected null|array|object $data = [];
 
     /**
      * Tableau d'arguments de chaîne de requête
@@ -373,7 +373,7 @@ class ServerRequest implements ServerRequestInterface
         if (empty($base) || empty($ref)) {
             return null;
         }
-        
+
         if ($local && str_starts_with($ref, $base)) {
             $ref = substr($ref, strlen($base));
             if ($ref === '' || str_starts_with($ref, '//')) {
@@ -389,7 +389,7 @@ class ServerRequest implements ServerRequestInterface
         if ($local) {
             return null;
         }
-        
+
         return $ref;
     }
 
@@ -681,7 +681,7 @@ class ServerRequest implements ServerRequestInterface
         }
         if (isset(static::$_detectors[$name], $detector['options'])) {
             /** @var array $data */
-            $data = static::$_detectors[$name];
+            $data     = static::$_detectors[$name];
             $detector = Arr::merge($data, $detector);
         }
         static::$_detectors[$name] = $detector;
@@ -1415,8 +1415,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * Utilisez `withParsedBody()` si vous devez remplacer toutes les données de la requête.
      *
-     * @param string $name  Le chemin séparé par des points où insérer $value.
-     * @param mixed  $value
+     * @param string $name Le chemin séparé par des points où insérer $value.
      */
     public function withData(string $name, mixed $value): static
     {
@@ -1454,7 +1453,7 @@ class ServerRequest implements ServerRequestInterface
      * Renvoie un objet de requête mis à jour. Cette méthode retourne
      * un *nouvel* objet de requête et ne mute pas la requête sur place.
      *
-     * @param string $name  Le chemin séparé par des points où insérer $value.
+     * @param string $name Le chemin séparé par des points où insérer $value.
      */
     public function withParam(string $name, mixed $value): static
     {
@@ -1524,10 +1523,8 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Lire un attribut de la requête ou obtenir la valeur par défaut
      *
-     * @param string     $name    Le nom de l'attribut.
-     * @param mixed $default La valeur par défaut si l'attribut n'a pas été défini.
-     *
-     * @return mixed
+     * @param string $name    Le nom de l'attribut.
+     * @param mixed  $default La valeur par défaut si l'attribut n'a pas été défini.
      */
     public function getAttribute(string $name, mixed $default = null): mixed
     {

@@ -60,7 +60,7 @@ if (! function_exists('base_url')) {
     {
         $index_page = index_page();
         config()->set('app.index_page', '');
-        
+
         $url = rtrim(site_url($relativePath, $scheme), '/');
         config()->set('app.index_page', $index_page);
 
