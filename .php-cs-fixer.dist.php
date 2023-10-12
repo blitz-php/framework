@@ -29,21 +29,41 @@ $finder = Finder::create()
     ]);
 
 $overrides = [
-    'static_lambda' => false,
-];
-
-$options = [
-    'cacheFile'    => 'build/.php-cs-fixer.cache',
-    'finder'       => $finder,
-    'customFixers' => FixerGenerator::create('vendor/nexusphp/cs-config/src/Fixer', 'Nexus\\CsConfig\\Fixer'),
-    'customRules'  => [
-        NoCodeSeparatorCommentFixer::name() => true,
+    'no_extra_blank_lines' => [
+        'tokens' => [
+            'attribute',
+            'break',
+            'case',
+            'continue',
+            'curly_brace_block',
+            'default',
+            'extra',
+            'parenthesis_brace_block',
+            'return',
+            'square_brace_block',
+            'switch',
+            'throw',
+            'use',
+        ],
     ],
 ];
 
-return Factory::create(new Blitz(), $overrides, $options)->forLibrary(
+$options = [
+    'cacheFile' => 'build/.php-cs-fixer.cache',
+    'finder'    => $finder,
+];
+
+$config = Factory::create(new Blitz(), $overrides, $options)->forLibrary(
     'Blitz PHP framework',
     'Dimitri Sitchet Tomkeu',
     'devcode.dst@gmail.com',
     2022
 );
+
+$config
+    ->registerCustomFixers(FixerGenerator::create('vendor/nexusphp/cs-config/src/Fixer', 'Nexus\\CsConfig\\Fixer'))
+    ->setRules(array_merge($config->getRules(), [
+        NoCodeSeparatorCommentFixer::name() => true,
+    ]));
+
+return $config;
