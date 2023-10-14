@@ -373,6 +373,16 @@ describe('Router', function () {
     });
 
     describe('Traduction des tirets d\'URI', function () {
+        it(': Traduire les tirets URI en snake case (methode) et pascal case (controleur) lorsqu\'on desactive la traduction d\'URI', function () {
+            $this->collection->setTranslateURIDashes(false);
+
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('user-setting/show-list');
+            expect($router->controllerName())->toBe('UserSettingController');
+            expect($router->methodName())->toBe('show_list');
+        });
+        
         it(': Traduire les tirets URI', function () {
             $this->collection->setTranslateURIDashes(true);
 

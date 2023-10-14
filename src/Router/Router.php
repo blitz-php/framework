@@ -199,11 +199,14 @@ class Router implements RouterInterface
             ['#(\_)?Controller$#i', '#' . config('app.url_suffix') . '$#i'],
             '',
             ucfirst($controller)
-        ) . 'Controller';
+        );
 
-        return $this->translateURIDashes
-            ? str_replace('-', '_', trim($controller, '/\\'))
+        $controller = trim($controller, '/\\');
+        $controller = $this->translateURIDashes 
+            ? str_replace('-', '_', $controller) 
             : Text::convertTo($controller, 'pascal');
+
+        return $controller . 'Controller'; 
     }
 
     /**
@@ -211,9 +214,7 @@ class Router implements RouterInterface
      */
     public function methodName(): string
     {
-        return $this->translateURIDashes
-            ? str_replace('-', '_', $this->method)
-            : $this->method;
+        return str_replace('-', '_', $this->method);
     }
 
     /**
