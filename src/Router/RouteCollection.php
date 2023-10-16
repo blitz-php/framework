@@ -743,9 +743,18 @@ class RouteCollection implements RouteCollectionInterface
         $callback = array_pop($params);
 
         if ($params && is_array($params[0])) {
+            $this->currentOptions = array_shift($params);
+            $options              = array_shift($params);
+
+            if (isset($options['middlewares']) || isset($options['middleware'])) {
+                $currentMiddlewares     = (array) ($this->currentOptions['middlewares'] ?? []);
+                $options['middlewares'] = array_merge($currentMiddlewares, (array) ($options['middlewares'] ?? $options['middleware']));
+            }
+
+            // Fusionner les options autres que les middlewares.
             $this->currentOptions = array_merge(
                 $this->currentOptions ?? [],
-                array_shift($params)
+                $options
             );
         }
 
@@ -1253,9 +1262,7 @@ class RouteCollection implements RouteCollectionInterface
     {
         $options = $this->loadRoutesOptions($verb);
 
-        $middlewares = $options[$search]['middlewares'] ?? (
-            $options[$search]['middleware'] ?? ($options[$search]['filter'] ?? [])
-        );
+        $middlewares = $options[$search]['middlewares'] ?? ($options[$search]['middleware'] ?? []);
 
         return (array) $middlewares;
     }
@@ -1369,6 +1376,13 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         $options = array_merge($this->currentOptions ?? [], $options ?? []);
+
+        if (isset($options['middleware'])) {
+            if (! isset($options['middlewares'])) {
+                $options['middlewares'] = (array) $options['middleware'];
+            }
+            unset($options['middleware']);
+        }
 
         if (is_string($to) && isset($options['controller'])) {
             $to = str_replace($options['controller'] . '::', '', $to);
