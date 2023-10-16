@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\View\Adapters;
 
-use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Utilities\Helpers;
@@ -43,7 +43,7 @@ abstract class AbstractAdapter implements RendererInterface
     /**
      * Instance de Locator lorsque nous devons tenter de trouver une vue qui n'est pas à l'emplacement standard.
      */
-    protected ?Locator $locator = null;
+    protected ?LocatorInterface $locator = null;
 
     /**
      * Le nom de la mise en page utilisée, le cas échéant.
@@ -73,7 +73,7 @@ abstract class AbstractAdapter implements RendererInterface
         if (! empty($viewPathLocator)) {
             if (is_string($viewPathLocator)) {
                 $this->viewPath = rtrim($viewPathLocator, '\\/ ') . DS;
-            } elseif ($viewPathLocator instanceof Locator) {
+            } elseif ($viewPathLocator instanceof LocatorInterface) {
                 $this->locator = $viewPathLocator;
             }
         } else {
@@ -243,7 +243,7 @@ abstract class AbstractAdapter implements RendererInterface
 
         $file = Helpers::ensureExt($file, $ext);
 
-        if (! is_file($file) && $this->locator instanceof Locator) {
+        if (! is_file($file) && $this->locator instanceof LocatorInterface) {
             $file = $this->locator->locateFile($view, 'Views', empty($ext) ? 'php' : $ext);
         }
 

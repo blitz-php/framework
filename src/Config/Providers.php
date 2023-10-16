@@ -29,6 +29,7 @@ class Providers extends AbstractProvider
     private static function interfaces(): array
     {
         return [
+            \BlitzPHP\Autoloader\LocatorInterface::class               => static fn () => service('locator'),
             \BlitzPHP\Contracts\Event\EventManagerInterface::class     => static fn () => service('event'),
             \BlitzPHP\Contracts\Router\RouteCollectionInterface::class => static fn () => service('routes'),
             \BlitzPHP\Contracts\Session\SessionInterface::class        => static fn () => service('session'),

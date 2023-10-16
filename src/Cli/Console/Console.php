@@ -13,7 +13,7 @@ namespace BlitzPHP\Cli\Console;
 
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
-use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\CLIException;
@@ -163,7 +163,7 @@ class Console extends Application
      *
      * @return string[] Chemins absolus des fichiers
      */
-    protected function files(Locator $locator): array
+    protected function files(LocatorInterface $locator): array
     {
         $files = array_merge(
             $locator->listFiles('Commands/'), // Commandes de l'application ou des fournisseurs

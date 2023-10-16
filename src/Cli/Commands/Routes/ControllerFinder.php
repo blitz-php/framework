@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
 
 /**
@@ -19,7 +19,7 @@ use BlitzPHP\Container\Services;
  */
 final class ControllerFinder
 {
-    private Locator $locator;
+    private LocatorInterface $locator;
 
     /**
      * @param string $namespace Namespace dans lequel on recherche

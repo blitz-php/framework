@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Router;
 
-use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Exceptions\RouterException;
@@ -222,9 +222,9 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Constructor
      *
-     * @param Locator $locator Descripteur du localisateur de fichiers à utiliser.
+     * @param LocatorInterface $locator Descripteur du localisateur de fichiers à utiliser.
      */
-    public function __construct(protected Locator $locator, object $routing)
+    public function __construct(protected LocatorInterface $locator, object $routing)
     {
         $this->httpHost = Services::request()->getEnv('HTTP_HOST');
 

@@ -13,6 +13,7 @@ namespace BlitzPHP\Container;
 
 use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Config\Config;
@@ -196,7 +197,7 @@ class Services
      * Le file locator fournit des methodes utilitaire pour chercher les fichiers non-classes
      * dans les dossiers de namespace. C'est une excelente methode pour charger les 'vues', 'helpers', et 'libraries'.
      */
-    public static function locator(bool $shared = true): Locator
+    public static function locator(bool $shared = true): LocatorInterface
     {
         if ($shared && isset(static::$instances[Locator::class])) {
             return static::$instances[Locator::class];
