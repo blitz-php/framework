@@ -188,9 +188,9 @@ class Console extends Application
         }
 
         foreach ($files as $file) {
-            $className = $locator->getClassname($file);
+            $className = $locator->findQualifiedNameFromPath($file);
 
-            if ($className === '' || ! class_exists($className)) {
+            if ($className === false || ! class_exists($className)) {
                 continue;
             }
 

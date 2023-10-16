@@ -21,7 +21,7 @@
         "ext-openssl": "*",
         "adhocore/cli": "^1.6",
         "blitz-php/annotations": "^1.0",
-        "blitz-php/autoloader": "^1.0",
+        "blitz-php/autoloader": "^1.1",
         "blitz-php/cache": "^1.2",
         "blitz-php/filesystem": "^1.0",
         "blitz-php/session": "^1.0",

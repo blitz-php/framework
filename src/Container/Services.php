@@ -524,7 +524,10 @@ class Services
 
             // Obtenez des instances de toutes les classes de service et mettez-les en cache localement.
             foreach ($files as $file) {
-                if (self::class !== $classname = $locator->getClassname($file)) {
+                if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
+                    continue;
+                }
+                if (self::class !== $classname) {
                     self::$serviceNames[] = $classname;
                     static::$services[]   = new $classname();
                 }

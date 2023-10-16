@@ -248,7 +248,11 @@ class Config
         $registrarsFiles = $locator->search('Config/Registrar.php');
 
         foreach ($registrarsFiles as $file) {
-            $class   = new ReflectionClass($locator->getClassname($file));
+            if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
+                continue;
+            }
+
+            $class   = new ReflectionClass($classname);
             $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
 
             foreach ($methods as $method) {
