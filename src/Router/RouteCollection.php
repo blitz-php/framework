@@ -753,8 +753,8 @@ class RouteCollection implements RouteCollectionInterface
 
             // Fusionner les options autres que les middlewares.
             $this->currentOptions = array_merge(
-                $this->currentOptions ?? [],
-                $options
+                $this->currentOptions ?: [],
+                $options ?: [],
             );
         }
 
