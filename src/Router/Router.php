@@ -202,11 +202,11 @@ class Router implements RouterInterface
         );
 
         $controller = trim($controller, '/\\');
-        $controller = $this->translateURIDashes 
-            ? str_replace('-', '_', $controller) 
+        $controller = $this->translateURIDashes
+            ? str_replace('-', '_', $controller)
             : Text::convertTo($controller, 'pascal');
 
-        return $controller . 'Controller'; 
+        return $controller . 'Controller';
     }
 
     /**
