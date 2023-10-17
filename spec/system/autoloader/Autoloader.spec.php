@@ -109,7 +109,7 @@ describe('Autoloader', function () {
             $this->loader->addNamespace('My\App', SUPPORT_PATH . 'Autoloader');
 
             $actual   = $this->classLoader('My\App\FatalLocator');
-            $expected = SUPPORT_PATH . 'Autoloader\FatalLocator.php';
+            $expected = SUPPORT_PATH . 'Autoloader' . DS . 'FatalLocator.php';
 
             expect($actual)->toBe($expected);
         });
@@ -120,7 +120,7 @@ describe('Autoloader', function () {
             ]);
 
             $actual   = $this->classLoader('My\App\FatalLocator');
-            $expected = SUPPORT_PATH . 'Autoloader\FatalLocator.php';
+            $expected = SUPPORT_PATH . 'Autoloader' . DS . 'FatalLocator.php';
             expect($actual)->toBe($expected);
 
             $actual   = $this->classLoader('My\App\CustomMiddleware');
@@ -132,7 +132,7 @@ describe('Autoloader', function () {
             $this->loader->addNamespace('App\Controllers', SUPPORT_PATH . 'Autoloader');
 
             $actual   = $this->classLoader('App\Controllers\FatalLocator');
-            $expected = SUPPORT_PATH . 'Autoloader\FatalLocator.php';
+            $expected = SUPPORT_PATH . 'Autoloader' . DS . 'FatalLocator.php';
             expect($actual)->toBe($expected);
         });
 
@@ -147,7 +147,7 @@ describe('Autoloader', function () {
 
         it(': Retrait de namespace', function () {
             $this->loader->addNamespace('My\App', SUPPORT_PATH . 'Autoloader');
-            expect($this->classLoader('My\App\FatalLocator'))->toBe(SUPPORT_PATH . 'Autoloader\FatalLocator.php');
+            expect($this->classLoader('My\App\FatalLocator'))->toBe(SUPPORT_PATH . 'Autoloader' . DS . 'FatalLocator.php');
 
             $this->loader->removeNamespace('My\App');
             expect($this->classLoader('My\App\FatalLocator'))->toBeFalsy();
@@ -155,7 +155,7 @@ describe('Autoloader', function () {
 
         it(': Retrait de namespace', function () {
             $this->loader->addNamespace('My\App', SUPPORT_PATH . 'Autoloader');
-            expect($this->classLoader('My\App\FatalLocator'))->toBe(SUPPORT_PATH . 'Autoloader\FatalLocator.php');
+            expect($this->classLoader('My\App\FatalLocator'))->toBe(SUPPORT_PATH . 'Autoloader' . DS . 'FatalLocator.php');
 
             $this->loader->removeNamespace('My\App');
             expect($this->classLoader('My\App\FatalLocator'))->toBeFalsy();
