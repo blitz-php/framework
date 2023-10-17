@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Spec;
 
 use Closure;
@@ -17,8 +26,8 @@ class ReflectionHelper
     /**
      * Recherchez un invocateur de méthode privée.
      *
-     * @param object|string $obj objet ou nom de classe
-     * @param string $method nom de la méthode
+     * @param object|string $obj    objet ou nom de classe
+     * @param string        $method nom de la méthode
      *
      * @throws ReflectionException
      */
@@ -49,8 +58,8 @@ class ReflectionHelper
     /**
      * Définir une propriété privée.
      *
-     * @param object|string $obj objet ou nom de classe
-     * @param string $property nom de la propriété
+     * @param object|string $obj      objet ou nom de classe
+     * @param string        $property nom de la propriété
      *
      * @throws ReflectionException
      */
@@ -68,8 +77,8 @@ class ReflectionHelper
     /**
      * Récupérer une propriété privée.
      *
-     * @param object|string $obj objet ou nom de classe
-     * @param string $property nom de la propriété
+     * @param object|string $obj      objet ou nom de classe
+     * @param string        $property nom de la propriété
      *
      * @throws ReflectionException
      */

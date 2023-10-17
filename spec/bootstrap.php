@@ -34,13 +34,13 @@ if (! is_file(COMPOSER_PATH)) {
 require_once COMPOSER_PATH;
 
 // Définir les constantes nécessaires au framework
-defined('SYST_PATH')    || define('SYST_PATH', realpath(HOME_PATH . 'src') . DS);
-defined('TEST_PATH')    || define('TEST_PATH', realpath(HOME_PATH . 'spec') . DS);
-defined('SUPPORT_PATH') || define('SUPPORT_PATH', TEST_PATH . 'support' . DS);
-defined('APPLICATION_PATH')     || define('APPLICATION_PATH', SUPPORT_PATH . 'application' . DS);
-defined('APP_PATH')     || define('APP_PATH', APPLICATION_PATH . 'app' . DS);
-defined('STORAGE_PATH') || define('STORAGE_PATH', APPLICATION_PATH . 'storage' . DS);
-defined('WEBROOT')      || define('WEBROOT', APPLICATION_PATH . 'public' . DS);
+defined('SYST_PATH')        || define('SYST_PATH', realpath(HOME_PATH . 'src') . DS);
+defined('TEST_PATH')        || define('TEST_PATH', realpath(HOME_PATH . 'spec') . DS);
+defined('SUPPORT_PATH')     || define('SUPPORT_PATH', TEST_PATH . 'support' . DS);
+defined('APPLICATION_PATH') || define('APPLICATION_PATH', SUPPORT_PATH . 'application' . DS);
+defined('APP_PATH')         || define('APP_PATH', APPLICATION_PATH . 'app' . DS);
+defined('STORAGE_PATH')     || define('STORAGE_PATH', APPLICATION_PATH . 'storage' . DS);
+defined('WEBROOT')          || define('WEBROOT', APPLICATION_PATH . 'public' . DS);
 
 // Définissez des valeurs d'environnement qui empêcheraient autrement le cadre de fonctionner pendant les tests.
 if (! isset($_SERVER['app.baseURL'])) {

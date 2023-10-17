@@ -16,4 +16,8 @@ return Expect::structure([
     'classmap' => Expect::arrayOf('string', 'string'),
     'files'    => Expect::listOf('string'),
     'helpers'  => Expect::listOf('string'),
-]);
+    'composer' => Expect::structure([
+        'discover' => Expect::bool()->default(true),
+        'packages' => Expect::arrayOf(Expect::listOf('string')->default([]), Expect::anyOf('only', 'exclude'))->default([]),
+    ]),
+])->otherItems();

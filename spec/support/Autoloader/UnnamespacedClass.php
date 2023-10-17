@@ -9,12 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-return [
-    'psr4'     => [APP_NAMESPACE => APP_PATH],
-    'classmap' => [],
-    'files'    => [],
-    'helpers'  => ['path'],
-    'composer' => [
-        'packages' => [],
-    ],
-];
+class UnnamespacedClass
+{
+}

@@ -21,7 +21,7 @@ $finder = Finder::create()
     ->files()
     ->in([
         __DIR__ . '/src',
-        __DIR__ . '/spec',
+        // __DIR__ . '/spec',
     ])
     ->notName('#Foobar.php$#')
     ->append([

@@ -9,12 +9,14 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-return [
-    'psr4'     => [APP_NAMESPACE => APP_PATH],
-    'classmap' => [],
-    'files'    => [],
-    'helpers'  => ['path'],
-    'composer' => [
-        'packages' => [],
-    ],
-];
+namespace App\Controllers;
+
+use BlitzPHP\Controllers\ApplicationController;
+
+class HomeController extends ApplicationController
+{
+    public function index(): string
+    {
+        return 'Hello World';
+    }
+}

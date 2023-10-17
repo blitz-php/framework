@@ -382,7 +382,7 @@ describe('Router', function () {
             expect($router->controllerName())->toBe('UserSettingController');
             expect($router->methodName())->toBe('show_list');
         });
-        
+
         it(': Traduire les tirets URI', function () {
             $this->collection->setTranslateURIDashes(true);
 
