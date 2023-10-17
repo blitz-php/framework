@@ -52,8 +52,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "BlitzPHP\\Spec\\Framework\\": "spec/framework/",
-            "BlitzPHP\\Spec\\": "spec/application/app/"
+            "Spec\\BlitzPHP\\System\\": "spec/system/",
+            "Spec\\BlitzPHP\\App\\": "spec/application/app/",
+            "Spec\\BlitzPHP\\": "spec/application/"
         }
     },
     "scripts": {

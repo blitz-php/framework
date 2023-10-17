@@ -13,7 +13,7 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Router\RouteCollection;
-use BlitzPHP\Spec\Middlewares\CustomMiddleware;
+use Spec\BlitzPHP\App\Middlewares\CustomMiddleware;
 
 describe('Router', function () {
     beforeEach(function () {
