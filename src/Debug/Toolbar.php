@@ -95,7 +95,7 @@ class Toolbar
         $data['isAJAX']          = Services::request()->ajax();
         $data['startTime']       = $startTime;
         $data['totalTime']       = $totalTime * 1000;
-        $data['totalMemory']     = number_format((memory_get_peak_usage()) / 1024 / 1024, 3);
+        $data['totalMemory']     = number_format(memory_get_peak_usage() / 1024 / 1024, 3);
         $data['segmentDuration'] = $this->roundTo($data['totalTime'] / 7);
         $data['segmentCount']    = (int) ceil($data['totalTime'] / $data['segmentDuration']);
         $data['blitzVersion']    = Application::VERSION;
