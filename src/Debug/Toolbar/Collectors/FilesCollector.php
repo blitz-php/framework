@@ -57,23 +57,23 @@ class FilesCollector extends BaseCollector
 
             if (str_contains($path, 'SYST_PATH')) {
                 $coreFiles[] = [
-                    'name' => basename($file),
                     'path' => $path,
+                    'name' => basename($file),
                 ];
             } elseif (str_contains($path, 'BLITZ_PATH')) {
                 $blitzFiles[] = [
-                    'name' => basename($file),
                     'path' => $path,
+                    'name' => basename($file),
                 ];
             } elseif (str_contains($path, 'VENDOR_PATH')) {
                 $vendorFiles[] = [
-                    'name' => basename($file),
                     'path' => $path,
+                    'name' => basename($file),
                 ];
             } else {
                 $userFiles[] = [
-                    'name' => basename($file),
                     'path' => $path,
+                    'name' => basename($file),
                 ];
             }
         }
