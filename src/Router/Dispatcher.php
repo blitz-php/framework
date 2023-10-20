@@ -595,8 +595,7 @@ class Dispatcher
         // Affiche l'erreur 404
         $this->response = $this->response->withStatus($e->getCode());
 
-        echo $this->outputBufferingEnd();
-        flush();
+        $this->outputBufferingEnd();
 
         throw PageNotFoundException::pageNotFound(! on_prod() || is_cli() ? $e->getMessage() : '');
     }
