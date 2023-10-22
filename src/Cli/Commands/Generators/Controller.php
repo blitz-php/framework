@@ -48,7 +48,7 @@ class Controller extends Command
      * @var array Arguments de la commande
      */
     protected $arguments = [
-        'name' => 'The controller class name.',
+        'name' => 'Le nom de la classe du contrôleur.',
     ];
 
     /**

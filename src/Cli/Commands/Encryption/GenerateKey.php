@@ -44,7 +44,7 @@ class GenerateKey extends Command
      */
     protected $options = [
         '--force'  => 'Force l\'écrasement de clé existante dans le fichier `.env`.',
-        '--length' => ['La longeuur de la chaine aléatoire qui doit être retournée en bytes. Par défaut "32".', 32],
+        '--length' => ['La longeur de la chaîne aléatoire qui doit être retournée en bytes. Par défaut "32".', 32],
         '--prefix' => ['Prefix à ajouter à la clé encodée (doit être hex2bin ou base64). Par défaut "hex2bin".', 'hex2bin'],
         '--show'   => 'Indique qu\'on souhaite afficher la clé générée dans le terminal après l\'avoir mis dans le fichier `.env`.',
     ];
@@ -72,7 +72,7 @@ class GenerateKey extends Command
 
         $encodedKey = $this->generateRandomKey($prefix, $length);
 
-        if ($this->getOption('show')) {
+        if ($this->option('show')) {
             $this->writer->warn($encodedKey, true);
 
             return;
@@ -121,7 +121,7 @@ class GenerateKey extends Command
      */
     protected function confirmOverwrite(): bool
     {
-        return $this->getOption('force') || $this->confirm('Voulez-vous modifier la clé existante ?');
+        return $this->option('force') || $this->confirm('Voulez-vous modifier la clé existante ?');
     }
 
     /**

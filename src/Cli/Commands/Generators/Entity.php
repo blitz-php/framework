@@ -37,6 +37,11 @@ class Entity extends Command
     protected $description = 'Génère un nouveau fichier d\'entité.';
 
     /**
+     * @var string
+     */
+    protected $service = 'Service de génération de code';
+
+    /**
      * @var array Arguments
      */
     protected $arguments = [

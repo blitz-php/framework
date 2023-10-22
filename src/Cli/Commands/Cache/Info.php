@@ -12,7 +12,7 @@
 namespace BlitzPHP\Cli\Commands\Cache;
 
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Loader\Services;
+use BlitzPHP\Container\Services;
 
 /**
  * Affiche des informations sur le cache.

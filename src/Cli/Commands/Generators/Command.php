@@ -77,9 +77,9 @@ class Command extends ConsoleCommand
      */
     protected function prepare(string $class): string
     {
-        $command = $this->getOption('command');
-        $group   = $this->getOption('group');
-        $type    = $this->getOption('type');
+        $command = $this->option('command');
+        $group   = $this->option('group');
+        $type    = $this->option('type');
 
         $command = is_string($command) ? $command : 'command:name';
         $type    = is_string($type) ? $type : 'basic';
