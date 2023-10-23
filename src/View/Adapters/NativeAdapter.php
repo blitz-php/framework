@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\View\Adapters;
 
+use BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector;
 use RuntimeException;
 
 /**
@@ -147,13 +148,15 @@ class NativeAdapter extends AbstractAdapter
         $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
 
         if (($this->debug && (! isset($options['debug']) || $options['debug'] === true))) {
-            // Nettoyer nos noms de chemins pour les rendre un peu plus propres
-            $this->renderVars['file'] = clean_path($this->renderVars['file']);
-            $this->renderVars['file'] = ++$this->viewsCount . ' ' . $this->renderVars['file'];
+            if (in_array(ViewsCollector::class, config('toolbar.collectors'), true)) {
+                // Nettoyer nos noms de chemins pour les rendre un peu plus propres
+                $this->renderVars['file'] = clean_path($this->renderVars['file']);
+                $this->renderVars['file'] = ++$this->viewsCount . ' ' . $this->renderVars['file'];
 
-            $output = '<!-- DEBUG-VIEW START ' . $this->renderVars['file'] . ' -->' . PHP_EOL
-                . $output . PHP_EOL
-                . '<!-- DEBUG-VIEW ENDED ' . $this->renderVars['file'] . ' -->' . PHP_EOL;
+                $output = '<!-- DEBUG-VIEW START ' . $this->renderVars['file'] . ' -->' . PHP_EOL
+                    . $output . PHP_EOL
+                    . '<!-- DEBUG-VIEW ENDED ' . $this->renderVars['file'] . ' -->' . PHP_EOL;
+            }
         }
 
         // Faut-il mettre en cache ?
@@ -261,7 +264,7 @@ class NativeAdapter extends AbstractAdapter
     }
 
     /**
-     * Commence contient le contenu d'une section dans la mise en page.
+     * Commence le contenu d'une section dans la mise en page.
      */
     public function start(string $name, ?string $content = null)
     {
@@ -275,7 +278,7 @@ class NativeAdapter extends AbstractAdapter
     }
 
     /**
-     * Commence contient le contenu d'une section dans la mise en page.
+     * Commence le contenu d'une section dans la mise en page.
      *
      * @alias self::start()
      */
@@ -285,7 +288,7 @@ class NativeAdapter extends AbstractAdapter
     }
 
     /**
-     * Commence contient le contenu d'une section dans la mise en page.
+     * Commence le contenu d'une section dans la mise en page.
      *
      * @alias self::start()
      */
