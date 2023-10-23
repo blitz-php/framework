@@ -23,7 +23,7 @@ class EventsCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected bool $hasTimeline = false;
+    protected bool $hasTimeline = true;
 
     /**
      * {@inheritDoc}
@@ -51,7 +51,7 @@ class EventsCollector extends BaseCollector
 
         foreach ($rows as $info) {
             $data[] = [
-                'name'      => 'Event: ' . $info['event'],
+                'name'      => 'Evenement: ' . $info['event'],
                 'component' => 'Events',
                 'start'     => $info['start'],
                 'duration'  => $info['end'] - $info['start'],
@@ -76,15 +76,19 @@ class EventsCollector extends BaseCollector
             if (! array_key_exists($key, $data['events'])) {
                 $data['events'][$key] = [
                     'event'    => $key,
-                    'duration' => number_format(($row['end'] - $row['start']) * 1000, 2),
+                    'duration' => ($row['end'] - $row['start']) * 1000,
                     'count'    => 1,
                 ];
 
                 continue;
             }
 
-            $data['events'][$key]['duration'] += number_format(($row['end'] - $row['start']) * 1000, 2);
+            $data['events'][$key]['duration'] += ($row['end'] - $row['start']) * 1000;
             $data['events'][$key]['count']++;
+        }
+
+        foreach ($data['events'] as &$row) {
+            $row['duration'] = number_format($row['duration'], 2);
         }
 
         return $data;
