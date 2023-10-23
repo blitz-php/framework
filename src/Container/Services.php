@@ -580,4 +580,17 @@ class Services
         static::$instances[$name] = $value;
         static::container()->set($name, $value);
     }
+
+    /**
+     * Réinitialisez les instances partagées et les simulations pour les tests.
+     */
+    public static function reset(bool $initAutoloader = true): void
+    {
+        // static::$mocks     = [];
+        static::$instances = [];
+
+        if ($initAutoloader) {
+            static::autoloader()->initialize();
+        }
+    }
 }
