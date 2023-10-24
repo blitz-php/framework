@@ -42,7 +42,11 @@ class ExceptionManager
                 }
             }
 
-            $files = array_map(static fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), Services::fs()->files($config['error_view_path']));
+            if (is_dir($config['error_view_path'])) {
+                $files = array_map(static fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), Services::fs()->files($config['error_view_path']));
+            } else {
+                $files = [];
+            }
 
             if (in_array((string) $exception->getCode(), $files, true)) {
                 $view = new View();

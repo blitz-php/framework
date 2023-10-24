@@ -32,6 +32,7 @@ class Providers extends AbstractProvider
             \BlitzPHP\Autoloader\LocatorInterface::class               => static fn () => service('locator'),
             \BlitzPHP\Contracts\Event\EventManagerInterface::class     => static fn () => service('event'),
             \BlitzPHP\Contracts\Router\RouteCollectionInterface::class => static fn () => service('routes'),
+            \BlitzPHP\Contracts\Security\EncrypterInterface::class     => static fn () => service('encrypter'),
             \BlitzPHP\Contracts\Session\SessionInterface::class        => static fn () => service('session'),
             \BlitzPHP\Mail\MailerInterface::class                      => static fn () => service('mail'),
             \Psr\Container\ContainerInterface::class                   => static fn () => service('container'),

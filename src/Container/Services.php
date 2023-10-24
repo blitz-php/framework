@@ -18,6 +18,7 @@ use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Contracts\Database\ConnectionResolverInterface;
+use BlitzPHP\Contracts\Security\EncrypterInterface;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
@@ -35,6 +36,7 @@ use BlitzPHP\Http\UrlGenerator;
 use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
+use BlitzPHP\Security\Encryption\Encryption;
 use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
 use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
@@ -157,6 +159,22 @@ class Services
         }
 
         return static::$instances[ResponseEmitter::class] = new ResponseEmitter();
+    }
+
+    /**
+     * La classe Encryption fournit un cryptage bidirectionnel.
+     */
+    public static function encrypter(?array $config = null, bool $shared = false): EncrypterInterface
+    {
+        if (true === $shared && isset(static::$instances[Encryption::class])) {
+            return static::$instances[Encryption::class];
+        }
+
+        $config   ??= config('encryption');
+        $config     = (object) $config;
+        $encryption = new Encryption($config);
+
+        return static::$instances[Encryption::class] = $encryption->initialize($config);
     }
 
     /**
