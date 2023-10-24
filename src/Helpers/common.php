@@ -9,6 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Cli\Console\Console;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
@@ -81,7 +82,13 @@ if (! function_exists('service')) {
      *
      * Ceux-ci sont égaux :
      *  - $cache = service('cache')
-     *  - $cache = \BlitzPHP\Loader\Services::cache();
+     *  - $cache = \BlitzPHP\Container\Services::cache();
+     * 
+     * @template T
+     *
+     * @param string|class-string<T> $name
+     *
+     * @return T
      */
     function service(string $name, ...$params)
     {
@@ -110,6 +117,66 @@ if (! function_exists('show404')) {
     function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = [])
     {
         throw PageNotFoundException::pageNotFound($message);
+    }
+}
+
+if (! function_exists('command')) {
+    /**
+     * Runs a single command.
+     * Input expected in a single string as would be used on the command line itself:
+     *
+     *  > command('migrate:create SomeMigration');
+     *
+     * @return false|string
+     */
+    function command(string $command)
+    {
+        $regexString = '([^\s]+?)(?:\s|(?<!\\\\)"|(?<!\\\\)\'|$)';
+        $regexQuoted = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\')';
+
+        $args   = [];
+        $length = strlen($command);
+        $cursor = 0;
+
+        /**
+         * Adopted from Symfony's `StringInput::tokenize()` with few changes.
+         *
+         * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Input/StringInput.php
+         */
+        while ($cursor < $length) {
+            if (preg_match('/\s+/A', $command, $match, 0, $cursor)) {
+                // nothing to do
+            } elseif (preg_match('/' . $regexQuoted . '/A', $command, $match, 0, $cursor)) {
+                $args[] = stripcslashes(substr($match[0], 1, strlen($match[0]) - 2));
+            } elseif (preg_match('/' . $regexString . '/A', $command, $match, 0, $cursor)) {
+                $args[] = stripcslashes($match[1]);
+            } else {
+                // @codeCoverageIgnoreStart
+                throw new InvalidArgumentException(sprintf(
+                    'Unable to parse input near "... %s ...".',
+                    substr($command, $cursor, 10)
+                ));
+                // @codeCoverageIgnoreEnd
+            }
+
+            $cursor += strlen($match[0]);
+        }
+
+        $command     = array_shift($args);
+        $params      = [];
+
+        foreach ($args as $key => $arg) {
+            if (mb_strpos($arg, '--') !== false) {
+                unset($args[$key]);
+                [$arg, $v]          = explode('=', $arg) + [1 => true];
+                $params[trim($arg)] = is_string($v) ? trim($v) : $v;
+            }
+        }
+        
+        ob_start();
+        Console::call($command, $args, $params);
+
+        return ob_get_clean();
     }
 }
 

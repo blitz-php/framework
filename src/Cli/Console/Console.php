@@ -155,6 +155,13 @@ class Console extends Application
             throw CLIException::commandNotFound($commandName);
         }
 
+        foreach ($options as $key => $value) {
+            $key = preg_replace('/^\-\-/', '', $key);
+            if (! isset($options[$key])) {
+                $options[$key] = $value;
+            }
+        }
+        
         return $action($arguments, $options, true);
     }
 
@@ -271,14 +278,14 @@ class Console extends Application
         }
 
         $console = $this;
-        $action  = static function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
+        $action  = function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
             foreach ($instance->required as $package) {
                 $package = explode(':', $package);
                 $version = $package[1] ?? null;
                 $package = $package[0];
 
                 /** @var \Ahc\Cli\IO\Interactor $io */
-                $io = $console->io();
+                $io = $this->io();
 
                 if (! InstalledVersions::isInstalled($package)) {
                     $io->info('Cette commande nécessite le package "' . $package . '" mais vous ne l\'avez pas', true);
