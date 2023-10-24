@@ -34,7 +34,7 @@ class SodiumHandler extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function encrypt(string $data, array|string|null $params = null): string
+    public function encrypt(string $data, null|array|string $params = null): string
     {
         $this->parseParams($params);
 
@@ -65,7 +65,7 @@ class SodiumHandler extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function decrypt(string $data, array|string|null $params = null): string
+    public function decrypt(string $data, null|array|string $params = null): string
     {
         $this->parseParams($params);
 
@@ -106,10 +106,10 @@ class SodiumHandler extends BaseHandler
 
     /**
      * Analysez les $params avant de faire l'affectation.
-     * 
+     *
      * @throws EncryptionException si la cle est vide
      */
-    protected function parseParams(array|string|null $params): void
+    protected function parseParams(null|array|string $params): void
     {
         if ($params === null) {
             return;

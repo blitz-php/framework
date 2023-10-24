@@ -70,7 +70,7 @@ class Encryption implements EncrypterInterface
     public function __construct(protected ?object $config = null)
     {
         $config ??= (object) config('encryption');
-        
+
         $this->config = $config;
         $this->key    = $config->key;
         $this->driver = $config->driver;
@@ -108,7 +108,7 @@ class Encryption implements EncrypterInterface
      *
      * @throws EncryptionException
      */
-    public function initialize(object $config = null): EncrypterInterface
+    public function initialize(?object $config = null): EncrypterInterface
     {
         if ($config) {
             $this->key    = $config->key;

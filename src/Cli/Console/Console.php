@@ -161,7 +161,7 @@ class Console extends Application
                 $options[$key] = $value;
             }
         }
-        
+
         return $action($arguments, $options, true);
     }
 

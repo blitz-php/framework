@@ -83,10 +83,10 @@ if (! function_exists('service')) {
      * Ceux-ci sont égaux :
      *  - $cache = service('cache')
      *  - $cache = \BlitzPHP\Container\Services::cache();
-     * 
+     *
      * @template T
      *
-     * @param string|class-string<T> $name
+     * @param class-string<T>|string $name
      *
      * @return T
      */
@@ -162,8 +162,8 @@ if (! function_exists('command')) {
             $cursor += strlen($match[0]);
         }
 
-        $command     = array_shift($args);
-        $params      = [];
+        $command = array_shift($args);
+        $params  = [];
 
         foreach ($args as $key => $arg) {
             if (mb_strpos($arg, '--') !== false) {
@@ -172,7 +172,7 @@ if (! function_exists('command')) {
                 $params[trim($arg)] = is_string($v) ? trim($v) : $v;
             }
         }
-        
+
         ob_start();
         Console::call($command, $args, $params);
 

@@ -170,7 +170,7 @@ class Services
             return static::$instances[Encryption::class];
         }
 
-        $config   ??= config('encryption');
+        $config ??= config('encryption');
         $config     = (object) $config;
         $encryption = new Encryption($config);
 

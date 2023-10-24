@@ -67,7 +67,7 @@ class OpenSSLHandler extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function encrypt(string $data, array|string|null $params = null): string
+    public function encrypt(string $data, null|array|string $params = null): string
     {
         // Autoriser le remplacement de clé
         if ($params) {
@@ -103,7 +103,7 @@ class OpenSSLHandler extends BaseHandler
     /**
      * {@inheritDoc}
      */
-    public function decrypt(string $data, array|string|null $params = null): string
+    public function decrypt(string $data, null|array|string $params = null): string
     {
         // Autoriser le remplacement de clé
         if ($params) {

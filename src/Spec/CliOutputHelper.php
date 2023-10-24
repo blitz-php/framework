@@ -15,9 +15,6 @@ use BlitzPHP\Facades\Fs;
 use php_user_filter;
 use ReturnTypeWillChange;
 
-use const STDERR;
-use const STDOUT;
-
 /**
  * Pour tester la sortie de la console.
  */
@@ -27,14 +24,14 @@ class CliOutputHelper
 
     public static function setUpBeforeClass(): void
     {
-        if ( ! is_dir($dirname = pathinfo(static::$ou, PATHINFO_DIRNAME))) {
-            mkdir($dirname, 0777, true);
+        if (! is_dir($dirname = pathinfo(static::$ou, PATHINFO_DIRNAME))) {
+            mkdir($dirname, 0o777, true);
         }
 
         // Thanks: https://stackoverflow.com/a/39785995
         stream_filter_register('intercept', StreamInterceptor::class);
-        stream_filter_append(STDOUT, 'intercept');
-        stream_filter_append(STDERR, 'intercept');
+        stream_filter_append(\STDOUT, 'intercept');
+        stream_filter_append(\STDERR, 'intercept');
     }
 
     public static function setUp(): void

@@ -36,7 +36,7 @@ abstract class BaseHandler implements EncrypterInterface
     /**
      * Byte-safe substr()
      */
-    protected static function substr(string $str, int $start, int $length = null): string
+    protected static function substr(string $str, int $start, ?int $length = null): string
     {
         return mb_substr($str, $start, $length, '8bit');
     }
