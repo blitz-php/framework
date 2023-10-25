@@ -56,7 +56,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      * La manipulation nécessite plus de soin que JSON.
      * - `methods` Les méthodes HTTP à analyser. Par défaut, PUT, POST, PATCH DELETE.
      */
-    public function init(array $options = []): self
+    public function init(array $options = []): static
     {
         $options += ['json' => true, 'xml' => false, 'methods' => null];
         if ($options['json']) {
@@ -80,7 +80,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      *
      * @param string[] $methods Les méthodes sur lesquelles analyser les données.
      */
-    public function setMethods(?array $methods): self
+    public function setMethods(?array $methods): static
     {
         if (is_array($methods)) {
             $this->methods = $methods;
@@ -117,7 +117,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      * @param string[] $types  Un tableau de valeurs d'en-tête de type de contenu à faire correspondre. par exemple. application/json
      * @param Closure  $parser La fonction de parser. Doit renvoyer un tableau de données à insérer dans la requête.
      */
-    public function addParser(array $types, Closure $parser): self
+    public function addParser(array $types, Closure $parser): static
     {
         foreach ($types as $type) {
             $type                 = strtolower($type);

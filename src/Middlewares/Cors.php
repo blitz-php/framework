@@ -34,7 +34,7 @@ class Cors extends BaseMiddleware implements MiddlewareInterface
     /**
      * Constructor
      */
-    public function init(array $config = []): self
+    public function init(array $config = []): static
     {
         $this->config = array_merge($this->config, $config);
 

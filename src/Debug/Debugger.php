@@ -23,25 +23,22 @@ class Debugger
 {
     /**
      * Demarre le processus
-     *
-     * @return void
      */
-    public static function init()
+    public static function init(): void
     {
         $config = config('exceptions');
 
         if (class_exists(Ignition::class)) {
-            return self::initIgnition($config);
-        }
-        if (class_exists(Run::class)) {
-            return self::initWhoops($config);
+            self::initIgnition($config);
+        } elseif (class_exists(Run::class)) {
+            self::initWhoops($config);
         }
     }
 
     /**
      * Initialisation du debugger a travers filp/Whoops
      */
-    private static function initWhoops(array $config)
+    private static function initWhoops(array $config): void
     {
         $debugger = new Run();
 
@@ -57,7 +54,7 @@ class Debugger
      *
      * @todo customisation du debugger et log des erreurs
      */
-    private static function initIgnition(array $config)
+    private static function initIgnition(array $config): void
     {
         $debugger = Ignition::make();
 

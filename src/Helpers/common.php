@@ -76,9 +76,7 @@ if (! function_exists('model')) {
 if (! function_exists('service')) {
     /**
      * Permet un accès plus propre au fichier de configuration des services.
-     * Renvoie toujours une instance SHARED de la classe, donc
-     * appeler la fonction plusieurs fois doit toujours
-     * renvoie la même instance.
+     * Renvoie toujours une instance SHARED de la classe, donc l'appel de la fonction plusieurs fois renvera toujours la même instance.
      *
      * Ceux-ci sont égaux :
      *  - $cache = service('cache')
@@ -86,9 +84,9 @@ if (! function_exists('service')) {
      *
      * @template T
      *
-     * @param class-string<T>|string $name
+     * @param class-string<T> $name
      *
-     * @return T
+     * @return object|T
      */
     function service(string $name, ...$params)
     {
@@ -100,6 +98,12 @@ if (! function_exists('single_service')) {
     /**
      * Autoriser l'accès propre à un service.
      * Renvoie toujours une nouvelle instance de la classe.
+     *
+     * @template T
+     *
+     * @param class-string<T> $name
+     *
+     * @return object|T
      */
     function single_service(string $name, ...$params)
     {
@@ -122,10 +126,12 @@ if (! function_exists('show404')) {
 
 if (! function_exists('command')) {
     /**
-     * Runs a single command.
-     * Input expected in a single string as would be used on the command line itself:
+     * Exécute une seule commande.
+     * Entrée attendue dans une seule chaîne comme celle qui serait utilisée sur la ligne de commande elle-même :
      *
      *  > command('migrate:create SomeMigration');
+     *
+     * @see https://github.com/codeigniter4/CodeIgniter4/blob/b56c85c9d09fd3b34893220b2221ed27f8d508e6/system/Common.php#L133
      *
      * @return false|string
      */
@@ -139,13 +145,13 @@ if (! function_exists('command')) {
         $cursor = 0;
 
         /**
-         * Adopted from Symfony's `StringInput::tokenize()` with few changes.
+         * Adopté de `StringInput::tokenize()` de Symfony avec quelques modifications.
          *
          * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Input/StringInput.php
          */
         while ($cursor < $length) {
             if (preg_match('/\s+/A', $command, $match, 0, $cursor)) {
-                // nothing to do
+                // Rien a faire
             } elseif (preg_match('/' . $regexQuoted . '/A', $command, $match, 0, $cursor)) {
                 $args[] = stripcslashes(substr($match[0], 1, strlen($match[0]) - 2));
             } elseif (preg_match('/' . $regexString . '/A', $command, $match, 0, $cursor)) {
@@ -153,7 +159,7 @@ if (! function_exists('command')) {
             } else {
                 // @codeCoverageIgnoreStart
                 throw new InvalidArgumentException(sprintf(
-                    'Unable to parse input near "... %s ...".',
+                    'Impossible d\'analyser l\'entrée à proximité "... %s ...".',
                     substr($command, $cursor, 10)
                 ));
                 // @codeCoverageIgnoreEnd

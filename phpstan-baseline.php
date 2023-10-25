@@ -77,6 +77,11 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Http/Request.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method BlitzPHP\\\\Http\\\\Request\\:\\:validation\\(\\) should return BlitzPHP\\\\Validation\\\\Validation but returns Dimtrovich\\\\Validation\\\\Validation\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Http/Request.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Parameter \\$default of method BlitzPHP\\\\Http\\\\Request\\:\\:old\\(\\) has invalid type BlitzPHP\\\\Wolke\\\\Model\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Http/Request.php',
@@ -85,6 +90,11 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Http/Response.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property BlitzPHP\\\\Http\\\\ServerRequest\\:\\:\\$uploadedFiles \\(array\\<BlitzPHP\\\\Filesystem\\\\Files\\\\UploadedFile\\>\\) does not accept array\\<array\\<BlitzPHP\\\\Filesystem\\\\Files\\\\UploadedFile\\>\\|Psr\\\\Http\\\\Message\\\\UploadedFileInterface\\>\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Http/ServerRequest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Access to constant DEBUG_SERVER on an unknown class PHPMailer\\\\PHPMailer\\\\SMTP\\.$#',
@@ -485,6 +495,16 @@ $ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$transporter has unknown class Symfony\\\\Component\\\\Mailer\\\\Mailer as its type\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$request \\(BlitzPHP\\\\Http\\\\ServerRequest\\) does not accept Psr\\\\Http\\\\Message\\\\ServerRequestInterface\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Router/Dispatcher.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$response \\(BlitzPHP\\\\Http\\\\Response\\) does not accept Psr\\\\Http\\\\Message\\\\ResponseInterface\\.$#',
+	'count' => 4,
+	'path' => __DIR__ . '/src/Router/Dispatcher.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to method getKeyName\\(\\) on an unknown class BlitzPHP\\\\Wolke\\\\Model\\.$#',

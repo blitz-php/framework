@@ -80,7 +80,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function init(array $config): self
+    public function init(array $config): static
     {
         $this->config  = $config;
         $this->adapter = null;
@@ -88,14 +88,14 @@ class Mail implements MailerInterface
         return $this;
     }
 
-    public function mailer(string $handler): self
+    public function mailer(string $handler): static
     {
         $this->clear();
 
         return $this->merge(['handler' => $handler]);
     }
 
-    public function merge(array $config): self
+    public function merge(array $config): static
     {
         $this->config = array_merge($this->config, $config);
 
@@ -147,7 +147,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function alt(string $content): self
+    public function alt(string $content): static
     {
         $this->factory()->alt($content);
 
@@ -157,7 +157,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
         $this->factory()->attach($path, $name, $type, $encoding, $disposition);
 
@@ -167,7 +167,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
+    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
         $this->factory()->attachBinary($binary, $name, $type, $encoding, $disposition);
 
@@ -177,7 +177,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function bcc(array|string $address, bool|string $name = '', bool $set = false): self
+    public function bcc(array|string $address, bool|string $name = '', bool $set = false): static
     {
         $this->factory()->bcc($address, $name, $set);
 
@@ -187,7 +187,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function cc(array|string $address, bool|string $name = '', bool $set = false): self
+    public function cc(array|string $address, bool|string $name = '', bool $set = false): static
     {
         $this->factory()->cc($address, $name, $set);
 
@@ -197,7 +197,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): static
     {
         $this->factory()->dkim($pk, $passphrase, $selector, $domain);
 
@@ -207,7 +207,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
         $this->factory()->embedded($path, $cid, $name, $encoding, $type, $disposition);
 
@@ -217,7 +217,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
         $this->factory()->embeddedBinary($binary, $cid, $name, $encoding, $type, $disposition);
 
@@ -227,7 +227,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function from(string $address, string $name = ''): self
+    public function from(string $address, string $name = ''): static
     {
         $this->factory()->from($address, $name);
 
@@ -237,7 +237,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function header(array|string $name, ?string $value = null): self
+    public function header(array|string $name, ?string $value = null): static
     {
         $this->factory()->header($name, $value);
 
@@ -247,7 +247,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function html(string $content): self
+    public function html(string $content): static
     {
         $this->factory()->html($content);
 
@@ -265,7 +265,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function message(string $message): self
+    public function message(string $message): static
     {
         return match ($this->config['mailType']) {
             'html'  => $this->html($message),
@@ -277,7 +277,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): self
+    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): static
     {
         $this->factory()->replyTo($address, $name, $set);
 
@@ -295,7 +295,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): self
+    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): static
     {
         $this->factory()->sign($cert_filename, $key_filename, $key_pass, $extracerts_filename);
 
@@ -305,7 +305,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->factory()->subject($subject);
 
@@ -315,7 +315,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function text(string $content): self
+    public function text(string $content): static
     {
         $this->factory()->text($content);
 
@@ -325,7 +325,7 @@ class Mail implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function to(array|string $address, bool|string $name = '', bool $set = false): self
+    public function to(array|string $address, bool|string $name = '', bool $set = false): static
     {
         $this->factory()->to($address, $name, $set);
 
@@ -335,7 +335,7 @@ class Mail implements MailerInterface
     /**
      * Utilise une vue html pour generer le message de l'email
      */
-    public function view(string $view, array $data = []): self
+    public function view(string $view, array $data = []): static
     {
         $path = '';
 

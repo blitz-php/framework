@@ -42,7 +42,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function init(array $config): self
+    public function init(array $config): static
     {
         if (! empty($config['username']) && ! empty($config['password'])) {
             $this->mailer->SMTPAuth = true;
@@ -54,7 +54,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPort(int $port): self
+    public function setPort(int $port): static
     {
         $this->mailer->Port = $port;
 
@@ -64,7 +64,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setHost(string $host): self
+    public function setHost(string $host): static
     {
         $this->mailer->Host = $host;
 
@@ -74,7 +74,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setUsername(string $username): self
+    public function setUsername(string $username): static
     {
         $this->mailer->Username = $username;
 
@@ -84,7 +84,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->mailer->Password = $password;
 
@@ -94,7 +94,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setDebug(int $debug = SMTP::DEBUG_SERVER): self
+    public function setDebug(int $debug = SMTP::DEBUG_SERVER): static
     {
         $this->mailer->SMTPDebug = $debug;
 
@@ -104,7 +104,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setProtocol(string $protocol): self
+    public function setProtocol(string $protocol): static
     {
         switch (strtolower($protocol)) {
             case static::PROTOCOL_MAIL:
@@ -130,7 +130,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setTimeout(int $timeout): self
+    public function setTimeout(int $timeout): static
     {
         $this->mailer->Timeout = $timeout;
 
@@ -140,7 +140,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setCharset(string $charset): self
+    public function setCharset(string $charset): static
     {
         $this->mailer->CharSet = $charset;
 
@@ -150,7 +150,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPriority(int $priority): self
+    public function setPriority(int $priority): static
     {
         if (in_array($priority, static::PRIORITY_MAP, true)) {
             $this->mailer->Priority = $priority;
@@ -162,7 +162,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setEncryption(?string $encryption): self
+    public function setEncryption(?string $encryption): static
     {
         if ($encryption === static::ENCRYPTION_NONE) {
             $encryption = null;
@@ -178,7 +178,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function alt(string $content): self
+    public function alt(string $content): static
     {
         $this->mailer->AltBody = $content;
 
@@ -190,7 +190,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
         if (is_string($path)) {
             $path = [$path => $name];
@@ -208,7 +208,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
+    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
         $this->mailer->addStringAttachment($binary, $name, $encoding, $type, $disposition);
 
@@ -220,7 +220,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function bcc(array|string $address, bool|string $name = '', bool $set = false): self
+    public function bcc(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 
@@ -240,7 +240,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function cc(array|string $address, bool|string $name = '', bool $set = false): self
+    public function cc(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 
@@ -258,7 +258,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): static
     {
         $this->mailer->DKIM_domain     = $domain;
         $this->mailer->DKIM_private    = $pk;
@@ -274,7 +274,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
         $this->mailer->addEmbeddedImage($path, $cid, $name, $encoding, $type, $disposition);
 
@@ -286,7 +286,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
         $this->mailer->addStringEmbeddedImage($binary, $cid, $name, $encoding, $type, $disposition);
 
@@ -298,7 +298,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function from(string $address, string $name = ''): self
+    public function from(string $address, string $name = ''): static
     {
         $this->mailer->setFrom($address, $name);
 
@@ -310,7 +310,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function header(array|string $name, ?string $value = null): self
+    public function header(array|string $name, ?string $value = null): static
     {
         if (is_string($name)) {
             $name = [$name => $value];
@@ -326,7 +326,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function html(string $content): self
+    public function html(string $content): static
     {
         $this->mailer->isHTML(true);
 
@@ -344,7 +344,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function message(string $message): self
+    public function message(string $message): static
     {
         $this->mailer->Body = $message;
 
@@ -356,7 +356,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): self
+    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 
@@ -384,7 +384,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): self
+    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): static
     {
         $this->mailer->sign($cert_filename, $key_filename, $key_pass, $extracerts_filename);
 
@@ -394,7 +394,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->mailer->Subject = $subject;
 
@@ -404,7 +404,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function text(string $content): self
+    public function text(string $content): static
     {
         $this->mailer->isHTML(false);
 
@@ -416,7 +416,7 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function to(array|string $address, bool|string $name = '', bool $set = false): self
+    public function to(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 

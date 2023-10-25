@@ -91,17 +91,11 @@ if (! function_exists('plural')) {
      * Plural
      *
      * Takes a singular word and makes it plural
-     *
-     * @param string $str Input string
-     *
-     * @return string
      */
-    function plural($str)
+    function plural(string $str): string
     {
-        $result = (string) $str;
-
-        if (! is_countable($result)) {
-            return $result;
+        if (! is_countable($str)) {
+            return $str;
         }
 
         $plural_rules = [
@@ -128,13 +122,15 @@ if (! function_exists('plural')) {
         ];
 
         foreach ($plural_rules as $rule => $replacement) {
-            if (preg_match($rule, $result)) {
-                $result = preg_replace($rule, $replacement, $result);
-                break;
+            if (preg_match($rule, $str)) {
+                if (is_string($result = preg_replace($rule, $replacement, $str))) {
+                    $str = $result;
+                    break;
+                }
             }
         }
 
-        return $result;
+        return $str;
     }
 }
 
@@ -157,17 +153,11 @@ if (! function_exists('singular')) {
      * Singular
      *
      * Takes a plural word and makes it singular
-     *
-     * @param string $str Input string
-     *
-     * @return string
      */
-    function singular($str)
+    function singular(string $str): string
     {
-        $result = (string) $str;
-
-        if (! is_countable($result)) {
-            return $result;
+        if (! is_countable($str)) {
+            return $str;
         }
 
         $singular_rules = [
@@ -202,13 +192,15 @@ if (! function_exists('singular')) {
         ];
 
         foreach ($singular_rules as $rule => $replacement) {
-            if (preg_match($rule, $result)) {
-                $result = preg_replace($rule, $replacement, $result);
-                break;
+            if (preg_match($rule, $str)) {
+                if (is_string($result = preg_replace($rule, $replacement, $str))) {
+                    $str = $result;
+                    break;
+                }
             }
         }
 
-        return $result;
+        return $str;
     }
 }
 

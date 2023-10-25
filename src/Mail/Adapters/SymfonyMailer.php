@@ -54,7 +54,7 @@ class SymfonyMailer extends AbstractAdapter
         parent::__construct($debug);
     }
 
-    public function setDsn(string $dsn): self
+    public function setDsn(string $dsn): static
     {
         $this->dsn = $dsn;
 
@@ -64,7 +64,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPort(int $port): self
+    public function setPort(int $port): static
     {
         $this->port = $port;
 
@@ -74,7 +74,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setHost(string $host): self
+    public function setHost(string $host): static
     {
         $this->host = $host;
 
@@ -84,7 +84,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setUsername(string $username): self
+    public function setUsername(string $username): static
     {
         $this->username = $username;
 
@@ -94,7 +94,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->password = $password;
 
@@ -104,7 +104,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setDebug(int $debug = 1): self
+    public function setDebug(int $debug = 1): static
     {
         $this->debug = $debug;
 
@@ -114,7 +114,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setProtocol(string $protocol): self
+    public function setProtocol(string $protocol): static
     {
         $this->protocol = $protocol;
 
@@ -124,7 +124,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setTimeout(int $timeout): self
+    public function setTimeout(int $timeout): static
     {
         $this->timeout = $timeout;
 
@@ -134,7 +134,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setCharset(string $charset): self
+    public function setCharset(string $charset): static
     {
         $this->charset = $charset;
 
@@ -144,7 +144,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setPriority(int $priority): self
+    public function setPriority(int $priority): static
     {
         if (in_array($priority, static::PRIORITY_MAP, true)) {
             $this->mailer->priority($priority);
@@ -156,7 +156,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function setEncryption(?string $encryption): self
+    public function setEncryption(?string $encryption): static
     {
         if ($encryption === static::ENCRYPTION_NONE) {
             $encryption = null;
@@ -172,7 +172,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function alt(string $content): self
+    public function alt(string $content): static
     {
         return $this;
     }
@@ -180,7 +180,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
         if (is_string($path)) {
             $path = [$path => $name];
@@ -196,7 +196,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function attachBinary($binary, string $name, string $encoding = self::ENCODING_BASE64, string $type = '', string $disposition = 'attachment'): self
+    public function attachBinary($binary, string $name, string $encoding = self::ENCODING_BASE64, string $type = '', string $disposition = 'attachment'): static
     {
         $this->mailer->addPart(new DataPart(@fopen($binary, 'rb'), $name, $type));
 
@@ -206,7 +206,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function bcc(array|string $address, bool|string $name = '', bool $set = false): self
+    public function bcc(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 
@@ -222,7 +222,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function cc(array|string $address, bool|string $name = '', bool $set = false): self
+    public function cc(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 
@@ -238,7 +238,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): static
     {
         $signer = new DkimSigner($pk, $domain ?: site_url(), $selector ?: 'blitz', [], $passphrase);
 
@@ -250,7 +250,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
         $this->mailer->addPart((new DataPart(new File($path), $cid, $type))->asInline());
 
@@ -260,7 +260,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
         $this->mailer->addPart((new DataPart(@fopen($binary, 'rb'), $name, $type))->asInline());
 
@@ -270,7 +270,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function from(string $address, string $name = ''): self
+    public function from(string $address, string $name = ''): static
     {
         $this->mailer->from($this->makeAddress($address, $name));
 
@@ -280,7 +280,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function header(array|string $name, ?string $value = null): self
+    public function header(array|string $name, ?string $value = null): static
     {
         if (is_string($name)) {
             $name = [$name => $value];
@@ -296,7 +296,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function html(string $content): self
+    public function html(string $content): static
     {
         $this->mailer->html($content, $this->charset);
 
@@ -306,7 +306,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function message(string $message): self
+    public function message(string $message): static
     {
         return $this;
     }
@@ -314,7 +314,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): self
+    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 
@@ -348,7 +348,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): self
+    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): static
     {
         $signer = new SMimeSigner($cert_filename, $key_filename, $key_pass, $extracerts_filename);
 
@@ -360,7 +360,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function subject(string $subject): self
+    public function subject(string $subject): static
     {
         $this->mailer->subject($subject);
 
@@ -370,7 +370,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function text(string $content): self
+    public function text(string $content): static
     {
         $this->mailer->text($content, $this->charset);
 
@@ -380,7 +380,7 @@ class SymfonyMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
-    public function to(array|string $address, bool|string $name = '', bool $set = false): self
+    public function to(array|string $address, bool|string $name = '', bool $set = false): static
     {
         [$addresses, $set] = $this->parseMultipleAddresses($address, $name, $set);
 

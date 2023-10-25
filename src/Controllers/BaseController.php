@@ -77,7 +77,10 @@ abstract class BaseController
     protected $forceHTTPS = 0;
 
     /**
-     * Constructor.
+     * Constructeur.
+     *
+     * @param Request  $request
+     * @param Response $response
      *
      * @throws HttpException
      */

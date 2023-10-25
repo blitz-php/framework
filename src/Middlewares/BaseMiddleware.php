@@ -31,7 +31,7 @@ abstract class BaseMiddleware implements MiddlewareInterface
      */
     protected string $path;
 
-    public function init(array $arguments = []): self
+    public function init(array $arguments = []): static
     {
         $this->path = $arguments['path'] ?: '/';
         unset($arguments['path']);
@@ -51,7 +51,7 @@ abstract class BaseMiddleware implements MiddlewareInterface
     /**
      * @internal
      */
-    public function fill(array $params): self
+    public function fill(array $params): static
     {
         foreach ($this->fillable as $key) {
             if (empty($params)) {

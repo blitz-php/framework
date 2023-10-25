@@ -234,11 +234,7 @@ class RestController extends BaseController
     {
         $config = array_merge(['base_url' => base_url()], $this->config->jwt ?? [], $config);
 
-        try {
-            return Jwt::encode($data, $config);
-        } catch (Exception $e) {
-            return $this->respondInternalError($e->getMessage());
-        }
+        return Jwt::encode($data, $config);
     }
 
     /**
@@ -251,11 +247,7 @@ class RestController extends BaseController
         $config = array_merge(['base_url' => base_url()], $this->config->jwt ?? [], $config);
 
         if ('bearer' === $authType) {
-            try {
-                return JWT::decode($token, $config);
-            } catch (Throwable $e) {
-                return $e;
-            }
+            return JWT::decode($token, $config);
         }
 
         return null;

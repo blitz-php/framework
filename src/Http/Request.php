@@ -12,9 +12,9 @@
 namespace BlitzPHP\Http;
 
 use ArrayAccess;
-use BlitzPHP\Contracts\Session\SessionInterface;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Exceptions\ValidationException;
+use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\Validation\Validation;
@@ -279,7 +279,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     /**
      * Définissez l'instance de session sur la demande.
      */
-    public function setSession(SessionInterface $session): void
+    public function setSession(Store $session): void
     {
         $this->session = $session;
     }

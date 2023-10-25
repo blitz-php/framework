@@ -101,7 +101,8 @@ class Router implements RouterInterface
     protected ?AutoRouterInterface $autoRouter = null;
 
     /**
-     * @param Request $request
+     * @param RouteCollection $routes
+     * @param Request         $request
      */
     public function __construct(RouteCollectionInterface $routes, ServerRequestInterface $request)
     {

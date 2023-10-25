@@ -57,7 +57,7 @@ abstract class AbstractAdapter implements MailerInterface
     /**
      * {@inheritDoc}
      */
-    public function init(array $config): self
+    public function init(array $config): static
     {
         foreach ($config as $key => $value) {
             $method = static::methodName($key);
@@ -69,25 +69,25 @@ abstract class AbstractAdapter implements MailerInterface
         return $this;
     }
 
-    abstract public function setPort(int $port): self;
+    abstract public function setPort(int $port): static;
 
-    abstract public function setHost(string $host): self;
+    abstract public function setHost(string $host): static;
 
-    abstract public function setUsername(string $username): self;
+    abstract public function setUsername(string $username): static;
 
-    abstract public function setPassword(string $password): self;
+    abstract public function setPassword(string $password): static;
 
-    abstract public function setDebug(int $debug = 1): self;
+    abstract public function setDebug(int $debug = 1): static;
 
-    abstract public function setProtocol(string $protocol): self;
+    abstract public function setProtocol(string $protocol): static;
 
-    abstract public function setTimeout(int $timeout): self;
+    abstract public function setTimeout(int $timeout): static;
 
-    abstract public function setCharset(string $charset): self;
+    abstract public function setCharset(string $charset): static;
 
-    abstract public function setPriority(int $priority): self;
+    abstract public function setPriority(int $priority): static;
 
-    abstract public function setEncryption(?string $encryption): self;
+    abstract public function setEncryption(?string $encryption): static;
 
     public function __call(string $method, array $arguments)
     {
@@ -116,7 +116,7 @@ abstract class AbstractAdapter implements MailerInterface
     /**
      * Cree une adresse au format valide pour l'adapter
      *
-     * @return array
+     * @return array|mixed
      */
     protected function makeAddress(string $email, string $name)
     {

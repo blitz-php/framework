@@ -41,7 +41,7 @@ class Redirection extends Response
     /**
      * Creer une redirection vers la route nommee "home" ou vers la page d'accueil.
      */
-    public function home(int $status = StatusCode::FOUND): self
+    public function home(int $status = StatusCode::FOUND): static
     {
         try {
             return $this->to($this->generator->route('home'), $status);
@@ -57,7 +57,7 @@ class Redirection extends Response
      * @param string   $uri  L'URI vers laquelle rediriger
      * @param int|null $code Code d'état HTTP
      */
-    public function to(string $uri, ?int $code = null, array $headers = [], ?bool $secure = null, string $method = 'auto'): self
+    public function to(string $uri, ?int $code = null, array $headers = [], ?bool $secure = null, string $method = 'auto'): static
     {
         $uri = $this->generator->to($uri, [], $secure);
 
@@ -73,7 +73,7 @@ class Redirection extends Response
     /**
      * Create a new redirect response to an external URL (no validation).
      */
-    public function away(string $path, int $status = StatusCode::FOUND, array $headers = []): self
+    public function away(string $path, int $status = StatusCode::FOUND, array $headers = []): static
     {
         return $this->createRedirect($path, $status, $headers);
     }
@@ -81,7 +81,7 @@ class Redirection extends Response
     /**
      * Create a new redirect response to the given HTTPS path.
      */
-    public function secure(string $path, int $status = StatusCode::FOUND, array $headers = []): self
+    public function secure(string $path, int $status = StatusCode::FOUND, array $headers = []): static
     {
         return $this->to($path, $status, $headers, true);
     }
@@ -90,7 +90,7 @@ class Redirection extends Response
      * Sets the URI to redirect to but as a reverse-routed or named route
      * instead of a raw URI.
      */
-    public function route(string $route, array $params = [], int $code = StatusCode::FOUND, array $headers = []): self
+    public function route(string $route, array $params = [], int $code = StatusCode::FOUND, array $headers = []): static
     {
         return $this->to($this->generator->route($route, $params, true), $code, $headers);
     }
@@ -104,7 +104,7 @@ class Redirection extends Response
      * @param mixed $status
      * @param mixed $fallback
      */
-    public function back($status = StatusCode::FOUND, array $headers = [], $fallback = false): self
+    public function back($status = StatusCode::FOUND, array $headers = [], $fallback = false): static
     {
         return $this->createRedirect($this->generator->previous($fallback), $status, $headers);
     }
@@ -112,7 +112,7 @@ class Redirection extends Response
     /**
      * Create a new redirect response to the current URI.
      */
-    public function refresh(int $status = StatusCode::FOUND, array $headers = []): self
+    public function refresh(int $status = StatusCode::FOUND, array $headers = []): static
     {
         return $this->to($this->generator->getRequest()->path(), $status, $headers);
     }
@@ -120,7 +120,7 @@ class Redirection extends Response
     /**
      * Create a new redirect response, while putting the current URL in the session.
      */
-    public function guest(string $path, int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): self
+    public function guest(string $path, int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): static
     {
         $request = $this->generator->getRequest();
 
@@ -138,7 +138,7 @@ class Redirection extends Response
     /**
      * Create a new redirect response.
      */
-    protected function createRedirect(string $uri, ?int $code = null, array $headers = [], string $method = 'auto'): self
+    protected function createRedirect(string $uri, ?int $code = null, array $headers = [], string $method = 'auto'): static
     {
         $instance = $this->redirect($uri, $method, $code);
 
@@ -152,7 +152,7 @@ class Redirection extends Response
     /**
      * Create a new redirect response to the previously intended location.
      */
-    public function intended(string $default = '/', int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): self
+    public function intended(string $default = '/', int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): static
     {
         $path = $this->session->pull('url.intended', $default);
 
@@ -170,7 +170,7 @@ class Redirection extends Response
     /**
      * Ajoute des erreurs à la session en tant que Flashdata.
      */
-    public function withErrors(array|ErrorBag|string $errors, string $key = 'default'): self
+    public function withErrors(array|ErrorBag|string $errors, string $key = 'default'): static
     {
         if ($errors instanceof ErrorBag) {
             $errors = $errors->toArray();
@@ -191,7 +191,7 @@ class Redirection extends Response
      *
      * Il sera alors disponible via la fonction d'assistance 'old()'.
      */
-    public function withInput(): self
+    public function withInput(): static
     {
         return $this->with('_blitz_old_input', [
             'get'  => $_GET ?: [],
@@ -204,7 +204,7 @@ class Redirection extends Response
      *
      * @param array|string $message
      */
-    public function with(string $key, $message): self
+    public function with(string $key, $message): static
     {
         $this->session->setFlashdata($key, $message);
 
@@ -217,7 +217,7 @@ class Redirection extends Response
      * définir un en-tête pour s'assurer qu'il est bien envoyé
      * avec la réponse de redirection..
      */
-    public function withHeaders(): self
+    public function withHeaders(): static
     {
         $new = clone $this;
 

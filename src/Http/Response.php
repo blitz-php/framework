@@ -531,7 +531,7 @@ class Response implements ResponseInterface
      *
      * @throws HttpException Pour un code d'état invalide.
      */
-    public function redirect(string $uri, string $method = 'auto', ?int $code = null): self
+    public function redirect(string $uri, string $method = 'auto', ?int $code = null): static
     {
         // Suppose une réponse de code d'état 302 ; remplacer si nécessaire
         if (empty($code)) {

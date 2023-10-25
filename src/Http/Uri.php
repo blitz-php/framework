@@ -561,10 +561,8 @@ class Uri implements UriInterface
 
     /**
      * Ajoute un seul nouvel élément à la requête vars.
-     *
-     * @param mixed $value
      */
-    public function addQuery(string $key, $value = null): self
+    public function addQuery(string $key, mixed $value = null): self
     {
         $this->query[$key] = $value;
 
@@ -573,8 +571,6 @@ class Uri implements UriInterface
 
     /**
      * Supprime une ou plusieurs variables de requête de l'URI.
-     *
-     * @param array ...$params
      */
     public function stripQuery(...$params): self
     {
@@ -588,8 +584,6 @@ class Uri implements UriInterface
     /**
      * Filtre les variables de requête afin que seules les clés transmises
      * sont gardés. Le reste est supprimé de l'objet.
-     *
-     * @param array ...$params
      */
     public function keepQuery(...$params): self
     {

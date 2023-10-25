@@ -31,7 +31,7 @@ final class MiddlewareCollector
      * @param string $method Methode HTTP
      * @param string $uri    Chemin URI pour trouver des middlewares
      *
-     * @return array{before: list<string>, after: list<string>} tableau d'alias de middleware ou de nom de classe
+     * @return array|array{before: list<string>, after: list<string>} tableau d'alias de middleware ou de nom de classe
      */
     public function get(string $method, string $uri): array
     {

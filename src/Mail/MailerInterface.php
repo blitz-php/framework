@@ -55,7 +55,7 @@ interface MailerInterface
     /**
      * Ajoute un texte alternatif pour le message en cas de nom prise en charge du html
      */
-    public function alt(string $content): self;
+    public function alt(string $content): static;
 
     /**
      * Ajoute des pièces jointes au mail a partir d'un chemin du systeme de fichier.
@@ -64,7 +64,7 @@ interface MailerInterface
      * Explicitement *ne prend pas* en charge la transmission d'URL ; Mailer n'est pas un client HTTP.
      * Si vous avez besoin de le faire, récupérez la ressource vous-même et transmettez-la via un fichier local ou une chaîne.
      */
-    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self;
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static;
 
     /**
      * Ajoutez une chaîne ou une pièce jointe binaire (non-système de fichiers).
@@ -73,19 +73,19 @@ interface MailerInterface
      *
      * @param mixed $binary
      */
-    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): self;
+    public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static;
 
     /**
      *Ajoute des adresses de copie (BCC) au mail
      */
-    public function bcc(array|string $address, bool|string $name = '', bool $set = false): self;
+    public function bcc(array|string $address, bool|string $name = '', bool $set = false): static;
 
     /**
      * Ajoute des adresses de copie (CC) au mail
      */
-    public function cc(array|string $address, bool|string $name = '', bool $set = false): self;
+    public function cc(array|string $address, bool|string $name = '', bool $set = false): static;
 
-    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): self;
+    public function dkim(string $pk, string $passphrase = '', string $selector = '', string $domain = ''): static;
 
     /**
      * Ajouter une pièce jointe intégrée (en ligne) à partir d'un fichier.
@@ -96,7 +96,7 @@ interface MailerInterface
      * le HTML fait référence à l'utilisation de la valeur `$cid` dans les balises `img`, par exemple `<img src="cid:mylogo">`.
      * N'utilisez jamais un chemin d'accès fourni par l'utilisateur vers un fichier !     *
      */
-    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self;
+    public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static;
 
     /**
      * Ajoutez une pièce jointe stringifiée intégrée.
@@ -105,27 +105,27 @@ interface MailerInterface
      *
      * @param mixed $binary
      */
-    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): self;
+    public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static;
 
     /**
      * Defini l'adresse de l'expéditeur (From) du mail
      */
-    public function from(string $address, string $name = ''): self;
+    public function from(string $address, string $name = ''): static;
 
     /**
      * Ajoute des entêtes personnalisées au mail à envoyer
      */
-    public function header(array|string $name, ?string $value = null): self;
+    public function header(array|string $name, ?string $value = null): static;
 
     /**
      * Defini le message à envoyer au format html
      */
-    public function html(string $content): self;
+    public function html(string $content): static;
 
     /**
      * Initialise le gestionnaire d'email avec les configurations données
      */
-    public function init(array $config): self;
+    public function init(array $config): static;
 
     /**
      * Renvoie l'identifiant du dernier mail envoyé
@@ -135,12 +135,12 @@ interface MailerInterface
     /**
      * Defini le message à envoyer
      */
-    public function message(string $message): self;
+    public function message(string $message): static;
 
     /**
      * Ajoute les adresses de reponse (Reply-To) au mail
      */
-    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): self;
+    public function replyTo(array|string $address, bool|string $name = '', bool $set = false): static;
 
     /**
      * Lance l'envoi du message
@@ -155,20 +155,20 @@ interface MailerInterface
      * @param string $key_pass            Mot de passe pour la clé privée
      * @param string $extracerts_filename Chemin facultatif vers le certificat de chaîne
      */
-    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): self;
+    public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): static;
 
     /**
      * Defini le sujet du mail
      */
-    public function subject(string $subject): self;
+    public function subject(string $subject): static;
 
     /**
      * Defini le message à envoyer au format texte
      */
-    public function text(string $content): self;
+    public function text(string $content): static;
 
     /**
      * Ajoute l'adresse de destination (To) du mail
      */
-    public function to(array|string $address, bool|string $name = '', bool $set = false): self;
+    public function to(array|string $address, bool|string $name = '', bool $set = false): static;
 }

@@ -255,7 +255,7 @@ class Publisher extends FileCollection
      *
      * @param string[] $paths
      */
-    final public function addPaths(array $paths, bool $recursive = true): self
+    final public function addPaths(array $paths, bool $recursive = true): static
     {
         foreach ($paths as $path) {
             $this->addPath($path, $recursive);
@@ -267,7 +267,7 @@ class Publisher extends FileCollection
     /**
      * Ajoute un chemin unique à la liste de fichiers.
      */
-    final public function addPath(string $path, bool $recursive = true): self
+    final public function addPath(string $path, bool $recursive = true): static
     {
         $this->add($this->source . $path, $recursive);
 
@@ -279,7 +279,7 @@ class Publisher extends FileCollection
      *
      * @param string[] $uris
      */
-    final public function addUris(array $uris): self
+    final public function addUris(array $uris): static
     {
         foreach ($uris as $uri) {
             $this->addUri($uri);
@@ -293,7 +293,7 @@ class Publisher extends FileCollection
      *
      * @param string $uri Parce que HTTP\URI est stringable, il sera toujours accepté
      */
-    final public function addUri(string $uri): self
+    final public function addUri(string $uri): static
     {
         // Trouvez un bon nom de fichier (en utilisant des requêtes et des fragments de bandes d'URI)
         $file = $this->getScratch() . basename((new Uri($uri))->getPath());
@@ -311,7 +311,7 @@ class Publisher extends FileCollection
     /**
      * Supprime la destination et tous ses fichiers et dossiers.
      */
-    final public function wipe(): self
+    final public function wipe(): static
     {
         self::wipeDirectory($this->destination);
 

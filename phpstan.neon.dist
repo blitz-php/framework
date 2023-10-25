@@ -4,7 +4,7 @@ includes:
 parameters:
 	phpVersion: 80100
 	tmpDir: build/phpstan
-	level: 2
+	level: 3
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	paths:

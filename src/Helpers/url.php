@@ -538,7 +538,7 @@ if (! function_exists('is_absolute_link')) {
     /**
      * Verifies si un chemin donnée est une url absolue ou relative
      */
-    function is_absolute_link(string $url): string
+    function is_absolute_link(string $url): bool
     {
         return Helpers::isAbsoluteUrl($url);
     }
