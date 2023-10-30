@@ -173,7 +173,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Negotiator
      */
-    protected Negotiator $negotiator;
+    protected Negotiator|null $negotiator = null;
 
     /**
      * Créer un nouvel objet de requête.
