@@ -13,8 +13,6 @@ namespace BlitzPHP\Http;
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Middlewares\BaseMiddleware;
-use BlitzPHP\Middlewares\BodyParser;
-use BlitzPHP\Middlewares\Cors;
 use LogicException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,10 +34,7 @@ class Middleware implements RequestHandlerInterface
     /**
      * Aliases des middlewares
      */
-    protected array $aliases = [
-        'body-parser' => BodyParser::class,
-        'cors'        => Cors::class,
-    ];
+    protected array $aliases = [];
 
     /**
      * Contructor
@@ -239,7 +234,7 @@ class Middleware implements RequestHandlerInterface
 
         if ($middleware instanceof MiddlewareInterface) {
             if ($middleware instanceof BaseMiddleware) {
-                $middleware = $middleware->init($options + ['path' => $this->path])->fill($options);
+                $middleware = $middleware->fill($options)->init($options + ['path' => $this->path]);
             }
 
             return $middleware->process($request, $this);

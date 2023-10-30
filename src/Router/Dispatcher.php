@@ -262,14 +262,15 @@ class Dispatcher
 
         // Le bootstrap dans un middleware
         $this->middleware->alias('blitz', $this->bootApp());
-        $this->middleware->append('blitz');
 
         /**
          * Ajouter des middlewares de routes
          */
         foreach ($routeMiddlewares as $middleware) {
-            $this->middleware->prepend($middleware);
+            $this->middleware->append($middleware);
         }
+
+        $this->middleware->append('blitz');
 
         // Enregistrer notre URI actuel en tant qu'URI précédent dans la session
         // pour une utilisation plus sûre et plus précise avec la fonction d'assistance `previous_url()`.
@@ -732,8 +733,8 @@ class Dispatcher
     {
         $this->middleware = new Middleware($this->response, $this->determinePath());
 
+        $this->middleware->append($this->spoofRequestMethod());
         $this->middleware->register($this->request);
-        $this->middleware->prepend($this->spoofRequestMethod());
     }
 
     protected function outputBufferingStart(): void

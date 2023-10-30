@@ -12,9 +12,8 @@
 namespace BlitzPHP\Middlewares;
 
 use BlitzPHP\Utilities\String\Text;
-use Psr\Http\Server\MiddlewareInterface;
 
-abstract class BaseMiddleware implements MiddlewareInterface
+abstract class BaseMiddleware
 {
     /**
      * Liste des arguments envoyes au middleware
@@ -36,22 +35,33 @@ abstract class BaseMiddleware implements MiddlewareInterface
         $this->path = $arguments['path'] ?: '/';
         unset($arguments['path']);
 
-        $this->arguments = $arguments;
+        $this->arguments = array_merge($this->arguments, $arguments);
 
         foreach ($this->arguments as $argument => $value) {
+            if (! is_string($argument)) {
+                continue;
+            }
+
             $method = Text::camel('set_' . $argument);
             if (method_exists($this, $method)) {
                 call_user_func([$this, $method], $value);
+            } else if (property_exists($this, $argument)) {
+                $this->{$argument} = $value;
             }
         }
 
         return $this;
     }
 
+    public function __get($name)
+    {
+        return $this->arguments[$name] ?? null;    
+    }
+
     /**
      * @internal
      */
-    public function fill(array $params): static
+    final public function fill(array $params): static
     {
         foreach ($this->fillable as $key) {
             if (empty($params)) {
