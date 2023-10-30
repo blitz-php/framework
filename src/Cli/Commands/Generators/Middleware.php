@@ -55,6 +55,7 @@ class Middleware extends Command
         '--namespace' => ["Définit l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--suffix'    => 'Ajouter le titre du composant au nom de la classe (par exemple, User => UserMiddleware).',
         '--force'     => 'Forcer à écraser le fichier existant.',
+        '--standard'  => 'Le standard utilisé pour le middleware. Par défaut: "psr15"',
     ];
 
     /**
@@ -68,5 +69,27 @@ class Middleware extends Command
 
         $this->classNameLang = 'CLI.generator.className.middleware';
         $this->runGeneration($params);
+    }
+
+    /**
+     * Préparez les options et effectuez les remplacements nécessaires.
+     */
+    protected function prepare(string $class): string
+    {
+        $standard = $this->option('standard', 'psr15');
+        
+        if (! in_array($standard, ['psr15', 'psr7'], true)) {
+            // @codeCoverageIgnoreStart
+            $standard = $this->choice(lang('CLI.generator.middlewareStandard'), ['psr15', 'psr7'], 'psr15');
+            $this->eol();
+            // @codeCoverageIgnoreEnd
+        }
+
+        return $this->parseTemplate(
+            $class,
+            [],
+            [],
+            ['standard' => $standard]
+        );
     }
 }
