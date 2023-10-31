@@ -77,7 +77,7 @@ class Middleware extends Command
     protected function prepare(string $class): string
     {
         $standard = $this->option('standard', 'psr15');
-        
+
         if (! in_array($standard, ['psr15', 'psr7'], true)) {
             // @codeCoverageIgnoreStart
             $standard = $this->choice(lang('CLI.generator.middlewareStandard'), ['psr15', 'psr7'], 'psr15');

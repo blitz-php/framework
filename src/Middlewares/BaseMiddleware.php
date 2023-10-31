@@ -45,7 +45,7 @@ abstract class BaseMiddleware
             $method = Text::camel('set_' . $argument);
             if (method_exists($this, $method)) {
                 call_user_func([$this, $method], $value);
-            } else if (property_exists($this, $argument)) {
+            } elseif (property_exists($this, $argument)) {
                 $this->{$argument} = $value;
             }
         }
@@ -55,7 +55,7 @@ abstract class BaseMiddleware
 
     public function __get($name)
     {
-        return $this->arguments[$name] ?? null;    
+        return $this->arguments[$name] ?? null;
     }
 
     /**

@@ -278,17 +278,17 @@ if (! function_exists('cache')) {
 
 if (! function_exists('cookie')) {
     /**
-     * Une méthode pratique qui donne accès à l'objet cookie. 
+     * Une méthode pratique qui donne accès à l'objet cookie.
      * Si aucun paramètre n'est fourni, renverra l'objet,
      * sinon, tentera de renvoyer la valeur du cookie.
      *
      * Exemples:
      *    cookie()->make('foo', 'bar'); ou cookie('foo', 'bar');
      *    $foo = cookie('bar')
-     * 
-     * @return CookieManagerInterface|CookieInterface|null
+     *
+     * @return CookieInterface|CookieManagerInterface|null
      */
-    function cookie(?string $name = null, array|string|null $value = null, int $minutes = 0, array $options = [])
+    function cookie(?string $name = null, null|array|string $value = null, int $minutes = 0, array $options = [])
     {
         $cookie = Services::cookie();
 
