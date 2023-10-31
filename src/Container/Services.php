@@ -19,6 +19,7 @@ use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Contracts\Database\ConnectionResolverInterface;
 use BlitzPHP\Contracts\Security\EncrypterInterface;
+use BlitzPHP\Contracts\Session\CookieManagerInterface;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
@@ -38,6 +39,7 @@ use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
 use BlitzPHP\Security\Encryption\Encryption;
 use BlitzPHP\Session\Cookie\Cookie;
+use BlitzPHP\Session\Cookie\CookieManager;
 use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
 use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
 use BlitzPHP\Session\Handlers\Database\Postgre as PostgreSessionHandler;
@@ -147,6 +149,26 @@ class Services
         }
 
         return static::$instances[Container::class] = new Container();
+    }
+
+    /**
+     * Gestionnaire de cookies
+     */
+    public static function cookie(bool $shared = true): CookieManagerInterface
+    {
+        if (true === $shared && isset(static::$instances[CookieManager::class])) {
+            return static::$instances[CookieManager::class];
+        }
+
+        $config = (object) static::config()->get('cookie');
+
+        return static::$instances[CookieManager::class] = (new CookieManager())->setDefaultPathAndDomain(
+            $config->path ?: '/',
+            $config->domain ?: '',
+            $config->secure ?: false,
+            $config->httponly ?: true,
+            $config->samesite ?: 'Lax'
+        );
     }
 
     /**

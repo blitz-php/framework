@@ -13,6 +13,8 @@ use BlitzPHP\Cli\Console\Console;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
+use BlitzPHP\Contracts\Session\CookieInterface;
+use BlitzPHP\Contracts\Session\CookieManagerInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
@@ -271,6 +273,34 @@ if (! function_exists('cache')) {
         }
 
         return $cache->set($key, $value);
+    }
+}
+
+if (! function_exists('cookie')) {
+    /**
+     * Une méthode pratique qui donne accès à l'objet cookie. 
+     * Si aucun paramètre n'est fourni, renverra l'objet,
+     * sinon, tentera de renvoyer la valeur du cookie.
+     *
+     * Exemples:
+     *    cookie()->make('foo', 'bar'); ou cookie('foo', 'bar');
+     *    $foo = cookie('bar')
+     * 
+     * @return CookieManagerInterface|CookieInterface|null
+     */
+    function cookie(?string $name = null, array|string|null $value = null, int $minutes = 0, array $options = [])
+    {
+        $cookie = Services::cookie();
+
+        if (null === $name) {
+            return $cookie;
+        }
+
+        if (null === $value) {
+            return $cookie->get($name);
+        }
+
+        return $cookie->make($name, $value, $minutes, $options);
     }
 }
 

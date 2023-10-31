@@ -33,6 +33,7 @@ class Providers extends AbstractProvider
             \BlitzPHP\Contracts\Event\EventManagerInterface::class     => static fn () => service('event'),
             \BlitzPHP\Contracts\Router\RouteCollectionInterface::class => static fn () => service('routes'),
             \BlitzPHP\Contracts\Security\EncrypterInterface::class     => static fn () => service('encrypter'),
+            \BlitzPHP\Contracts\Session\CookieManagerInterface::class  => static fn () => service('cookie'),
             \BlitzPHP\Contracts\Session\SessionInterface::class        => static fn () => service('session'),
             \BlitzPHP\Mail\MailerInterface::class                      => static fn () => service('mail'),
             \Psr\Container\ContainerInterface::class                   => static fn () => service('container'),
@@ -59,6 +60,7 @@ class Providers extends AbstractProvider
             \BlitzPHP\Cache\ResponseCache::class          => static fn () => service('responsecache'),
             \BlitzPHP\Router\RouteCollection::class       => static fn () => service('routes'),
             \BlitzPHP\Router\Router::class                => static fn () => service('router'),
+            \BlitzPHP\Session\Cookie\CookieManager::class => static fn () => service('cookie'),
             \BlitzPHP\Session\Store::class                => static fn () => service('session'),
             \BlitzPHP\Filesystem\FilesystemManager::class => static fn () => service('storage'),
         ];
