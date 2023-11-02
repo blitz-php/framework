@@ -805,8 +805,8 @@ class RouteCollection implements RouteCollectionInterface
      *      POST		/photos/{id}/delete delete
      *      POST        /photos/{id}        update
      *
-     * @param string     $name    Le nom de la ressource/du contrôleur vers lequel router.
-     * @param array 	 $options Une liste des façons possibles de personnaliser le routage.
+     * @param string $name    Le nom de la ressource/du contrôleur vers lequel router.
+     * @param array  $options Une liste des façons possibles de personnaliser le routage.
      */
     public function resource(string $name, array $options = []): self
     {
@@ -819,7 +819,7 @@ class RouteCollection implements RouteCollectionInterface
         // valeur de $name avec le nom du nouveau contrôleur.
         if (isset($options['controller'])) {
             $newName = ucfirst(esc(strip_tags($options['controller'])));
-			unset($options['controller']);
+            unset($options['controller']);
         }
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
@@ -923,8 +923,8 @@ class RouteCollection implements RouteCollectionInterface
      *      GET         /photos/remove/{id} remove          affiche un formulaire pour confirmer la suppression d'un objet photo spécifique
      *      POST        /photos/delete/{id} delete          suppression de l'objet photo spécifié
      *
-     * @param string     $name    Le nom du contrôleur vers lequel router.
-     * @param array		 $options Une liste des façons possibles de personnaliser le routage.
+     * @param string $name    Le nom du contrôleur vers lequel router.
+     * @param array  $options Une liste des façons possibles de personnaliser le routage.
      */
     public function presenter(string $name, array $options = []): self
     {
@@ -937,7 +937,7 @@ class RouteCollection implements RouteCollectionInterface
         // valeur de $name avec le nom du nouveau contrôleur.
         if (isset($options['controller'])) {
             $newName = ucfirst(esc(strip_tags($options['controller'])));
-			unset($options['controller']);
+            unset($options['controller']);
         }
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
