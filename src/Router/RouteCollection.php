@@ -738,13 +738,12 @@ class RouteCollection implements RouteCollectionInterface
         // Pour enregistrer une route, nous allons définir un indicateur afin que notre routeur
         // donc il verra le nom du groupe.
         // Si le nom du groupe est vide, nous continuons à utiliser le nom du groupe précédemment construit.
-        $this->group = implode('/', array_unique(explode('/', $name ? (rtrim($oldGroup, '/') . '/' . ltrim($name, '/')) : $oldGroup)));
+        $this->group = $name ? trim($oldGroup . '/' . $name, '/') : $oldGroup;
 
         $callback = array_pop($params);
 
         if ($params && is_array($params[0])) {
-            $this->currentOptions = array_shift($params);
-            $options              = array_shift($params);
+            $options = array_shift($params);
 
             if (isset($options['middlewares']) || isset($options['middleware'])) {
                 $currentMiddlewares     = (array) ($this->currentOptions['middlewares'] ?? []);
@@ -807,9 +806,9 @@ class RouteCollection implements RouteCollectionInterface
      *      POST        /photos/{id}        update
      *
      * @param string     $name    Le nom de la ressource/du contrôleur vers lequel router.
-     * @param array|null $options Une liste des façons possibles de personnaliser le routage.
+     * @param array 	 $options Une liste des façons possibles de personnaliser le routage.
      */
-    public function resource(string $name, ?array $options = null): self
+    public function resource(string $name, array $options = []): self
     {
         // Afin de permettre la personnalisation de la route, le
         // les ressources sont envoyées à, nous devons avoir un nouveau nom
@@ -820,6 +819,7 @@ class RouteCollection implements RouteCollectionInterface
         // valeur de $name avec le nom du nouveau contrôleur.
         if (isset($options['controller'])) {
             $newName = ucfirst(esc(strip_tags($options['controller'])));
+			unset($options['controller']);
         }
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
@@ -887,12 +887,12 @@ class RouteCollection implements RouteCollectionInterface
         if (isset($options['websafe'])) {
             if (in_array('delete', $methods, true)) {
                 $this->post($name . '/' . $id . '/delete', $newName . '::delete/$1', $options + [
-                    'as' => $routeName . '.websafe.delete',
+                    'as' => $routeName . '.delete',
                 ]);
             }
             if (in_array('update', $methods, true)) {
                 $this->post($name . '/' . $id, $newName . '::update/$1', $options + [
-                    'as' => $routeName . '.websafe.update',
+                    'as' => $routeName . '.update',
                 ]);
             }
         }
@@ -924,9 +924,9 @@ class RouteCollection implements RouteCollectionInterface
      *      POST        /photos/delete/{id} delete          suppression de l'objet photo spécifié
      *
      * @param string     $name    Le nom du contrôleur vers lequel router.
-     * @param array|null $options Une liste des façons possibles de personnaliser le routage.
+     * @param array		 $options Une liste des façons possibles de personnaliser le routage.
      */
-    public function presenter(string $name, ?array $options = null): self
+    public function presenter(string $name, array $options = []): self
     {
         // Afin de permettre la personnalisation de la route, le
         // les ressources sont envoyées à, nous devons avoir un nouveau nom
@@ -937,6 +937,7 @@ class RouteCollection implements RouteCollectionInterface
         // valeur de $name avec le nom du nouveau contrôleur.
         if (isset($options['controller'])) {
             $newName = ucfirst(esc(strip_tags($options['controller'])));
+			unset($options['controller']);
         }
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
@@ -1490,7 +1491,7 @@ class RouteCollection implements RouteCollectionInterface
     private function checkHostname(string $hostname): bool
     {
         // Les appels CLI ne peuvent pas être sur le nom d'hôte.
-        if (! isset($this->httpHost) || is_cli()) {
+        if (! isset($this->httpHost)) {
             return false;
         }
 
