@@ -1354,7 +1354,7 @@ class ServerRequest implements ServerRequestInterface
     public function getEnv(string $key, ?string $default = null): ?string
     {
         $key = strtoupper($key);
-        if (! array_key_exists($key, $this->_environment)) {
+        if (! array_key_exists($key, $this->_environment) || null === $this->_environment[$key]) {
             $this->_environment[$key] = env($key);
         }
 
