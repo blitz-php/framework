@@ -1,19 +1,19 @@
 <!--
 
-Each pull request should address a single issue and have a meaningful title.
+Chaque pull request doit traiter d’un seul problème et avoir un titre significatif.
 
-- Pull requests must be in English.
-- If a pull request fixes an issue, reference the issue with a suitable keyword (e.g., Fixes <issue number>).
-- All bug fixes should be sent to the __"develop"__ branch, this is where the next bug fix version will be developed.
-- PRs with any enhancement should be sent to the next minor version branch, e.g. __"4.3"__
+- Les pull request doivent être en français.
+- Si une pull request résout un problème, référencez le problème avec un mot-clé approprié (par exemple, fix <numéro de problème>).
+- Toutes les corrections de bugs doivent être envoyées à la branche __"dev"__, c'est là que la prochaine version de correction de bug sera développée.
+- Les PR avec toute amélioration doivent être envoyés à la branche de version mineure suivante, par ex. __"1.2"__
 
 -->
 **Description**
-Explain what you have changed, and why.
+Expliquez ce que vous avez changé et pourquoi.
 
-**Checklist:**
-- [ ] Securely signed commits
-- [ ] Component(s) with PHPDoc blocks, only if necessary or adds value
-- [ ] Unit testing, with >80% coverage
-- [ ] User guide updated
-- [ ] Conforms to style guide
+**Liste de contrôle:**
+- [ ] Des commits signés en toute sécurité
+- [ ] Composant(s) avec blocs PHPDoc, uniquement si nécessaire ou ajoute de la valeur
+- [ ] Tests unitaires, avec une couverture > 80 %
+- [ ] Guide de l'utilisateur mis à jour
+- [ ] Conforme au guide de style

@@ -1,3 +1,6 @@
+# Veuillez consulter la documentation pour toutes les options de configuration :
+# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
 version: 2
 
 updates:
@@ -5,13 +8,14 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-      time: "04:00"
     open-pull-requests-limit: 10
 
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
+    labels:
+      - "dependencies"
     ignore:
       - dependency-name: '*'
         update-types:
