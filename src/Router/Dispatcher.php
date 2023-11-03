@@ -804,30 +804,38 @@ class Dispatcher
 
                 return $this->formatResponse($response, $returned);
             } catch (ValidationException $e) {
-                $code = $e->getCode();
-                if (empty($errors = $e->getErrors())) {
-                    $errors = [$e->getMessage()];
-                }
-
-                if (is_string($this->controller)) {
-                    if (strtoupper($request->getMethod()) === 'POST') {
-                        if (is_subclass_of($this->controller, RestController::class)) {
-                            return $this->formatResponse($response->withStatus($code), [
-                                'success' => false,
-                                'code'    => $code,
-                                'errors'  => $errors,
-                            ]);
-                        }
-                        if (is_subclass_of($this->controller, BaseController::class)) {
-                            return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
-                        }
-                    }
-                } elseif (strtoupper($request->getMethod()) === 'POST') {
-                    return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
-                }
-
-                throw $e;
+                return $this->formatValidationResponse($e, $request, $response);
             }
         };
+    }
+
+	/**
+	 * Formattage des erreurs de validation
+	 */
+    private function formatValidationResponse(ValidationException $e, ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        $code = $e->getCode();
+        if (empty($errors = $e->getErrors())) {
+            $errors = [$e->getMessage()];
+        }
+
+        if (is_string($this->controller)) {
+            if (strtoupper($request->getMethod()) === 'POST') {
+                if (is_subclass_of($this->controller, BaseController::class)) {
+                    return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
+                }
+                if (is_subclass_of($this->controller, RestController::class)) {
+                    return $this->formatResponse($response->withStatus($code), [
+                        'success' => false,
+                        'code'    => $code,
+                        'errors'  => $errors,
+                    ]);
+                }
+            }
+        } elseif (strtoupper($request->getMethod()) === 'POST') {
+            return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
+        }
+
+        throw $e;
     }
 }

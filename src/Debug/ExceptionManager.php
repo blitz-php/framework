@@ -91,7 +91,7 @@ class ExceptionManager
         }
 
         if (! is_online()) {
-            if (Misc::isAjaxRequest()) {
+            if (Misc::isAjaxRequest() || Services::request()->isJson()) {
                 $debugger->pushHandler(new JsonResponseHandler());
             } else {
                 $handler = new PrettyPageHandler();

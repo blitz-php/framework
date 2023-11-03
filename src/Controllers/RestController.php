@@ -16,6 +16,7 @@ use BlitzPHP\Annotations\Http\AjaxOnlyAnnotation;
 use BlitzPHP\Annotations\Http\RequestMappingAnnotation;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Traits\Http\ApiResponseTrait;
 use BlitzPHP\Utilities\Jwt;
@@ -108,20 +109,39 @@ class RestController extends BaseController
 
             return $this->respondOk($response);
         } catch (Throwable $ex) {
-            if (! on_dev()) {
-                $url = explode('?', $this->request->getRequestTarget())[0];
-
-                return $this->respondBadRequest($this->_translate('badUsed', [$url]));
-            }
-
-            return $this->respondInternalError('Internal Server Error', [
-                'type'    => get_class($ex),
-                'message' => $ex->getMessage(),
-                'code'    => $ex->getCode(),
-                'file'    => $ex->getFile(),
-                'line'    => $ex->getLine(),
-            ]);
+            return $this->manageException($ex);
         }
+    }
+
+    /**
+     * Gestionnaire des exceptions
+     *
+     * Ceci permet aux classes filles de specifier comment elles doivent gerer les exceptions lors de la methode remap
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    protected function manageException(Throwable $ex)
+    {
+        if ($ex instanceof ValidationException) {
+            $message = 'Validation failed';
+            $errors  = $ex->getErrors()->all();
+
+            return $this->respondBadRequest($message, $ex->getCode(), $errors);
+        }
+
+		if (! on_dev()) {
+            $url = explode('?', $this->request->getRequestTarget())[0];
+
+            return $this->respondBadRequest($this->_translate('badUsed', [$url]));
+        }
+
+        return $this->respondInternalError('Internal Server Error', [
+            'type'    => get_class($ex),
+            'message' => $ex->getMessage(),
+            'code'    => $ex->getCode(),
+            'file'    => $ex->getFile(),
+            'line'    => $ex->getLine(),
+        ]);
     }
 
     /**
