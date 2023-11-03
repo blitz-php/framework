@@ -1,112 +1,110 @@
 name: Rapport d'erreur
 description: Signaler un problème ou un bug pour nous aider à améliorer BlitzPHP
-title: "[Bug]: "
-labels: ["bug"]
+title: "Bug: "
+labels: ['bug']
+
 body:
-    - type: markdown
-      attributes:
-          value: |
-              Nous sommes désolés d'apprendre que vous avez un problème.
+  - type: markdown
+    attributes:
+      value: |
+        Nous sommes désolés d'apprendre que vous avez un problème.
 
-				 			Pouvez-vous nous aider à le résoudre en fournissant les détails suivants.
+        Pouvez-vous nous aider à le résoudre en fournissant les détails suivants.
 
-         			Avant de commencer, **veuillez vous assurer qu'il n'existe aucun problème existant, qu'il soit encore ouvert ou clos, lié à votre rapport**.
-         			Si tel est le cas, votre rapport sera fermé rapidement.
+        Avant de commencer, **veuillez vous assurer qu'il n'existe aucun problème existant, qu'il soit encore ouvert ou clos, lié à votre rapport**. Si tel est le cas, votre rapport sera fermé rapidement.
 
-							---
+        ---
 
-    - type: dropdown
-      id: php-version
-      attributes:
-          label: Version PHP
-          description: Quelle version de PHP utilisez-vous ? S'il vous plaît soyez aussi précis que possible
-          multiple: true
-					options:
-						- '8.1'
-						- '8.2'
-      validations:
-          required: true
+  - type: dropdown
+    id: php-version
+    attributes:
+      label: Version PHP
+      description: Quelle version de PHP utilisez-vous ? S'il vous plaît soyez aussi précis que possible
+      multiple: true
+      options:
+        - '8.1'
+        - '8.2'
+    validations:
+      required: true
 
-		- type: input
-    	id: blitzphp-version
-    	attributes:
-				label: Version de BlitzPHP
-				description: |
-					ex. 0.9.5
-					Si vous n'utilisez pas la [dernière version](https://github.com/blitz-php/framework/releases),
-					veuillez vérifiez si le problème se produit avec la dernière version.
-			validations:
-      	required: true
+  - type: input
+    id: blitzphp-version
+    attributes:
+      label: Version de BlitzPHP
+      description: |
+        e.g. 0.9.5
+        Si vous n'utilisez pas la [dernière version](https://github.com/blitz-php/framework/releases),
+        veuillez vérifiez si le problème se produit avec la dernière version.
+    validations:
+      required: true
 
-    - type: dropdown
-      id: operating-systems
-      attributes:
-        label: Avec quels systèmes d'exploitation cela se produit-il ?
-        description: Vous pouvez en sélectionner plusieurs.
-        multiple: true
-        options:
+  - type: dropdown
+    id: operating-systems
+    attributes:
+      label: Avec quels systèmes d'exploitation cela se produit-il ?
+      description: Vous pouvez en sélectionner plusieurs.
+      multiple: true
+      options:
         - macOS
         - Windows
         - Linux
-    	validations:
-      	required: true
+    validations:
+      required: true
 
-		- type: dropdown
-			id: server
-			attributes:
-				label: Quel serveur avez-vous utilisé?
-				options:
-					- apache
-					- cli
-					- cli-server (PHP built-in webserver)
-					- cgi-fcgi
-					- fpm-fcgi
-					- phpdbg
-			validations:
-				required: true
+  - type: dropdown
+    id: server
+    attributes:
+      label: Quel serveur avez-vous utilisé?
+      options:
+        - apache
+        - cli
+        - cli-server (PHP built-in webserver)
+        - cgi-fcgi
+        - fpm-fcgi
+        - phpdbg
+    validations:
+      required: true
 
-		- type: input
-			id: database
-			attributes:
-				label: Base de données
-				description: ex. MySQL 5.6, MariaDB 10.2, PostgreSQL 9.6
-			validations:
-				required: false
+  - type: input
+    id: database
+    attributes:
+      label: Base de données
+      description: ex. MySQL 5.6, MariaDB 10.2, PostgreSQL 9.6
+    validations:
+      required: false
 
-		- type: textarea
-      id: what-happened
-      attributes:
-          label: Ce qui s'est passé?
-          description: À quoi vous attendiez-vous ?
-          placeholder: Je ne peux pas actuellement faire X chose parce que quand je le fais, cela casse X chose.
-      validations:
-          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Ce qui s'est passé?
+			description: À quoi vous attendiez-vous ?
+      placeholder: Je ne peux pas actuellement faire X chose parce que quand je le fais, cela casse X chose.
+    validations:
+      required: true
 
-    - type: textarea
-      id: how-to-reproduce
-      attributes:
-          label: Comment reproduire le bug
-          description: Comment cela s'est-il produit, veuillez ajouter toutes les valeurs de configuration utilisées et fournir un ensemble d'étapes fiables si possible.
-          placeholder: Quand je fais X, je vois Y.
-      validations:
-          required: true
+  - type: textarea
+    attributes:
+      label: Comment reproduire le bug
+      description: Comment cela s'est-il produit, veuillez ajouter toutes les valeurs de configuration utilisées et fournir un ensemble d'étapes fiables si possible.
+			placeholder: Quand je fais X, je vois Y.
+    validations:
+      required: true
 
-		- type: textarea
-			attributes:
-				label: Resultat attendu
-				description: Que pensez-vous qu'il se serait passé à la place de ce bug signalé ?
-			validations:
-				required: true
+  - type: textarea
+    attributes:
+      label: Resultat attendu
+      description: Que pensez-vous qu'il se serait passé à la place de ce bug signalé ?
+    validations:
+      required: true
 
-    - type: textarea
-      id: notes
-      attributes:
-				label: Autres choses ?
-				description: |
-					Utilisez ce champ pour fournir toute autre note qui, selon vous, pourrait être pertinente au problème.
+  - type: textarea
+    attributes:
+      label: Autres choses ?
+      description: |
+        Utilisez ce champ pour fournir toute autre note qui, selon vous, pourrait être pertinente au problème.
 
-					Liens? Les références? Tout ce qui nous donnera plus de contexte sur le problème que vous rencontrez !
+        Liens? Les références? Tout ce qui nous donnera plus de contexte sur le problème que vous rencontrez !
 
-					Astuce : Vous pouvez joindre des images ou des fichiers journaux en cliquant sur cette zone pour la mettre en surbrillance, puis en y faisant glisser les fichiers.
-      validations:
-          required: false
+        Tip: Vous pouvez joindre des images ou des fichiers journaux en cliquant sur cette zone pour la mettre en surbrillance, puis en y faisant glisser les fichiers.
+    validations:
+      required: false
