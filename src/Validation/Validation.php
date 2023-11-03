@@ -27,6 +27,14 @@ class Validation extends BaseValidation
 
     /**
      * {@inheritDoc}
+     */
+    public function errors(): ErrorBag
+    {
+        return new ErrorBag(parent::errors()->toArray());
+    }
+
+    /**
+     * {@inheritDoc}
      *
      * @param array<AbstractRule> $rules
      */
