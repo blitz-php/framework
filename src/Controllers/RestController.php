@@ -129,7 +129,7 @@ class RestController extends BaseController
             return $this->respondBadRequest($message, $ex->getCode(), $errors);
         }
 
-		if (! on_dev()) {
+        if (! on_dev()) {
             $url = explode('?', $this->request->getRequestTarget())[0];
 
             return $this->respondBadRequest($this->_translate('badUsed', [$url]));

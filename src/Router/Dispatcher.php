@@ -809,9 +809,9 @@ class Dispatcher
         };
     }
 
-	/**
-	 * Formattage des erreurs de validation
-	 */
+    /**
+     * Formattage des erreurs de validation
+     */
     private function formatValidationResponse(ValidationException $e, ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $code = $e->getCode();
