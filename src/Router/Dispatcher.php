@@ -22,7 +22,6 @@ use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Controllers\RestController;
 use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
-use BlitzPHP\Event\EventDiscover;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
@@ -245,15 +244,10 @@ class Dispatcher
     {
         $this->forceSecureAccess();
 
-        /**
-         * Init event manager
-         */
-        Services::singleton(EventDiscover::class)->discove();
-
         $this->event->trigger('pre_system');
 
-        // Check for a cached page.
-        // Execution will stop if the page has been cached.
+        // Recherchez une page en cache.
+        // L'exécution s'arrêtera si la page a été mise en cache.
         if (($response = $this->displayCache($cacheConfig)) instanceof ResponseInterface) {
             return $response;
         }

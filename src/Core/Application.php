@@ -13,6 +13,7 @@ namespace BlitzPHP\Core;
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Debug\Debugger;
+use BlitzPHP\Event\EventDiscover;
 use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Router\Dispatcher;
 use MirazMac\Requirements\Checker;
@@ -67,6 +68,12 @@ class Application
          * Lance la capture des exceptions et erreurs
          */
         Debugger::init();
+
+        /**
+         * Initialisation du gestionnaire d'evenement
+         */
+        Services::singleton(EventDiscover::class)->discove();
+        Services::event()->trigger('app:init');
 
         return $this;
     }

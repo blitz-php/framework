@@ -93,13 +93,16 @@ return function (array $paths, string $paths_config_file, bool $is_cli) {
     Services::autoloader()->initialize()->register();
     Services::autoloader()->loadHelpers();
 
-    $app = new Application();
-    $app->init();
-
     /**
      * Initialisation de Kint
      */
     require_once __DIR__ . DS . 'kint.php';
+
+    /**
+     * Lancement de l'application
+     */
+    $app = new Application();
+    $app->init();
 
     if (! $is_cli) {
         $app->run();
