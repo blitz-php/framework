@@ -459,7 +459,7 @@ if (! function_exists('url_to')) {
      */
     function url_to(string $controller, ...$args): string
     {
-        if (! $route = link_to($controller, ...$args)) {
+        if (! $route = route($controller, ...$args)) {
             $explode = explode('::', $controller);
 
             if (isset($explode[1])) {
@@ -470,6 +470,18 @@ if (! function_exists('url_to')) {
         }
 
         return site_url($route);
+    }
+}
+
+if (! function_exists('route')) {
+    /**
+     * Tente de rechercher une route en fonction de sa destination.
+     * 
+     * @return string|false
+     */
+    function route(string $method, ...$params)
+    {
+        return Services::routes()->reverseRoute($method, ...$params);
     }
 }
 
