@@ -476,8 +476,8 @@ if (! function_exists('url_to')) {
 if (! function_exists('route')) {
     /**
      * Tente de rechercher une route en fonction de sa destination.
-     * 
-     * @return string|false
+     *
+     * @return false|string
      */
     function route(string $method, ...$params)
     {
