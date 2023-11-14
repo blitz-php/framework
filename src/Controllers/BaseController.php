@@ -13,9 +13,12 @@ namespace BlitzPHP\Controllers;
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\HttpException;
+use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Validation\Validation;
+use BlitzPHP\Validation\Validator;
+use Dimtrovich\Validation\Exceptions\ValidationException as DimtrovichValidationException;
 use Dimtrovich\Validation\ValidatedInput;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -110,6 +113,21 @@ abstract class BaseController
     protected function validate(array $rules, array $messages = []): ValidatedInput
     {
         return $this->request->validate($rules, $messages);
+    }
+
+    /**
+     * Validation des donnees quelconques
+     */
+    protected function validateData(array $data, array $rules, array $messages = []): ValidatedInput
+    {
+		try {
+            return Validator::make($data, $rules, $messages)->safe();
+        } catch (DimtrovichValidationException $e) {
+            $th = new ValidationException($e->getMessage());
+            $th->setErrors($e->getErrors());
+
+            throw $th;
+        }
     }
 
     /**
