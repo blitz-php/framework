@@ -6,7 +6,17 @@ use {useStatement};
 
 class {class} extends {extends}
 {
-<?php if ($type === 'controller'): ?>
+<?php if (!empty($invokable)): ?>
+	/**
+	 * Traitement
+	 *
+	 * @return mixed
+	 */
+	public function __invoke()
+    {
+        //
+    }
+<?php elseif ($type === 'controller'): ?>
     /**
      * Renvoie un tableau d'objets ressources, eux-mêmes au format tableau
      *
