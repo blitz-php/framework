@@ -372,18 +372,107 @@ describe('RouteCollection', function () {
     });
 
     describe('Options', function () {
-        it('Hostname', function () {
-			$_SERVER['HTTP_HOST'] = 'example.com';
-
+        it('Options', function () {
 			$routes = getCollector();
 
-            $routes->add('from', 'to', ['hostname' => 'example.com']);
-	        $routes->add('foo', 'bar', ['hostname' => 'foobar.com']);
+            // les options doivent être déclarées séparément, pour ne pas confondre PHPCBF
+			$options = [
+				'as'  => 'admin',
+				'foo' => 'baz',
+			];
+			$routes->add(
+				'administrator',
+				static function (): void {},
+				$options
+			);
 
-            expect($routes->getRoutes())->toBe([
-                'from' => '\to',
-            ]);
+        	expect($routes->getRoutesOptions('administrator'))->toBe($options);
         });
+
+        it('Options pour les different verbes', function () {
+			$routes = getCollector();
+
+            // les options doivent être déclarées séparément, pour ne pas confondre PHPCBF
+			$options1 = [
+				'as'  => 'admin1',
+				'foo' => 'baz1',
+			];
+			$options2 = [
+				'as'  => 'admin2',
+				'foo' => 'baz2',
+			];
+			$options3 = [
+				'bar' => 'baz',
+			];
+			$routes->get(
+				'administrator',
+				static function (): void {},
+				$options1
+			);
+			$routes->post(
+				'administrator',
+				static function (): void {},
+				$options2
+			);
+			$routes->add(
+				'administrator',
+				static function (): void {},
+				$options3
+			);
+
+			$options = $routes->getRoutesOptions('administrator');
+			expect($options)->toBe(['as' => 'admin1', 'foo' => 'baz1', 'bar' => 'baz']);
+
+			$options = $routes->setHTTPVerb('post')->getRoutesOptions('administrator');
+			expect($options)->toBe(['as' => 'admin2', 'foo' => 'baz2', 'bar' => 'baz']);
+
+			$options = $routes->setHTTPVerb('get')->getRoutesOptions('administrator', 'post');
+			expect($options)->toBe(['as' => 'admin2', 'foo' => 'baz2', 'bar' => 'baz']);
+		});
+
+        it('Options de groupes avec des middlewares simple', function () {
+			setRequestMethod('GET');
+			$routes = getCollector();
+
+			$routes->group(
+				'admin',
+				['middleware' => 'role'],
+				static function ($routes): void {
+					$routes->add('users', '\Users::list');
+				}
+			);
+
+			expect($routes->isFiltered('admin/users'))->toBeTruthy();
+			expect($routes->isFiltered('admin/franky'))->toBeFalsy();
+			expect($routes->getFiltersForRoute('admin/users'))->toBe(['role']);
+			expect($routes->getFiltersForRoute('admin/bosses'))->toBe([]);
+		});
+
+        it('Options de groupes avec des middlewares et les parametres', function () {
+			setRequestMethod('GET');
+			$routes = getCollector();
+
+			$routes->group(
+				'admin',
+				['middleware' => 'role:admin,manager'],
+				static function ($routes): void {
+					$routes->add('users', '\Users::list');
+				}
+			);
+
+			expect($routes->isFiltered('admin/users'))->toBeTruthy();
+			expect($routes->isFiltered('admin/franky'))->toBeFalsy();
+			expect($routes->getFiltersForRoute('admin/users'))->toBe(['role:admin,manager']);
+		});
+
+        it('Options de decalage', function () {
+			setRequestMethod('GET');
+			$routes = getCollector();
+
+			$routes->get('users/(:num)', 'users/show/$1', ['offset' => 1]);
+			$expected = ['users/([0-9]+)' => '\users/show/$2'];
+			expect($routes->getRoutes())->toBe($expected);
+		});
     });
 
     describe('Resource & presenter', function () {
@@ -702,6 +791,369 @@ describe('RouteCollection', function () {
 			);
 
             expect($routes->getRoutes())->toBe(['here' => '\there']);
+		});
+	});
+
+	describe('Routes nommées', function() {
+		it('Route nommée', function() {
+			$routes = getCollector();
+
+			$routes->add('users', 'Users::index', ['as' => 'namedRoute']);
+			$routes->add('profil', 'Users::index', ['name' => 'namedRoute2']);
+
+			expect($routes->reverseRoute('namedRoute'))->toBe('/users');
+			expect($routes->reverseRoute('namedRoute2'))->toBe('/profil');
+		});
+
+		it('Route nommée avec la locale', function() {
+			$routes = getCollector();
+
+			$routes->add('{locale}/users', 'Users::index', ['as' => 'namedRoute']);
+
+			expect($routes->reverseRoute('namedRoute'))->toBe('/en/users');
+		});
+
+		it('Route nommée avec les parametres', function() {
+			$routes = getCollector();
+
+			// @TODO Ne mettez aucun espace réservé après (:any).
+			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
+
+			$match = $routes->reverseRoute('namedRoute', 'string', 13);
+
+			expect($match)->toBe('/path/string/to/13');
+		});
+
+		it('Route nommée avec les parametres et la locale', function() {
+			$routes = getCollector();
+
+			// @TODO Ne mettez aucun espace réservé après (:any).
+			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+			$routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
+
+			$match = $routes->reverseRoute('namedRoute', 'string', 13);
+
+			expect($match)->toBe('/en/path/string/to/13');
+		});
+
+		it('Route nommée avec la meme URI mais differentes methodes', function() {
+			$routes = getCollector();
+
+			$routes->get('user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
+			$routes->post(
+				'user/insert',
+				static function (): void {},
+				['as' => 'namedRoute2']
+			);
+			$routes->put(
+				'user/insert',
+				static function (): void {},
+				['as' => 'namedRoute3']
+			);
+
+			$match1 = $routes->reverseRoute('namedRoute1');
+			$match2 = $routes->reverseRoute('namedRoute2');
+			$match3 = $routes->reverseRoute('namedRoute3');
+
+			expect('/user/insert')->toBe($match1);
+			expect('/user/insert')->toBe($match2);
+			expect('/user/insert')->toBe($match3);
+		});
+
+		it('Route nommée avec la locale, la meme URI mais differentes methodes', function() {
+			$routes = getCollector();
+
+			$routes->get('{locale}/user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
+			$routes->post(
+				'{locale}/user/insert',
+				static function (): void {},
+				['as' => 'namedRoute2']
+			);
+			$routes->put(
+				'{locale}/user/insert',
+				static function (): void {},
+				['as' => 'namedRoute3']
+			);
+
+			$match1 = $routes->reverseRoute('namedRoute1');
+			$match2 = $routes->reverseRoute('namedRoute2');
+			$match3 = $routes->reverseRoute('namedRoute3');
+
+			expect('/en/user/insert')->toBe($match1);
+			expect('/en/user/insert')->toBe($match2);
+			expect('/en/user/insert')->toBe($match3);
+		});
+
+		it('Route nommée avec un pipe dans la regex', function() {
+			$routes = getCollector();
+
+			$routes->get('/system/(this|that)', 'myController::system/$1', ['as' => 'pipedRoute']);
+
+        	expect('/system/this')->toBe($routes->reverseRoute('pipedRoute', 'this'));
+        	expect('/system/that')->toBe($routes->reverseRoute('pipedRoute', 'that'));
+		});
+	});
+
+	describe('Redirection', function() {
+		it('Ajout de redirection', function() {
+			$routes = getCollector();
+
+			// Le deuxième paramètre est soit le nouvel URI vers lequel rediriger, soit le nom d'une route nommée.
+			$routes->redirect('users', 'users/index', 307);
+
+			$expected = [
+				'users' => 'users/index',
+			];
+
+			expect($routes->getRoutes())->toBe($expected);
+			expect($routes->isRedirect('users'))->toBeTruthy();
+			expect($routes->getRedirectCode('users'))->toBe(307);
+			expect($routes->getRedirectCode('bosses'))->toBe(0);
+		});
+
+		it('Ajout de redirection avec une route nommee', function() {
+			$routes = getCollector();
+
+			$routes->add('zombies', 'Zombies::index', ['as' => 'namedRoute']);
+        	$routes->redirect('users', 'namedRoute', 307);
+
+			$expected = [
+				'zombies' => '\Zombies::index',
+				'users'   => ['zombies' => '\Zombies::index'],
+			];
+
+			expect($routes->getRoutes())->toBe($expected);
+			expect($routes->isRedirect('users'))->toBeTruthy();
+			expect($routes->getRedirectCode('users'))->toBe(307);
+		});
+
+		it('Ajout de redirection avec la methode GET', function() {
+			$routes = getCollector();
+
+			$routes->get('zombies', 'Zombies::index', ['as' => 'namedRoute']);
+        	$routes->redirect('users', 'namedRoute', 307);
+
+			$expected = [
+				'zombies' => '\Zombies::index',
+				'users'   => ['zombies' => '\Zombies::index'],
+			];
+
+			expect($routes->getRoutes())->toBe($expected);
+			expect($routes->isRedirect('users'))->toBeTruthy();
+			expect($routes->getRedirectCode('users'))->toBe(307);
+		});
+
+		it('Route nommée avec les parametres et la locale', function() {
+			$routes = getCollector();
+
+			// @TODO Do not put any placeholder after (:any).
+			//       Because the number of parameters passed to the controller method may change.
+			$routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
+
+			$match = $routes->reverseRoute('namedRoute', 'string', 13);
+
+			expect($match)->toBe('/en/path/string/to/13');
+		});
+
+		it('Route nommée avec la meme URI mais differentes methodes', function() {
+			$routes = getCollector();
+
+			$routes->get('user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
+			$routes->post(
+				'user/insert',
+				static function (): void {},
+				['as' => 'namedRoute2']
+			);
+			$routes->put(
+				'user/insert',
+				static function (): void {},
+				['as' => 'namedRoute3']
+			);
+
+			$match1 = $routes->reverseRoute('namedRoute1');
+			$match2 = $routes->reverseRoute('namedRoute2');
+			$match3 = $routes->reverseRoute('namedRoute3');
+
+			expect('/user/insert')->toBe($match1);
+			expect('/user/insert')->toBe($match2);
+			expect('/user/insert')->toBe($match3);
+		});
+
+		it('Route nommée avec la locale, la meme URI mais differentes methodes', function() {
+			$routes = getCollector();
+
+			$routes->get('{locale}/user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
+			$routes->post(
+				'{locale}/user/insert',
+				static function (): void {},
+				['as' => 'namedRoute2']
+			);
+			$routes->put(
+				'{locale}/user/insert',
+				static function (): void {},
+				['as' => 'namedRoute3']
+			);
+
+			$match1 = $routes->reverseRoute('namedRoute1');
+			$match2 = $routes->reverseRoute('namedRoute2');
+			$match3 = $routes->reverseRoute('namedRoute3');
+
+			expect('/en/user/insert')->toBe($match1);
+			expect('/en/user/insert')->toBe($match2);
+			expect('/en/user/insert')->toBe($match3);
+		});
+
+		it('Route nommée avec un pipe dans la regex', function() {
+			$routes = getCollector();
+
+			$routes->get('/system/(this|that)', 'myController::system/$1', ['as' => 'pipedRoute']);
+
+        	expect('/system/this')->toBe($routes->reverseRoute('pipedRoute', 'this'));
+        	expect('/system/that')->toBe($routes->reverseRoute('pipedRoute', 'that'));
+		});
+	});
+
+	describe('Sous domaines', function() {
+		it('Hostname', function () {
+			$_SERVER['HTTP_HOST'] = 'example.com';
+
+			$routes = getCollector();
+
+            $routes->add('from', 'to', ['hostname' => 'example.com']);
+	        $routes->add('foo', 'bar', ['hostname' => 'foobar.com']);
+
+            expect($routes->getRoutes())->toBe([
+                'from' => '\to',
+            ]);
+        });
+
+		it('Sous domaine', function () {
+			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+
+			$routes = getCollector();
+
+            $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
+        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+
+            expect($routes->getRoutes())->toBe([
+                'objects/([a-zA-Z0-9]+)' => '\Admin::objectsList/$1',
+        	]);
+        });
+
+		it('Sous domaine absent', function() {
+			$_SERVER['HTTP_HOST'] = 'www.example.com';
+
+			$routes = getCollector();
+
+			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
+        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+
+			expect($routes->getRoutes())->toBe([
+				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+			]);
+		});
+
+		it('Test avec des sous domaines differents', function() {
+			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+
+			$routes = getCollector();
+
+			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
+        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+
+			expect($routes->getRoutes())->toBe([
+				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+			]);
+		});
+
+		it('Test avec le sous domaine www', function() {
+			$routes = getCollector();
+
+			$_SERVER['HTTP_HOST'] = 'www.example.com';
+
+			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
+			$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+
+			expect($routes->getRoutes())->toBe([
+				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+			]);
+		});
+
+		it('Test avec le sous domaine .co', function() {
+			$routes = getCollector();
+
+			$_SERVER['HTTP_HOST'] = 'example.co.uk';
+
+			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
+	        $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+
+			expect($routes->getRoutes())->toBe([
+				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+			]);
+		});
+
+		it('Test avec de differents sous domaine absent', function() {
+			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+
+			$routes = getCollector();
+
+			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'nothere']);
+        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1', ['subdomain' => '*']);
+
+			expect($routes->getRoutes())->toBe([
+				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+			]);
+		});
+
+		it('Test sans sous domaine et le point', function() {
+			$_SERVER['HTTP_HOST'] = 'example.com';
+
+			$routes = getCollector();
+
+			$routes->add('/objects/(:alphanum)', 'App::objectsList/$1', ['subdomain' => '*']);
+
+        	expect($routes->getRoutes())->toBe([]);
+		});
+
+		it('Test avec les sous domaine en ordre', function() {
+			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+
+			$routes = getCollector();
+
+			$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+        	$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
+
+        	expect($routes->getRoutes())->toBe([
+				'objects/([a-zA-Z0-9]+)' => '\Admin::objectsList/$1',
+			]);
+		});
+	});
+
+	describe('Fallback', function() {
+		it('Fallback', function() {
+			setRequestMethod('GET');
+			$routes = getCollector();
+
+			expect($routes->get404Override())->toBeNull();
+		});
+
+		it('Fallback sous forme de chaine', function() {
+			setRequestMethod('GET');
+			$routes = getCollector();
+
+			$routes->fallback('Explode');
+			expect($routes->get404Override())->toBe('Explode');
+		});
+
+		it('Fallback sous forme de callback', function() {
+			setRequestMethod('GET');
+			$routes = getCollector();
+
+			$routes->fallback(static function (): void {
+				echo 'Explode now';
+			});
+			expect($routes->get404Override())->toBeAnInstanceOf('closure');
 		});
 	});
 });

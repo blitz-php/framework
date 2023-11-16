@@ -20,7 +20,7 @@ return Expect::structure([
     'url_suffix'                   => Expect::string()->default(''),
     'use_absolute_link'            => Expect::bool()->default(true),
     'negotiate_locale'             => Expect::bool()->default(true),
-    'supported_locales'            => Expect::listOf('string')->default(['fr', 'en']),
+    'supported_locales'            => Expect::listOf('string')->default([]),
     'timezone'                     => Expect::anyOf(...DateTimeZone::listIdentifiers())->default('UTC'),
     'index_page'                   => Expect::string()->default(''),
 ])->otherItems();

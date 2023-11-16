@@ -226,7 +226,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function __construct(protected LocatorInterface $locator, object $routing)
     {
-        $this->httpHost = Services::request()->getEnv('HTTP_HOST');
+        $this->httpHost = env('HTTP_HOST');
 
         // Configuration basée sur le fichier de config. Laissez le fichier routes substituer.
         $this->defaultNamespace   = rtrim($routing->default_namespace ?: $this->defaultNamespace, '\\') . '\\';
@@ -662,7 +662,7 @@ class RouteCollection implements RouteCollectionInterface
             $routeName  = $to;
             $routeKey   = $this->routesNames['*'][$routeName];
             $redirectTo = [$routeKey => $this->routes['*'][$routeKey]['handler']];
-        } elseif (array_key_exists($to, $this->routes['get'])) {
+        } elseif (array_key_exists($to, $this->routesNames['get'])) {
             $routeName  = $to;
             $routeKey   = $this->routesNames['get'][$routeName];
             $redirectTo = [$routeKey => $this->routes['get'][$routeKey]['handler']];
@@ -1184,10 +1184,11 @@ class RouteCollection implements RouteCollectionInterface
             return false;
         }
 
+		$name = $this->formatRouteName($search);
         // Les routes nommées ont une priorité plus élevée.
         foreach ($this->routesNames as $verb => $collection) {
-            if (array_key_exists($search, $collection)) {
-                $routeKey = $collection[$search];
+            if (array_key_exists($name, $collection)) {
+                $routeKey = $collection[$name];
 
                 $from = $this->routes[$verb][$routeKey]['from'];
 
@@ -1457,7 +1458,7 @@ class RouteCollection implements RouteCollectionInterface
             $to = '\\' . ltrim($to, '\\');
         }
 
-        $name = $this->formatRouteName($options['as'] ?? $routeKey);
+        $name = $this->formatRouteName($options['as'] ?? $options['name'] ?? $routeKey);
 
         // Ne remplacez aucun 'from' existant afin que les routes découvertes automatiquement
         // n'écrase pas les paramètres app/Config/Routes.
@@ -1579,7 +1580,7 @@ class RouteCollection implements RouteCollectionInterface
     {
         $name = trim($name, '/');
 
-        return strtolower(str_replace(['/', '\\', '_', '.', ' '], '.', $name));
+        return str_replace(['/', '\\', '_', '.', ' '], '.', $name);
     }
 
     private function getControllerName(Closure|string $handler): ?string
