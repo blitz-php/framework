@@ -177,6 +177,31 @@ class View
         return $this->addData($key, $context);
     }
 
+	/**
+     * Ajoute des erreurs à la session en tant que Flashdata.
+     */
+    public function withErrors(array|ErrorBag|string $errors): static
+    {
+		if (is_string($errors)) {
+			$errors = ['default' => $errors];
+		}
+		if (! ($errors instanceof ErrorBag)) {
+			$errors = new ErrorBag($errors);
+		}
+
+		if (isset(static::$shared['errors']) && static::$shared['errors'] instanceof ErrorBag) {
+			$messages = array_merge(
+				static::$shared['errors']->toArray(),
+				$errors->toArray()
+			);
+			$errors = new ErrorBag($messages);
+		}
+
+		$this->share('errors', $errors);
+
+        return $this;
+    }
+
     /**
      * Définit une seule donnée de vue.
      *
