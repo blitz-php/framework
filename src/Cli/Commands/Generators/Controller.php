@@ -120,9 +120,9 @@ class Controller extends Command
             ['{useStatement}', '{extends}'],
             [$useStatement, $extends],
             [
-				'type'      => $rest,
-				'invokable' => $this->option('invokable'),
-			]
+                'type'      => $rest,
+                'invokable' => $this->option('invokable'),
+            ]
         );
     }
 }

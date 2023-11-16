@@ -120,7 +120,7 @@ abstract class BaseController
      */
     protected function validateData(array $data, array $rules, array $messages = []): ValidatedInput
     {
-		try {
+        try {
             return Validator::make($data, $rules, $messages)->safe();
         } catch (DimtrovichValidationException $e) {
             $th = new ValidationException($e->getMessage());

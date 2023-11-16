@@ -6,7 +6,7 @@ use {useStatement};
 
 class {class} extends {extends}
 {
-<?php if (!empty($invokable)): ?>
+<?php if (! empty($invokable)): ?>
 	/**
 	 * Traitement
 	 *
