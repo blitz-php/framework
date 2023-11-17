@@ -40,7 +40,9 @@ class ApplicationController extends BaseController
      */
     protected function view(string $view, ?array $data = [], ?array $options = []): View
     {
-        $path = '';
+		$path    = '';
+		$data    = (array) $data;
+		$options = (array) $options;
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
         if (! str_contains($view, '\\')) {
@@ -63,18 +65,39 @@ class ApplicationController extends BaseController
             $viewer->addData($this->viewDatas);
         }
 
-        if (! is_string($controllerName = Dispatcher::getController(false))) {
-            $controllerName = static::class;
-        }
+		if (empty($data['title'])) {
+			if (! is_string($controllerName = Dispatcher::getController(false))) {
+				$controllerName = static::class;
+			}
+			$controllerName = str_ireplace(['App\Controllers', 'Controller'], '', $controllerName);
 
-        return $viewer->display($path . $view)->setVar('title', str_ireplace('Controller', '', $controllerName) . ' - ' . Dispatcher::getMethod());
+			$dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+			$func = isset($dbt[1]['function']) ? $dbt[1]['function'] : Dispatcher::getMethod();
+
+			$viewer->setVar('title', $controllerName . ' - ' . $func);
+		}
+
+        return $viewer->display($path . $view);
     }
 
     /**
      * Charge et rend directement une vue
      */
-    final protected function render(?string $view = null, ?array $data = [], ?array $options = []): ResponseInterface
+    final protected function render(array|string $view = '', ?array $data = [], ?array $options = []): ResponseInterface
     {
+        if (is_array($view)) {
+			$data    = $view;
+			$options = $data;
+
+            $dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $view = isset($dbt[1]['function']) ? $dbt[1]['function'] : '';
+        }
+
+        if (empty($view) && empty($data)) {
+            $dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $view = isset($dbt[1]['function']) ? $dbt[1]['function'] : '';
+        }
+
         if (empty($view)) {
             $view = Dispatcher::getMethod();
         }
