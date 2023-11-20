@@ -82,6 +82,34 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
         return trim(config()->get('app.base_url'), '/');
     }
 
+	/**
+     * Obtient le schéma et l'hôte HTTP.
+     *
+     * Si l'URL a été appelée avec une authentification de base, l'utilisateur et
+	 * le mot de passe ne sont pas ajoutés à la chaîne générée.
+     */
+    public function getSchemeAndHttpHost(): string
+    {
+        return $this->getScheme().'://'.$this->getHttpHost();
+    }
+
+    /**
+     * Renvoie l'hôte HTTP demandé.
+     *
+     * Le nom du port sera ajouté à l'hôte s'il n'est pas standard.
+     */
+    public function getHttpHost(): string
+    {
+        $scheme = $this->getScheme();
+        $port   = $this->getPort();
+
+        if (('http' === $scheme && 80 == $port) || ('https' === $scheme && 443 == $port)) {
+            return $this->getHost();
+        }
+
+        return $this->getHost().':'.$port;
+    }
+
     /**
      * Obtenez l'URL (pas de chaîne de requête) pour la demande.
      */
@@ -161,7 +189,17 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Déterminez si le nom de l'itinéraire correspond à un modèle donné.
+     * Déterminez si l’URI de la demande actuelle correspond à un modèle.
+     */
+    public function pathIs(...$patterns): bool
+    {
+        $path = $this->decodedPath();
+
+        return collect($patterns)->contains(fn ($pattern) => Text::is($pattern, $path));
+    }
+
+	/**
+     * Déterminez si le nom de la route correspond à un modèle donné.
      *
      * @param mixed ...$patterns
      */
@@ -169,6 +207,20 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     {
         return false;
         // return $this->route() && $this->route()->named(...$patterns);
+    }
+
+    /**
+     * Verifier si la methode de la requete actuelle est l'une envoyee en parametre
+     */
+    public function isMethod(array|string $methods): bool
+    {
+		foreach ((array) $methods as $method) {
+			if (strtolower($method) === strtolower($this->method())) {
+				return true;
+			}
+		}
+
+        return false;
     }
 
     /**
@@ -296,6 +348,16 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     {
         return $this->getUri()->getScheme();
     }
+
+	public function getHost(): string
+	{
+		return $this->getUri()->getHost();
+	}
+
+	public function getPort(): int
+	{
+		return $this->getUri()->getPort() ?? 80;
+	}
 
     /**
      * {@inheritDoc}

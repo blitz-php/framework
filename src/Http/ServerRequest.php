@@ -1000,6 +1000,24 @@ class ServerRequest implements ServerRequestInterface
         return array_slice($segments, 0, -1 * ($tldLength + 1));
     }
 
+
+    /**
+     * Obtient une liste de types de contenu acceptables par le navigateur client dans l'ordre préférable.
+     *
+     * @return string[]
+     */
+    public function getAcceptableContentTypes(): array
+    {
+        $raw    = $this->parseAccept();
+        $accept = [];
+
+        foreach ($raw as $types) {
+            $accept = array_merge($accept, $types);
+        }
+
+		return $accept;
+    }
+
     /**
      * Découvrez quels types de contenu le client accepte ou vérifiez s'il accepte un
      * type particulier de contenu.
@@ -1019,23 +1037,25 @@ class ServerRequest implements ServerRequestInterface
      * Cette méthode ordonnera les types de contenu renvoyés par les valeurs de préférence indiquées
      * par le client.
      *
-     * @param string|null $type Le type de contenu à vérifier. Laissez null pour obtenir tous les types qu'un client accepte.
+     * @param array|string|null $types Le type de contenu à vérifier. Laissez null pour obtenir tous les types qu'un client accepte.
      *
      * @return bool|string[] Soit un tableau de tous les types acceptés par le client, soit un booléen s'il accepte le type fourni.
      */
-    public function accepts(?string $type = null)
+    public function accepts(array|string|null $types = null)
     {
-        $raw    = $this->parseAccept();
-        $accept = [];
+        $accept = $this->getAcceptableContentTypes();
 
-        foreach ($raw as $types) {
-            $accept = array_merge($accept, $types);
-        }
-        if ($type === null) {
+        if ($types === null) {
             return $accept;
         }
 
-        return in_array($type, $accept, true);
+		foreach ((array) $types as $type) {
+			if (in_array($type, $accept, true)) {
+				return true;
+			}
+		}
+
+		return false;
     }
 
     /**
