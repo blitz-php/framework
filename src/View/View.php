@@ -189,9 +189,9 @@ class View
             $errors = new ErrorBag($errors);
         }
 
-        if (isset(static::$shared['errors']) && static::$shared['errors'] instanceof ErrorBag) {
+        if (isset(self::$shared['errors']) && self::$shared['errors'] instanceof ErrorBag) {
             $messages = array_merge(
-                static::$shared['errors']->toArray(),
+                self::$shared['errors']->toArray(),
                 $errors->toArray()
             );
             $errors = new ErrorBag($messages);
