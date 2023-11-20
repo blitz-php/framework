@@ -40,9 +40,9 @@ class ApplicationController extends BaseController
      */
     protected function view(string $view, ?array $data = [], ?array $options = []): View
     {
-		$path    = '';
-		$data    = (array) $data;
-		$options = (array) $options;
+        $path    = '';
+        $data    = (array) $data;
+        $options = (array) $options;
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
         if (! str_contains($view, '\\')) {
@@ -65,17 +65,17 @@ class ApplicationController extends BaseController
             $viewer->addData($this->viewDatas);
         }
 
-		if (empty($data['title'])) {
-			if (! is_string($controllerName = Dispatcher::getController(false))) {
-				$controllerName = static::class;
-			}
-			$controllerName = str_ireplace(['App\Controllers', 'Controller'], '', $controllerName);
+        if (empty($data['title'])) {
+            if (! is_string($controllerName = Dispatcher::getController(false))) {
+                $controllerName = static::class;
+            }
+            $controllerName = str_ireplace(['App\Controllers', 'Controller'], '', $controllerName);
 
-			$dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-			$func = isset($dbt[1]['function']) ? $dbt[1]['function'] : Dispatcher::getMethod();
+            $dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $func = $dbt[1]['function'] ?? Dispatcher::getMethod();
 
-			$viewer->setVar('title', $controllerName . ' - ' . $func);
-		}
+            $viewer->setVar('title', $controllerName . ' - ' . $func);
+        }
 
         return $viewer->display($path . $view);
     }
@@ -86,16 +86,16 @@ class ApplicationController extends BaseController
     final protected function render(array|string $view = '', ?array $data = [], ?array $options = []): ResponseInterface
     {
         if (is_array($view)) {
-			$data    = $view;
-			$options = $data;
+            $data    = $view;
+            $options = $data;
 
             $dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-            $view = isset($dbt[1]['function']) ? $dbt[1]['function'] : '';
+            $view = $dbt[1]['function'] ?? '';
         }
 
         if (empty($view) && empty($data)) {
             $dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-            $view = isset($dbt[1]['function']) ? $dbt[1]['function'] : '';
+            $view = $dbt[1]['function'] ?? '';
         }
 
         if (empty($view)) {

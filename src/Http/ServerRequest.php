@@ -1000,7 +1000,6 @@ class ServerRequest implements ServerRequestInterface
         return array_slice($segments, 0, -1 * ($tldLength + 1));
     }
 
-
     /**
      * Obtient une liste de types de contenu acceptables par le navigateur client dans l'ordre préférable.
      *
@@ -1015,7 +1014,7 @@ class ServerRequest implements ServerRequestInterface
             $accept = array_merge($accept, $types);
         }
 
-		return $accept;
+        return $accept;
     }
 
     /**
@@ -1041,7 +1040,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return bool|string[] Soit un tableau de tous les types acceptés par le client, soit un booléen s'il accepte le type fourni.
      */
-    public function accepts(array|string|null $types = null)
+    public function accepts(null|array|string $types = null)
     {
         $accept = $this->getAcceptableContentTypes();
 
@@ -1049,13 +1048,13 @@ class ServerRequest implements ServerRequestInterface
             return $accept;
         }
 
-		foreach ((array) $types as $type) {
-			if (in_array($type, $accept, true)) {
-				return true;
-			}
-		}
+        foreach ((array) $types as $type) {
+            if (in_array($type, $accept, true)) {
+                return true;
+            }
+        }
 
-		return false;
+        return false;
     }
 
     /**
