@@ -57,11 +57,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Facades/Route.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method BlitzPHP\\\\Http\\\\Request\\:\\:getAcceptableContentTypes\\(\\)\\.$#',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Http/Request.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method BlitzPHP\\\\Http\\\\Request\\:\\:getFormat\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Http/Request.php',

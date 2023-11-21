@@ -12,11 +12,13 @@
 namespace BlitzPHP\Http;
 
 use ArrayAccess;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\String\Text;
+use BlitzPHP\Validation\DataValidation;
 use BlitzPHP\Validation\Validation;
 use BlitzPHP\Validation\Validator;
 use Dimtrovich\Validation\Exceptions\ValidationException as DimtrovichValidationException;
@@ -30,8 +32,10 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
 
     /**
      * Validation des donnees de la requete
+	 *
+	 * @param array|class-string<DataValidation> $rules
      */
-    public function validate(array $rules, array $messages = []): ValidatedInput
+    public function validate(array|string $rules, array $messages = []): ValidatedInput
     {
         try {
             return $this->validation($rules, $messages)->safe();
@@ -45,10 +49,23 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
 
     /**
      * Cree un validateur avec les donnees de la requete actuelle
+	 *
+	 * @param array|class-string<DataValidation> $rules
      */
-    public function validation(array $rules, array $messages = []): Validation
+    public function validation(array|string $rules, array $messages = []): Validation
     {
-        return Validator::make($this->all(), $rules, $messages);
+        if (is_string($rules)) {
+			if (! class_exists($rules) || ! is_subclass_of($rules, DataValidation::class)) {
+				throw new \InvalidArgumentException();
+			}
+
+			/** @var DataValidation $validation */
+			$validation = Services::container()->make($rules);
+
+			return $validation->process($this);
+		}
+
+		return Validator::make($this->all(), $rules, $messages);
     }
 
     /**
