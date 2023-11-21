@@ -23,6 +23,7 @@ use BlitzPHP\Validation\Validation;
 use BlitzPHP\Validation\Validator;
 use Dimtrovich\Validation\Exceptions\ValidationException as DimtrovichValidationException;
 use Dimtrovich\Validation\ValidatedInput;
+use InvalidArgumentException;
 
 class Request extends ServerRequest implements Arrayable, ArrayAccess
 {
@@ -32,8 +33,8 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
 
     /**
      * Validation des donnees de la requete
-	 *
-	 * @param array|class-string<DataValidation> $rules
+     *
+     * @param array|class-string<DataValidation> $rules
      */
     public function validate(array|string $rules, array $messages = []): ValidatedInput
     {
@@ -49,23 +50,23 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
 
     /**
      * Cree un validateur avec les donnees de la requete actuelle
-	 *
-	 * @param array|class-string<DataValidation> $rules
+     *
+     * @param array|class-string<DataValidation> $rules
      */
     public function validation(array|string $rules, array $messages = []): Validation
     {
         if (is_string($rules)) {
-			if (! class_exists($rules) || ! is_subclass_of($rules, DataValidation::class)) {
-				throw new \InvalidArgumentException();
-			}
+            if (! class_exists($rules) || ! is_subclass_of($rules, DataValidation::class)) {
+                throw new InvalidArgumentException();
+            }
 
-			/** @var DataValidation $validation */
-			$validation = Services::container()->make($rules);
+            /** @var DataValidation $validation */
+            $validation = Services::container()->make($rules);
 
-			return $validation->process($this);
-		}
+            return $validation->process($this);
+        }
 
-		return Validator::make($this->all(), $rules, $messages);
+        return Validator::make($this->all(), $rules, $messages);
     }
 
     /**

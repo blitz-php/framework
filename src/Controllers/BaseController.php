@@ -109,8 +109,8 @@ abstract class BaseController
 
     /**
      * Validation des donnees de la requete actuelle
-	 *
-	 * @param array|class-string<\BlitzPHP\Validation\DataValidation> $rules
+     *
+     * @param array|class-string<\BlitzPHP\Validation\DataValidation> $rules
      */
     protected function validate(array|string $rules, array $messages = []): ValidatedInput
     {
@@ -134,8 +134,8 @@ abstract class BaseController
 
     /**
      * Cree un validateur avec les donnees de la requete actuelle
-	 *
-	 * @param array|class-string<\BlitzPHP\Validation\DataValidation> $rules
+     *
+     * @param array|class-string<\BlitzPHP\Validation\DataValidation> $rules
      */
     protected function validation(array|string $rules, array $messages = []): Validation
     {

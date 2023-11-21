@@ -202,15 +202,15 @@ class Container implements ContainerInterface
         $this->initialized = true;
     }
 
-	/**
-	 * Listes des providers chargés par le framework
-	 *
-	 * @return array<class-string<AbstractProvider>, AbstractProvider>
-	 */
-	public static function providers(): array
-	{
-		return array_combine(self::$providerNames, self::$providers);
-	}
+    /**
+     * Listes des providers chargés par le framework
+     *
+     * @return array<class-string<AbstractProvider>, AbstractProvider>
+     */
+    public static function providers(): array
+    {
+        return array_combine(self::$providerNames, self::$providers);
+    }
 
     /**
      * Enregistre les provider dans le conteneur

@@ -16,7 +16,6 @@ use BlitzPHP\Exceptions\MethodNotFoundException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
-use Closure;
 use ReflectionClass;
 use ReflectionException;
 
@@ -235,7 +234,7 @@ final class AutoRouter implements AutoRouterInterface
         $this->segments = $this->createSegments($uri);
 
         // Verifier les routes de modules
-		$routingConfig = (object) config()->get('routing');
+        $routingConfig = (object) config()->get('routing');
         if ($this->segments !== [] && array_key_exists($this->segments[0], $routingConfig->module_routes)) {
             $uriSegment      = array_shift($this->segments);
             $this->namespace = rtrim($routingConfig->module_routes[$uriSegment], '\\');
