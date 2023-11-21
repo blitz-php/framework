@@ -28,6 +28,8 @@ describe('Router', function () {
             'pages'                                           => 'App\Pages::list_all',
             'posts/(:num)'                                    => 'Blog::show/$1',
             'posts/(:num)/edit'                               => 'Blog::edit/$1',
+            'shop/(:num)'                                     => 'Shop::show',
+            'shop/(:num)/edit'                                => 'Shop::edit',
             'books/(:num)/(:alpha)/(:num)'                    => 'Blog::show/$3/$1',
             'closure/(:num)/(:alpha)'                         => static fn ($num, $str) => $num . '-' . $str,
             '{locale}/pages'                                  => 'App\Pages::list_all',
@@ -121,6 +123,25 @@ describe('Router', function () {
 
             expect('show')->toBe($router->methodName());
             expect(['456', '123'])->toBe($router->params());
+        });
+
+        it("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('shop/123');
+
+            expect('show')->toBe($router->methodName());
+			expect('ShopController')->toBe($router->controllerName());
+            expect(['123'])->toBe($router->params());
+        });
+
+        it("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
+            $router = Services::router($this->collection, $this->request, false);
+
+            $router->handle('shop/123/edit');
+
+            expect('edit')->toBe($router->methodName());
+            expect(['123'])->toBe($router->params());
         });
 
         it("Mappages d'URI avec plusieurs paramètres", function () {

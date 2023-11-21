@@ -421,6 +421,9 @@ class Router implements RouterInterface
 
                     // Utilisation de back-references
                     $handler = preg_replace('#^' . $routeKey . '$#u', $handler, $uri);
+                } else {
+                    array_shift($matches);
+                    $handler .= '/' . implode('/', $matches);
                 }
 
                 $this->setRequest(explode('/', $handler));
