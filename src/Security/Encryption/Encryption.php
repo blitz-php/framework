@@ -27,7 +27,7 @@ class Encryption implements EncrypterInterface
     /**
      * Le chiffreur que nous créons
      */
-    protected EncrypterInterface $encrypter;
+    protected ?EncrypterInterface $encrypter = null;
 
     /**
      * Le pilote utilisé

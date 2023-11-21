@@ -73,7 +73,7 @@ class SmartyAdapter extends AbstractAdapter
         // Doit-on mettre en cache?
         if (! empty($this->renderVars['options']['cache_name']) || ! empty($this->renderVars['options']['cache'])) {
             $this->enableCache();
-            $this->engine->setCacheLifetime(60 * $this->renderVars['options']['cache'] ?? 60);
+            $this->engine->setCacheLifetime(60 * ($this->renderVars['options']['cache'] ?? 60));
             $this->engine->setCompileId($this->renderVars['options']['cache_name'] ?? null);
         }
 

@@ -49,10 +49,8 @@ class Logger implements LoggerInterface
 
     /**
      * Met en cache les appels de journalisation pour la barre de débogage.
-     *
-     * @var array
      */
-    public $logCache;
+    public array $logCache = [];
 
     /**
      * Devrions-nous mettre en cache nos éléments enregistrés ?

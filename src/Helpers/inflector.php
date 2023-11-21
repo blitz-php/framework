@@ -92,10 +92,12 @@ if (! function_exists('plural')) {
      *
      * Takes a singular word and makes it plural
      */
-    function plural(string $str): string
+    function plural(string $string): string
     {
-        if (! is_countable($str)) {
-            return $str;
+        $result = $string;
+
+        if (! is_pluralizable($result)) {
+            return $result;
         }
 
         $plural_rules = [
@@ -122,15 +124,13 @@ if (! function_exists('plural')) {
         ];
 
         foreach ($plural_rules as $rule => $replacement) {
-            if (preg_match($rule, $str)) {
-                if (is_string($result = preg_replace($rule, $replacement, $str))) {
-                    $str = $result;
-                    break;
-                }
+            if (preg_match($rule, $result)) {
+                $result = preg_replace($rule, $replacement, $result);
+                break;
             }
         }
 
-        return $str;
+        return $result;
     }
 }
 
@@ -154,10 +154,12 @@ if (! function_exists('singular')) {
      *
      * Takes a plural word and makes it singular
      */
-    function singular(string $str): string
+    function singular(string $string): string
     {
-        if (! is_countable($str)) {
-            return $str;
+        $result = $string;
+
+        if (! is_pluralizable($result)) {
+            return $result;
         }
 
         $singular_rules = [
@@ -192,15 +194,13 @@ if (! function_exists('singular')) {
         ];
 
         foreach ($singular_rules as $rule => $replacement) {
-            if (preg_match($rule, $str)) {
-                if (is_string($result = preg_replace($rule, $replacement, $str))) {
-                    $str = $result;
-                    break;
-                }
+            if (preg_match($rule, $result)) {
+                $result = preg_replace($rule, $replacement, $result);
+                break;
             }
         }
 
-        return $str;
+        return $result;
     }
 }
 

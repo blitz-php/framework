@@ -33,52 +33,40 @@ class NativeAdapter extends AbstractAdapter
 
     /**
      * Nombre de vues chargées
-     *
-     * @var int
      */
-    protected $viewsCount = 0;
+    protected int $viewsCount = 0;
 
     /**
      * Contient les sections et leurs données.
-     *
-     * @var array
      */
-    protected $sections = [];
+    protected array $sections = [];
 
     /**
      * Le nom de la section actuelle en cours de rendu, le cas échéant.
      *
      * @var string[]
      */
-    protected $sectionStack = [];
+    protected array $sectionStack = [];
 
     /**
      * Contient les css charges a partie de la section actuelle en cours de rendu
-     *
-     * @var array
      */
-    protected $_styles = [];
+    protected array $_styles = [];
 
     /**
      * Contient les librairies css charges a partie de la section actuelle en cours de rendu
-     *
-     * @var array
      */
-    protected $_lib_styles = [];
+    protected array $_lib_styles = [];
 
     /**
      * Contient les scripts js charges a partie de la section actuelle en cours de rendu
-     *
-     * @var array
      */
-    protected $_scripts = [];
+    protected array $_scripts = [];
 
     /**
      * Contient les scripts js des librairies charges a partie de la section actuelle en cours de rendu
-     *
-     * @var array
      */
-    protected $_lib_scripts = [];
+    protected array $_lib_scripts = [];
 
     /**
      * {@inheritDoc}
@@ -544,12 +532,12 @@ class NativeAdapter extends AbstractAdapter
             $lib_styles = array_merge(
                 $lib_styles,
                 // (array) config('layout.'.$group.'.lib_styles'),
-                $this->_lib_styles ?? []
+                $this->_lib_styles
             );
             $styles = array_merge(
                 $styles,
                 // (array) config('layout.'.$group.'.styles'),
-                $this->_styles ?? []
+                $this->_styles
             );
         }
 
@@ -603,12 +591,12 @@ class NativeAdapter extends AbstractAdapter
             $lib_scripts = array_merge(
                 $lib_scripts,
                 // (array) config('layout.'.$group.'.lib_scripts'),
-                $this->_lib_scripts ?? []
+                $this->_lib_scripts
             );
             $scripts = array_merge(
                 $scripts,
                 // (array) config('layout.'.$group.'.scripts'),
-                $this->_scripts ?? []
+                $this->_scripts
             );
         }
 

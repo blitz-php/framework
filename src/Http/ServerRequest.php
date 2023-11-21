@@ -859,7 +859,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getMethod(): string
     {
-        return (string) $this->getEnv('REQUEST_METHOD');
+        return (string) $this->getEnv('REQUEST_METHOD', $_SERVER['REQUEST_METHOD'] ?? 'GET');
     }
 
     /**
@@ -1374,10 +1374,10 @@ class ServerRequest implements ServerRequestInterface
     {
         $key = strtoupper($key);
         if (! array_key_exists($key, $this->_environment) || null === $this->_environment[$key]) {
-            $this->_environment[$key] = env($key);
+            $this->_environment[$key] = env($key, $default);
         }
 
-        return $this->_environment[$key] !== null ? (string) $this->_environment[$key] : $default;
+        return $this->_environment[$key];
     }
 
     /**

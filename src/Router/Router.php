@@ -111,7 +111,7 @@ class Router implements RouterInterface
         $this->setController($this->collection->getDefaultController());
         $this->setMethod($this->collection->getDefaultMethod());
 
-        $this->collection->setHTTPVerb($request->getMethod() ?? $_SERVER['REQUEST_METHOD']);
+        $this->collection->setHTTPVerb($request->getMethod());
 
         $this->translateURIDashes = $this->collection->shouldTranslateURIDashes();
 

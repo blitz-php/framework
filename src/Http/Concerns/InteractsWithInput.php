@@ -224,7 +224,7 @@ trait InteractsWithInput
      */
     protected function isEmptyString(string $key): bool
     {
-        $value = $this->input($key);
+        $value = $this->data($key);
 
         return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
     }

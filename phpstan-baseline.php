@@ -52,9 +52,54 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Debug/Debugger.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Negated boolean expression is always false\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Debug/Toolbar.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^PHPDoc tag @method has invalid value \\(static void         configure\\(callable \\$callback\\(RouteBuilder \\$route\\)\\)                         Configure les parametres de routing\\.\\)\\: Unexpected token "\\(", expected \'\\)\' at offset 63$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Facades/Route.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Function img\\(\\) never returns void so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/assets.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Function less_styles\\(\\) never returns void so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/assets.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Function lib_scripts\\(\\) never returns void so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/assets.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Function lib_styles\\(\\) never returns void so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/assets.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Function scripts\\(\\) never returns void so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/assets.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Function styles\\(\\) never returns void so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/assets.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Negated boolean expression is always false\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/assets.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Function logger\\(\\) never returns void so it can be removed from the return type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/common.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method BlitzPHP\\\\Http\\\\Request\\:\\:getFormat\\(\\)\\.$#',
@@ -482,7 +527,17 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$encryption is never read, only written\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$mailer has unknown class Symfony\\\\Component\\\\Mime\\\\Email as its type\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$timeout is never read, only written\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
 ];
@@ -490,6 +545,11 @@ $ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$transporter has unknown class Symfony\\\\Component\\\\Mailer\\\\Mailer as its type\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Property BlitzPHP\\\\Router\\\\AutoRouter\\:\\:\\$methodPos is never read, only written\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Router/AutoRouter.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$request \\(BlitzPHP\\\\Http\\\\ServerRequest\\) does not accept Psr\\\\Http\\\\Message\\\\ServerRequestInterface\\.$#',

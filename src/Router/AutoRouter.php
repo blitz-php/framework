@@ -235,11 +235,8 @@ final class AutoRouter implements AutoRouterInterface
         $this->segments = $this->createSegments($uri);
 
         // Verifier les routes de modules
-        if (
-            $this->segments !== []
-            && ($routingConfig = (object) config('routing'))
-            && array_key_exists($this->segments[0], $routingConfig->module_routes)
-        ) {
+		$routingConfig = (object) config()->get('routing');
+        if ($this->segments !== [] && array_key_exists($this->segments[0], $routingConfig->module_routes)) {
             $uriSegment      = array_shift($this->segments);
             $this->namespace = rtrim($routingConfig->module_routes[$uriSegment], '\\');
         }
@@ -463,15 +460,9 @@ final class AutoRouter implements AutoRouterInterface
 
     /**
      * Renvoie le nom du contrôleur matché
-     *
-     * @return Closure|string
      */
-    private function controllerName()
+    private function controllerName(): string
     {
-        if (! is_string($this->controller)) {
-            return $this->controller;
-        }
-
         return $this->translateURIDashes
             ? str_replace('-', '_', trim($this->controller, '/\\'))
             : Text::convertTo($this->controller, 'pascal');

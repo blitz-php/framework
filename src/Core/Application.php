@@ -29,7 +29,7 @@ class Application
     /**
      * @var string Version de PHP minimale pour l'execution du framework
      */
-    private const PHP_MIN_VERSION = '8.0.0';
+    private const PHP_MIN_VERSION = '8.1.0';
 
     /**
      * @var array Liste des extensions requises pour le fonctionnement du framework
@@ -89,7 +89,7 @@ class Application
     private static function checkRequirements()
     {
         $checker = (new Checker())
-            // ->requirePhpVersion('>=' . self::PHP_MIN_VERSION)
+            ->requirePhpVersion('>=' . self::PHP_MIN_VERSION)
             ->requirePhpExtensions(self::REQUIRED_EXTENSIONS)
             ->requireDirectory(SYST_PATH, Checker::CHECK_IS_READABLE)
             ->requireDirectory(APP_PATH, Checker::CHECK_IS_READABLE);

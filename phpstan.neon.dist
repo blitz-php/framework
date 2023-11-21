@@ -4,7 +4,7 @@ includes:
 parameters:
 	phpVersion: 80100
 	tmpDir: build/phpstan
-	level: 3
+	level: 4
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	paths:
@@ -14,7 +14,7 @@ parameters:
 			- src/Helpers/scl.php
 		analyseAndScan:
 			- src/Cli/Commands/Generators/Views/*
-			- src/Debug/Toolbar/Views/toolbar.tpl.php		
+			- src/Debug/Toolbar/Views/toolbar.tpl.php
 	scanDirectories:
 		- src/Helpers
 	checkMissingIterableValueType: false
