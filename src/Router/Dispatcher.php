@@ -28,7 +28,6 @@ use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Http\Middleware;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
-use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Utilities\Helpers;
 use Closure;
@@ -76,7 +75,7 @@ class Dispatcher
     /**
      * requête courrante.
      *
-     * @var ServerRequest
+     * @var Request
      */
     protected $request;
 
@@ -591,9 +590,15 @@ class Dispatcher
      */
     protected function sendResponse()
     {
-        Services::emitter()->emit(
-            Services::toolbar()->prepare($this->getPerformanceStats(), $this->request, $this->response)
-        );
+        if (! ($this->request->expectsJson() || $this->request->isJson())) {
+            $this->response = Services::toolbar()->prepare(
+                $this->getPerformanceStats(),
+                $this->request,
+                $this->response
+            );
+        }
+
+        Services::emitter()->emit($this->response);
     }
 
     protected function emitResponse()
@@ -738,23 +743,18 @@ class Dispatcher
             $errors = [$e->getMessage()];
         }
 
-        if (is_string($this->controller)) {
-            if (strtoupper($request->getMethod()) === 'POST') {
-                if (is_subclass_of($this->controller, BaseController::class)) {
-                    return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
-                }
-                if (is_subclass_of($this->controller, RestController::class)) {
-                    return $this->formatResponse($response->withStatus($code), [
-                        'success' => false,
-                        'code'    => $code,
-                        'errors'  => $errors,
-                    ]);
-                }
-            }
-        } elseif (strtoupper($request->getMethod()) === 'POST') {
-            return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
-        }
+		if (in_array($request->getMethod(), ['OPTIONS', 'HEAD'], true)) {
+			throw $e;
+		}
 
-        throw $e;
+		if ($this->request->isJson() || $this->request->expectsJson()) {
+			return $this->formatResponse($response->withStatus($code), [
+				'success' => false,
+				'code'    => $code,
+				'errors'  => $errors,
+			]);
+		}
+
+		return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
     }
 }
