@@ -13,12 +13,13 @@ use BlitzPHP\Cli\Console\Console;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
+use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
 use BlitzPHP\Exceptions\PageNotFoundException;
+use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\ServerRequest;
-use BlitzPHP\Http\Uri;
 use BlitzPHP\Loader\Load;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
@@ -791,47 +792,32 @@ if (! function_exists('force_https')) {
      *
      * @credit CodeIgniter <a href="http://codeigniter.com/">helpers force_https() - /system/Common.php</a>
      *
-     * Non testable, car il sortira !
-     *
-     * @codeCoverageIgnore
+     * @throws RedirectException
      */
     function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?Redirection $response = null)
     {
-        if (null === $request) {
-            $request = Services::request();
-        }
-        if (null === $response) {
-            $response = Services::redirection();
-        }
+        $request ??= Services::request();
+        $response ??= Services::redirection();
 
         if (is_cli() || $request->is('ssl')) {
             return;
         }
 
-        // Si la bibliothèque de session est chargée, nous devons régénérer
+        // Si la session est active, nous devons régénérer
         // l'ID de session pour des raisons de sécurité.
-        Services::session()->regenerate();
-
-        $baseURL = base_url();
-
-        if (str_starts_with($baseURL, 'http://')) {
-            $baseURL = (string) substr($baseURL, strlen('http://'));
+        if (! on_test() && session_status() === PHP_SESSION_ACTIVE) {
+            Services::session()->regenerate(); // @codeCoverageIgnore
         }
 
-        $uri = Uri::createURIString(
-            'https',
-            $baseURL,
-            $request->getUri()->getPath(), // Les URI absolus doivent utiliser un "/" pour un chemin vide
-            $request->getUri()->getQuery(),
-            $request->getUri()->getFragment()
-        );
+        $uri = (string) $request->getUri()->withScheme('https');
 
         // Définir un en-tête HSTS
-        $response = $response->to($uri)->withHeader('Strict-Transport-Security', 'max-age=' . $duration);
+        $response = $response->to($uri)
+			->withStatus(StatusCode::TEMPORARY_REDIRECT)
+			->withHeader('Strict-Transport-Security', 'max-age=' . $duration)
+			->withStringBody('');
 
-        Services::emitter()->emitHeaders($response);
-
-        exit(EXIT_SUCCESS);
+		throw new RedirectException($response);
     }
 }
 

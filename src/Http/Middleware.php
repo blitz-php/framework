@@ -23,6 +23,8 @@ class Middleware implements RequestHandlerInterface
 {
     /**
      * Middlewares a executer pour la requete courante
+     *
+     * @var array[]
      */
     protected array $middlewares = [];
 
@@ -134,8 +136,11 @@ class Middleware implements RequestHandlerInterface
     {
         [$middleware, $options] = $this->getMiddlewareAndOptions($middleware, $options);
 
-        $middleware = $this->makeMiddleware($middleware);
-        array_splice($this->middlewares, $index, 0, compact('middleware', 'options'));
+        $middleware = [
+            'middleware' => $this->makeMiddleware($middleware),
+            'options'    => $options
+        ];
+        array_splice($this->middlewares, $index, 0, [$middleware]);
 
         return $this;
     }
@@ -156,11 +161,13 @@ class Middleware implements RequestHandlerInterface
         $found = false;
         $i     = 0;
 
-        if (array_key_exists($class, $this->aliases)) {
+        if (array_key_exists($class, $this->aliases) && is_string($this->aliases[$class])) {
             $class = $this->aliases[$class];
         }
 
         foreach ($this->middlewares as $i => $object) {
+            $object = $object['middleware'];
+
             if ((is_string($object) && $object === $class) || is_a($object, $class)) {
                 $found = true;
                 break;
@@ -189,11 +196,13 @@ class Middleware implements RequestHandlerInterface
         $found = false;
         $i     = 0;
 
-        if (array_key_exists($class, $this->aliases)) {
+        if (array_key_exists($class, $this->aliases) && is_string($this->aliases[$class])) {
             $class = $this->aliases[$class];
         }
 
         foreach ($this->middlewares as $i => $object) {
+            $object = $object['middleware'];
+
             if ((is_string($object) && $object === $class) || is_a($object, $class)) {
                 $found = true;
                 break;
