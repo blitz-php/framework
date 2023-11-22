@@ -203,8 +203,8 @@ final class RouteBuilder
      */
     public function group(callable $callback): void
     {
-		$prefix = $this->attributes['prefix'] ?? '';
-		unset($this->attributes['prefix']);
+        $prefix = $this->attributes['prefix'] ?? '';
+        unset($this->attributes['prefix']);
 
         $this->collection->group($prefix, $this->attributes, fn () => $callback($this));
     }
