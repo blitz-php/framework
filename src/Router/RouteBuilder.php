@@ -51,7 +51,7 @@ use InvalidArgumentException;
  * @method $this setDefaultNamespace(string $value)                                    Définit l'espace de noms par défaut à utiliser pour les contrôleurs lorsqu'aucun autre n'a été spécifié.
  * @method $this setPrioritize(bool $enabled = true)                                   Activer ou désactiver le tri des routes par priorité
  * @method $this setTranslateURIDashes(bool $value)                                    Indique au système s'il faut convertir les tirets des chaînes URI en traits de soulignement.
- * @method $this subdomain(string $subdomain)
+ * @method $this subdomain(string $subdomain)                                          Defini une restriction de sous domaine pour la route
  * @method $this where($placeholder, ?string $pattern = null)                          Enregistre une nouvelle contrainte auprès du système.
  */
 final class RouteBuilder
@@ -177,8 +177,8 @@ final class RouteBuilder
             $method     = $parts[1];
         } elseif (count($parts) === 1) {
             // Si on est ici, ca veut dire 2 choses.
-            // - Soit c'est la methode qui est definie (utilisateur d'un string)
-            // - Soit c'est le controleur qui est defini (utilisateur d'un array)
+            // - Soit c'est la methode qui est definie (utilisation d'un string)
+            // - Soit c'est le controleur qui est defini (utilisation d'un array)
 
             if (is_array($to)) {
                 $controller = $parts[0];
@@ -203,7 +203,10 @@ final class RouteBuilder
      */
     public function group(callable $callback): void
     {
-        $this->collection->group($this->attributes['prefix'] ?? '', $this->attributes, fn () => $callback($this));
+		$prefix = $this->attributes['prefix'] ?? '';
+		unset($this->attributes['prefix']);
+
+        $this->collection->group($prefix, $this->attributes, fn () => $callback($this));
     }
 
     /**

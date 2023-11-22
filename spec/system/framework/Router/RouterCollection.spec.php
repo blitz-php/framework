@@ -10,6 +10,7 @@
  */
 
 use BlitzPHP\Container\Services;
+use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Router\RouteCollection;
 use Spec\BlitzPHP\App\Controllers\HomeController;
@@ -943,75 +944,6 @@ describe('RouteCollection', function () {
 			expect($routes->isRedirect('users'))->toBeTruthy();
 			expect($routes->getRedirectCode('users'))->toBe(307);
 		});
-
-		it('Route nommée avec les parametres et la locale', function() {
-			$routes = getCollector();
-
-			// @TODO Do not put any placeholder after (:any).
-			//       Because the number of parameters passed to the controller method may change.
-			$routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
-
-			$match = $routes->reverseRoute('namedRoute', 'string', 13);
-
-			expect($match)->toBe('/en/path/string/to/13');
-		});
-
-		it('Route nommée avec la meme URI mais differentes methodes', function() {
-			$routes = getCollector();
-
-			$routes->get('user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
-			$routes->post(
-				'user/insert',
-				static function (): void {},
-				['as' => 'namedRoute2']
-			);
-			$routes->put(
-				'user/insert',
-				static function (): void {},
-				['as' => 'namedRoute3']
-			);
-
-			$match1 = $routes->reverseRoute('namedRoute1');
-			$match2 = $routes->reverseRoute('namedRoute2');
-			$match3 = $routes->reverseRoute('namedRoute3');
-
-			expect('/user/insert')->toBe($match1);
-			expect('/user/insert')->toBe($match2);
-			expect('/user/insert')->toBe($match3);
-		});
-
-		it('Route nommée avec la locale, la meme URI mais differentes methodes', function() {
-			$routes = getCollector();
-
-			$routes->get('{locale}/user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
-			$routes->post(
-				'{locale}/user/insert',
-				static function (): void {},
-				['as' => 'namedRoute2']
-			);
-			$routes->put(
-				'{locale}/user/insert',
-				static function (): void {},
-				['as' => 'namedRoute3']
-			);
-
-			$match1 = $routes->reverseRoute('namedRoute1');
-			$match2 = $routes->reverseRoute('namedRoute2');
-			$match3 = $routes->reverseRoute('namedRoute3');
-
-			expect('/en/user/insert')->toBe($match1);
-			expect('/en/user/insert')->toBe($match2);
-			expect('/en/user/insert')->toBe($match3);
-		});
-
-		it('Route nommée avec un pipe dans la regex', function() {
-			$routes = getCollector();
-
-			$routes->get('/system/(this|that)', 'myController::system/$1', ['as' => 'pipedRoute']);
-
-        	expect('/system/this')->toBe($routes->reverseRoute('pipedRoute', 'this'));
-        	expect('/system/that')->toBe($routes->reverseRoute('pipedRoute', 'that'));
-		});
 	});
 
 	describe('Sous domaines', function() {
@@ -1154,6 +1086,138 @@ describe('RouteCollection', function () {
 				echo 'Explode now';
 			});
 			expect($routes->get404Override())->toBeAnInstanceOf('closure');
+		});
+	});
+
+	describe('Routage inversé', function () {
+		it('Reverse route avec une chaine vide', function () {
+			$routes = getCollector();
+			$routes->add('/', 'Home::index');
+
+			expect($routes->reverseRoute(''))->toBeFalsy();
+		});
+
+		it('Reverse route simple', function () {
+			$routes = getCollector();
+
+			// @TODO Ne mettez aucun espace réservé après (:any).
+			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+
+			$match = $routes->reverseRoute('myController::goto', 'string', 13);
+
+			expect($match)->toBe('/path/string/to/13');
+		});
+
+		it('Reverse route avec la locale', function () {
+			$routes = getCollector();
+
+			// @TODO Ne mettez aucun espace réservé après (:any).
+			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+			$routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+
+			$match = $routes->reverseRoute('myController::goto', 'string', 13);
+
+			expect($match)->toBe('/en/path/string/to/13');
+		});
+
+		it('Reverse route retourne false lorsque le nombre de parametres est incorrect', function () {
+			$routes = getCollector();
+
+			// @TODO Ne mettez aucun espace réservé après (:any).
+			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1');
+
+			$match = $routes->reverseRoute('myController::goto', 'string', 13);
+
+			expect($match)->toBeFalsy();
+		});
+
+		it('Reverse route retourne false lorsqu\'il y\'a pas de correspondance', function () {
+			$routes = getCollector();
+
+			// @TODO Ne mettez aucun espace réservé après (:any).
+			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+
+			$match = $routes->reverseRoute('myBadController::goto', 'string', 13);
+
+			expect($match)->toBeFalsy();
+		});
+
+		it('Reverse route leve une exception en cas de mauvais types de parametres', function () {
+			$routes = getCollector();
+
+			// @TODO Ne mettez aucun espace réservé après (:any).
+			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+
+			expect(static function () use ($routes) {
+                $routes->reverseRoute('myController::goto', 13, 'string');
+            })->toThrow(new RouterException());
+        });
+
+		it('Reverse route simple avec la locale', function () {
+			$routes = getCollector();
+
+			$routes->add('{locale}/contact', 'myController::goto');
+
+			$match = $routes->reverseRoute('myController::goto');
+
+			expect($match)->toBe('/en/contact');
+		});
+
+		it('Reverse route avec le namespace par defaut', function () {
+			$routes = getCollector();
+			$routes->setDefaultNamespace('App\Controllers');
+
+			$routes->get('admin/(:num)/gallery(:any)', 'Admin\Galleries::showUserGallery/$1/$2');
+
+			$match = $routes->reverseRoute('Admin\Galleries::showUserGallery', 15, 12);
+
+			expect($match)->toBe('/admin/15/gallery12');
+		});
+
+		it('Reverse route avec une route nommee', function () {
+			$routes = getCollector();
+
+			$routes->get('test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
+
+			$match = $routes->reverseRoute('testRouter', 1, 2);
+
+			expect($match)->toBe('/test/1/2');
+		});
+
+		it('Reverse route avec une route nommee et la locale', function () {
+			$routes = getCollector();
+
+			$routes->get('{locale}/test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
+
+			$match = $routes->reverseRoute('testRouter', 1, 2);
+
+			expect($match)->toBe('/en/test/1/2');
+		});
+
+		it('Reverse route avec une closure', function () {
+			$routes = getCollector();
+
+			$routes->add('login', static function (): void {
+			});
+
+			$match = $routes->reverseRoute('login');
+
+			expect($match)->toBe('/login');
+		});
+
+		it('Reverse route avec une closure qui ne correspond pas', function () {
+			$routes = getCollector();
+
+			$routes->add('login', static function (): void {
+			});
+
+			$match = $routes->reverseRoute('foobar');
+
+			expect($match)->toBeFalsy();
 		});
 	});
 });

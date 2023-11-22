@@ -1312,7 +1312,7 @@ class RouteCollection implements RouteCollectionInterface
             // ou peut-être que $placeholder n'est pas un espace réservé, mais une regex.
             $pattern = $this->placeholders[$placeholderName] ?? $placeholder;
 
-            if (! preg_match('#^' . $pattern . '$#u', $params[$index])) {
+            if (! preg_match('#^' . $pattern . '$#u', (string) $params[$index])) {
                 throw RouterException::invalidParameterType();
             }
 
