@@ -46,14 +46,14 @@ class SecureHeaders implements MiddlewareInterface
         // 'X-XSS-Protection' => '1; mode=block',
     ];
 
-	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-	{
-		$response = $handler->handle($request);
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $response = $handler->handle($request);
 
-		foreach ($this->headers as $header => $value) {
+        foreach ($this->headers as $header => $value) {
             $response = $response->withHeader($header, $value);
         }
 
-		return $response;
+        return $response;
     }
 }

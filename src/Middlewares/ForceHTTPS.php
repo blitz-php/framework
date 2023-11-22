@@ -20,25 +20,26 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ForceHTTPS implements MiddlewareInterface
 {
-
-	/**
-     * Forcer l'accès au site sécurisé ?
-	 *
-	 * Si la valeur de configuration « forceGlobalSecureRequests » est vrai, imposera que toutes
-	 * les demandes adressées à ce site soient effectuées via HTTPS.
-	 * Redirigera l'utilisateur vers la page actuelle avec HTTPS, ainsi que définira l'en-tête
-	 * HTTP Strict Transport Security (HSTS) pour les navigateurs qui le prennent en charge.
+    /**
+     * Forcer l'accès au site sécurisé ?
+     *
+     * Si la valeur de configuration « forceGlobalSecureRequests » est vrai, imposera que toutes
+     * les demandes adressées à ce site soient effectuées via HTTPS.
+     * Redirigera l'utilisateur vers la page actuelle avec HTTPS, ainsi que définira l'en-tête
+     * HTTP Strict Transport Security (HSTS) pour les navigateurs qui le prennent en charge.
      */
-	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-	{
-		if (config('app.force_global_secure_requests') !== true) {
-			return $handler->handle($request);
-		}
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        if (config('app.force_global_secure_requests') !== true) {
+            return $handler->handle($request);
+        }
 
-		try {
+        try {
             force_https(YEAR, $request, Services::redirection());
+
+			return $handler->handle($request);
         } catch (RedirectException $e) {
             return $e->getResponse();
         }
-	}
+    }
 }

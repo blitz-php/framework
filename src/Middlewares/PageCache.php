@@ -29,20 +29,20 @@ class PageCache implements MiddlewareInterface
      * Vérifie le cache de la page et revient si trouvé.
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-	{
-		if (null !== $cachedResponse = $this->pageCache->get($request, Services::response())) {
+    {
+        if (null !== $cachedResponse = $this->pageCache->get($request, Services::response())) {
             return $cachedResponse;
         }
 
-		$response = $handler->handle($request);
+        $response = $handler->handle($request);
         $content  = $response->getBody()->getContents();
 
-		if (! $response instanceof Redirection) {
+        if (! $response instanceof Redirection) {
             // Mettez-le en cache sans remplacer les mesures de performances afin que nous puissions avoir des mises à jour de vitesse en direct en cours de route.
-			// Doit être exécuté après les filtres pour conserver les en-têtes de réponse.
+            // Doit être exécuté après les filtres pour conserver les en-têtes de réponse.
             $this->pageCache->make($request, $response->withBody(to_stream($content)));
         }
 
-		return $response->withBody(to_stream($content));
+        return $response->withBody(to_stream($content));
     }
 }

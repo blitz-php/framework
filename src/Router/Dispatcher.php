@@ -207,7 +207,7 @@ class Dispatcher
         $this->getRequestObject();
         $this->getResponseObject();
 
-		$this->event->trigger('pre_system');
+        $this->event->trigger('pre_system');
 
         $this->timer->stop('bootstrap');
 
@@ -226,7 +226,7 @@ class Dispatcher
             throw $e;
         }
 
-		// Y a-t-il un événement post-système ?
+        // Y a-t-il un événement post-système ?
         $this->event->trigger('post_system');
 
         if ($returnResponse) {
@@ -369,7 +369,7 @@ class Dispatcher
             $routes = Services::routes()->loadRoutes();
         }
 
-		// $routes est defini dans app/Config/routes.php
+        // $routes est defini dans app/Config/routes.php
         $this->router = Services::router($routes, $this->request, false);
 
         $this->outputBufferingStart();
@@ -391,8 +391,8 @@ class Dispatcher
     /**
      * Détermine le chemin à utiliser pour que nous essayions d'acheminer vers, en fonction
      * de l'entrée de l'utilisateur (setPath), ou le chemin CLI/IncomingRequest.
-	 *
-	 * @deprecated 0.10.0
+     *
+     * @deprecated 0.10.0
      */
     protected function determinePath(): string
     {
@@ -697,9 +697,9 @@ class Dispatcher
     {
         return function (ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface {
             Services::set(Request::class, $request);
-			Services::set(Response::class, $response);
+            Services::set(Response::class, $response);
 
-			try {
+            try {
                 $returned = $this->startController();
 
                 // Les controleur sous forme de Closure sont executes dans startController().

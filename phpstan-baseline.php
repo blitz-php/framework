@@ -558,7 +558,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$response \\(BlitzPHP\\\\Http\\\\Response\\) does not accept Psr\\\\Http\\\\Message\\\\ResponseInterface\\.$#',
-	'count' => 4,
+	'count' => 3,
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
 ];
 $ignoreErrors[] = [

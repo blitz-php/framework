@@ -138,7 +138,7 @@ class Middleware implements RequestHandlerInterface
 
         $middleware = [
             'middleware' => $this->makeMiddleware($middleware),
-            'options'    => $options
+            'options'    => $options,
         ];
         array_splice($this->middlewares, $index, 0, [$middleware]);
 

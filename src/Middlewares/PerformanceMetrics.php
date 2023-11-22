@@ -19,14 +19,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class PerformanceMetrics implements MiddlewareInterface
 {
-	/**
-	 * Remplace les balises de mesures de performance
-	 */
+    /**
+     * Remplace les balises de mesures de performance
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-	{
-		$response = $handler->handle($request);
+    {
+        $response = $handler->handle($request);
 
-		if (!empty($body = $response->getBody()->getContents())) {
+        if (! empty($body = $response->getBody()->getContents())) {
             $benchmark = Services::timer();
 
             $output = str_replace(
@@ -41,9 +41,9 @@ class PerformanceMetrics implements MiddlewareInterface
                 $body
             );
 
-			$response = $response->withBody(to_stream($output));
+            $response = $response->withBody(to_stream($output));
         }
 
-		return $response;
-	}
+        return $response;
+    }
 }

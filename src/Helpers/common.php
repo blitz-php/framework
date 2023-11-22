@@ -813,11 +813,11 @@ if (! function_exists('force_https')) {
 
         // Définir un en-tête HSTS
         $response = $response->to($uri)
-			->withStatus(StatusCode::TEMPORARY_REDIRECT)
-			->withHeader('Strict-Transport-Security', 'max-age=' . $duration)
-			->withStringBody('');
+            ->withStatus(StatusCode::TEMPORARY_REDIRECT)
+            ->withHeader('Strict-Transport-Security', 'max-age=' . $duration)
+            ->withStringBody('');
 
-		throw new RedirectException($response);
+        throw new RedirectException($response);
     }
 }
 
