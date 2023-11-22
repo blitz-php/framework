@@ -27,7 +27,7 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Déterminez si la demande actuelle attend probablement une réponse JSON.
+     * Déterminez si la requête actuelle attend probablement une réponse JSON.
      */
     public function expectsJson(): bool
     {
@@ -35,7 +35,7 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Déterminez si la demande actuelle demande JSON.
+     * Déterminez si la requête actuelle demande un JSON.
      */
     public function wantsJson(): bool
     {
