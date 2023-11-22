@@ -22,16 +22,15 @@ use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Controllers\RestController;
 use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
-use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Http\Middleware;
+use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Utilities\Helpers;
-use BlitzPHP\View\View;
 use Closure;
 use Exception;
 use InvalidArgumentException;
@@ -103,7 +102,7 @@ class Dispatcher
     /**
      * Contrôleur à utiliser.
      *
-     * @var Closure|string
+     * @var (Closure(mixed...): ResponseInterface|string)|string
      */
     protected $controller;
 
@@ -208,16 +207,16 @@ class Dispatcher
         $this->getRequestObject();
         $this->getResponseObject();
 
+		$this->event->trigger('pre_system');
+
+        $this->timer->stop('bootstrap');
+
         $this->initMiddlewareQueue();
 
         try {
             $this->response = $this->handleRequest($routes, config('cache'));
-        } catch (RedirectException|ResponsableInterface $e) {
+        } catch (ResponsableInterface $e) {
             $this->outputBufferingEnd();
-            if ($e instanceof RedirectException) {
-                $e = new RedirectException($e->getMessage(), $e->getCode(), $e);
-            }
-
             $this->response = $e->getResponse();
         } catch (PageNotFoundException $e) {
             $this->response = $this->display404errors($e);
@@ -226,6 +225,9 @@ class Dispatcher
 
             throw $e;
         }
+
+		// Y a-t-il un événement post-système ?
+        $this->event->trigger('post_system');
 
         if ($returnResponse) {
             return $this->response;
@@ -242,17 +244,7 @@ class Dispatcher
      */
     protected function handleRequest(?RouteCollectionInterface $routes = null, ?array $cacheConfig = null): ResponseInterface
     {
-        $this->forceSecureAccess();
-
-        $this->event->trigger('pre_system');
-
-        // Recherchez une page en cache.
-        // L'exécution s'arrêtera si la page a été mise en cache.
-        if (($response = $this->displayCache($cacheConfig)) instanceof ResponseInterface) {
-            return $response;
-        }
-
-        $routeMiddlewares = (array) $this->dispatchRoutes($routes);
+        $routeMiddlewares = $this->dispatchRoutes($routes);
 
         // Le bootstrap dans un middleware
         $this->middleware->alias('blitz', $this->bootApp());
@@ -270,15 +262,7 @@ class Dispatcher
         // pour une utilisation plus sûre et plus précise avec la fonction d'assistance `previous_url()`.
         $this->storePreviousURL(current_url(true));
 
-        /**
-         * Emission de la reponse
-         */
-        $this->gatherOutput($this->middleware->handle($this->request));
-
-        // Y a-t-il un événement post-système ?
-        $this->event->trigger('post_system');
-
-        return $this->response;
+        return $this->middleware->handle($this->request);
     }
 
     /**
@@ -352,64 +336,17 @@ class Dispatcher
     }
 
     /**
-     * Forcer l'accès au site sécurisé ? Si la valeur de configuration 'forceGlobalSecureRequests'
-     * est vrai, imposera que toutes les demandes adressées à ce site soient effectuées via
-     * HTTPS. Redirigera également l'utilisateur vers la page actuelle avec HTTPS
-     * comme défini l'en-tête HTTP Strict Transport Security pour ces navigateurs
-     * qui le supportent.
-     *
-     * @param int $duration Combien de temps la sécurité stricte des transports
-     *                      doit être appliqué pour cette URL.
-     */
-    protected function forceSecureAccess($duration = 31536000)
-    {
-        if ($this->config->force_global_secure_requests !== true) {
-            return;
-        }
-
-        force_https($duration, $this->request, $this->response);
-    }
-
-    /**
-     * Détermine si une réponse a été mise en cache pour l'URI donné.
-     *
-     * @return bool|ResponseInterface
-     *
-     * @throws FrameworkException
-     */
-    public function displayCache(?array $config = null)
-    {
-        if ($cachedResponse = $this->pageCache->get($this->request, $this->response)) {
-            $this->response = $cachedResponse;
-
-            $this->totalTime = $this->timer->getElapsedTime('total_execution');
-            $output          = $this->displayPerformanceMetrics($cachedResponse->getBody());
-
-            return $this->response->withBody(to_stream($output));
-        }
-
-        return false;
-    }
-
-    /**
      * Renvoie un tableau avec nos statistiques de performances de base collectées.
      */
     public function getPerformanceStats(): array
     {
+        // Après le filtre, la barre d'outils de débogage nécessite 'total_execution'.
+        $this->totalTime = $this->timer->getElapsedTime('total_execution');
+
         return [
             'startTime' => $this->startTime,
             'totalTime' => $this->totalTime,
         ];
-    }
-
-    /**
-     * Remplace les balises memory_usage et elapsed_time.
-     */
-    public function displayPerformanceMetrics(string $output): string
-    {
-        $this->totalTime = $this->timer->getElapsedTime('total_execution');
-
-        return str_replace('{elapsed_time}', (string) $this->totalTime, $output);
     }
 
     /**
@@ -426,20 +363,18 @@ class Dispatcher
      */
     protected function dispatchRoutes(?RouteCollectionInterface $routes = null): array
     {
+        $this->timer->start('routing');
+
         if ($routes === null) {
             $routes = Services::routes()->loadRoutes();
         }
 
+		// $routes est defini dans app/Config/routes.php
         $this->router = Services::router($routes, $this->request, false);
-
-        $path = $this->determinePath();
-
-        $this->timer->stop('bootstrap');
-        $this->timer->start('routing');
 
         $this->outputBufferingStart();
 
-        $this->controller = $this->router->handle($path ?: '/');
+        $this->controller = $this->router->handle($this->request->getPath());
         $this->method     = $this->router->methodName();
 
         // Si un segment {locale} correspondait dans la route finale,
@@ -456,18 +391,14 @@ class Dispatcher
     /**
      * Détermine le chemin à utiliser pour que nous essayions d'acheminer vers, en fonction
      * de l'entrée de l'utilisateur (setPath), ou le chemin CLI/IncomingRequest.
+	 *
+	 * @deprecated 0.10.0
      */
     protected function determinePath(): string
     {
-        if (! empty($this->path)) {
-            return $this->path;
-        }
+        $path = $this->request->getPath();
 
-        $path = method_exists($this->request, 'getPath')
-            ? $this->request->getPath()
-            : $this->request->getUri()->getPath();
-
-        return $this->path = preg_replace('#^' . App::getUri()->getPath() . '#i', '', $path);
+        return preg_replace('#^' . App::getUri()->getPath() . '#i', '', $path);
     }
 
     /**
@@ -475,28 +406,23 @@ class Dispatcher
      * méthode du contrôleur et lancez le script. S'il n'en est pas capable, le fera
      * afficher l'erreur Page introuvable appropriée.
      */
-    protected function startController(ServerRequest $request, Response $response)
+    protected function startController()
     {
+        $this->timer->start('controller');
+        $this->timer->start('controller_constructor');
+
         // Aucun contrôleur spécifié - nous ne savons pas quoi faire maintenant.
         if (empty($this->controller)) {
             throw PageNotFoundException::emptyController();
         }
 
-        $this->timer->start('controller');
-        $this->timer->start('controller_constructor');
-
         // Est-il acheminé vers une Closure ?
         if (is_object($this->controller) && (get_class($this->controller) === 'Closure')) {
-            $controller = $this->controller;
-
-            $sendParameters = [];
-
-            foreach ($this->router->params() as $parameter) {
-                $sendParameters[] = $parameter;
+            if (empty($returned = $this->container->call($this->controller, $this->router->params()))) {
+                $returned = $this->outputBufferingEnd();
             }
-            array_push($sendParameters, $request, $response);
 
-            return $this->container->call($controller, $sendParameters);
+            return $returned;
         }
 
         // Essayez de charger automatiquement la classe
@@ -537,8 +463,7 @@ class Dispatcher
      */
     protected function runController($class)
     {
-        // S'il s'agit d'une demande de console, utilisez les segments d'entrée comme paramètres
-        $params = defined('KLINGED') ? [/* $this->request->getSegments() */] : $this->router->params();
+        $params = $this->router->params();
         $method = $this->method;
 
         if (method_exists($class, '_remap')) {
@@ -546,13 +471,11 @@ class Dispatcher
             $method = '_remap';
         }
 
-        $output = $this->container->call([$class, $method], (array) $params);
+        if (empty($output = $this->container->call([$class, $method], $params))) {
+            $output = $this->outputBufferingEnd();
+        }
 
         $this->timer->stop('controller');
-
-        if ($output instanceof View) {
-            $output = $this->response->withBody(to_stream($output->get()));
-        }
 
         return $output;
     }
@@ -668,7 +591,6 @@ class Dispatcher
      */
     protected function sendResponse()
     {
-        $this->totalTime = $this->timer->getElapsedTime('total_execution');
         Services::emitter()->emit(
             Services::toolbar()->prepare($this->getPerformanceStats(), $this->request, $this->response)
         );
@@ -725,7 +647,7 @@ class Dispatcher
      */
     protected function initMiddlewareQueue(): void
     {
-        $this->middleware = new Middleware($this->response, $this->determinePath());
+        $this->middleware = new Middleware($this->response, $this->request->getPath());
 
         $this->middleware->append($this->spoofRequestMethod());
         $this->middleware->register($this->request);
@@ -760,9 +682,9 @@ class Dispatcher
             $post = $request->getParsedBody();
 
             // Ne fonctionne qu'avec les formulaires POST
-            if (strtoupper($request->getMethod()) === 'POST' && ! empty($post['_method'])) {
+            if ($request->getMethod() === 'POST' && ! empty($post['_method'])) {
                 // Accepte seulement PUT, PATCH, DELETE
-                if (in_array(strtoupper($post['_method']), ['PUT', 'PATCH', 'DELETE'], true)) {
+                if (in_array($post['_method'], ['PUT', 'PATCH', 'DELETE'], true)) {
                     $request = $request->withMethod($post['_method']);
                 }
             }
@@ -774,10 +696,13 @@ class Dispatcher
     private function bootApp(): callable
     {
         return function (ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface {
-            try {
-                $returned = $this->startController($request, $response);
+            Services::set(Request::class, $request);
+			Services::set(Response::class, $response);
 
-                // Closure controller has run in startController().
+			try {
+                $returned = $this->startController();
+
+                // Les controleur sous forme de Closure sont executes dans startController().
                 if (! is_callable($this->controller)) {
                     $controller = $this->createController($request, $response);
 
