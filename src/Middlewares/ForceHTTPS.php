@@ -37,7 +37,7 @@ class ForceHTTPS implements MiddlewareInterface
         try {
             force_https(YEAR, $request, Services::redirection());
 
-			return $handler->handle($request);
+            return $handler->handle($request);
         } catch (RedirectException $e) {
             return $e->getResponse();
         }
