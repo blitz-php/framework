@@ -112,11 +112,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Http/Request.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method BlitzPHP\\\\Session\\\\Store\\:\\:flashInput\\(\\)\\.$#',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Http/Request.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method BlitzPHP\\\\Http\\\\Request\\:\\:validation\\(\\) should return BlitzPHP\\\\Validation\\\\Validation but returns Dimtrovich\\\\Validation\\\\Validation\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Http/Request.php',
@@ -552,13 +547,13 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Router/AutoRouter.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$request \\(BlitzPHP\\\\Http\\\\ServerRequest\\) does not accept Psr\\\\Http\\\\Message\\\\ServerRequestInterface\\.$#',
+	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$request \\(BlitzPHP\\\\Http\\\\Request\\) does not accept Psr\\\\Http\\\\Message\\\\ServerRequestInterface\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$response \\(BlitzPHP\\\\Http\\\\Response\\) does not accept Psr\\\\Http\\\\Message\\\\ResponseInterface\\.$#',
-	'count' => 3,
+	'count' => 4,
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
 ];
 $ignoreErrors[] = [
