@@ -74,6 +74,11 @@ class Services
     protected static array $instances = [];
 
     /**
+     * Objets simulés à tester qui sont renvoyés s'ils existent.
+     */
+    protected static array $mocks = [];
+
+    /**
      * Cache d'autres classe de que nous avons trouver via la methode cacheService.
      */
     protected static array $services = [];
@@ -541,6 +546,14 @@ class Services
         }
 
         return null;
+    }
+
+    /**
+     * Injectez un objet fictif pour les tests.
+     */
+    public static function injectMock(string $name, object $mock): void
+    {
+        static::$mocks[strtolower($name)] = $mock;
     }
 
     /**

@@ -245,6 +245,10 @@ class ServerRequest implements ServerRequestInterface
             $uri = Psr7ServerRequest::getUriFromGlobals();
         }
 
+		if (in_array($uri->getHost(), ['localhost', '127.0.0.1'], true)) {
+			$uri = $uri->withHost(parse_url(config('app.base_url'), PHP_URL_HOST));
+		}
+
         $this->_environment = $config['environment'];
 
         $this->uri     = $uri;

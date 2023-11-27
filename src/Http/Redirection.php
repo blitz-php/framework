@@ -16,6 +16,7 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Validation\ErrorBag;
+use GuzzleHttp\Psr7\UploadedFile;
 
 /**
  * Gérer une réponse de redirection
@@ -29,13 +30,16 @@ class Redirection extends Response
      */
     protected Store $session;
 
+	protected Request $request;
+
     /**
      * @param UrlGenerator $generator The URL generator instance.
      */
     public function __construct(protected UrlGenerator $generator, array $options = [])
     {
         parent::__construct($options);
-        $this->session = $generator->getRequest()->session();
+        $this->request = $generator->getRequest();
+        $this->session = $this->request->session();
     }
 
     /**
@@ -201,14 +205,25 @@ class Redirection extends Response
 
     /**
      * Ajoute une clé et un message à la session en tant que Flashdata.
-     *
-     * @param array|string $message
      */
-    public function with(string $key, $message): static
+    public function with(array|string $key, mixed $value = null): static
     {
-        $this->session->setFlashdata($key, $message);
+        $key = is_array($key) ? $key : [$key => $value];
+
+        foreach ($key as $k => $v) {
+            $this->session->flash($k, $v);
+        }
 
         return $this;
+    }
+
+    /**
+     * Copie tous les cookies de l’instance de réponse globale dans cette RedirectResponse.
+	 * Utile lorsque vous venez de définir un cookie mais que vous devez vous assurer qu'il est réellement envoyé avec la réponse au lieu d'être perdu.
+     */
+    public function withCookies(): static
+    {
+		return $this->withCookieCollection(Services::response()->getCookieCollection());
     }
 
     /**
@@ -226,5 +241,23 @@ class Redirection extends Response
         }
 
         return $new;
+    }
+
+    /**
+     * Supprimez tous les fichiers téléchargés du tableau d’entrée donné.
+     */
+    protected function removeFilesFromInput(array $input): array
+    {
+        foreach ($input as $key => $value) {
+            if (is_array($value)) {
+                $input[$key] = $this->removeFilesFromInput($value);
+            }
+
+            if ($value instanceof UploadedFile) {
+                unset($input[$key]);
+            }
+        }
+
+        return $input;
     }
 }

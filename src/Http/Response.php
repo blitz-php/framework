@@ -1303,12 +1303,20 @@ class Response implements ResponseInterface
      */
     public function getCookie(string $name): ?array
     {
-        if (! $this->_cookies->has($name)) {
+        if (! $this->hasCookie($name)) {
             return null;
         }
 
         return $this->_cookies->get($name)->toArray();
     }
+
+	/**
+	 * Vérifier si la reponse contient un cookie avec le nom donné
+	 */
+	public function hasCookie(string $name): bool
+	{
+		return $this->_cookies->has($name);
+	}
 
     /**
      * Obtenez tous les cookies dans la réponse.

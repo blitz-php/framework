@@ -10,7 +10,7 @@
  */
 
 return [
-    'handler'            => \BlitzPHP\Session\Handlers\File::class,
+    'handler'            => \BlitzPHP\Session\Handlers\ArrayHandler::class,
     'cookie_name'        => 'blitz_session',
     'expiration'         => 7200,
     'savePath'           => FRAMEWORK_STORAGE_PATH . 'session',
