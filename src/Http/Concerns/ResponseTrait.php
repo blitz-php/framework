@@ -12,6 +12,7 @@
 namespace BlitzPHP\Http\Concerns;
 
 use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Formatter\Formatter;
 use DateTime;
 use DateTimeZone;
@@ -20,6 +21,58 @@ use InvalidArgumentException;
 
 trait ResponseTrait
 {
+    /**
+     * Obtient le code d'état de la réponse.
+     */
+    public function status(): int
+    {
+        return $this->getStatusCode();
+    }
+
+    /**
+     * Obtient la phrase de motif de réponse associée au code d'état.
+     */
+    public function statusText(): string
+    {
+        return $this->getReasonPhrase();
+    }
+
+    /**
+     * Obtient le contenu de la réponse
+     */
+    public function content(): string
+    {
+        return $this->getBody()->getContents();
+    }
+
+    /**
+     * Définissez un en-tête sur la réponse.
+     *
+     * @param string|string[]  $values
+     */
+    public function header(string $key, array|string $values, bool $replace = true): static
+    {
+		if ($replace) {
+			return $this->withHeader($key, $values);
+		}
+
+        return $this->withAddedHeader($key, $values);
+    }
+
+    /**
+     * Ajoutez un cookie à la réponse.
+     *
+     * @param  CookieInterface|string  $cookie
+     */
+    public function cookie($cookie): static
+    {
+        if (is_string($cookie) && function_exists('cookie')) {
+            $cookie = cookie(...func_get_args());
+        }
+
+		return $this->withCookie($cookie);
+    }
+
     /**
      * Définit l'en-tête de date
      */

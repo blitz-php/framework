@@ -1278,6 +1278,20 @@ class Response implements ResponseInterface
     }
 
     /**
+     * Expire un cookie lors de l'envoi de la réponse.
+     *
+     * @param  CookieInterface|string  $cookie
+     */
+    public function withoutCookie($cookie, ?string $path = null, ?string $domain = null)
+    {
+        if (is_string($cookie) && function_exists('cookie')) {
+            $cookie = cookie($cookie, null, -2628000, compact('path', 'domain'));
+        }
+
+		return $this->withExpiredCookie($cookie);
+    }
+
+    /**
      * Lire un seul cookie à partir de la réponse.
      *
      * Cette méthode fournit un accès en lecture aux cookies en attente. Ce sera
