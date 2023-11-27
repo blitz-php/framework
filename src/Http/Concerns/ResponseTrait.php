@@ -48,13 +48,13 @@ trait ResponseTrait
     /**
      * Définissez un en-tête sur la réponse.
      *
-     * @param string|string[]  $values
+     * @param string|string[] $values
      */
     public function header(string $key, array|string $values, bool $replace = true): static
     {
-		if ($replace) {
-			return $this->withHeader($key, $values);
-		}
+        if ($replace) {
+            return $this->withHeader($key, $values);
+        }
 
         return $this->withAddedHeader($key, $values);
     }
@@ -62,7 +62,7 @@ trait ResponseTrait
     /**
      * Ajoutez un cookie à la réponse.
      *
-     * @param  CookieInterface|string  $cookie
+     * @param CookieInterface|string $cookie
      */
     public function cookie($cookie): static
     {
@@ -70,7 +70,7 @@ trait ResponseTrait
             $cookie = cookie(...func_get_args());
         }
 
-		return $this->withCookie($cookie);
+        return $this->withCookie($cookie);
     }
 
     /**

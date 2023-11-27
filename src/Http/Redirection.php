@@ -30,7 +30,7 @@ class Redirection extends Response
      */
     protected Store $session;
 
-	protected Request $request;
+    protected Request $request;
 
     /**
      * @param UrlGenerator $generator The URL generator instance.
@@ -219,11 +219,11 @@ class Redirection extends Response
 
     /**
      * Copie tous les cookies de l’instance de réponse globale dans cette RedirectResponse.
-	 * Utile lorsque vous venez de définir un cookie mais que vous devez vous assurer qu'il est réellement envoyé avec la réponse au lieu d'être perdu.
+     * Utile lorsque vous venez de définir un cookie mais que vous devez vous assurer qu'il est réellement envoyé avec la réponse au lieu d'être perdu.
      */
     public function withCookies(): static
     {
-		return $this->withCookieCollection(Services::response()->getCookieCollection());
+        return $this->withCookieCollection(Services::response()->getCookieCollection());
     }
 
     /**

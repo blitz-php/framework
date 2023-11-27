@@ -1280,7 +1280,7 @@ class Response implements ResponseInterface
     /**
      * Expire un cookie lors de l'envoi de la réponse.
      *
-     * @param  CookieInterface|string  $cookie
+     * @param CookieInterface|string $cookie
      */
     public function withoutCookie($cookie, ?string $path = null, ?string $domain = null)
     {
@@ -1288,7 +1288,7 @@ class Response implements ResponseInterface
             $cookie = cookie($cookie, null, -2628000, compact('path', 'domain'));
         }
 
-		return $this->withExpiredCookie($cookie);
+        return $this->withExpiredCookie($cookie);
     }
 
     /**
@@ -1310,13 +1310,13 @@ class Response implements ResponseInterface
         return $this->_cookies->get($name)->toArray();
     }
 
-	/**
-	 * Vérifier si la reponse contient un cookie avec le nom donné
-	 */
-	public function hasCookie(string $name): bool
-	{
-		return $this->_cookies->has($name);
-	}
+    /**
+     * Vérifier si la reponse contient un cookie avec le nom donné
+     */
+    public function hasCookie(string $name): bool
+    {
+        return $this->_cookies->has($name);
+    }
 
     /**
      * Obtenez tous les cookies dans la réponse.
