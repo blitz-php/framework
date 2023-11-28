@@ -23,6 +23,11 @@ class HttpException extends FrameworkException
         return new static(lang('HTTP.invalidStatusCode', [$code]));
     }
 
+	public static function unkownStatusCode(int $code)
+    {
+        return new static(lang('HTTP.unknownStatusCode', [$code]));
+    }
+
     public static function invalidRedirectRoute(string $route)
     {
         return new static(lang('HTTP.invalidRoute', [$route]));
