@@ -11,13 +11,17 @@
 
 namespace BlitzPHP\Http\Concerns;
 
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
+use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Formatter\Formatter;
 use DateTime;
 use DateTimeZone;
 use GuzzleHttp\Psr7\Utils;
 use InvalidArgumentException;
+use Psr\Http\Message\StreamInterface;
+use SplFileInfo;
 
 trait ResponseTrait
 {
@@ -84,6 +88,22 @@ trait ResponseTrait
     }
 
     /**
+     * Copie tous les en-têtes de l'instance de réponse globale dans cette Redirection.
+	 * Utile lorsque vous venez de définir un en-tête pour s'assurer qu'il est bien envoyé avec la réponse de redirection..
+     */
+    public function withHeaders(array $headers = []): static
+    {
+		$new     = clone $this;
+		$headers = $headers === [] ? Services::response()->getHeaders() : $headers;
+
+        foreach ($headers as $name => $header) {
+            $new = $new->withHeader($name, $header);
+        }
+
+        return $new;
+    }
+
+    /**
      * Convertit le $body en JSON et définit l'en-tête Content Type.
      */
     public function json(array|string $body, int $status = StatusCode::OK): self
@@ -140,26 +160,37 @@ trait ResponseTrait
      * Génère les en-têtes qui forcent un téléchargement à se produire.
      * Et envoie le fichier au navigateur.
      *
-     * @param string      $filename Le nom que vous souhaitez donner au fichier téléchargé ou le chemin d'accès au fichier à envoyer
-     * @param string|null $data     Les données à télécharger. Définissez null si le $filename est le chemin du fichier
+     * @param string|SplFileInfo $file Le chemin absolue du fichier à télécharger ou une instance SplFileInfo
+	 * @param ?string $name Le nom que vous souhaitez donner au fichier téléchargé
+	 * @param array $headers     Les entêtes supplémentaires à definir dans la réponse
      */
-    public function download(string $filename, ?string $data = ''): static
+    public function download(string|SplFileInfo $file, ?string $name = null, array $headers = []): static
     {
-        if (is_file($filename)) {
-            $filepath = realpath($filename);
-            $filename = explode('/', str_replace(DIRECTORY_SEPARATOR, '/', $filename));
-            $filename = end($filename);
+		if (is_string($file) && ! is_file($file)) {
+			throw new LoadException('The requested file was not found');
+		}
 
-            return $this->withFile($filepath, ['download' => true, 'name' => $filename]);
-        }
+		return $this->withHeaders($headers)->withFile($file, ['download' => true, 'name' => $name]);
+    }
 
-        if (! empty($data)) {
-            return $this->withStringBody($data)
-                ->withType(pathinfo($filename, PATHINFO_EXTENSION))
-                ->withDownload($filename);
-        }
+	/**
+	 * Créez une nouvelle instance de réponse diffusée en continu sous forme de téléchargement de fichier.
+	 */
+	public function streamDownload(string|callable|StreamInterface $stream, string $name, array $headers = []): static
+	{
+		if (!($stream instanceof StreamInterface)) {
+			$stream = to_stream($stream);
+		}
 
-        return $this;
+		return $this->withHeaders($headers)->withBody($stream)->withType(pathinfo($name, PATHINFO_EXTENSION))->withDownload($name);
+	}
+
+    /**
+     * Renvoie le contenu brut d'un fichier binaire.
+     */
+    public function file(string|SplFileInfo $file, array $headers = []): static
+    {
+		return $this->withHeaders($headers)->withFile($file);
     }
 
     /**

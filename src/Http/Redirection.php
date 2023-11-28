@@ -235,23 +235,6 @@ class Redirection extends Response
     }
 
     /**
-     * Copie tous les en-têtes de l'instance de réponse globale
-     * dans cette Redirection. Utile lorsque vous venez de
-     * définir un en-tête pour s'assurer qu'il est bien envoyé
-     * avec la réponse de redirection..
-     */
-    public function withHeaders(): static
-    {
-        $new = clone $this;
-
-        foreach (Services::response()->getHeaders() as $name => $header) {
-            $new = $new->withHeader($name, $header);
-        }
-
-        return $new;
-    }
-
-    /**
      * Supprimez tous les fichiers téléchargés du tableau d’entrée donné.
      */
     protected function removeFilesFromInput(array $input): array

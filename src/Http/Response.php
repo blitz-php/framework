@@ -1147,7 +1147,7 @@ class Response implements ResponseInterface
      *
      * @param int|string $bytes Nombre d'octets
      */
-    public function withLength($bytes): static
+    public function withLength(int|string $bytes): static
     {
         return $this->withHeader('Content-Length', (string) $bytes);
     }
@@ -1369,14 +1369,14 @@ class Response implements ResponseInterface
      * - download : si `true` définit l'en-tête de téléchargement et force le fichier à
      * être téléchargé plutôt qu'affiché en ligne.
      *
-     * @param string               $path    Chemin d'accès absolu au fichier.
+     * @param string|SplFileInfo   $file    Chemin d'accès absolu au fichier ou instance de \SplFileInfo.
      * @param array<string, mixed> $options Options Voir ci-dessus.
      *
      * @throws LoadException
      */
-    public function withFile(string $path, array $options = []): static
+    public function withFile(string|SplFileInfo $file, array $options = []): static
     {
-        $file = $this->validateFile($path);
+        $file = is_string($file) ? $this->validateFile($file) : $file;
         $options += [
             'name'     => null,
             'download' => null,
