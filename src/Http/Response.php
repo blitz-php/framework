@@ -116,8 +116,8 @@ class Response implements ResponseInterface
         428 => 'Precondition Required', // 1.1; http://www.ietf.org/rfc/rfc6585.txt
         429 => 'Too Many Requests', // 1.1; http://www.ietf.org/rfc/rfc6585.txt
         431 => 'Request Header Fields Too Large', // 1.1; http://www.ietf.org/rfc/rfc6585.txt
-		444 => 'Connection Closed Without Response',
-		451 => 'Unavailable For Legal Reasons', // http://tools.ietf.org/html/rfc7725
+        444 => 'Connection Closed Without Response',
+        451 => 'Unavailable For Legal Reasons', // http://tools.ietf.org/html/rfc7725
         499 => 'Client Closed Request', // http://lxr.nginx.org/source/src/http/ngx_http_request.h#0133
         // 5xx: Server error
         500 => 'Internal Server Error',
@@ -1326,13 +1326,13 @@ class Response implements ResponseInterface
      */
     public function hasCookie(string $name, ?string $value = null): bool
     {
-		if (! $this->_cookies->has($name)) {
-			return false;
-		}
+        if (! $this->_cookies->has($name)) {
+            return false;
+        }
 
-		if ($value !== null) {
-			return $this->_cookies->get($name)->getValue() === $value;
-		}
+        if ($value !== null) {
+            return $this->_cookies->get($name)->getValue() === $value;
+        }
 
         return true;
     }
