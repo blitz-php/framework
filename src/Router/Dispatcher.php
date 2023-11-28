@@ -18,8 +18,6 @@ use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Http\ResponsableInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Support\Responsable;
-use BlitzPHP\Controllers\BaseController;
-use BlitzPHP\Controllers\RestController;
 use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Exceptions\PageNotFoundException;
@@ -30,6 +28,7 @@ use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Utilities\Helpers;
+use BlitzPHP\Utilities\String\Text;
 use Closure;
 use Exception;
 use InvalidArgumentException;
@@ -590,7 +589,7 @@ class Dispatcher
      */
     protected function sendResponse()
     {
-        if (! ($this->request->expectsJson() || $this->request->isJson())) {
+        if (! ($this->request->expectsJson() || $this->request->isJson() || Text::contains($this->response->getType(), ['/json', '+json']))) {
             $this->response = Services::toolbar()->prepare(
                 $this->getPerformanceStats(),
                 $this->request,
@@ -743,18 +742,18 @@ class Dispatcher
             $errors = [$e->getMessage()];
         }
 
-		if (in_array($request->getMethod(), ['OPTIONS', 'HEAD'], true)) {
-			throw $e;
-		}
+        if (in_array($request->getMethod(), ['OPTIONS', 'HEAD'], true)) {
+            throw $e;
+        }
 
-		if ($this->request->isJson() || $this->request->expectsJson()) {
-			return $this->formatResponse($response->withStatus($code), [
-				'success' => false,
-				'code'    => $code,
-				'errors'  => $errors,
-			]);
-		}
+        if ($this->request->expectsJson() || $this->request->isJson() || Text::contains($this->response->getType(), ['/json', '+json'])) {
+            return $this->formatResponse($response->withStatus($code), [
+                'success' => false,
+                'code'    => $code,
+                'errors'  => $errors,
+            ]);
+        }
 
-		return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
+        return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
     }
 }
