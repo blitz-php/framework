@@ -89,12 +89,12 @@ trait ResponseTrait
 
     /**
      * Copie tous les en-têtes de l'instance de réponse globale dans cette Redirection.
-	 * Utile lorsque vous venez de définir un en-tête pour s'assurer qu'il est bien envoyé avec la réponse de redirection..
+     * Utile lorsque vous venez de définir un en-tête pour s'assurer qu'il est bien envoyé avec la réponse de redirection..
      */
     public function withHeaders(array $headers = []): static
     {
-		$new     = clone $this;
-		$headers = $headers === [] ? Services::response()->getHeaders() : $headers;
+        $new     = clone $this;
+        $headers = $headers === [] ? Services::response()->getHeaders() : $headers;
 
         foreach ($headers as $name => $header) {
             $new = $new->withHeader($name, $header);
@@ -160,37 +160,37 @@ trait ResponseTrait
      * Génère les en-têtes qui forcent un téléchargement à se produire.
      * Et envoie le fichier au navigateur.
      *
-     * @param string|SplFileInfo $file Le chemin absolue du fichier à télécharger ou une instance SplFileInfo
-	 * @param ?string $name Le nom que vous souhaitez donner au fichier téléchargé
-	 * @param array $headers     Les entêtes supplémentaires à definir dans la réponse
+     * @param SplFileInfo|string $file    Le chemin absolue du fichier à télécharger ou une instance SplFileInfo
+     * @param ?string            $name    Le nom que vous souhaitez donner au fichier téléchargé
+     * @param array              $headers Les entêtes supplémentaires à definir dans la réponse
      */
-    public function download(string|SplFileInfo $file, ?string $name = null, array $headers = []): static
+    public function download(SplFileInfo|string $file, ?string $name = null, array $headers = []): static
     {
-		if (is_string($file) && ! is_file($file)) {
-			throw new LoadException('The requested file was not found');
-		}
+        if (is_string($file) && ! is_file($file)) {
+            throw new LoadException('The requested file was not found');
+        }
 
-		return $this->withHeaders($headers)->withFile($file, ['download' => true, 'name' => $name]);
+        return $this->withHeaders($headers)->withFile($file, ['download' => true, 'name' => $name]);
     }
 
-	/**
-	 * Créez une nouvelle instance de réponse diffusée en continu sous forme de téléchargement de fichier.
-	 */
-	public function streamDownload(string|callable|StreamInterface $stream, string $name, array $headers = []): static
-	{
-		if (!($stream instanceof StreamInterface)) {
-			$stream = to_stream($stream);
-		}
+    /**
+     * Créez une nouvelle instance de réponse diffusée en continu sous forme de téléchargement de fichier.
+     */
+    public function streamDownload(callable|StreamInterface|string $stream, string $name, array $headers = []): static
+    {
+        if (! ($stream instanceof StreamInterface)) {
+            $stream = to_stream($stream);
+        }
 
-		return $this->withHeaders($headers)->withBody($stream)->withType(pathinfo($name, PATHINFO_EXTENSION))->withDownload($name);
-	}
+        return $this->withHeaders($headers)->withBody($stream)->withType(pathinfo($name, PATHINFO_EXTENSION))->withDownload($name);
+    }
 
     /**
      * Renvoie le contenu brut d'un fichier binaire.
      */
-    public function file(string|SplFileInfo $file, array $headers = []): static
+    public function file(SplFileInfo|string $file, array $headers = []): static
     {
-		return $this->withHeaders($headers)->withFile($file);
+        return $this->withHeaders($headers)->withFile($file);
     }
 
     /**

@@ -1369,12 +1369,12 @@ class Response implements ResponseInterface
      * - download : si `true` définit l'en-tête de téléchargement et force le fichier à
      * être téléchargé plutôt qu'affiché en ligne.
      *
-     * @param string|SplFileInfo   $file    Chemin d'accès absolu au fichier ou instance de \SplFileInfo.
+     * @param SplFileInfo|string   $file    Chemin d'accès absolu au fichier ou instance de \SplFileInfo.
      * @param array<string, mixed> $options Options Voir ci-dessus.
      *
      * @throws LoadException
      */
-    public function withFile(string|SplFileInfo $file, array $options = []): static
+    public function withFile(SplFileInfo|string $file, array $options = []): static
     {
         $file = is_string($file) ? $this->validateFile($file) : $file;
         $options += [

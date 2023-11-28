@@ -263,21 +263,21 @@ class UrlGenerator
         return $absolute ? site_url($route) : $route;
     }
 
-	/**
+    /**
      * Get the URL to a controller action.
      *
      * @return false|string
      */
     public function action(array|string $action, array $parameters = [], bool $absolute = true)
     {
-		if (is_array($action)) {
-			$action = implode('::', $action);
-		}
+        if (is_array($action)) {
+            $action = implode('::', $action);
+        }
 
         $route = $this->routes->reverseRoute($action, ...$parameters);
 
         if (! $route) {
-			throw RouterException::actionNotDefined($action);
+            throw RouterException::actionNotDefined($action);
         }
 
         return $absolute ? site_url($route) : $route;
