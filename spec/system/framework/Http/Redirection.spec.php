@@ -3,6 +3,7 @@
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\HttpException;
+use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\UrlGenerator;
@@ -111,6 +112,20 @@ describe('Redirection', function () {
 
 			config(['app.base_url' => BASE_URL]);
         });
+
+		it('Redirection vers une route avec parametres', function () {
+			$this->routes->add('users/(:num)', 'Home::index', ['as' => 'users.profile']);
+
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
+
+        	$response = $response->route('users.profile', [123]);
+
+			expect($response->hasHeader('Location'))->toBeTruthy();
+			expect($response->getHeaderLine('Location'))->toBe('http://example.com/users/123');
+
+			expect(fn() => $response->route('users.profile'))->toThrow(new InvalidArgumentException());
+			expect(fn() => $response->route('users.profile', ['user']))->toThrow(new RouterException('A parameter does not match the expected type.'));
+		});
     });
 
     describe('With', function () {
@@ -255,6 +270,28 @@ describe('Redirection', function () {
         	$response = $response->home();
 			expect($response->hasHeader('Location'))->toBeTruthy();
 			expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRouteHome');
+		});
+
+		it('action', function () {
+			$this->routes->add('action', 'Controller::index');
+			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+
+        	$response = $response->action(['Controller', 'index']);
+			expect($response->hasHeader('Location'))->toBeTruthy();
+			expect($response->getHeaderLine('Location'))->toBe('http://example.com/action');
+
+        	$response = $response->action('Controller::index');
+			expect($response->hasHeader('Location'))->toBeTruthy();
+			expect($response->getHeaderLine('Location'))->toBe('http://example.com/action');
+
+			$this->routes->add('action/(:slug)', 'Action::index/$1');
+			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+
+        	$response = $response->action(['Action', 'index'], ['une-action']);
+			expect($response->hasHeader('Location'))->toBeTruthy();
+			expect($response->getHeaderLine('Location'))->toBe('http://example.com/action/une-action');
+
+			expect(fn() => $response->action('fackeAction::method'))->toThrow(new RouterException("Action fackeAction::method not defined."));
 		});
 
 		it('away', function () {

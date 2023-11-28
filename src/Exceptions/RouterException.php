@@ -24,7 +24,7 @@ class RouterException extends FrameworkException
      */
     public static function invalidParameterType()
     {
-        return new static(lang('Router.invalidParameterType'));
+        return new static(lang('Router.invalidParameter'));
     }
 
     /**
@@ -45,6 +45,16 @@ class RouterException extends FrameworkException
     public static function controllerNotFound(string $controller, string $method)
     {
         return new static(lang('HTTP.controllerNotFound', [$controller, $method]));
+    }
+
+    /**
+     * Lancer lorsqu'une action (contrôleur + méthode) n'a pas etee definie dans les routes.
+     *
+     * @return RouterException
+     */
+    public static function actionNotDefined(string $action)
+    {
+        return new static(lang('Router.actionNotDefined', [$action]));
     }
 
     /**

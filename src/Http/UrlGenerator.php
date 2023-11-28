@@ -14,6 +14,7 @@ namespace BlitzPHP\Http;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Exceptions\HttpException;
+use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Traits\Macroable;
 use BlitzPHP\Utilities\Iterable\Arr;
@@ -257,6 +258,26 @@ class UrlGenerator
 
         if (! $route) {
             throw HttpException::invalidRedirectRoute($route);
+        }
+
+        return $absolute ? site_url($route) : $route;
+    }
+
+	/**
+     * Get the URL to a controller action.
+     *
+     * @return false|string
+     */
+    public function action(array|string $action, array $parameters = [], bool $absolute = true)
+    {
+		if (is_array($action)) {
+			$action = implode('::', $action);
+		}
+
+        $route = $this->routes->reverseRoute($action, ...$parameters);
+
+        if (! $route) {
+			throw RouterException::actionNotDefined($action);
         }
 
         return $absolute ? site_url($route) : $route;

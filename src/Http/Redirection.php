@@ -100,6 +100,14 @@ class Redirection extends Response
     }
 
     /**
+     * Sets the URI to redirect to but as a controller action.
+     */
+    public function action(array|string $action, array $params = [], int $code = StatusCode::FOUND, array $headers = []): static
+    {
+        return $this->to($this->generator->action($action, $params, true), $code, $headers);
+    }
+
+    /**
      * Helper function to return to previous page.
      *
      * Example:
