@@ -89,7 +89,7 @@ class EncryptCookies implements MiddlewareInterface
      *
      * @return array|string|null
      */
-    protected function validateValue(string $key, string $value)
+    protected function validateValue(string $key, array|string $value)
     {
         return is_array($value)
                     ? $this->validateArray($key, $value)
