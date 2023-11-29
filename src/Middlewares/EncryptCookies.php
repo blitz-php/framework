@@ -19,8 +19,8 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Session\Cookie\CookieValuePrefix;
 use Exception;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -48,25 +48,25 @@ class EncryptCookies implements MiddlewareInterface
     /**
      * Désactivez le cryptage pour le(s) nom(s) de cookie donné(s).
      */
-    public function disableFor(string|array $name): void
+    public function disableFor(array|string $name): void
     {
         $this->except = array_merge($this->except, (array) $name);
     }
 
-	/**
-	 * @param Request $request
-	 */
-	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-	{
-		return $this->encrypt($handler->handle($this->decrypt($request)));
-	}
+    /**
+     * @param Request $request
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        return $this->encrypt($handler->handle($this->decrypt($request)));
+    }
 
     /**
      * Décryptez les cookies sur requete.
      */
     protected function decrypt(Request $request): Request
     {
-		$cookies = new CookieCollection();
+        $cookies = new CookieCollection();
 
         foreach ($request->getCookieParams() as $name => $cookie) {
             if ($this->isDisabled($name)) {
@@ -75,8 +75,8 @@ class EncryptCookies implements MiddlewareInterface
 
             try {
                 $value = $this->decryptCookie($name, $cookie);
-				$value = $this->validateValue($name, $value);
-				$cookies->add($this->cookieManager->make($name, $value));
+                $value = $this->validateValue($name, $value);
+                $cookies->add($this->cookieManager->make($name, $value));
             } catch (Exception) {
             }
         }
@@ -86,8 +86,8 @@ class EncryptCookies implements MiddlewareInterface
 
     /**
      * Validez et supprimez le préfixe de valeur du cookie de la valeur.
-	 *
-     * @return string|array|null
+     *
+     * @return array|string|null
      */
     protected function validateValue(string $key, string $value)
     {
@@ -142,8 +142,8 @@ class EncryptCookies implements MiddlewareInterface
 
     /**
      * Chiffrez les cookies sur une réponse sortante.
-	 *
-	 * @param Response $response
+     *
+     * @param Response $response
      */
     protected function encrypt(ResponseInterface $response): Response
     {
@@ -152,10 +152,10 @@ class EncryptCookies implements MiddlewareInterface
                 continue;
             }
 
-			$response = $response->withCookie($this->duplicate(
+            $response = $response->withCookie($this->duplicate(
                 $cookie,
                 $this->encrypter->encrypt(
-                    CookieValuePrefix::create($cookie->getName(), $this->encrypter->getKey()).$cookie->getValue(),
+                    CookieValuePrefix::create($cookie->getName(), $this->encrypter->getKey()) . $cookie->getValue(),
                 )
             ));
         }
@@ -168,7 +168,7 @@ class EncryptCookies implements MiddlewareInterface
      */
     protected function duplicate(CookieInterface $cookie, mixed $value): CookieInterface
     {
-		return $cookie->withValue($value);
+        return $cookie->withValue($value);
     }
 
     /**
@@ -176,7 +176,7 @@ class EncryptCookies implements MiddlewareInterface
      */
     public function isDisabled(string $name): bool
     {
-        return in_array($name, $this->except);
+        return in_array($name, $this->except, true);
     }
 
     /**

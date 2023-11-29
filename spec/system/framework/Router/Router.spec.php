@@ -131,7 +131,7 @@ describe('Router', function () {
             $router->handle('shop/123');
 
             expect('show')->toBe($router->methodName());
-			expect('ShopController')->toBe($router->controllerName());
+            expect('ShopController')->toBe($router->controllerName());
             expect(['123'])->toBe($router->params());
         });
 

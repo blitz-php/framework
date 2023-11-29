@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\HttpException;
@@ -13,335 +22,333 @@ use BlitzPHP\Spec\Mock\MockRequest;
 use BlitzPHP\Spec\ReflectionHelper;
 
 describe('Redirection', function () {
-	beforeAll(function () {
-		$this->routes = new RouteCollection(Services::locator(), (object) config('routing'));
+    beforeAll(function () {
+        $this->routes = new RouteCollection(Services::locator(), (object) config('routing'));
         Services::injectMock('routes', $this->routes);
 
         $this->request = new MockRequest();
         Services::injectMock('request', $this->request);
-	});
+    });
 
-	beforeEach(function () {
-
-	});
+    beforeEach(function () {
+    });
 
     describe('Redirection simple', function () {
         it('Redirection vers une URL complete', function () {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->to('http://example.com/foo');
+            $response = $response->to('http://example.com/foo');
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/foo');
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/foo');
         });
 
         it('Redirection vers une URL relative convertie en URL complete', function () {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->to('/foo');
+            $response = $response->to('/foo');
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/foo');
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/foo');
         });
 
         it('Redirection avec une baseURL personalisee', function () {
-           	config(['app.base_url' => 'http://example.com/test/']);
+            config(['app.base_url' => 'http://example.com/test/']);
 
-		   	$request = new MockRequest();
-			$response = new Redirection(new UrlGenerator($this->routes, $request));
+            $request  = new MockRequest();
+            $response = new Redirection(new UrlGenerator($this->routes, $request));
 
-        	$response = $response->to('/foo');
+            $response = $response->to('/foo');
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/test/foo');
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/test/foo');
 
-			config(['app.base_url' => BASE_URL]);
+            config(['app.base_url' => BASE_URL]);
         });
     });
 
     describe('Redirection vers une route', function () {
         it('Redirection vers une route', function () {
-			$this->routes->add('exampleRoute', 'Home::index');
-
-            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
-
-        	$response = $response->route('exampleRoute');
-
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRoute');
-
-
-			$this->routes->add('exampleRoute2', 'Home::index', ['as' => 'homepage']);
-
-        	$response = $response->route('homepage');
-
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRoute2');
-        });
-
-		it('Redirection vers un mauvais nom de route', function () {
-			$this->routes->add('exampleRoute', 'Home::index');
-
-            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
-
-			expect(fn() => $response->route('differentRoute'))
-				->toThrow(new HttpException());
-        });
-
-		it('Redirection vers une mauvaise methode de controleur', function () {
             $this->routes->add('exampleRoute', 'Home::index');
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-			expect(fn() => $response->route('Bad::badMethod'))
-				->toThrow(new HttpException());
+            $response = $response->route('exampleRoute');
+
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRoute');
+
+            $this->routes->add('exampleRoute2', 'Home::index', ['as' => 'homepage']);
+
+            $response = $response->route('homepage');
+
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRoute2');
+        });
+
+        it('Redirection vers un mauvais nom de route', function () {
+            $this->routes->add('exampleRoute', 'Home::index');
+
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
+
+            expect(static fn () => $response->route('differentRoute'))
+                ->toThrow(new HttpException());
+        });
+
+        it('Redirection vers une mauvaise methode de controleur', function () {
+            $this->routes->add('exampleRoute', 'Home::index');
+
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
+
+            expect(static fn () => $response->route('Bad::badMethod'))
+                ->toThrow(new HttpException());
         });
 
         it('Redirection vers une route nommee et avec une baseURL personalisee', function () {
-           	config(['app.base_url' => 'http://example.com/test/']);
+            config(['app.base_url' => 'http://example.com/test/']);
 
-		   	$request = new MockRequest();
-			$response = new Redirection(new UrlGenerator($this->routes, $request));
+            $request  = new MockRequest();
+            $response = new Redirection(new UrlGenerator($this->routes, $request));
 
-			$this->routes->add('exampleRoute', 'Home::index');
+            $this->routes->add('exampleRoute', 'Home::index');
 
-        	$response = $response->route('exampleRoute');
+            $response = $response->route('exampleRoute');
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/test/exampleRoute');
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/test/exampleRoute');
 
-			config(['app.base_url' => BASE_URL]);
+            config(['app.base_url' => BASE_URL]);
         });
 
-		it('Redirection vers une route avec parametres', function () {
-			$this->routes->add('users/(:num)', 'Home::index', ['as' => 'users.profile']);
+        it('Redirection vers une route avec parametres', function () {
+            $this->routes->add('users/(:num)', 'Home::index', ['as' => 'users.profile']);
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->route('users.profile', [123]);
+            $response = $response->route('users.profile', [123]);
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/users/123');
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/users/123');
 
-			expect(fn() => $response->route('users.profile'))->toThrow(new InvalidArgumentException());
-			expect(fn() => $response->route('users.profile', ['user']))->toThrow(new RouterException('A parameter does not match the expected type.'));
-		});
+            expect(static fn () => $response->route('users.profile'))->toThrow(new InvalidArgumentException());
+            expect(static fn () => $response->route('users.profile', ['user']))->toThrow(new RouterException('A parameter does not match the expected type.'));
+        });
     });
 
     describe('With', function () {
         it('WithInput', function () {
-			$_SESSION = [];
-			$_GET     = ['foo' => 'bar'];
-			$_POST    = ['bar' => 'baz'];
+            $_SESSION = [];
+            $_GET     = ['foo' => 'bar'];
+            $_POST    = ['bar' => 'baz'];
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$returned = $response->withInput();
+            $returned = $response->withInput();
 
-			expect($response)->toBe($returned);
-			expect($_SESSION)->toContainKey('_blitz_old_input');
-			expect($_SESSION['_blitz_old_input']['get']['foo'])->toBe('bar');
-			expect($_SESSION['_blitz_old_input']['post']['bar'])->toBe('baz');
-		});
+            expect($response)->toBe($returned);
+            expect($_SESSION)->toContainKey('_blitz_old_input');
+            expect($_SESSION['_blitz_old_input']['get']['foo'])->toBe('bar');
+            expect($_SESSION['_blitz_old_input']['post']['bar'])->toBe('baz');
+        });
 
         it('With', function () {
-			$_SESSION = [];
+            $_SESSION = [];
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$returned = $response->with('foo', 'bar');
+            $returned = $response->with('foo', 'bar');
 
-			expect($response)->toBe($returned);
-			expect($_SESSION)->toContainKey('foo');
-		});
+            expect($response)->toBe($returned);
+            expect($_SESSION)->toContainKey('foo');
+        });
 
         it('WithCookies', function () {
-			Services::set(
-				Response::class,
-				Services::response()->cookie('foo', 'bar')
-			);
+            Services::set(
+                Response::class,
+                Services::response()->cookie('foo', 'bar')
+            );
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-			expect($response->hasCookie('foo'))->toBeFalsy();
+            expect($response->hasCookie('foo'))->toBeFalsy();
 
-			$response = $response->withCookies();
+            $response = $response->withCookies();
 
-			expect($response->hasCookie('foo'))->toBeTruthy();
-			expect($response->getCookie('foo'))->toContainKey('value');
-			expect($response->getCookie('foo')['value'])->toBe('bar');
+            expect($response->hasCookie('foo'))->toBeTruthy();
+            expect($response->getCookie('foo'))->toContainKey('value');
+            expect($response->getCookie('foo')['value'])->toBe('bar');
 
-			$response = Services::response();
+            $response = Services::response();
 
-			ReflectionHelper::setPrivateProperty($response, '_cookies', new CookieCollection());
-			Services::set(Response::class, $response);
-		});
+            ReflectionHelper::setPrivateProperty($response, '_cookies', new CookieCollection());
+            Services::set(Response::class, $response);
+        });
         it('WithCookies vides', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-			$response = $response->withCookies();
+            $response = $response->withCookies();
 
-			expect($response->getCookies())->toBe([]);
-		});
+            expect($response->getCookies())->toBe([]);
+        });
 
         it('WithHeaders', function () {
-			Services::set(
-				Response::class,
-				$baseResponse = Services::response()->header('foo', 'bar')
-			);
+            Services::set(
+                Response::class,
+                $baseResponse = Services::response()->header('foo', 'bar')
+            );
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-			expect($response->hasHeader('foo'))->toBeFalsy();
+            expect($response->hasHeader('foo'))->toBeFalsy();
 
-			$response = $response->withHeaders();
+            $response = $response->withHeaders();
 
-			foreach ($baseResponse->getHeaders() as $name => $value) {
-				expect($response->hasHeader($name))->toBeTruthy();
-				expect($value)->toBe($response->getHeader($name));
-			}
-		});
+            foreach ($baseResponse->getHeaders() as $name => $value) {
+                expect($response->hasHeader($name))->toBeTruthy();
+                expect($value)->toBe($response->getHeader($name));
+            }
+        });
 
         it('WithHeaders vide', function () {
-			$baseResponse = Services::response();
+            $baseResponse = Services::response();
 
-			foreach (array_keys($baseResponse->getHeaders()) as $key) {
-				$baseResponse = $baseResponse->withoutHeader($key);
-			}
-			Services::set(Response::class, $baseResponse);
+            foreach (array_keys($baseResponse->getHeaders()) as $key) {
+                $baseResponse = $baseResponse->withoutHeader($key);
+            }
+            Services::set(Response::class, $baseResponse);
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-			$response = $response->withHeaders();
+            $response = $response->withHeaders();
 
-			expect(count($response->getHeaders()))->toBe(1);
-		});
+            expect(count($response->getHeaders()))->toBe(1);
+        });
 
         it('WithErrors', function () {
-			$_SESSION = [];
+            $_SESSION = [];
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$returned = $response->withErrors('login failed');
+            $returned = $response->withErrors('login failed');
 
-			expect($response)->toBe($returned);
-			expect($_SESSION)->toContainKey('errors');
-			expect($_SESSION['errors'])->toContainKey('default');
-			expect($_SESSION['errors']['default'])->toBe('login failed');
-		});
+            expect($response)->toBe($returned);
+            expect($_SESSION)->toContainKey('errors');
+            expect($_SESSION['errors'])->toContainKey('default');
+            expect($_SESSION['errors']['default'])->toBe('login failed');
+        });
     });
 
     describe('Redirect back', function () {
         it('back', function () {
-			$_SERVER['HTTP_REFERER'] = 'http://somewhere.com';
+            $_SERVER['HTTP_REFERER'] = 'http://somewhere.com';
 
-        	$this->request = new MockRequest();
-	        Services::injectMock('request', $this->request);
+            $this->request = new MockRequest();
+            Services::injectMock('request', $this->request);
 
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->back();
+            $response = $response->back();
 
-			expect($response->getHeaderLine('Location'))->toBe('http://somewhere.com');
-		});
+            expect($response->getHeaderLine('Location'))->toBe('http://somewhere.com');
+        });
 
         it('HTTP REFERER manquant', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$returned = $response->back();
+            $returned = $response->back();
 
-			expect($response)->toBeAnInstanceOf(get_class($returned));
-		});
+            expect($response)->toBeAnInstanceOf(get_class($returned));
+        });
     });
 
-	describe('Methodes raccourcies', function () {
-		it('home', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+    describe('Methodes raccourcies', function () {
+        it('home', function () {
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->home();
+            $response = $response->home();
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getStatusCode())->toBe(StatusCode::FOUND);
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com');
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getStatusCode())->toBe(StatusCode::FOUND);
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com');
 
-			$this->routes->add('exampleRouteHome', 'Home::index', ['as' => 'home']);
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $this->routes->add('exampleRouteHome', 'Home::index', ['as' => 'home']);
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->home();
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRouteHome');
-		});
+            $response = $response->home();
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRouteHome');
+        });
 
-		it('action', function () {
-			$this->routes->add('action', 'Controller::index');
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+        it('action', function () {
+            $this->routes->add('action', 'Controller::index');
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->action(['Controller', 'index']);
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/action');
+            $response = $response->action(['Controller', 'index']);
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/action');
 
-        	$response = $response->action('Controller::index');
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/action');
+            $response = $response->action('Controller::index');
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/action');
 
-			$this->routes->add('action/(:slug)', 'Action::index/$1');
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+            $this->routes->add('action/(:slug)', 'Action::index/$1');
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->action(['Action', 'index'], ['une-action']);
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/action/une-action');
+            $response = $response->action(['Action', 'index'], ['une-action']);
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/action/une-action');
 
-			expect(fn() => $response->action('fackeAction::method'))->toThrow(new RouterException("Action fackeAction::method not defined."));
-		});
+            expect(static fn () => $response->action('fackeAction::method'))->toThrow(new RouterException('Action fackeAction::method not defined.'));
+        });
 
-		it('away', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+        it('away', function () {
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->away('http://google.com');
+            $response = $response->away('http://google.com');
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://google.com');
-		});
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://google.com');
+        });
 
-		it('secure', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+        it('secure', function () {
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->secure('foo');
+            $response = $response->secure('foo');
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('https://example.com/foo');
-		});
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('https://example.com/foo');
+        });
 
-		it('refresh', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+        it('refresh', function () {
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->refresh();
+            $response = $response->refresh();
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe(trim(BASE_URL, '/'));
-		});
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe(trim(BASE_URL, '/'));
+        });
 
-		it('guest', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+        it('guest', function () {
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-        	$response = $response->guest('home');
+            $response = $response->guest('home');
 
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/home');
-		});
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/home');
+        });
 
-		it('intended', function () {
-			$response = new Redirection(new UrlGenerator($this->routes, $this->request));
+        it('intended', function () {
+            $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-			$response = $response->intended();
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com');
+            $response = $response->intended();
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com');
 
-			$response->setIntendedUrl('home');
+            $response->setIntendedUrl('home');
 
-			$response = $response->intended();
-			expect($response->hasHeader('Location'))->toBeTruthy();
-			expect($response->getHeaderLine('Location'))->toBe('http://example.com/home');
-		});
-	});
+            $response = $response->intended();
+            expect($response->hasHeader('Location'))->toBeTruthy();
+            expect($response->getHeaderLine('Location'))->toBe('http://example.com/home');
+        });
+    });
 });

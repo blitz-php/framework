@@ -30,7 +30,7 @@ describe('Security / Encryption / OpenSSL', function () {
         expect($encrypter->key)->toBe("Quelque chose d'autre qu'une chaîne vide");
         expect($encrypter->cipher)->toBe('AES-256-CTR');
     });
-    
+
     it(': Test simple', function () {
         $params         = (object) config('encryption');
         $params->driver = 'OpenSSL';
@@ -45,22 +45,22 @@ describe('Security / Encryption / OpenSSL', function () {
         // Cryptage/décryptage simple, paramètres par défaut
         $message1 = 'Ceci est un message en clair.';
         expect($encrypter->decrypt($encrypter->encrypt($message1)))->toBe($message1);
-        
+
         $message2 = 'Ceci est un message en clair different.';
         expect($encrypter->decrypt($encrypter->encrypt($message2)))->toBe($message2);
         expect($encrypter->decrypt($encrypter->encrypt($message1)))->not->toBe($message2);
     });
-    
-    it(": L'abscence de la cle leve une exception", function() {
+
+    it(": L'abscence de la cle leve une exception", function () {
         $encrypter = new OpenSSLHandler();
         $message1  = 'Ceci est un message en clair.';
-        
-        expect(function() use ($message1, $encrypter) {
+
+        expect(static function () use ($message1, $encrypter) {
             $encrypter->encrypt($message1, ['key' => '']);
         })->toThrow(new EncryptionException());
     });
-    
-    it(": Chiffrement avec une cle sous forme de chaine", function() {
+
+    it(': Chiffrement avec une cle sous forme de chaine', function () {
         $key       = 'abracadabra';
         $encrypter = new OpenSSLHandler();
         $message1  = 'Ceci est un message en clair.';
@@ -68,9 +68,9 @@ describe('Security / Encryption / OpenSSL', function () {
 
         expect($encrypter->decrypt($encoded, $key))->toBe($message1);
     });
-    
-    it(": dechiffrement avec une cle erronée", function() {
-        expect(function() {
+
+    it(': dechiffrement avec une cle erronée', function () {
+        expect(static function () {
             $key1      = 'abracadabra';
             $encrypter = new OpenSSLHandler();
             $message1  = 'Ceci est un message en clair.';
@@ -82,7 +82,7 @@ describe('Security / Encryption / OpenSSL', function () {
         })->toThrow(new EncryptionException());
     });
 
-    it(": Chiffrement avec une cle sous forme de tableau", function() {
+    it(': Chiffrement avec une cle sous forme de tableau', function () {
         $key       = 'abracadabra';
         $encrypter = new OpenSSLHandler();
         $message1  = 'Ceci est un message en clair.';
@@ -90,9 +90,9 @@ describe('Security / Encryption / OpenSSL', function () {
 
         expect($message1)->toBe($encrypter->decrypt($encoded, ['key' => $key]));
     });
-    
-    it(": L'authentification échouera lors du décryptage avec la mauvaise clé", function() {
-        expect(function() {
+
+    it(": L'authentification échouera lors du décryptage avec la mauvaise clé", function () {
+        expect(static function () {
             $key1      = 'abracadabra';
             $encrypter = new OpenSSLHandler();
             $message1  = 'Ceci est un message en clair.';

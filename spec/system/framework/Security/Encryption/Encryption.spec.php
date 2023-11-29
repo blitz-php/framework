@@ -23,104 +23,104 @@ describe('Security / Encryption', function () {
         it(': Constructeur', function () {
             // Assume no configuration from set_up()
             expect($this->encryption->key)->toBeEmpty();
-            
+
             // Try with an empty value
             $config           = (object) config('encryption');
             $this->encryption = new Encryption($config);
             expect($this->encryption->key)->toBeEmpty();
-    
+
             // try a different key
             $ikm              = 'Secret stuff';
             $config->key      = $ikm;
             $this->encryption = new Encryption($config);
             expect($this->encryption->key)->toBe($ikm);
         });
-    
-        it(": L'utilisation d'un mauvais pilote leve une exception", function() {
+
+        it(": L'utilisation d'un mauvais pilote leve une exception", function () {
             // ask for a bad driver
             $config         = (object) config('encryption');
             $config->driver = 'Bogus';
             $config->key    = 'anything';
-    
-            expect(function() use ($config) {
+
+            expect(function () use ($config) {
                 $this->encryption->initialize($config);
             })->toThrow(new EncryptionException());
         });
-    
-        it(": L'abscence du pilote leve une exception", function() {
+
+        it(": L'abscence du pilote leve une exception", function () {
             // ask for a bad driver
             $config         = (object) config('encryption');
             $config->driver = '';
             $config->key    = 'anything';
-    
-            expect(function() use ($config) {
+
+            expect(function () use ($config) {
                 $this->encryption->initialize($config);
             })->toThrow(new EncryptionException());
         });
-    
-        it(": Creation d'une cle", function() {
+
+        it(": Creation d'une cle", function () {
             expect($this->encryption->createKey())->not->toBeEmpty();
             expect(strlen($this->encryption->createKey()))->toBe(32);
             expect(strlen($this->encryption->createKey(16)))->toBe(16);
         });
     });
 
-    describe('Service', function () {
-        it(": Le service encrypter fonctionne", function() {
+    describe('Service', static function () {
+        it(': Le service encrypter fonctionne', static function () {
             $config           = config('encryption');
             $config['driver'] = 'OpenSSL';
             $config['key']    = 'anything';
-    
+
             $encrypter = Services::encrypter($config);
-    
+
             expect($encrypter)->toBeAnInstanceOf(EncrypterInterface::class);
         });
-    
-        it(": Le service encrypter leve une exception si le pilote est mauvais", function() {
+
+        it(': Le service encrypter leve une exception si le pilote est mauvais', static function () {
             // ask for a bad driver
             $config           = config('encryption');
             $config['driver'] = 'Bogus';
             $config['key']    = 'anything';
-    
-            expect(function() use ($config) {
+
+            expect(static function () use ($config) {
                 Services::encrypter($config);
             })->toThrow(new EncryptionException());
         });
-    
-        it(": Le service encrypter leve une exception s'il n'y a pas de cle", function() {
-            expect(function() {
+
+        it(": Le service encrypter leve une exception s'il n'y a pas de cle", static function () {
+            expect(static function () {
                 Services::encrypter();
             })->toThrow(new EncryptionException());
         });
-    
-        it(": Service encrypter partagé", function() {
+
+        it(': Service encrypter partagé', static function () {
             $config           = config('encryption');
             $config['driver'] = 'OpenSSL';
             $config['key']    = 'anything';
-    
+
             $encrypter = Services::encrypter($config, true);
-    
+
             $config['key'] = 'Abracadabra';
             $encrypter     = Services::encrypter($config, true);
-            
+
             expect($encrypter->key)->toBe('anything');
         });
     });
 
     describe('Methodes magiques', function () {
-        it(": Magic isset", function() {
+        it(': Magic isset', function () {
             expect(isset($this->encryption->digest))->toBeTruthy();
             expect(isset($this->encryption->bogus))->toBeFalsy();
         });
-    
-        it(": Magic get", function() {
+
+        it(': Magic get', function () {
             expect($this->encryption->digest)->toBe('SHA512');
             expect($this->encryption->bogus)->toBeNull();
         });
     });
 
-    describe('Decryptage', function() {
-        it(': Decrypte une chaine codée avec AES-128-CBC', function() {
+    describe('Decryptage', static function () {
+        it(': Decrypte une chaine codée avec AES-128-CBC', static function () {
             $config                   = config('encryption');
             $config['driver']         = 'OpenSSL';
             $config['key']            = hex2bin('64c70b0b8d45b80b9eba60b8b3c8a34d0193223d20fea46f8644b848bf7ce67f');
@@ -137,7 +137,7 @@ describe('Security / Encryption', function () {
             expect($decrypted)->toBe($expected);
         });
 
-        it(': Decrypte une chaine codée avec AES-256-CTR', function() {
+        it(': Decrypte une chaine codée avec AES-256-CTR', static function () {
             $config                   = config('encryption');
             $config['driver']         = 'OpenSSL';
             $config['key']            = hex2bin('64c70b0b8d45b80b9eba60b8b3c8a34d0193223d20fea46f8644b848bf7ce67f');
@@ -154,7 +154,7 @@ describe('Security / Encryption', function () {
             expect($decrypted)->toBe($expected);
         });
 
-        it(': Decrypte une chaine codée avec base64_encode', function() {
+        it(': Decrypte une chaine codée avec base64_encode', static function () {
             $config           = config('encryption');
             $config['driver'] = 'OpenSSL';
             $config['key']    = hex2bin('64c70b0b8d45b80b9eba60b8b3c8a34d0193223d20fea46f8644b848bf7ce67f');

@@ -20,54 +20,54 @@ use BlitzPHP\Router\RouteBuilder;
 use BlitzPHP\Spec\ReflectionHelper;
 
 describe('Facades', function () {
-	describe('Container', function () {
-		it('Container', function () {
-			$accessor = ReflectionHelper::getPrivateMethodInvoker(Container::class, 'accessor');
+    describe('Container', function () {
+        it('Container', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(Container::class, 'accessor');
 
-			expect($accessor())->toBeAnInstanceOf(ContainerContainer::class);
-		});
+            expect($accessor())->toBeAnInstanceOf(ContainerContainer::class);
+        });
 
-		it('Execution d\'une methode', function () {
-			expect(Container::has(ContainerContainer::class))->toBeTruthy();
-		});
-	});
+        it('Execution d\'une methode', function () {
+            expect(Container::has(ContainerContainer::class))->toBeTruthy();
+        });
+    });
 
-	describe('Fs', function () {
-		it('FS', function () {
-			$accessor = ReflectionHelper::getPrivateMethodInvoker(Fs::class, 'accessor');
+    describe('Fs', function () {
+        it('FS', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(Fs::class, 'accessor');
 
-			expect($accessor())->toBeAnInstanceOf(Filesystem::class);
-		});
+            expect($accessor())->toBeAnInstanceOf(Filesystem::class);
+        });
 
-		it('Execution d\'une methode', function () {
-			expect(FS::exists(__FILE__))->toBeTruthy();
-		});
-	});
+        it('Execution d\'une methode', function () {
+            expect(FS::exists(__FILE__))->toBeTruthy();
+        });
+    });
 
-	describe('Route', function () {
-		it('Route', function () {
-			$accessor = ReflectionHelper::getPrivateMethodInvoker(Route::class, 'accessor');
+    describe('Route', function () {
+        it('Route', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(Route::class, 'accessor');
 
-			expect($accessor())->toBeAnInstanceOf(RouteBuilder::class);
-		});
+            expect($accessor())->toBeAnInstanceOf(RouteBuilder::class);
+        });
 
-		it('Execution d\'une methode', function () {
-			$routeBuilder = Route::setDefaultController('TestController');
+        it('Execution d\'une methode', function () {
+            $routeBuilder = Route::setDefaultController('TestController');
 
-			expect(ReflectionHelper::getPrivateProperty($routeBuilder, 'collection')->getDefaultController())
-				->toBe('TestController');
-		});
-	});
+            expect(ReflectionHelper::getPrivateProperty($routeBuilder, 'collection')->getDefaultController())
+                ->toBe('TestController');
+        });
+    });
 
-	describe('Storage', function () {
-		it('Storage', function () {
-			$accessor = ReflectionHelper::getPrivateMethodInvoker(Storage::class, 'accessor');
+    describe('Storage', function () {
+        it('Storage', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(Storage::class, 'accessor');
 
-			expect($accessor())->toBeAnInstanceOf(FilesystemManager::class);
-		});
+            expect($accessor())->toBeAnInstanceOf(FilesystemManager::class);
+        });
 
-		it('Execution d\'une methode', function () {
-			expect(Storage::exists(__FILE__))->toBeFalsy();
-		});
-	});
+        it('Execution d\'une methode', function () {
+            expect(Storage::exists(__FILE__))->toBeFalsy();
+        });
+    });
 });

@@ -133,7 +133,7 @@ describe('RouteCollection', function () {
             $routes->match(['get', 'post'], 'here', 'there');
             expect($routes->getRoutes())->toBe(['here' => '\there']);
 
-			setRequestMethod('POST');
+            setRequestMethod('POST');
             $routes = getCollector();
 
             $routes->match(['get', 'post'], 'here', 'there');
@@ -214,7 +214,7 @@ describe('RouteCollection', function () {
     describe('Groupement', function () {
         it('Les regroupements de routes fonctionne', function () {
             $routes = getCollector();
-            $routes->group('admin', function ($routes): void {
+            $routes->group('admin', static function ($routes): void {
                 $routes->add('users/list', '\UsersController::list');
             });
 
@@ -225,7 +225,7 @@ describe('RouteCollection', function () {
 
         it('Netoyage du nom de groupe', function () {
             $routes = getCollector();
-            $routes->group('<script>admin', function ($routes): void {
+            $routes->group('<script>admin', static function ($routes): void {
                 $routes->add('users/list', '\UsersController::list');
             });
 
@@ -255,10 +255,10 @@ describe('RouteCollection', function () {
                 'admin',
                 ['namespace' => 'Admin', 'middlewares' => ['csrf']],
                 static function ($routes) {
-                    $routes->get('dashboard', function () {});
+                    $routes->get('dashboard', static function () {});
 
-                    $routes->group('profile', function ($routes) {
-                        $routes->get('/', function () {});
+                    $routes->group('profile', static function ($routes) {
+                        $routes->get('/', static function () {});
                     });
                 }
             );
@@ -281,15 +281,15 @@ describe('RouteCollection', function () {
                 'admin',
                 ['middlewares' => ['csrf']],
                 static function ($routes) {
-                    $routes->get('dashboard', function () {});
+                    $routes->get('dashboard', static function () {});
 
                     $routes->group(
-						'profile',
-						['middlewares' => ['honeypot']],
-						static function ($routes) {
-                        	$routes->get('/', function () {});
-                    	}
-					);
+                        'profile',
+                        ['middlewares' => ['honeypot']],
+                        static function ($routes) {
+                            $routes->get('/', static function () {});
+                        }
+                    );
                 }
             );
 
@@ -309,15 +309,15 @@ describe('RouteCollection', function () {
                 'admin',
                 ['middlewares' => ['csrf']],
                 static function ($routes) {
-                    $routes->get('dashboard', function () {});
+                    $routes->get('dashboard', static function () {});
 
                     $routes->group(
-						'profile',
-						['namespace' => 'Admin'],
-						static function ($routes) {
-                        	$routes->get('/', function () {});
-                    	}
-					);
+                        'profile',
+                        ['namespace' => 'Admin'],
+                        static function ($routes) {
+                            $routes->get('/', static function () {});
+                        }
+                    );
                 }
             );
 
@@ -327,7 +327,7 @@ describe('RouteCollection', function () {
                 ],
                 'admin/profile' => [
                     'middlewares' => ['csrf'],
-					'namespace' => 'Admin',
+                    'namespace'   => 'Admin',
                 ],
             ]);
         });
@@ -349,875 +349,875 @@ describe('RouteCollection', function () {
         it('Le regroupement imbriqué fonctionne avec un préfixe vide', function () {
             $routes = getCollector();
 
-			$routes->add('verify/begin', '\VerifyController::begin');
+            $routes->add('verify/begin', '\VerifyController::begin');
 
-			$routes->group('admin', static function ($routes): void {
-				$routes->group(
-					'',
-					static function ($routes): void {
-						$routes->add('users/list', '\UsersController::list');
+            $routes->group('admin', static function ($routes): void {
+                $routes->group(
+                    '',
+                    static function ($routes): void {
+                        $routes->add('users/list', '\UsersController::list');
 
-						$routes->group('delegate', static function ($routes): void {
-							$routes->add('foo', '\UsersController::foo');
-						});
-					}
-				);
-			});
+                        $routes->group('delegate', static function ($routes): void {
+                            $routes->add('foo', '\UsersController::foo');
+                        });
+                    }
+                );
+            });
 
             expect($routes->getRoutes())->toBe([
-				'verify/begin'       => '\VerifyController::begin',
-				'admin/users/list'   => '\UsersController::list',
-				'admin/delegate/foo' => '\UsersController::foo',
-			]);
+                'verify/begin'       => '\VerifyController::begin',
+                'admin/users/list'   => '\UsersController::list',
+                'admin/delegate/foo' => '\UsersController::foo',
+            ]);
         });
     });
 
     describe('Options', function () {
         it('Options', function () {
-			$routes = getCollector();
+            $routes = getCollector();
 
             // les options doivent être déclarées séparément, pour ne pas confondre PHPCBF
-			$options = [
-				'as'  => 'admin',
-				'foo' => 'baz',
-			];
-			$routes->add(
-				'administrator',
-				static function (): void {},
-				$options
-			);
+            $options = [
+                'as'  => 'admin',
+                'foo' => 'baz',
+            ];
+            $routes->add(
+                'administrator',
+                static function (): void {},
+                $options
+            );
 
-        	expect($routes->getRoutesOptions('administrator'))->toBe($options);
+            expect($routes->getRoutesOptions('administrator'))->toBe($options);
         });
 
         it('Options pour les different verbes', function () {
-			$routes = getCollector();
+            $routes = getCollector();
 
             // les options doivent être déclarées séparément, pour ne pas confondre PHPCBF
-			$options1 = [
-				'as'  => 'admin1',
-				'foo' => 'baz1',
-			];
-			$options2 = [
-				'as'  => 'admin2',
-				'foo' => 'baz2',
-			];
-			$options3 = [
-				'bar' => 'baz',
-			];
-			$routes->get(
-				'administrator',
-				static function (): void {},
-				$options1
-			);
-			$routes->post(
-				'administrator',
-				static function (): void {},
-				$options2
-			);
-			$routes->add(
-				'administrator',
-				static function (): void {},
-				$options3
-			);
+            $options1 = [
+                'as'  => 'admin1',
+                'foo' => 'baz1',
+            ];
+            $options2 = [
+                'as'  => 'admin2',
+                'foo' => 'baz2',
+            ];
+            $options3 = [
+                'bar' => 'baz',
+            ];
+            $routes->get(
+                'administrator',
+                static function (): void {},
+                $options1
+            );
+            $routes->post(
+                'administrator',
+                static function (): void {},
+                $options2
+            );
+            $routes->add(
+                'administrator',
+                static function (): void {},
+                $options3
+            );
 
-			$options = $routes->getRoutesOptions('administrator');
-			expect($options)->toBe(['as' => 'admin1', 'foo' => 'baz1', 'bar' => 'baz']);
+            $options = $routes->getRoutesOptions('administrator');
+            expect($options)->toBe(['as' => 'admin1', 'foo' => 'baz1', 'bar' => 'baz']);
 
-			$options = $routes->setHTTPVerb('post')->getRoutesOptions('administrator');
-			expect($options)->toBe(['as' => 'admin2', 'foo' => 'baz2', 'bar' => 'baz']);
+            $options = $routes->setHTTPVerb('post')->getRoutesOptions('administrator');
+            expect($options)->toBe(['as' => 'admin2', 'foo' => 'baz2', 'bar' => 'baz']);
 
-			$options = $routes->setHTTPVerb('get')->getRoutesOptions('administrator', 'post');
-			expect($options)->toBe(['as' => 'admin2', 'foo' => 'baz2', 'bar' => 'baz']);
-		});
+            $options = $routes->setHTTPVerb('get')->getRoutesOptions('administrator', 'post');
+            expect($options)->toBe(['as' => 'admin2', 'foo' => 'baz2', 'bar' => 'baz']);
+        });
 
         it('Options de groupes avec des middlewares simple', function () {
-			setRequestMethod('GET');
-			$routes = getCollector();
+            setRequestMethod('GET');
+            $routes = getCollector();
 
-			$routes->group(
-				'admin',
-				['middleware' => 'role'],
-				static function ($routes): void {
-					$routes->add('users', '\Users::list');
-				}
-			);
+            $routes->group(
+                'admin',
+                ['middleware' => 'role'],
+                static function ($routes): void {
+                    $routes->add('users', '\Users::list');
+                }
+            );
 
-			expect($routes->isFiltered('admin/users'))->toBeTruthy();
-			expect($routes->isFiltered('admin/franky'))->toBeFalsy();
-			expect($routes->getFiltersForRoute('admin/users'))->toBe(['role']);
-			expect($routes->getFiltersForRoute('admin/bosses'))->toBe([]);
-		});
+            expect($routes->isFiltered('admin/users'))->toBeTruthy();
+            expect($routes->isFiltered('admin/franky'))->toBeFalsy();
+            expect($routes->getFiltersForRoute('admin/users'))->toBe(['role']);
+            expect($routes->getFiltersForRoute('admin/bosses'))->toBe([]);
+        });
 
         it('Options de groupes avec des middlewares et les parametres', function () {
-			setRequestMethod('GET');
-			$routes = getCollector();
+            setRequestMethod('GET');
+            $routes = getCollector();
 
-			$routes->group(
-				'admin',
-				['middleware' => 'role:admin,manager'],
-				static function ($routes): void {
-					$routes->add('users', '\Users::list');
-				}
-			);
+            $routes->group(
+                'admin',
+                ['middleware' => 'role:admin,manager'],
+                static function ($routes): void {
+                    $routes->add('users', '\Users::list');
+                }
+            );
 
-			expect($routes->isFiltered('admin/users'))->toBeTruthy();
-			expect($routes->isFiltered('admin/franky'))->toBeFalsy();
-			expect($routes->getFiltersForRoute('admin/users'))->toBe(['role:admin,manager']);
-		});
+            expect($routes->isFiltered('admin/users'))->toBeTruthy();
+            expect($routes->isFiltered('admin/franky'))->toBeFalsy();
+            expect($routes->getFiltersForRoute('admin/users'))->toBe(['role:admin,manager']);
+        });
 
         it('Options de decalage', function () {
-			setRequestMethod('GET');
-			$routes = getCollector();
+            setRequestMethod('GET');
+            $routes = getCollector();
 
-			$routes->get('users/(:num)', 'users/show/$1', ['offset' => 1]);
-			$expected = ['users/([0-9]+)' => '\users/show/$2'];
-			expect($routes->getRoutes())->toBe($expected);
-		});
+            $routes->get('users/(:num)', 'users/show/$1', ['offset' => 1]);
+            $expected = ['users/([0-9]+)' => '\users/show/$2'];
+            expect($routes->getRoutes())->toBe($expected);
+        });
     });
 
     describe('Resource & presenter', function () {
         it('Échafaudages de ressources correctement', function () {
-			$routes = getCollector();
-			$routes->setHTTPVerb('get');
-        	$routes->resource('photos');
+            $routes = getCollector();
+            $routes->setHTTPVerb('get');
+            $routes->resource('photos');
 
             expect($routes->getRoutes())->toBe([
-				'photos'           => '\Photos::index',
-				'photos/new'       => '\Photos::new',
-				'photos/(.*)/edit' => '\Photos::edit/$1',
-				'photos/(.*)'      => '\Photos::show/$1',
-			]);
+                'photos'           => '\Photos::index',
+                'photos/new'       => '\Photos::new',
+                'photos/(.*)/edit' => '\Photos::edit/$1',
+                'photos/(.*)'      => '\Photos::show/$1',
+            ]);
 
-			$routes = getCollector();
-			$routes->setHTTPVerb('post');
-        	$routes->resource('photos');
-
-            expect($routes->getRoutes())->toBe([
-				'photos' => '\Photos::create',
-			]);
-
-			$routes = getCollector();
-			$routes->setHTTPVerb('put');
-        	$routes->resource('photos');
+            $routes = getCollector();
+            $routes->setHTTPVerb('post');
+            $routes->resource('photos');
 
             expect($routes->getRoutes())->toBe([
-				'photos/(.*)' => '\Photos::update/$1',
-			]);
+                'photos' => '\Photos::create',
+            ]);
 
-			$routes = getCollector();
-			$routes->setHTTPVerb('patch');
-        	$routes->resource('photos');
-
-            expect($routes->getRoutes())->toBe([
-				'photos/(.*)' => '\Photos::update/$1',
-			]);
-
-			$routes = getCollector();
-			$routes->setHTTPVerb('delete');
-        	$routes->resource('photos');
+            $routes = getCollector();
+            $routes->setHTTPVerb('put');
+            $routes->resource('photos');
 
             expect($routes->getRoutes())->toBe([
-				'photos/(.*)' => '\Photos::delete/$1',
-			]);
+                'photos/(.*)' => '\Photos::update/$1',
+            ]);
+
+            $routes = getCollector();
+            $routes->setHTTPVerb('patch');
+            $routes->resource('photos');
+
+            expect($routes->getRoutes())->toBe([
+                'photos/(.*)' => '\Photos::update/$1',
+            ]);
+
+            $routes = getCollector();
+            $routes->setHTTPVerb('delete');
+            $routes->resource('photos');
+
+            expect($routes->getRoutes())->toBe([
+                'photos/(.*)' => '\Photos::delete/$1',
+            ]);
         });
 
         it('Échafaudages de ressources d\'API correctement', function () {
-			$routes = getCollector();
-			$routes->setHTTPVerb('get');
-        	$routes->resource('api/photos', ['controller' => 'Photos']);
+            $routes = getCollector();
+            $routes->setHTTPVerb('get');
+            $routes->resource('api/photos', ['controller' => 'Photos']);
 
             expect($routes->getRoutes())->toBe([
-				'api/photos'           => '\Photos::index',
-				'api/photos/new'       => '\Photos::new',
-				'api/photos/(.*)/edit' => '\Photos::edit/$1',
-				'api/photos/(.*)'      => '\Photos::show/$1',
-			]);
+                'api/photos'           => '\Photos::index',
+                'api/photos/new'       => '\Photos::new',
+                'api/photos/(.*)/edit' => '\Photos::edit/$1',
+                'api/photos/(.*)'      => '\Photos::show/$1',
+            ]);
 
-			$routes = getCollector();
-			$routes->setHTTPVerb('post');
-        	$routes->resource('api/photos', ['controller' => 'Photos']);
-
-            expect($routes->getRoutes())->toBe([
-				'api/photos' => '\Photos::create',
-			]);
-
-			$routes = getCollector();
-			$routes->setHTTPVerb('put');
-        	$routes->resource('api/photos', ['controller' => 'Photos']);
+            $routes = getCollector();
+            $routes->setHTTPVerb('post');
+            $routes->resource('api/photos', ['controller' => 'Photos']);
 
             expect($routes->getRoutes())->toBe([
-				'api/photos/(.*)' => '\Photos::update/$1',
-			]);
+                'api/photos' => '\Photos::create',
+            ]);
 
-			$routes = getCollector();
-			$routes->setHTTPVerb('patch');
-        	$routes->resource('api/photos', ['controller' => 'Photos']);
-
-            expect($routes->getRoutes())->toBe([
-				'api/photos/(.*)' => '\Photos::update/$1',
-			]);
-
-			$routes = getCollector();
-			$routes->setHTTPVerb('delete');
-        	$routes->resource('api/photos', ['controller' => 'Photos']);
+            $routes = getCollector();
+            $routes->setHTTPVerb('put');
+            $routes->resource('api/photos', ['controller' => 'Photos']);
 
             expect($routes->getRoutes())->toBe([
-				'api/photos/(.*)' => '\Photos::delete/$1',
-			]);
+                'api/photos/(.*)' => '\Photos::update/$1',
+            ]);
+
+            $routes = getCollector();
+            $routes->setHTTPVerb('patch');
+            $routes->resource('api/photos', ['controller' => 'Photos']);
+
+            expect($routes->getRoutes())->toBe([
+                'api/photos/(.*)' => '\Photos::update/$1',
+            ]);
+
+            $routes = getCollector();
+            $routes->setHTTPVerb('delete');
+            $routes->resource('api/photos', ['controller' => 'Photos']);
+
+            expect($routes->getRoutes())->toBe([
+                'api/photos/(.*)' => '\Photos::delete/$1',
+            ]);
         });
 
-		it('Échafaudages correct de presenter', function () {
-			$routes = getCollector();
-			$routes->setHTTPVerb('get');
-        	$routes->presenter('photos');
+        it('Échafaudages correct de presenter', function () {
+            $routes = getCollector();
+            $routes->setHTTPVerb('get');
+            $routes->presenter('photos');
 
             expect($routes->getRoutes())->toBe([
-				'photos'             => '\Photos::index',
-				'photos/show/(.*)'   => '\Photos::show/$1',
-				'photos/(.*)'        => '\Photos::show/$1',
-				'photos/new'         => '\Photos::new',
-				'photos/edit/(.*)'   => '\Photos::edit/$1',
-				'photos/remove/(.*)' => '\Photos::remove/$1',
-			]);
+                'photos'             => '\Photos::index',
+                'photos/show/(.*)'   => '\Photos::show/$1',
+                'photos/(.*)'        => '\Photos::show/$1',
+                'photos/new'         => '\Photos::new',
+                'photos/edit/(.*)'   => '\Photos::edit/$1',
+                'photos/remove/(.*)' => '\Photos::remove/$1',
+            ]);
 
-			$routes = getCollector();
-			$routes->setHTTPVerb('post');
-        	$routes->presenter('photos');
+            $routes = getCollector();
+            $routes->setHTTPVerb('post');
+            $routes->presenter('photos');
 
             expect($routes->getRoutes())->toBe([
-				'photos/create'      => '\Photos::create',
-				'photos'      => '\Photos::create',
-				'photos/update/(.*)' => '\Photos::update/$1',
-				'photos/delete/(.*)' => '\Photos::delete/$1',
-			]);
+                'photos/create'      => '\Photos::create',
+                'photos'             => '\Photos::create',
+                'photos/update/(.*)' => '\Photos::update/$1',
+                'photos/delete/(.*)' => '\Photos::delete/$1',
+            ]);
         });
 
-		it('Ressources avec un controleur personnalisé', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
-			$routes->resource('photos', ['controller' => '<script>gallery']);
+        it('Ressources avec un controleur personnalisé', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
+            $routes->resource('photos', ['controller' => '<script>gallery']);
 
             expect($routes->getRoutes())->toBe([
-				'photos'           => '\Gallery::index',
-				'photos/new'       => '\Gallery::new',
-				'photos/(.*)/edit' => '\Gallery::edit/$1',
-				'photos/(.*)'      => '\Gallery::show/$1',
-			]);
+                'photos'           => '\Gallery::index',
+                'photos/new'       => '\Gallery::new',
+                'photos/(.*)/edit' => '\Gallery::edit/$1',
+                'photos/(.*)'      => '\Gallery::show/$1',
+            ]);
         });
 
-		it('Ressources avec un placeholder personnalisé', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
-			$routes->resource('photos', ['placeholder' => ':num']);
+        it('Ressources avec un placeholder personnalisé', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
+            $routes->resource('photos', ['placeholder' => ':num']);
 
             expect($routes->getRoutes())->toBe([
-				'photos'               => '\Photos::index',
-				'photos/new'           => '\Photos::new',
-				'photos/([0-9]+)/edit' => '\Photos::edit/$1',
-				'photos/([0-9]+)'      => '\Photos::show/$1',
-			]);
+                'photos'               => '\Photos::index',
+                'photos/new'           => '\Photos::new',
+                'photos/([0-9]+)/edit' => '\Photos::edit/$1',
+                'photos/([0-9]+)'      => '\Photos::show/$1',
+            ]);
         });
 
-		it('Ressources avec le placeholder par defaut', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
+        it('Ressources avec le placeholder par defaut', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
 
-			$routes->setDefaultConstraint('num');
-			$routes->resource('photos');
+            $routes->setDefaultConstraint('num');
+            $routes->resource('photos');
 
             expect($routes->getRoutes())->toBe([
-				'photos'               => '\Photos::index',
-				'photos/new'           => '\Photos::new',
-				'photos/([0-9]+)/edit' => '\Photos::edit/$1',
-				'photos/([0-9]+)'      => '\Photos::show/$1',
-			]);
+                'photos'               => '\Photos::index',
+                'photos/new'           => '\Photos::new',
+                'photos/([0-9]+)/edit' => '\Photos::edit/$1',
+                'photos/([0-9]+)'      => '\Photos::show/$1',
+            ]);
         });
 
-		it('Ressources avec un bug du placeholder par defaut', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
+        it('Ressources avec un bug du placeholder par defaut', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
 
-			$routes->setDefaultConstraint(':num');
-			$routes->resource('photos');
+            $routes->setDefaultConstraint(':num');
+            $routes->resource('photos');
 
             expect($routes->getRoutes())->toBe([
-				'photos'           => '\Photos::index',
-				'photos/new'       => '\Photos::new',
-				'photos/(.*)/edit' => '\Photos::edit/$1',
-				'photos/(.*)'      => '\Photos::show/$1',
-			]);
+                'photos'           => '\Photos::index',
+                'photos/new'       => '\Photos::new',
+                'photos/(.*)/edit' => '\Photos::edit/$1',
+                'photos/(.*)'      => '\Photos::show/$1',
+            ]);
         });
 
-		it('Ressources avec l\'option <only>', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
+        it('Ressources avec l\'option <only>', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
 
-			$routes->resource('photos', ['only' => 'index']);
+            $routes->resource('photos', ['only' => 'index']);
 
             expect($routes->getRoutes())->toBe([
-				'photos'           => '\Photos::index',
-			]);
+                'photos' => '\Photos::index',
+            ]);
         });
 
-		it('Ressources avec l\'option <except>', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
+        it('Ressources avec l\'option <except>', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
 
-			$routes->resource('photos', ['except' => 'edit,new']);
+            $routes->resource('photos', ['except' => 'edit,new']);
 
             expect($routes->getRoutes())->toBe([
-				'photos'      => '\Photos::index',
-				'photos/(.*)' => '\Photos::show/$1',
-			]);
+                'photos'      => '\Photos::index',
+                'photos/(.*)' => '\Photos::show/$1',
+            ]);
         });
 
-		xit('Ressources avec l\'option <websafe>', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
+        xit('Ressources avec l\'option <websafe>', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
 
-			$routes->resource('photos', ['websafe' => true]);
+            $routes->resource('photos', ['websafe' => true]);
 
             expect($routes->getRoutes())->toBe([
-				'photos'             => '\Photos::create',
-				'photos/(.*)/delete' => '\Photos::delete/$1',
-				'photos/(.*)'        => '\Photos::update/$1',
-			]);
+                'photos'             => '\Photos::create',
+                'photos/(.*)/delete' => '\Photos::delete/$1',
+                'photos/(.*)'        => '\Photos::update/$1',
+            ]);
         });
     });
 
-	describe('Creation a partir des verbes http appropries', function () {
-		it('GET', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
+    describe('Creation a partir des verbes http appropries', function () {
+        it('GET', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
 
-			$routes->get('here', 'there');
-
-            expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
-
-		it('POST', function () {
-			$routes = getCollector('post');
-
-			$routes->post('here', 'there');
+            $routes->get('here', 'there');
 
             expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
+        });
 
-		it('GET n\'autorise pas d\'autres methodes', function () {
-			$routes = getCollector();
-			$routes->setHTTPVerb('GET');
+        it('POST', function () {
+            $routes = getCollector('post');
 
-			$routes->get('here', 'there');
-			$routes->post('from', 'to');
+            $routes->post('here', 'there');
 
             expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
+        });
 
-		it('PUT', function () {
-			$routes = getCollector('put');
+        it('GET n\'autorise pas d\'autres methodes', function () {
+            $routes = getCollector();
+            $routes->setHTTPVerb('GET');
 
-			$routes->put('here', 'there');
-
-            expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
-
-		it('DELETE', function () {
-			$routes = getCollector('delete');
-
-			$routes->delete('here', 'there');
+            $routes->get('here', 'there');
+            $routes->post('from', 'to');
 
             expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
+        });
 
-		it('HEAD', function () {
-			$routes = getCollector('head');
+        it('PUT', function () {
+            $routes = getCollector('put');
 
-			$routes->head('here', 'there');
-
-            expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
-
-		it('PATCH', function () {
-			$routes = getCollector('patch');
-
-			$routes->patch('here', 'there');
+            $routes->put('here', 'there');
 
             expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
+        });
 
-		it('OPTIONS', function () {
-			$routes = getCollector('options');
+        it('DELETE', function () {
+            $routes = getCollector('delete');
 
-			$routes->options('here', 'there');
-
-            expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
-
-		it('Route de vue', function () {
-			$routes = getCollector();
-
-			$routes->view('here', 'hello');
-
-			$route = $routes->getRoutes('get')['here'];
-			expect($route)->toBeAnInstanceOf('closure');
-
-			// Testez que la route n'est pas disponible dans aucun autre verbe
-			expect($routes->getRoutes('*'))->not->toContainKey('here');
-			expect($routes->getRoutes('options'))->not->toContainKey('here');
-			expect($routes->getRoutes('head'))->not->toContainKey('here');
-			expect($routes->getRoutes('post'))->not->toContainKey('here');
-			expect($routes->getRoutes('put'))->not->toContainKey('here');
-			expect($routes->getRoutes('delete'))->not->toContainKey('here');
-			expect($routes->getRoutes('trace'))->not->toContainKey('here');
-			expect($routes->getRoutes('connect'))->not->toContainKey('here');
-			expect($routes->getRoutes('cli'))->not->toContainKey('here');
-		});
-
-		it('Restriction d\'environnement', function () {
-			setRequestMethod('get');
-			$routes = getCollector();
-
-			$routes->environment(
-				'testing',
-				static function ($routes): void {
-					$routes->get('here', 'there');
-				}
-			);
-			$routes->environment(
-				'badenvironment',
-				static function ($routes): void {
-					$routes->get('from', 'to');
-				}
-			);
+            $routes->delete('here', 'there');
 
             expect($routes->getRoutes())->toBe(['here' => '\there']);
-		});
-	});
+        });
 
-	describe('Routes nommées', function() {
-		it('Route nommée', function() {
-			$routes = getCollector();
+        it('HEAD', function () {
+            $routes = getCollector('head');
 
-			$routes->add('users', 'Users::index', ['as' => 'namedRoute']);
-			$routes->add('profil', 'Users::index', ['name' => 'namedRoute2']);
+            $routes->head('here', 'there');
 
-			expect($routes->reverseRoute('namedRoute'))->toBe('/users');
-			expect($routes->reverseRoute('namedRoute2'))->toBe('/profil');
-		});
+            expect($routes->getRoutes())->toBe(['here' => '\there']);
+        });
 
-		it('Route nommée avec la locale', function() {
-			$routes = getCollector();
+        it('PATCH', function () {
+            $routes = getCollector('patch');
 
-			$routes->add('{locale}/users', 'Users::index', ['as' => 'namedRoute']);
+            $routes->patch('here', 'there');
 
-			expect($routes->reverseRoute('namedRoute'))->toBe('/en/users');
-		});
+            expect($routes->getRoutes())->toBe(['here' => '\there']);
+        });
 
-		it('Route nommée avec les parametres', function() {
-			$routes = getCollector();
+        it('OPTIONS', function () {
+            $routes = getCollector('options');
 
-			// @TODO Ne mettez aucun espace réservé après (:any).
-			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
-			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
+            $routes->options('here', 'there');
 
-			$match = $routes->reverseRoute('namedRoute', 'string', 13);
+            expect($routes->getRoutes())->toBe(['here' => '\there']);
+        });
 
-			expect($match)->toBe('/path/string/to/13');
-		});
+        it('Route de vue', function () {
+            $routes = getCollector();
 
-		it('Route nommée avec les parametres et la locale', function() {
-			$routes = getCollector();
+            $routes->view('here', 'hello');
 
-			// @TODO Ne mettez aucun espace réservé après (:any).
-			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
-			$routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
+            $route = $routes->getRoutes('get')['here'];
+            expect($route)->toBeAnInstanceOf('closure');
 
-			$match = $routes->reverseRoute('namedRoute', 'string', 13);
+            // Testez que la route n'est pas disponible dans aucun autre verbe
+            expect($routes->getRoutes('*'))->not->toContainKey('here');
+            expect($routes->getRoutes('options'))->not->toContainKey('here');
+            expect($routes->getRoutes('head'))->not->toContainKey('here');
+            expect($routes->getRoutes('post'))->not->toContainKey('here');
+            expect($routes->getRoutes('put'))->not->toContainKey('here');
+            expect($routes->getRoutes('delete'))->not->toContainKey('here');
+            expect($routes->getRoutes('trace'))->not->toContainKey('here');
+            expect($routes->getRoutes('connect'))->not->toContainKey('here');
+            expect($routes->getRoutes('cli'))->not->toContainKey('here');
+        });
 
-			expect($match)->toBe('/en/path/string/to/13');
-		});
+        it('Restriction d\'environnement', function () {
+            setRequestMethod('get');
+            $routes = getCollector();
 
-		it('Route nommée avec la meme URI mais differentes methodes', function() {
-			$routes = getCollector();
+            $routes->environment(
+                'testing',
+                static function ($routes): void {
+                    $routes->get('here', 'there');
+                }
+            );
+            $routes->environment(
+                'badenvironment',
+                static function ($routes): void {
+                    $routes->get('from', 'to');
+                }
+            );
 
-			$routes->get('user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
-			$routes->post(
-				'user/insert',
-				static function (): void {},
-				['as' => 'namedRoute2']
-			);
-			$routes->put(
-				'user/insert',
-				static function (): void {},
-				['as' => 'namedRoute3']
-			);
+            expect($routes->getRoutes())->toBe(['here' => '\there']);
+        });
+    });
 
-			$match1 = $routes->reverseRoute('namedRoute1');
-			$match2 = $routes->reverseRoute('namedRoute2');
-			$match3 = $routes->reverseRoute('namedRoute3');
+    describe('Routes nommées', function () {
+        it('Route nommée', function () {
+            $routes = getCollector();
 
-			expect('/user/insert')->toBe($match1);
-			expect('/user/insert')->toBe($match2);
-			expect('/user/insert')->toBe($match3);
-		});
+            $routes->add('users', 'Users::index', ['as' => 'namedRoute']);
+            $routes->add('profil', 'Users::index', ['name' => 'namedRoute2']);
 
-		it('Route nommée avec la locale, la meme URI mais differentes methodes', function() {
-			$routes = getCollector();
+            expect($routes->reverseRoute('namedRoute'))->toBe('/users');
+            expect($routes->reverseRoute('namedRoute2'))->toBe('/profil');
+        });
 
-			$routes->get('{locale}/user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
-			$routes->post(
-				'{locale}/user/insert',
-				static function (): void {},
-				['as' => 'namedRoute2']
-			);
-			$routes->put(
-				'{locale}/user/insert',
-				static function (): void {},
-				['as' => 'namedRoute3']
-			);
+        it('Route nommée avec la locale', function () {
+            $routes = getCollector();
 
-			$match1 = $routes->reverseRoute('namedRoute1');
-			$match2 = $routes->reverseRoute('namedRoute2');
-			$match3 = $routes->reverseRoute('namedRoute3');
+            $routes->add('{locale}/users', 'Users::index', ['as' => 'namedRoute']);
 
-			expect('/en/user/insert')->toBe($match1);
-			expect('/en/user/insert')->toBe($match2);
-			expect('/en/user/insert')->toBe($match3);
-		});
+            expect($routes->reverseRoute('namedRoute'))->toBe('/en/users');
+        });
 
-		it('Route nommée avec un pipe dans la regex', function() {
-			$routes = getCollector();
+        it('Route nommée avec les parametres', function () {
+            $routes = getCollector();
 
-			$routes->get('/system/(this|that)', 'myController::system/$1', ['as' => 'pipedRoute']);
+            // @TODO Ne mettez aucun espace réservé après (:any).
+            // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+            $routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
 
-        	expect('/system/this')->toBe($routes->reverseRoute('pipedRoute', 'this'));
-        	expect('/system/that')->toBe($routes->reverseRoute('pipedRoute', 'that'));
-		});
-	});
+            $match = $routes->reverseRoute('namedRoute', 'string', 13);
 
-	describe('Redirection', function() {
-		it('Ajout de redirection', function() {
-			$routes = getCollector();
+            expect($match)->toBe('/path/string/to/13');
+        });
 
-			// Le deuxième paramètre est soit le nouvel URI vers lequel rediriger, soit le nom d'une route nommée.
-			$routes->redirect('users', 'users/index', 307);
+        it('Route nommée avec les parametres et la locale', function () {
+            $routes = getCollector();
 
-			$expected = [
-				'users' => 'users/index',
-			];
+            // @TODO Ne mettez aucun espace réservé après (:any).
+            // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+            $routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2', ['as' => 'namedRoute']);
 
-			expect($routes->getRoutes())->toBe($expected);
-			expect($routes->isRedirect('users'))->toBeTruthy();
-			expect($routes->getRedirectCode('users'))->toBe(307);
-			expect($routes->getRedirectCode('bosses'))->toBe(0);
-		});
+            $match = $routes->reverseRoute('namedRoute', 'string', 13);
 
-		it('Ajout de redirection avec une route nommee', function() {
-			$routes = getCollector();
+            expect($match)->toBe('/en/path/string/to/13');
+        });
 
-			$routes->add('zombies', 'Zombies::index', ['as' => 'namedRoute']);
-        	$routes->redirect('users', 'namedRoute', 307);
+        it('Route nommée avec la meme URI mais differentes methodes', function () {
+            $routes = getCollector();
 
-			$expected = [
-				'zombies' => '\Zombies::index',
-				'users'   => ['zombies' => '\Zombies::index'],
-			];
+            $routes->get('user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
+            $routes->post(
+                'user/insert',
+                static function (): void {},
+                ['as' => 'namedRoute2']
+            );
+            $routes->put(
+                'user/insert',
+                static function (): void {},
+                ['as' => 'namedRoute3']
+            );
 
-			expect($routes->getRoutes())->toBe($expected);
-			expect($routes->isRedirect('users'))->toBeTruthy();
-			expect($routes->getRedirectCode('users'))->toBe(307);
-		});
+            $match1 = $routes->reverseRoute('namedRoute1');
+            $match2 = $routes->reverseRoute('namedRoute2');
+            $match3 = $routes->reverseRoute('namedRoute3');
 
-		it('Ajout de redirection avec la methode GET', function() {
-			$routes = getCollector();
+            expect('/user/insert')->toBe($match1);
+            expect('/user/insert')->toBe($match2);
+            expect('/user/insert')->toBe($match3);
+        });
 
-			$routes->get('zombies', 'Zombies::index', ['as' => 'namedRoute']);
-        	$routes->redirect('users', 'namedRoute', 307);
+        it('Route nommée avec la locale, la meme URI mais differentes methodes', function () {
+            $routes = getCollector();
 
-			$expected = [
-				'zombies' => '\Zombies::index',
-				'users'   => ['zombies' => '\Zombies::index'],
-			];
+            $routes->get('{locale}/user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
+            $routes->post(
+                '{locale}/user/insert',
+                static function (): void {},
+                ['as' => 'namedRoute2']
+            );
+            $routes->put(
+                '{locale}/user/insert',
+                static function (): void {},
+                ['as' => 'namedRoute3']
+            );
 
-			expect($routes->getRoutes())->toBe($expected);
-			expect($routes->isRedirect('users'))->toBeTruthy();
-			expect($routes->getRedirectCode('users'))->toBe(307);
-		});
-	});
+            $match1 = $routes->reverseRoute('namedRoute1');
+            $match2 = $routes->reverseRoute('namedRoute2');
+            $match3 = $routes->reverseRoute('namedRoute3');
 
-	describe('Sous domaines', function() {
-		it('Hostname', function () {
-			$_SERVER['HTTP_HOST'] = 'example.com';
+            expect('/en/user/insert')->toBe($match1);
+            expect('/en/user/insert')->toBe($match2);
+            expect('/en/user/insert')->toBe($match3);
+        });
 
-			$routes = getCollector();
+        it('Route nommée avec un pipe dans la regex', function () {
+            $routes = getCollector();
+
+            $routes->get('/system/(this|that)', 'myController::system/$1', ['as' => 'pipedRoute']);
+
+            expect('/system/this')->toBe($routes->reverseRoute('pipedRoute', 'this'));
+            expect('/system/that')->toBe($routes->reverseRoute('pipedRoute', 'that'));
+        });
+    });
+
+    describe('Redirection', function () {
+        it('Ajout de redirection', function () {
+            $routes = getCollector();
+
+            // Le deuxième paramètre est soit le nouvel URI vers lequel rediriger, soit le nom d'une route nommée.
+            $routes->redirect('users', 'users/index', 307);
+
+            $expected = [
+                'users' => 'users/index',
+            ];
+
+            expect($routes->getRoutes())->toBe($expected);
+            expect($routes->isRedirect('users'))->toBeTruthy();
+            expect($routes->getRedirectCode('users'))->toBe(307);
+            expect($routes->getRedirectCode('bosses'))->toBe(0);
+        });
+
+        it('Ajout de redirection avec une route nommee', function () {
+            $routes = getCollector();
+
+            $routes->add('zombies', 'Zombies::index', ['as' => 'namedRoute']);
+            $routes->redirect('users', 'namedRoute', 307);
+
+            $expected = [
+                'zombies' => '\Zombies::index',
+                'users'   => ['zombies' => '\Zombies::index'],
+            ];
+
+            expect($routes->getRoutes())->toBe($expected);
+            expect($routes->isRedirect('users'))->toBeTruthy();
+            expect($routes->getRedirectCode('users'))->toBe(307);
+        });
+
+        it('Ajout de redirection avec la methode GET', function () {
+            $routes = getCollector();
+
+            $routes->get('zombies', 'Zombies::index', ['as' => 'namedRoute']);
+            $routes->redirect('users', 'namedRoute', 307);
+
+            $expected = [
+                'zombies' => '\Zombies::index',
+                'users'   => ['zombies' => '\Zombies::index'],
+            ];
+
+            expect($routes->getRoutes())->toBe($expected);
+            expect($routes->isRedirect('users'))->toBeTruthy();
+            expect($routes->getRedirectCode('users'))->toBe(307);
+        });
+    });
+
+    describe('Sous domaines', function () {
+        it('Hostname', function () {
+            $_SERVER['HTTP_HOST'] = 'example.com';
+
+            $routes = getCollector();
 
             $routes->add('from', 'to', ['hostname' => 'example.com']);
-	        $routes->add('foo', 'bar', ['hostname' => 'foobar.com']);
+            $routes->add('foo', 'bar', ['hostname' => 'foobar.com']);
 
             expect($routes->getRoutes())->toBe([
                 'from' => '\to',
             ]);
         });
 
-		it('Sous domaine', function () {
-			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+        it('Sous domaine', function () {
+            $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
-			$routes = getCollector();
+            $routes = getCollector();
 
             $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
-        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
 
             expect($routes->getRoutes())->toBe([
                 'objects/([a-zA-Z0-9]+)' => '\Admin::objectsList/$1',
-        	]);
+            ]);
         });
 
-		it('Sous domaine absent', function() {
-			$_SERVER['HTTP_HOST'] = 'www.example.com';
+        it('Sous domaine absent', function () {
+            $_SERVER['HTTP_HOST'] = 'www.example.com';
 
-			$routes = getCollector();
+            $routes = getCollector();
 
-			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
-        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+            $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
 
-			expect($routes->getRoutes())->toBe([
-				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
-			]);
-		});
+            expect($routes->getRoutes())->toBe([
+                'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+            ]);
+        });
 
-		it('Test avec des sous domaines differents', function() {
-			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+        it('Test avec des sous domaines differents', function () {
+            $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
-			$routes = getCollector();
+            $routes = getCollector();
 
-			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
-        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+            $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
 
-			expect($routes->getRoutes())->toBe([
-				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
-			]);
-		});
+            expect($routes->getRoutes())->toBe([
+                'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+            ]);
+        });
 
-		it('Test avec le sous domaine www', function() {
-			$routes = getCollector();
+        it('Test avec le sous domaine www', function () {
+            $routes = getCollector();
 
-			$_SERVER['HTTP_HOST'] = 'www.example.com';
+            $_SERVER['HTTP_HOST'] = 'www.example.com';
 
-			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
-			$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+            $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
 
-			expect($routes->getRoutes())->toBe([
-				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
-			]);
-		});
+            expect($routes->getRoutes())->toBe([
+                'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+            ]);
+        });
 
-		it('Test avec le sous domaine .co', function() {
-			$routes = getCollector();
+        it('Test avec le sous domaine .co', function () {
+            $routes = getCollector();
 
-			$_SERVER['HTTP_HOST'] = 'example.co.uk';
+            $_SERVER['HTTP_HOST'] = 'example.co.uk';
 
-			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
-	        $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+            $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'sales']);
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
 
-			expect($routes->getRoutes())->toBe([
-				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
-			]);
-		});
+            expect($routes->getRoutes())->toBe([
+                'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+            ]);
+        });
 
-		it('Test avec de differents sous domaine absent', function() {
-			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+        it('Test avec de differents sous domaine absent', function () {
+            $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
-			$routes = getCollector();
+            $routes = getCollector();
 
-			$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'nothere']);
-        	$routes->add('/objects/(:alphanum)', 'App::objectsList/$1', ['subdomain' => '*']);
+            $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'nothere']);
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1', ['subdomain' => '*']);
 
-			expect($routes->getRoutes())->toBe([
-				'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
-			]);
-		});
+            expect($routes->getRoutes())->toBe([
+                'objects/([a-zA-Z0-9]+)' => '\App::objectsList/$1',
+            ]);
+        });
 
-		it('Test sans sous domaine et le point', function() {
-			$_SERVER['HTTP_HOST'] = 'example.com';
+        it('Test sans sous domaine et le point', function () {
+            $_SERVER['HTTP_HOST'] = 'example.com';
 
-			$routes = getCollector();
+            $routes = getCollector();
 
-			$routes->add('/objects/(:alphanum)', 'App::objectsList/$1', ['subdomain' => '*']);
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1', ['subdomain' => '*']);
 
-        	expect($routes->getRoutes())->toBe([]);
-		});
+            expect($routes->getRoutes())->toBe([]);
+        });
 
-		it('Test avec les sous domaine en ordre', function() {
-			$_SERVER['HTTP_HOST'] = 'adm.example.com';
+        it('Test avec les sous domaine en ordre', function () {
+            $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
-			$routes = getCollector();
+            $routes = getCollector();
 
-			$routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
-        	$routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
+            $routes->add('/objects/(:alphanum)', 'App::objectsList/$1');
+            $routes->add('/objects/(:alphanum)', 'Admin::objectsList/$1', ['subdomain' => 'adm']);
 
-        	expect($routes->getRoutes())->toBe([
-				'objects/([a-zA-Z0-9]+)' => '\Admin::objectsList/$1',
-			]);
-		});
-	});
+            expect($routes->getRoutes())->toBe([
+                'objects/([a-zA-Z0-9]+)' => '\Admin::objectsList/$1',
+            ]);
+        });
+    });
 
-	describe('Fallback', function() {
-		it('Fallback', function() {
-			setRequestMethod('GET');
-			$routes = getCollector();
+    describe('Fallback', function () {
+        it('Fallback', function () {
+            setRequestMethod('GET');
+            $routes = getCollector();
 
-			expect($routes->get404Override())->toBeNull();
-		});
+            expect($routes->get404Override())->toBeNull();
+        });
 
-		it('Fallback sous forme de chaine', function() {
-			setRequestMethod('GET');
-			$routes = getCollector();
+        it('Fallback sous forme de chaine', function () {
+            setRequestMethod('GET');
+            $routes = getCollector();
 
-			$routes->fallback('Explode');
-			expect($routes->get404Override())->toBe('Explode');
-		});
+            $routes->fallback('Explode');
+            expect($routes->get404Override())->toBe('Explode');
+        });
 
-		it('Fallback sous forme de callback', function() {
-			setRequestMethod('GET');
-			$routes = getCollector();
+        it('Fallback sous forme de callback', function () {
+            setRequestMethod('GET');
+            $routes = getCollector();
 
-			$routes->fallback(static function (): void {
-				echo 'Explode now';
-			});
-			expect($routes->get404Override())->toBeAnInstanceOf('closure');
-		});
-	});
+            $routes->fallback(static function (): void {
+                echo 'Explode now';
+            });
+            expect($routes->get404Override())->toBeAnInstanceOf('closure');
+        });
+    });
 
-	describe('Routage inversé', function () {
-		it('Reverse route avec une chaine vide', function () {
-			$routes = getCollector();
-			$routes->add('/', 'Home::index');
+    describe('Routage inversé', function () {
+        it('Reverse route avec une chaine vide', function () {
+            $routes = getCollector();
+            $routes->add('/', 'Home::index');
 
-			expect($routes->reverseRoute(''))->toBeFalsy();
-		});
+            expect($routes->reverseRoute(''))->toBeFalsy();
+        });
 
-		it('Reverse route simple', function () {
-			$routes = getCollector();
+        it('Reverse route simple', function () {
+            $routes = getCollector();
 
-			// @TODO Ne mettez aucun espace réservé après (:any).
-			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
-			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+            // @TODO Ne mettez aucun espace réservé après (:any).
+            // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+            $routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
 
-			$match = $routes->reverseRoute('myController::goto', 'string', 13);
+            $match = $routes->reverseRoute('myController::goto', 'string', 13);
 
-			expect($match)->toBe('/path/string/to/13');
-		});
+            expect($match)->toBe('/path/string/to/13');
+        });
 
-		it('Reverse route avec la locale', function () {
-			$routes = getCollector();
+        it('Reverse route avec la locale', function () {
+            $routes = getCollector();
 
-			// @TODO Ne mettez aucun espace réservé après (:any).
-			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
-			$routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+            // @TODO Ne mettez aucun espace réservé après (:any).
+            // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+            $routes->add('{locale}/path/(:any)/to/(:num)', 'myController::goto/$1/$2');
 
-			$match = $routes->reverseRoute('myController::goto', 'string', 13);
+            $match = $routes->reverseRoute('myController::goto', 'string', 13);
 
-			expect($match)->toBe('/en/path/string/to/13');
-		});
+            expect($match)->toBe('/en/path/string/to/13');
+        });
 
-		it('Reverse route retourne false lorsque le nombre de parametres est incorrect', function () {
-			$routes = getCollector();
+        it('Reverse route retourne false lorsque le nombre de parametres est incorrect', function () {
+            $routes = getCollector();
 
-			// @TODO Ne mettez aucun espace réservé après (:any).
-			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
-			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1');
+            // @TODO Ne mettez aucun espace réservé après (:any).
+            // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+            $routes->add('path/(:any)/to/(:num)', 'myController::goto/$1');
 
-			$match = $routes->reverseRoute('myController::goto', 'string', 13);
+            $match = $routes->reverseRoute('myController::goto', 'string', 13);
 
-			expect($match)->toBeFalsy();
-		});
+            expect($match)->toBeFalsy();
+        });
 
-		it('Reverse route retourne false lorsqu\'il y\'a pas de correspondance', function () {
-			$routes = getCollector();
+        it('Reverse route retourne false lorsqu\'il y\'a pas de correspondance', function () {
+            $routes = getCollector();
 
-			// @TODO Ne mettez aucun espace réservé après (:any).
-			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
-			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+            // @TODO Ne mettez aucun espace réservé après (:any).
+            // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+            $routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
 
-			$match = $routes->reverseRoute('myBadController::goto', 'string', 13);
+            $match = $routes->reverseRoute('myBadController::goto', 'string', 13);
 
-			expect($match)->toBeFalsy();
-		});
+            expect($match)->toBeFalsy();
+        });
 
-		it('Reverse route leve une exception en cas de mauvais types de parametres', function () {
-			$routes = getCollector();
+        it('Reverse route leve une exception en cas de mauvais types de parametres', function () {
+            $routes = getCollector();
 
-			// @TODO Ne mettez aucun espace réservé après (:any).
-			// 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
-			$routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
+            // @TODO Ne mettez aucun espace réservé après (:any).
+            // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
+            $routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
 
-			expect(static function () use ($routes) {
+            expect(static function () use ($routes) {
                 $routes->reverseRoute('myController::goto', 13, 'string');
             })->toThrow(new RouterException());
         });
 
-		it('Reverse route simple avec la locale', function () {
-			$routes = getCollector();
+        it('Reverse route simple avec la locale', function () {
+            $routes = getCollector();
 
-			$routes->add('{locale}/contact', 'myController::goto');
+            $routes->add('{locale}/contact', 'myController::goto');
 
-			$match = $routes->reverseRoute('myController::goto');
+            $match = $routes->reverseRoute('myController::goto');
 
-			expect($match)->toBe('/en/contact');
-		});
+            expect($match)->toBe('/en/contact');
+        });
 
-		it('Reverse route avec le namespace par defaut', function () {
-			$routes = getCollector();
-			$routes->setDefaultNamespace('App\Controllers');
+        it('Reverse route avec le namespace par defaut', function () {
+            $routes = getCollector();
+            $routes->setDefaultNamespace('App\Controllers');
 
-			$routes->get('admin/(:num)/gallery(:any)', 'Admin\Galleries::showUserGallery/$1/$2');
+            $routes->get('admin/(:num)/gallery(:any)', 'Admin\Galleries::showUserGallery/$1/$2');
 
-			$match = $routes->reverseRoute('Admin\Galleries::showUserGallery', 15, 12);
+            $match = $routes->reverseRoute('Admin\Galleries::showUserGallery', 15, 12);
 
-			expect($match)->toBe('/admin/15/gallery12');
-		});
+            expect($match)->toBe('/admin/15/gallery12');
+        });
 
-		it('Reverse route avec une route nommee', function () {
-			$routes = getCollector();
+        it('Reverse route avec une route nommee', function () {
+            $routes = getCollector();
 
-			$routes->get('test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
+            $routes->get('test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
 
-			$match = $routes->reverseRoute('testRouter', 1, 2);
+            $match = $routes->reverseRoute('testRouter', 1, 2);
 
-			expect($match)->toBe('/test/1/2');
-		});
+            expect($match)->toBe('/test/1/2');
+        });
 
-		it('Reverse route avec une route nommee et la locale', function () {
-			$routes = getCollector();
+        it('Reverse route avec une route nommee et la locale', function () {
+            $routes = getCollector();
 
-			$routes->get('{locale}/test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
+            $routes->get('{locale}/test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
 
-			$match = $routes->reverseRoute('testRouter', 1, 2);
+            $match = $routes->reverseRoute('testRouter', 1, 2);
 
-			expect($match)->toBe('/en/test/1/2');
-		});
+            expect($match)->toBe('/en/test/1/2');
+        });
 
-		it('Reverse route avec une closure', function () {
-			$routes = getCollector();
+        it('Reverse route avec une closure', function () {
+            $routes = getCollector();
 
-			$routes->add('login', static function (): void {
-			});
+            $routes->add('login', static function (): void {
+            });
 
-			$match = $routes->reverseRoute('login');
+            $match = $routes->reverseRoute('login');
 
-			expect($match)->toBe('/login');
-		});
+            expect($match)->toBe('/login');
+        });
 
-		it('Reverse route avec une closure qui ne correspond pas', function () {
-			$routes = getCollector();
+        it('Reverse route avec une closure qui ne correspond pas', function () {
+            $routes = getCollector();
 
-			$routes->add('login', static function (): void {
-			});
+            $routes->add('login', static function (): void {
+            });
 
-			$match = $routes->reverseRoute('foobar');
+            $match = $routes->reverseRoute('foobar');
 
-			expect($match)->toBeFalsy();
-		});
-	});
+            expect($match)->toBeFalsy();
+        });
+    });
 });

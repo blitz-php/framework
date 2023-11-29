@@ -14,24 +14,24 @@ use BlitzPHP\Router\DefinedRouteCollector;
 use BlitzPHP\Router\RouteCollection;
 
 describe('DefinedRouteCollector', function () {
-	beforeAll(function () {
-		$this->getCollector = function (array $config = [], array $files = []): RouteCollection {
-			$defaults = ['App' => APP_PATH];
-			$config   = array_merge($config, $defaults);
+    beforeAll(function () {
+        $this->getCollector = static function (array $config = [], array $files = []): RouteCollection {
+            $defaults = ['App' => APP_PATH];
+            $config   = array_merge($config, $defaults);
 
-			Services::autoloader()->addNamespace($config);
+            Services::autoloader()->addNamespace($config);
 
-			$loader = Services::locator();
+            $loader = Services::locator();
 
-			$routing = (object) config('routing');
+            $routing = (object) config('routing');
 
-			return (new RouteCollection($loader, $routing));
-		};
-	});
+            return new RouteCollection($loader, $routing);
+        };
+    });
 
     it('Test de collection', function () {
-		$routes = $this->getCollector();
-		$routes->get('journals', 'Blogs');
+        $routes = $this->getCollector();
+        $routes->get('journals', 'Blogs');
         $routes->get('product/(:num)', 'Catalog::productLookupByID/$1');
         $routes->get('feed', static fn () => 'A Closure route.');
         $routes->view('about', 'pages/about');
@@ -74,9 +74,9 @@ describe('DefinedRouteCollector', function () {
         expect($definedRoutes)->toBe($expected);
     });
 
-	it('Test de collection avec les verbes differents', function () {
-		$routes = $this->getCollector();
-		$routes->get('login', 'AuthController::showLogin', ['as' => 'loginShow']);
+    it('Test de collection avec les verbes differents', function () {
+        $routes = $this->getCollector();
+        $routes->get('login', 'AuthController::showLogin', ['as' => 'loginShow']);
         $routes->post('login', 'AuthController::login', ['as' => 'login']);
         $routes->get('logout', 'AuthController::logout', ['as' => 'logout']);
 

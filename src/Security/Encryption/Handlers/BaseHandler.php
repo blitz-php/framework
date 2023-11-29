@@ -38,13 +38,13 @@ abstract class BaseHandler implements EncrypterInterface
         }
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function getKey(): string
-	{
-		return $this->key;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
 
     /**
      * Byte-safe substr()

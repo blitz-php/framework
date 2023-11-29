@@ -19,35 +19,35 @@ describe('Security / Encryption / Sodium', function () {
         $this->config         = (object) config('encryption');
         $this->config->driver = 'Sodium';
         $this->config->key    = sodium_crypto_secretbox_keygen();
-        $this->encryption     = new Encryption($this->config);        
+        $this->encryption     = new Encryption($this->config);
     });
 
     it(': Recuperation des proprietes', function () {
-        $this->config->key        = sodium_crypto_secretbox_keygen();
+        $this->config->key       = sodium_crypto_secretbox_keygen();
         $this->config->blockSize = 256;
-        $encrypter                = $this->encryption->initialize($this->config);
+        $encrypter               = $this->encryption->initialize($this->config);
 
         expect($this->config->key)->toBe($encrypter->key);
         expect($this->config->blockSize)->toBe($encrypter->blockSize);
         expect($encrypter->driver)->toBeNull();
     });
-    
-    it(": L'abscence de la clé lève une exception lors de l'initialisation", function() {
-        expect(function() {
+
+    it(": L'abscence de la clé lève une exception lors de l'initialisation", function () {
+        expect(function () {
             $this->config->key = '';
             $this->encryption->initialize($this->config);
         })->toThrow(new EncryptionException());
     });
 
-    it(": L'abscence de la clé lève une exception lors du chiffrement", function() {
-        expect(function() {
+    it(": L'abscence de la clé lève une exception lors du chiffrement", function () {
+        expect(function () {
             $encrypter = $this->encryption->initialize($this->config);
             $encrypter->encrypt('Un message à chiffrer', '');
         })->toThrow(new EncryptionException());
     });
 
-    it(": L'abscence de la clé lève une exception lors du déchiffrement", function() {
-        expect(function() {
+    it(": L'abscence de la clé lève une exception lors du déchiffrement", function () {
+        expect(function () {
             $encrypter  = $this->encryption->initialize($this->config);
             $ciphertext = $encrypter->encrypt('Un message à chiffrer');
             // Après le chiffrement, le message et la clé sont effacés du tampon
@@ -55,19 +55,19 @@ describe('Security / Encryption / Sodium', function () {
         })->toThrow(new EncryptionException());
     });
 
-    it(":Un blocksize invalide lève une exception lors du chiffrement", function() {
-        expect(function() {
+    it(':Un blocksize invalide lève une exception lors du chiffrement', function () {
+        expect(function () {
             $this->config->blockSize = -1;
 
-            $encrypter  = $this->encryption->initialize($this->config);
+            $encrypter = $this->encryption->initialize($this->config);
             $encrypter->encrypt('Un message à chiffrer');
         })->toThrow(new EncryptionException());
     });
 
-    xit(":Un blocksize invalide lève une exception lors du déchiffrement", function() {
-        expect(function() {
-            $key = $this->config->key;
-            $encrypter  = $this->encryption->initialize($this->config);
+    xit(':Un blocksize invalide lève une exception lors du déchiffrement', function () {
+        expect(function () {
+            $key       = $this->config->key;
+            $encrypter = $this->encryption->initialize($this->config);
 
             $ciphertext = $encrypter->encrypt('Un message.');
             // Après le chiffrement, le message et la clé sont effacés du tampon.
@@ -75,17 +75,17 @@ describe('Security / Encryption / Sodium', function () {
         })->toThrow(new EncryptionException());
     });
 
-    it(":Un texte tronqué lève une exception lors du déchiffrement", function() {
-        expect(function() {
-            $encrypter  = $this->encryption->initialize($this->config);
+    it(':Un texte tronqué lève une exception lors du déchiffrement', function () {
+        expect(function () {
+            $encrypter = $this->encryption->initialize($this->config);
 
             $ciphertext = $encrypter->encrypt('Un message à chiffrer');
             $truncated  = mb_substr($ciphertext, 0, 24, '8bit');
             $encrypter->decrypt($truncated, ['blockSize' => 256, 'key' => sodium_crypto_secretbox_keygen()]);
         })->toThrow(new EncryptionException());
     });
-    
-    it(": décryptage", function() {
+
+    it(': décryptage', function () {
         $key = sodium_crypto_secretbox_keygen();
         $msg = 'Un message en clair pour vous.';
 
