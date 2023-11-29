@@ -19,6 +19,11 @@ use BlitzPHP\Contracts\Security\EncrypterInterface;
 abstract class BaseHandler implements EncrypterInterface
 {
     /**
+     * Clé de démarrage
+     */
+    protected string $key = '';
+
+    /**
      * Constructeur
      */
     public function __construct(?object $config = null)
@@ -32,6 +37,14 @@ abstract class BaseHandler implements EncrypterInterface
             }
         }
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getKey(): string
+	{
+		return $this->key;
+	}
 
     /**
      * Byte-safe substr()

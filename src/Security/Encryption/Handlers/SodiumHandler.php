@@ -22,11 +22,6 @@ use BlitzPHP\Exceptions\EncryptionException;
 class SodiumHandler extends BaseHandler
 {
     /**
-     * Clé de démarrage
-     */
-    protected string $key = '';
-
-    /**
      * Taille du bloc pour le message de remplissage.
      */
     protected int $blockSize = 16;

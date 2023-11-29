@@ -43,11 +43,6 @@ class OpenSSLHandler extends BaseHandler
     protected string $cipher = 'AES-256-CTR';
 
     /**
-     * Clé de démarrage
-     */
-    protected string $key = '';
-
-    /**
      * Indique si le texte chiffré doit être brut. S'il est défini sur false, il sera codé en base64.
      */
     protected bool $rawData = true;
