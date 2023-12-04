@@ -20,10 +20,10 @@ use RuntimeException;
  */
 class NativeAdapter extends AbstractAdapter
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $ext = 'php';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $ext = 'php';
 
     /**
      * Fusionner les données enregistrées et les données utilisateur

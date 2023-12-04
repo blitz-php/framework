@@ -15,10 +15,10 @@ use Jenssegers\Blade\Blade;
 
 class BladeAdapter extends AbstractAdapter
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $ext = 'blade.php';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $ext = 'blade.php';
 
     /**
      * Instance Blade

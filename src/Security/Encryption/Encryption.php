@@ -103,13 +103,13 @@ class Encryption implements EncrypterInterface
         return $this->encrypter()->decrypt($data, $params);
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function getKey(): string
-	{
-		return $this->encrypter()->getKey();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function getKey(): string
+    {
+        return $this->encrypter()->getKey();
+    }
 
     /**
      * Initialiser ou réinitialiser un chiffreur

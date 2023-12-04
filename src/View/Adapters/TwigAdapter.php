@@ -18,10 +18,10 @@ use Twig\TwigFunction;
 
 class TwigAdapter extends AbstractAdapter
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $ext = 'twig';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $ext = 'twig';
 
     /**
      * Instance Twig

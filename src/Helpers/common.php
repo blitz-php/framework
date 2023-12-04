@@ -906,7 +906,7 @@ if (! function_exists('view_exist')) {
      */
     function view_exist(string $name, ?string $ext = null, array $options = []): bool
     {
-       return Services::viewer()->exist($name, $ext, $options);
+        return Services::viewer()->exist($name, $ext, $options);
     }
 }
 

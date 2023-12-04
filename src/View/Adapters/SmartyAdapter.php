@@ -15,10 +15,10 @@ use Smarty;
 
 class SmartyAdapter extends AbstractAdapter
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $ext = 'tpl';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $ext = 'tpl';
 
     /**
      * Instance Smarty

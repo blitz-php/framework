@@ -75,9 +75,9 @@ class View implements Stringable
         $this->setAdapter($this->config['active_adapter'] ?? 'native');
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     public function __toString(): string
     {
         return $this->get();
@@ -121,42 +121,42 @@ class View implements Stringable
         echo $this->get($compress);
     }
 
-	/**
-	 * Verifie qu'un fichier de vue existe
-	 */
-	public function exist(string $view, ?string $ext = null, array $options = []): bool
-	{
-		return $this->adapter->exist($view, $ext, $options);
-	}
+    /**
+     * Verifie qu'un fichier de vue existe
+     */
+    public function exist(string $view, ?string $ext = null, array $options = []): bool
+    {
+        return $this->adapter->exist($view, $ext, $options);
+    }
 
-	/**
-	 * Utilise le premier fichier de vue trouvé pour le rendu
-	 *
-	 * @param string[] $views
-	 */
-	public function first(array $views, array $data = [], array $options = []): static
-	{
-		foreach ($views as $view) {
-			if ($this->exist($view, null, $options)) {
-				return $this->make($view, $data, $options);
-			}
-		}
+    /**
+     * Utilise le premier fichier de vue trouvé pour le rendu
+     *
+     * @param string[] $views
+     */
+    public function first(array $views, array $data = [], array $options = []): static
+    {
+        foreach ($views as $view) {
+            if ($this->exist($view, null, $options)) {
+                return $this->make($view, $data, $options);
+            }
+        }
 
-		throw ViewException::invalidFile(implode(' OR ', $views));
-	}
+        throw ViewException::invalidFile(implode(' OR ', $views));
+    }
 
-	/**
-	 * Crée une instance de vue prêt à être utilisé
-	 */
-	public function make(string $view, array $data = [], array $options = []): static
-	{
-		return $this->addData($data)->setOptions($options)->display($view);
-	}
+    /**
+     * Crée une instance de vue prêt à être utilisé
+     */
+    public function make(string $view, array $data = [], array $options = []): static
+    {
+        return $this->addData($data)->setOptions($options)->display($view);
+    }
 
     /**
      * Modifier les options d'affichage
-	 *
-	 * {@internal}
+     *
+     * {@internal}
      */
     public function setOptions(?array $options = []): static
     {
@@ -167,8 +167,8 @@ class View implements Stringable
 
     /**
      * Définir la vue à afficher
-	 *
-	 * {@internal}
+     *
+     * {@internal}
      */
     public function display(string $view): static
     {
@@ -179,8 +179,8 @@ class View implements Stringable
 
     /**
      * Définit plusieurs éléments de données de vue à la fois.
-	 *
-	 * {@internal}
+     *
+     * {@internal}
      */
     public function addData(array $data = [], ?string $context = null): static
     {
@@ -294,18 +294,18 @@ class View implements Stringable
         return $this;
     }
 
-	/**
-	 * @deprecated 1.0 Please use layout method instead
-	 */
-	public function setLayout(string $layout): static
-	{
-		return $this->layout($layout);
-	}
+    /**
+     * @deprecated 1.0 Please use layout method instead
+     */
+    public function setLayout(string $layout): static
+    {
+        return $this->layout($layout);
+    }
 
     /**
      * Defini l'adapteur à utiliser
-	 *
-	 * {@internal}
+     *
+     * {@internal}
      */
     public function setAdapter(string $adapter, array $config = []): static
     {
@@ -337,9 +337,9 @@ class View implements Stringable
 
     /**
      * Renvoie les données de performances qui ont pu être collectées lors de l'exécution.
-	 * Utilisé principalement dans la barre d'outils de débogage.
-	 *
-	 * {@internal}
+     * Utilisé principalement dans la barre d'outils de débogage.
+     *
+     * {@internal}
      */
     public function getPerformanceData(): array
     {

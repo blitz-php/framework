@@ -16,10 +16,10 @@ use Latte\Loaders\FileLoader;
 
 class LatteAdapter extends AbstractAdapter
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $ext = 'latte';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $ext = 'latte';
 
     /**
      * Instance Latte

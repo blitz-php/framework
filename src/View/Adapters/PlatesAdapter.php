@@ -16,10 +16,10 @@ use League\Plates\Extension\Asset;
 
 class PlatesAdapter extends AbstractAdapter
 {
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $ext = 'tpl';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $ext = 'tpl';
 
     /**
      * Instance Plate

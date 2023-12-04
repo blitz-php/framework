@@ -40,10 +40,10 @@ abstract class AbstractAdapter implements RendererInterface
      */
     protected $viewPath = '';
 
-	/**
-	 * Extension des fichiers de vue
-	 */
-	protected string $ext = '';
+    /**
+     * Extension des fichiers de vue
+     */
+    protected string $ext = '';
 
     /**
      * Instance de Locator lorsque nous devons tenter de trouver une vue qui n'est pas à l'emplacement standard.
@@ -83,12 +83,12 @@ abstract class AbstractAdapter implements RendererInterface
             }
         }
 
-		if (empty($this->locator) && ! is_dir($this->viewPath)) {
-			$this->viewPath = '';
-			$this->locator  = Services::locator();
+        if (empty($this->locator) && ! is_dir($this->viewPath)) {
+            $this->viewPath = '';
+            $this->locator  = Services::locator();
         }
 
-		$this->ext = preg_replace('#^\.#', '', $config['extension'] ?? $this->ext);
+        $this->ext = preg_replace('#^\.#', '', $config['extension'] ?? $this->ext);
     }
 
     /**
@@ -237,18 +237,19 @@ abstract class AbstractAdapter implements RendererInterface
         return $this->setVar('meta', $meta);
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function exist(string $view, ?string $ext = null, array $options = []): bool
-	{
-		try {
-			$this->getRenderedFile($options, $view, $ext);
-			return true;
-		} catch (ViewException) {
-			return false;
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function exist(string $view, ?string $ext = null, array $options = []): bool
+    {
+        try {
+            $this->getRenderedFile($options, $view, $ext);
+
+            return true;
+        } catch (ViewException) {
+            return false;
+        }
+    }
 
     /**
      * Recupere le chemin absolue du fichier de vue a rendre
