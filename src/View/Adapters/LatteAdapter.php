@@ -16,6 +16,11 @@ use Latte\Loaders\FileLoader;
 
 class LatteAdapter extends AbstractAdapter
 {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected string $ext = 'latte';
+
     /**
      * Instance Latte
      *
@@ -42,7 +47,7 @@ class LatteAdapter extends AbstractAdapter
     {
         $view = str_replace([$this->viewPath, ' '], '', $view);
         if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
-            $view .= '.' . str_replace('.', '', $this->config['extension'] ?? 'latte');
+            $view .= '.' . $this->ext;
         }
 
         $this->renderVars['start'] = microtime(true);
@@ -50,7 +55,7 @@ class LatteAdapter extends AbstractAdapter
         $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
 
-        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], 'latte');
+        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], $this->ext);
 
         $output = $this->latte->renderToString($this->renderVars['view'], $this->data);
 

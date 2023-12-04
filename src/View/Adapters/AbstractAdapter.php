@@ -40,6 +40,11 @@ abstract class AbstractAdapter implements RendererInterface
      */
     protected $viewPath = '';
 
+	/**
+	 * Extension des fichiers de vue
+	 */
+	protected string $ext = '';
+
     /**
      * Instance de Locator lorsque nous devons tenter de trouver une vue qui n'est pas à l'emplacement standard.
      */
@@ -76,9 +81,14 @@ abstract class AbstractAdapter implements RendererInterface
             } elseif ($viewPathLocator instanceof LocatorInterface) {
                 $this->locator = $viewPathLocator;
             }
-        } else {
-            $this->locator = Services::locator();
         }
+
+		if (empty($this->locator) && ! is_dir($this->viewPath)) {
+			$this->viewPath = '';
+			$this->locator  = Services::locator();
+        }
+
+		$this->ext = preg_replace('#^\.#', '', $config['extension'] ?? $this->ext);
     }
 
     /**
@@ -230,7 +240,7 @@ abstract class AbstractAdapter implements RendererInterface
     /**
      * Recupere le chemin absolue du fichier de vue a rendre
      */
-    protected function getRenderedFile(?array $options, string $view, string $ext = 'php'): string
+    protected function getRenderedFile(?array $options, string $view, ?string $ext = null): string
     {
         $options = (array) $options;
 
@@ -244,7 +254,7 @@ abstract class AbstractAdapter implements RendererInterface
         $file = Helpers::ensureExt($file, $ext);
 
         if (! is_file($file) && $this->locator instanceof LocatorInterface) {
-            $file = $this->locator->locateFile($view, 'Views', empty($ext) ? 'php' : $ext);
+            $file = $this->locator->locateFile($view, 'Views', $ext ?: $this->ext);
         }
 
         $file = realpath($file);

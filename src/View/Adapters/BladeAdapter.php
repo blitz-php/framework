@@ -15,6 +15,11 @@ use Jenssegers\Blade\Blade;
 
 class BladeAdapter extends AbstractAdapter
 {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected string $ext = 'blade.php';
+
     /**
      * Instance Blade
      *
@@ -30,7 +35,7 @@ class BladeAdapter extends AbstractAdapter
         parent::__construct($config, $viewPathLocator, $debug);
 
         $this->engine = new Blade(
-            $this->viewPath,
+            $this->viewPath ?: VIEW_PATH,
             $this->config['cache_path'] ?? VIEW_CACHE_PATH . 'blade' . DIRECTORY_SEPARATOR . 'cache'
         );
 
@@ -49,7 +54,7 @@ class BladeAdapter extends AbstractAdapter
         $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
 
-        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], 'blade.php');
+        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], $this->ext);
 
         $output = $this->engine->render($this->renderVars['view'], $this->data);
 

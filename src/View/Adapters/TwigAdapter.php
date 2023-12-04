@@ -18,6 +18,11 @@ use Twig\TwigFunction;
 
 class TwigAdapter extends AbstractAdapter
 {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected string $ext = 'twig';
+
     /**
      * Instance Twig
      *
@@ -54,7 +59,7 @@ class TwigAdapter extends AbstractAdapter
     {
         $view = str_replace([$this->viewPath, ' '], '', $view);
         if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
-            $view .= '.' . str_replace('.', '', $this->config['extension'] ?? 'twig');
+            $view .= '.' . $this->ext;
         }
 
         $this->renderVars['start'] = microtime(true);
@@ -62,7 +67,7 @@ class TwigAdapter extends AbstractAdapter
         $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
 
-        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], 'twig');
+        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], $this->ext);
 
         $output = $this->engine->render($this->renderVars['view'], $this->data);
 

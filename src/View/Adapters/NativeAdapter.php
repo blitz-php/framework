@@ -12,6 +12,7 @@
 namespace BlitzPHP\View\Adapters;
 
 use BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector;
+use BlitzPHP\Utilities\Helpers;
 use RuntimeException;
 
 /**
@@ -19,6 +20,11 @@ use RuntimeException;
  */
 class NativeAdapter extends AbstractAdapter
 {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected string $ext = 'php';
+
     /**
      * Fusionner les données enregistrées et les données utilisateur
      */
@@ -94,7 +100,7 @@ class NativeAdapter extends AbstractAdapter
 
         // A-t-il été mis en cache ?
         if (isset($this->renderVars['options']['cache'])) {
-            $cacheName = $this->renderVars['options']['cache_name'] ?? str_replace('.php', '', $this->renderVars['view']);
+            $cacheName = $this->renderVars['options']['cache_name'] ?? str_replace('.' . $this->ext, '', $this->renderVars['view']);
             $cacheName = str_replace(['\\', '/'], '', $cacheName);
 
             $this->renderVars['cacheName'] = $cacheName;
@@ -106,7 +112,7 @@ class NativeAdapter extends AbstractAdapter
             }
         }
 
-        $this->renderVars['file'] = $this->getRenderedFile($this->renderVars['options'], $this->renderVars['view'], 'php');
+        $this->renderVars['file'] = $this->getRenderedFile($this->renderVars['options'], $this->renderVars['view'], $this->ext);
 
         // Rendre nos données de vue disponibles pour la vue.
         $this->prepareTemplateData($saveData);
@@ -381,7 +387,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function insert(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
     {
-        $view = preg_replace('#\.php$#i', '', $view) . '.php';
+        $view = Helpers::ensureExt($view, $this->ext);
         $view = str_replace(' ', '', $view);
 
         if ($view[0] !== '/') {
@@ -478,7 +484,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function insertIf(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
     {
-        $view = preg_replace('#\.php$#i', '', $view) . '.php';
+        $view = Helpers::ensureExt($view, $this->ext);
         $view = str_replace(' ', '', $view);
 
         if ($view[0] !== '/') {

@@ -15,6 +15,11 @@ use Smarty;
 
 class SmartyAdapter extends AbstractAdapter
 {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected string $ext = 'tpl';
+
     /**
      * Instance Smarty
      *
@@ -51,19 +56,18 @@ class SmartyAdapter extends AbstractAdapter
     {
         $view = str_replace([$this->viewPath, ' '], '', $view);
         if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
-            $view .= '.' . str_replace('.', '', $this->config['extension'] ?? 'tpl');
+            $view .= '.' . $this->ext;
         }
 
         $this->renderVars['start']   = microtime(true);
         $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
 
-        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], 'tpl');
+        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], $this->ext);
 
-        $layout = $this->layout;
-        if (! empty($layout)) {
+        if (! empty($layout = $this->layout)) {
             if (empty(pathinfo($layout, PATHINFO_EXTENSION))) {
-                $layout .= '.tpl';
+                $layout .= '.' . $this->ext;
             }
             $view = 'extends:[layouts]' . $layout . '|' . $view;
         }

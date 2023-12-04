@@ -16,6 +16,11 @@ use League\Plates\Extension\Asset;
 
 class PlatesAdapter extends AbstractAdapter
 {
+	/**
+	 * {@inheritDoc}
+	 */
+	protected string $ext = 'tpl';
+
     /**
      * Instance Plate
      *
@@ -24,21 +29,13 @@ class PlatesAdapter extends AbstractAdapter
     private $engine;
 
     /**
-     * Extension de fichier à utiliser
-     *
-     * @var string
-     */
-    private $extension;
-
-    /**
      * {@inheritDoc}
      */
     public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
     {
         parent::__construct($config, $viewPathLocator, $debug);
 
-        $this->extension = str_replace('.', '', $this->config['extension'] ?? 'tpl');
-        $this->engine    = new Engine(rtrim($this->viewPath, '/\\'), $this->extension);
+        $this->engine = new Engine(rtrim($this->viewPath, '/\\'), $this->ext);
 
         $this->configure();
     }
@@ -55,7 +52,7 @@ class PlatesAdapter extends AbstractAdapter
         $this->renderVars['view']    = $view;
         $this->renderVars['options'] = $options ?? [];
 
-        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], 'tpl');
+        $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], $this->ext);
 
         $output = $this->engine->render($this->renderVars['view'], $this->data);
 
