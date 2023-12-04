@@ -134,7 +134,7 @@ class View implements Stringable
 	 *
 	 * @param string[] $views
 	 */
-	public function first(array $views, array $data = [], array $options = []): self
+	public function first(array $views, array $data = [], array $options = []): static
 	{
 		foreach ($views as $view) {
 			if ($this->exist($view, null, $options)) {
@@ -148,15 +148,17 @@ class View implements Stringable
 	/**
 	 * Crée une instance de vue prêt à être utilisé
 	 */
-	public function make(string $view, array $data = [], array $options = []): self
+	public function make(string $view, array $data = [], array $options = []): static
 	{
 		return $this->addData($data)->setOptions($options)->display($view);
 	}
 
     /**
      * Modifier les options d'affichage
+	 *
+	 * {@internal}
      */
-    public function setOptions(?array $options = []): self
+    public function setOptions(?array $options = []): static
     {
         $this->options = (array) $options;
 
@@ -165,8 +167,10 @@ class View implements Stringable
 
     /**
      * Définir la vue à afficher
+	 *
+	 * {@internal}
      */
-    public function display(string $view): self
+    public function display(string $view): static
     {
         $this->view = $view;
 
@@ -175,8 +179,10 @@ class View implements Stringable
 
     /**
      * Définit plusieurs éléments de données de vue à la fois.
+	 *
+	 * {@internal}
      */
-    public function addData(array $data = [], ?string $context = null): self
+    public function addData(array $data = [], ?string $context = null): static
     {
         unset($data['errors']);
 
@@ -194,7 +200,7 @@ class View implements Stringable
     /**
      * Définit plusieurs éléments de données de vue à la fois.
      */
-    public function with(array|string $key, mixed $value = null, ?string $context = null): self
+    public function with(array|string $key, mixed $value = null, ?string $context = null): static
     {
         if (is_array($key)) {
             $context = $value;
@@ -235,7 +241,7 @@ class View implements Stringable
      *
      * @param mixed|null $value
      */
-    public function setVar(string $name, $value = null, ?string $context = null): self
+    public function setVar(string $name, $value = null, ?string $context = null): static
     {
         $this->adapter->setVar($name, $value, $context);
 
@@ -245,7 +251,7 @@ class View implements Stringable
     /**
      * Remplacer toutes les données de vue par de nouvelles données
      */
-    public function setData(array $data, ?string $context = null): self
+    public function setData(array $data, ?string $context = null): static
     {
         unset($data['errors']);
 
@@ -271,7 +277,7 @@ class View implements Stringable
     /**
      * Supprime toutes les données de vue du système.
      */
-    public function resetData(): self
+    public function resetData(): static
     {
         $this->adapter->resetData();
 
@@ -281,17 +287,27 @@ class View implements Stringable
     /**
      * Definit le layout a utiliser par les vues
      */
-    public function setLayout(string $layout): self
+    public function layout(string $layout): static
     {
         $this->adapter->setLayout($layout);
 
         return $this;
     }
 
+	/**
+	 * @deprecated 1.0 Please use layout method instead
+	 */
+	public function setLayout(string $layout): static
+	{
+		return $this->layout($layout);
+	}
+
     /**
      * Defini l'adapteur à utiliser
+	 *
+	 * {@internal}
      */
-    public function setAdapter(string $adapter, array $config = []): self
+    public function setAdapter(string $adapter, array $config = []): static
     {
         if (! array_key_exists($adapter, self::$validAdapters)) {
             $adapter = 'native';
@@ -320,8 +336,10 @@ class View implements Stringable
     }
 
     /**
-     * Renvoie les données de performances qui ont pu être collectées
-     * lors de l'exécution. Utilisé principalement dans la barre d'outils de débogage.
+     * Renvoie les données de performances qui ont pu être collectées lors de l'exécution.
+	 * Utilisé principalement dans la barre d'outils de débogage.
+	 *
+	 * {@internal}
      */
     public function getPerformanceData(): array
     {
