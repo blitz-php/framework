@@ -129,6 +129,30 @@ class View implements Stringable
 		return $this->adapter->exist($view, $ext, $options);
 	}
 
+	/**
+	 * Utilise le premier fichier de vue trouvé pour le rendu
+	 *
+	 * @param string[] $views
+	 */
+	public function first(array $views, array $data = [], array $options = []): self
+	{
+		foreach ($views as $view) {
+			if ($this->exist($view, null, $options)) {
+				return $this->make($view, $data, $options);
+			}
+		}
+
+		throw ViewException::invalidFile(implode(' OR ', $views));
+	}
+
+	/**
+	 * Crée une instance de vue prêt à être utilisé
+	 */
+	public function make(string $view, array $data = [], array $options = []): self
+	{
+		return $this->addData($data)->setOptions($options)->display($view);
+	}
+
     /**
      * Modifier les options d'affichage
      */

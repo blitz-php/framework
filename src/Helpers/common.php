@@ -916,13 +916,9 @@ if (! function_exists('view')) {
      *
      * @return \BlitzPHP\View\View
      */
-    function view(string $view, ?array $data = [], ?array $options = [])
+    function view(string $view, array $data = [], array $options = [])
     {
-        $object = Services::viewer(false);
-
-        $object->addData($data)->setOptions($options);
-
-        return $object->display($view);
+        return Services::viewer()->make($view, $data, $options);
     }
 }
 
