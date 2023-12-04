@@ -22,15 +22,14 @@ use BlitzPHP\View\Adapters\PlatesAdapter;
 use BlitzPHP\View\Adapters\SmartyAdapter;
 use BlitzPHP\View\Adapters\TwigAdapter;
 use Closure;
+use Stringable;
 
-class View
+class View implements Stringable
 {
     /**
      * Views configuration
-     *
-     * @var array
      */
-    protected $config;
+    protected array $config = [];
 
     /**
      * @var RendererInterface
@@ -39,10 +38,8 @@ class View
 
     /**
      * Liste des adapters pris en comptes
-     *
-     * @var array
      */
-    public static $validAdapters = [
+    public static array $validAdapters = [
         'native' => NativeAdapter::class,
         'blade'  => BladeAdapter::class,
         'latte'  => LatteAdapter::class,
@@ -53,10 +50,8 @@ class View
 
     /**
      * Options de la vue
-     *
-     * @var array
      */
-    private $options = [];
+    private array $options = [];
 
     /**
      * La vue à rendre
@@ -67,10 +62,8 @@ class View
 
     /**
      * Données partagées à toutes les vues
-     *
-     * @var array
      */
-    private static $shared = [];
+    private static array $shared = [];
 
     /**
      * Constructeur
@@ -82,7 +75,10 @@ class View
         $this->setAdapter($this->config['active_adapter'] ?? 'native');
     }
 
-    public function __toString()
+	/**
+	 * {@inheritDoc}
+	 */
+    public function __toString(): string
     {
         return $this->get();
     }
