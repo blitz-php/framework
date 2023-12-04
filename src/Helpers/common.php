@@ -904,13 +904,9 @@ if (! function_exists('view_exist')) {
     /**
      * Verifie si un fichier de vue existe. Utile pour limiter les failles include
      */
-    function view_exist(string $name, string $ext = '.php'): bool
+    function view_exist(string $name, ?string $ext = null, array $options = []): bool
     {
-        $ext  = str_replace('.', '', $ext);
-        $name = str_replace(VIEW_PATH, '', $name);
-        $name = preg_match('#\.' . $ext . '$#', $name) ? $name : $name . '.' . $ext;
-
-        return is_file(VIEW_PATH . rtrim($name, DS));
+       return Services::viewer()->exist($name, $ext, $options);
     }
 }
 

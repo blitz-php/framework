@@ -121,6 +121,14 @@ class View implements Stringable
         echo $this->get($compress);
     }
 
+	/**
+	 * Verifie qu'un fichier de vue existe
+	 */
+	public function exist(string $view, ?string $ext = null, array $options = []): bool
+	{
+		return $this->adapter->exist($view, $ext, $options);
+	}
+
     /**
      * Modifier les options d'affichage
      */

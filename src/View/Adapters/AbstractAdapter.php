@@ -237,6 +237,19 @@ abstract class AbstractAdapter implements RendererInterface
         return $this->setVar('meta', $meta);
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public function exist(string $view, ?string $ext = null, array $options = []): bool
+	{
+		try {
+			$this->getRenderedFile($options, $view, $ext);
+			return true;
+		} catch (ViewException) {
+			return false;
+		}
+	}
+
     /**
      * Recupere le chemin absolue du fichier de vue a rendre
      */
