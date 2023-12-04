@@ -124,9 +124,9 @@ class View implements Stringable
     /**
      * Verifie qu'un fichier de vue existe
      */
-    public function exist(string $view, ?string $ext = null, array $options = []): bool
+    public function exists(string $view, ?string $ext = null, array $options = []): bool
     {
-        return $this->adapter->exist($view, $ext, $options);
+        return $this->adapter->exists($view, $ext, $options);
     }
 
     /**
@@ -137,7 +137,7 @@ class View implements Stringable
     public function first(array $views, array $data = [], array $options = []): static
     {
         foreach ($views as $view) {
-            if ($this->exist($view, null, $options)) {
+            if ($this->exists($view, null, $options)) {
                 return $this->make($view, $data, $options);
             }
         }

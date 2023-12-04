@@ -240,7 +240,7 @@ abstract class AbstractAdapter implements RendererInterface
     /**
      * {@inheritDoc}
      */
-    public function exist(string $view, ?string $ext = null, array $options = []): bool
+    public function exists(string $view, ?string $ext = null, array $options = []): bool
     {
         try {
             $this->getRenderedFile($options, $view, $ext);

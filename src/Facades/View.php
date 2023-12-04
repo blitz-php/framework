@@ -14,7 +14,7 @@ namespace BlitzPHP\Facades;
 use BlitzPHP\Container\Services;
 
 /**
- * @method static bool                exist(string $view, ?string $ext = null, array $options = [])         Verifie qu'un fichier de vue existe
+ * @method static bool                exists(string $view, ?string $ext = null, array $options = [])         Verifie qu'un fichier de vue existe
  * @method static \BlitzPHP\View\View first(string $view, array $data = [], array $options = [])            Utilise le premier fichier de vue trouvé pour le rendu
  * @method static string              get(bool|string $compress = 'auto')                                   Recupere et retourne le code html de la vue créée
  * @method static \BlitzPHP\View\View layout(string $layout)                                                Definit le layout a utiliser par les vues

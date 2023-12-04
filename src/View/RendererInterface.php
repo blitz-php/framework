@@ -62,7 +62,7 @@ interface RendererInterface
     /**
      * Verifie qu'un fichier de vue existe
      */
-    public function exist(string $view, ?string $ext = null, array $options = []): bool;
+    public function exists(string $view, ?string $ext = null, array $options = []): bool;
 
     /**
      * Définit plusieurs éléments de données de vue à la fois.
