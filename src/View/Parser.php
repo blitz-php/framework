@@ -23,17 +23,13 @@ class Parser extends NativeAdapter
 {
     /**
      * Left delimiter character for pseudo vars
-     *
-     * @var string
      */
-    public $leftDelimiter = '{';
+    public string $leftDelimiter = '{';
 
     /**
      * Right delimiter character for pseudo vars
-     *
-     * @var string
      */
-    public $rightDelimiter = '}';
+    public string $rightDelimiter = '}';
 
     /**
      * Left delimiter characters for conditionals
@@ -47,25 +43,32 @@ class Parser extends NativeAdapter
 
     /**
      * Stores extracted noparse blocks.
-     *
-     * @var array
      */
-    protected $noparseBlocks = [];
+    protected array $noparseBlocks = [];
 
     /**
      * Stores any plugins registered at run-time.
      *
-     * @var array
+     * @var array<string, array<string>|callable|string>
      */
-    protected $plugins = [];
+    protected array $plugins = [];
 
     /**
      * Stores the context for each data element
      * when set by `setData` so the context is respected.
-     *
-     * @var array
      */
-    protected $dataContexts = [];
+    protected array $dataContexts = [];
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
+    {
+		// Ensure user plugins override core plugins.
+		$this->plugins = $config['plugins'] ?? [];
+
+        parent::__construct($config, $viewPathLocator, $debug);
+    }
 
     /**
      * Parse a template
@@ -77,7 +80,7 @@ class Parser extends NativeAdapter
     {
         $start = microtime(true);
         if ($saveData === null) {
-            // $saveData = $this->config->saveData;
+            $saveData = $this->saveData;
         }
 
         $fileExt = pathinfo($view, PATHINFO_EXTENSION);
@@ -96,7 +99,7 @@ class Parser extends NativeAdapter
 
         if (! is_file($file)) {
             $fileOrig = $file;
-            $file     = Services::locator()->locateFile($view, 'Views');
+            $file     = ($this->locator ?: Services::locator())->locateFile($view, 'Views');
 
             // locateFile will return an empty string if the file cannot be found.
             if (empty($file)) {
@@ -115,6 +118,8 @@ class Parser extends NativeAdapter
         if ($saveData) {
             $this->data = $this->tempData;
         }
+
+        $output = $this->decorate($output);
 
         // Should we cache?
         if (isset($options['cache'])) {
@@ -135,7 +140,7 @@ class Parser extends NativeAdapter
     {
         $start = microtime(true);
         if ($saveData === null) {
-            // $saveData = $this->config->saveData;
+            $saveData = $this->saveData;
         }
 
         if ($this->tempData === null) {
@@ -161,10 +166,10 @@ class Parser extends NativeAdapter
      * so that the variable is correctly handled within the
      * parsing itself, and contexts (including raw) are respected.
      *
-     * @param string $context The context to escape it for: html, css, js, url, raw
-     *                        If 'raw', no escaping will happen
+     * @param string|null $context The context to escape it for: html, css, js, url, raw
+     *                             If 'raw', no escaping will happen
      */
-    public function setData(array $data = [], ?string $context = null): self
+    public function setData(array $data = [], ?string $context = null): static
     {
         if (! empty($context)) {
             foreach ($data as $key => &$value) {
@@ -239,7 +244,9 @@ class Parser extends NativeAdapter
      */
     protected function parseSingle(string $key, string $val): array
     {
-        $pattern = '#' . $this->leftDelimiter . '!?\s*' . preg_quote($key, '#') . '(?(?=\s*\|\s*)(\s*\|*\s*([|\w<>=\(\),:.\-\s\+\\\\/]+)*\s*))(\s*)!?' . $this->rightDelimiter . '#ms';
+        $pattern = '#' . $this->leftDelimiter . '!?\s*' . preg_quote($key, '#')
+            . '(?(?=\s*\|\s*)(\s*\|*\s*([|\w<>=\(\),:.\-\s\+\\\\/]+)*\s*))(\s*)!?'
+            . $this->rightDelimiter . '#ums';
 
         return [$pattern => $val];
     }
@@ -259,7 +266,7 @@ class Parser extends NativeAdapter
         // have something to loop over.
         preg_match_all(
             '#' . $this->leftDelimiter . '\s*' . preg_quote($variable, '#') . '\s*' . $this->rightDelimiter . '(.+?)' .
-            $this->leftDelimiter . '\s*/' . preg_quote($variable, '#') . '\s*' . $this->rightDelimiter . '#s',
+            $this->leftDelimiter . '\s*/' . preg_quote($variable, '#') . '\s*' . $this->rightDelimiter . '#us',
             $template,
             $matches,
             PREG_SET_ORDER
@@ -311,7 +318,7 @@ class Parser extends NativeAdapter
                         $val = 'Resource';
                     }
 
-                    $temp['#' . $this->leftDelimiter . '!?\s*' . preg_quote($key, '#') . '(?(?=\s*\|\s*)(\s*\|*\s*([|\w<>=\(\),:.\-\s\+\\\\/]+)*\s*))(\s*)!?' . $this->rightDelimiter . '#s'] = $val;
+                    $temp['#' . $this->leftDelimiter . '!?\s*' . preg_quote($key, '#') . '(?(?=\s*\|\s*)(\s*\|*\s*([|\w<>=\(\),:.\-\s\+\\\\/]+)*\s*))(\s*)!?' . $this->rightDelimiter . '#us'] = $val;
                 }
 
                 // Now replace our placeholders with the new content.
@@ -324,7 +331,7 @@ class Parser extends NativeAdapter
 
             $escapedMatch = preg_quote($match[0], '#');
 
-            $replace['#' . $escapedMatch . '#s'] = $str;
+            $replace['#' . $escapedMatch . '#us'] = $str;
         }
 
         return $replace;
@@ -337,7 +344,7 @@ class Parser extends NativeAdapter
      */
     protected function parseComments(string $template): string
     {
-        return preg_replace('/\{#.*?#\}/s', '', $template);
+        return preg_replace('/\{#.*?#\}/us', '', $template);
     }
 
     /**
@@ -346,7 +353,7 @@ class Parser extends NativeAdapter
      */
     protected function extractNoparse(string $template): string
     {
-        $pattern = '/\{\s*noparse\s*\}(.*?)\{\s*\/noparse\s*\}/ms';
+        $pattern = '/\{\s*noparse\s*\}(.*?)\{\s*\/noparse\s*\}/ums';
 
         /*
          * $matches[][0] is the raw match
@@ -395,7 +402,7 @@ class Parser extends NativeAdapter
             . $leftDelimiter
             . '\s*(if|elseif)\s*((?:\()?(.*?)(?:\))?)\s*'
             . $rightDelimiter
-            . '/ms';
+            . '/ums';
 
         /*
          * For each match:
@@ -415,12 +422,12 @@ class Parser extends NativeAdapter
         }
 
         $template = preg_replace(
-            '/' . $leftDelimiter . '\s*else\s*' . $rightDelimiter . '/ms',
+            '/' . $leftDelimiter . '\s*else\s*' . $rightDelimiter . '/ums',
             '<?php else: ?>',
             $template
         );
         $template = preg_replace(
-            '/' . $leftDelimiter . '\s*endif\s*' . $rightDelimiter . '/ms',
+            '/' . $leftDelimiter . '\s*endif\s*' . $rightDelimiter . '/ums',
             '<?php endif; ?>',
             $template
         );
@@ -451,7 +458,7 @@ class Parser extends NativeAdapter
      * @param string $leftDelimiter
      * @param string $rightDelimiter
      */
-    public function setDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): self
+    public function setDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): RendererInterface
     {
         $this->leftDelimiter  = $leftDelimiter;
         $this->rightDelimiter = $rightDelimiter;
@@ -465,7 +472,7 @@ class Parser extends NativeAdapter
      * @param string $leftDelimiter
      * @param string $rightDelimiter
      */
-    public function setConditionalDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): self
+    public function setConditionalDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): RendererInterface
     {
         $this->leftConditionalDelimiter  = $leftDelimiter;
         $this->rightConditionalDelimiter = $rightDelimiter;
@@ -477,9 +484,9 @@ class Parser extends NativeAdapter
      * Handles replacing a pseudo-variable with the actual content. Will double-check
      * for escaping brackets.
      *
-     * @param mixed  $pattern
-     * @param string $content
-     * @param string $template
+     * @param array|string $pattern
+     * @param string       $content
+     * @param string       $template
      */
     protected function replaceSingle($pattern, $content, $template, bool $escape = false): string
     {
@@ -488,7 +495,10 @@ class Parser extends NativeAdapter
         // Replace the content in the template
         return preg_replace_callback($pattern, function ($matches) use ($content, $escape) {
             // Check for {! !} syntax to not escape this one.
-            if (str_starts_with($matches[0], '{!') && substr($matches[0], -2) === '!}') {
+            if (
+                strpos($matches[0], $this->leftDelimiter . '!') === 0
+                && substr($matches[0], -1 - strlen($this->rightDelimiter)) === '!' . $this->rightDelimiter
+            ) {
                 $escape = false;
             }
 
@@ -541,7 +551,7 @@ class Parser extends NativeAdapter
             $escape = false;
         }
         // If no `esc` filter is found, then we'll need to add one.
-        elseif (! preg_match('/\s+esc/', $key)) {
+        elseif (! preg_match('/\s+esc/u', $key)) {
             $escape = 'html';
         }
 
@@ -557,7 +567,7 @@ class Parser extends NativeAdapter
         // Determine the requested filters
         foreach ($filters as $filter) {
             // Grab any parameter we might need to send
-            preg_match('/\([\w<>=\/\\\,:.\-\s\+]+\)/', $filter, $param);
+            preg_match('/\([\w<>=\/\\\,:.\-\s\+]+\)/u', $filter, $param);
 
             // Remove the () and spaces to we have just the parameter left
             $param = ! empty($param) ? trim($param[0], '() ') : null;
@@ -586,7 +596,7 @@ class Parser extends NativeAdapter
             $replace = $this->config['filters'][$filter]($replace, ...$param);
         }
 
-        return $replace;
+        return (string) $replace;
     }
 
     // Plugins
@@ -606,8 +616,8 @@ class Parser extends NativeAdapter
 
             // See https://regex101.com/r/BCBBKB/1
             $pattern = $isPair
-                ? '#\{\+\s*' . $plugin . '([\w=\-_:\+\s\(\)/"@.]*)?\s*\+\}(.+?)\{\+\s*/' . $plugin . '\s*\+\}#ims'
-                : '#\{\+\s*' . $plugin . '([\w=\-_:\+\s\(\)/"@.]*)?\s*\+\}#ims';
+                ? '#\{\+\s*' . $plugin . '([\w=\-_:\+\s\(\)/"@.]*)?\s*\+\}(.+?)\{\+\s*/' . $plugin . '\s*\+\}#uims'
+                : '#\{\+\s*' . $plugin . '([\w=\-_:\+\s\(\)/"@.]*)?\s*\+\}#uims';
 
             /**
              * Match tag pairs
@@ -624,7 +634,7 @@ class Parser extends NativeAdapter
             foreach ($matches as $match) {
                 $params = [];
 
-                preg_match_all('/([\w-]+=\"[^"]+\")|([\w-]+=[^\"\s=]+)|(\"[^"]+\")|(\S+)/', trim($match[1]), $matchesParams);
+                preg_match_all('/([\w-]+=\"[^"]+\")|([\w-]+=[^\"\s=]+)|(\"[^"]+\")|(\S+)/u', trim($match[1]), $matchesParams);
 
                 foreach ($matchesParams[0] as $item) {
                     $keyVal = explode('=', $item);
@@ -673,9 +683,9 @@ class Parser extends NativeAdapter
      * Converts an object to an array, respecting any
      * toArray() methods on an object.
      *
-     * @param mixed $value
+     * @param array|bool|float|int|object|string|null $value
      *
-     * @return mixed
+     * @return array|bool|float|int|string|null
      */
     protected function objectToArray($value)
     {
