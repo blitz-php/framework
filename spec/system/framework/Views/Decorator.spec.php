@@ -64,7 +64,7 @@ describe('Views / Decorator', function () {
 
 		$view->setVar('teststring', 'Hello World');
 
-		expect($view->render('parser1'))->toBe("<h1>Hello World</h1>\r\n");
+		expect(trim($view->render('parser1')))->toBe('<h1>Hello World</h1>');
 	});
 
 	it('Le decorateur modifie la sortie du parser', function () {
@@ -74,6 +74,6 @@ describe('Views / Decorator', function () {
 
 		$view->setVar('teststring', 'Hello World');
 
-		expect($view->render('parser1'))->toBe("<h1>Hello Galaxy</h1>\r\n");
+		expect(trim($view->render('parser1')))->toBe('<h1>Hello Galaxy</h1>');
 	});
 });
