@@ -108,8 +108,8 @@ class Config
      */
     public function set(string $key, $value)
     {
-		$path = explode('.', $key);
-		$this->load($path[0]);
+        $path = explode('.', $key);
+        $this->load($path[0]);
 
         $this->configurator->set($key, $value);
     }

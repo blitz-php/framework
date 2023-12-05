@@ -104,7 +104,7 @@ class View implements Stringable
     /**
      * Recupere et retourne le code html de la vue créée
      */
-    public function get(bool|string $compress = 'auto', bool $saveData = null): string
+    public function get(bool|string $compress = 'auto', ?bool $saveData = null): string
     {
         $output = $this->adapter->render($this->view, $this->options, $saveData);
 
@@ -114,20 +114,20 @@ class View implements Stringable
     /**
      * Affiche la vue generee au navigateur
      */
-    public function render(bool $saveData = null): void
+    public function render(?bool $saveData = null): void
     {
         $compress = $this->config['compress_output'] ?? 'auto';
 
         echo $this->get($compress, $saveData);
     }
 
-	/**
-	 * Construit la sortie en fonction d'une chaîne et de tout données déjà définies.
-	 */
-	public function renderString(string $view, ?array $options = null, bool $saveData = false): string
-	{
-		return $this->adapter->renderString($view, $options, $saveData);
-	}
+    /**
+     * Construit la sortie en fonction d'une chaîne et de tout données déjà définies.
+     */
+    public function renderString(string $view, ?array $options = null, bool $saveData = false): string
+    {
+        return $this->adapter->renderString($view, $options, $saveData);
+    }
 
     /**
      * Verifie qu'un fichier de vue existe
@@ -171,22 +171,22 @@ class View implements Stringable
         return $this->options($options ?: []);
     }
 
-	/**
+    /**
      * Modifier les options d'affichage
      *
      * {@internal}
      */
-	public function options(array $options = []): static
-	{
-		if (isset($options['layout'])) {
-			$this->layout($options['layout']);
-			unset($options['layout']);
-		}
+    public function options(array $options = []): static
+    {
+        if (isset($options['layout'])) {
+            $this->layout($options['layout']);
+            unset($options['layout']);
+        }
 
-		$this->options = $options;
+        $this->options = $options;
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Définir la vue à afficher
@@ -197,9 +197,9 @@ class View implements Stringable
     {
         $this->view = $view;
 
-		if ($options !== null) {
-			$this->options($options);
-		}
+        if ($options !== null) {
+            $this->options($options);
+        }
 
         return $this;
     }
@@ -215,7 +215,7 @@ class View implements Stringable
 
         $data = array_merge(self::$shared, $data);
 
-		if (! on_test() && ! isset($data['errors'])) {
+        if (! on_test() && ! isset($data['errors'])) {
             $data['errors'] = $this->setValidationErrors();
         }
 
@@ -282,13 +282,13 @@ class View implements Stringable
     {
         unset($data['errors']);
 
-		$data = array_merge(self::$shared, $data);
+        $data = array_merge(self::$shared, $data);
 
-		if (! on_test() && ! isset($data['errors'])) {
+        if (! on_test() && ! isset($data['errors'])) {
             $data['errors'] = $this->setValidationErrors();
-		}
+        }
 
-		$this->adapter->setData($data, $context);
+        $this->adapter->setData($data, $context);
 
         return $this;
     }
@@ -300,11 +300,11 @@ class View implements Stringable
     {
         $data = $this->adapter->getData();
 
-		if (on_test() && isset($data['errors'])) {
-			unset($data['errors']);
-		}
+        if (on_test() && isset($data['errors'])) {
+            unset($data['errors']);
+        }
 
-		return $data;
+        return $data;
     }
 
     /**

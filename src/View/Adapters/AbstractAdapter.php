@@ -20,7 +20,7 @@ use BlitzPHP\View\ViewDecoratorTrait;
 
 abstract class AbstractAdapter implements RendererInterface
 {
-	use ViewDecoratorTrait;
+    use ViewDecoratorTrait;
 
     /**
      * Données mises à la disposition des vues.
@@ -258,7 +258,7 @@ abstract class AbstractAdapter implements RendererInterface
     protected function getRenderedFile(?array $options, string $view, ?string $ext = null): string
     {
         $options = (array) $options;
-		$ext   ??= $this->ext;
+        $ext ??= $this->ext;
 
         $viewPath = $options['viewPath'] ?? $this->viewPath;
         if (! empty($viewPath)) {

@@ -153,7 +153,7 @@ class NativeAdapter extends AbstractAdapter
             }
         }
 
-		$output = $this->decorate($output);
+        $output = $this->decorate($output);
 
         // Faut-il mettre en cache ?
         if (isset($this->renderVars['options']['cache'])) {

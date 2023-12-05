@@ -64,8 +64,8 @@ class Parser extends NativeAdapter
      */
     public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
     {
-		// Ensure user plugins override core plugins.
-		$this->plugins = $config['plugins'] ?? [];
+        // Ensure user plugins override core plugins.
+        $this->plugins = $config['plugins'] ?? [];
 
         parent::__construct($config, $viewPathLocator, $debug);
     }
@@ -496,7 +496,7 @@ class Parser extends NativeAdapter
         return preg_replace_callback($pattern, function ($matches) use ($content, $escape) {
             // Check for {! !} syntax to not escape this one.
             if (
-                strpos($matches[0], $this->leftDelimiter . '!') === 0
+                str_starts_with($matches[0], $this->leftDelimiter . '!')
                 && substr($matches[0], -1 - strlen($this->rightDelimiter)) === '!' . $this->rightDelimiter
             ) {
                 $escape = false;
