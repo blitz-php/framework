@@ -73,7 +73,7 @@ class TwigAdapter extends AbstractAdapter
 
         $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
 
-        return $output;
+        return $this->decorate($output);
     }
 
     /**

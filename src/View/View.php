@@ -106,7 +106,6 @@ class View implements Stringable
     public function get($compress = 'auto'): string
     {
         $output = $this->adapter->render($this->view, $this->options);
-        $output = $this->decorate($output);
 
         return $this->compressView($output, $compress);
     }
@@ -363,22 +362,6 @@ class View implements Stringable
         }
 
         return true === $compress ? trim(preg_replace('/\s+/', ' ', $output)) : $output;
-    }
-
-    /**
-     * Exécute la sortie générée via tous les décorateurs de vue déclarés.
-     */
-    protected function decorate(string $output): string
-    {
-        foreach ($this->config['decorators'] as $decorator) {
-            if (! is_subclass_of($decorator, ViewDecoratorInterface::class)) {
-                throw ViewException::invalidDecorator($decorator);
-            }
-
-            $output = $decorator::decorate($output);
-        }
-
-        return $output;
     }
 
     /**

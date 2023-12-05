@@ -16,9 +16,12 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\RendererInterface;
+use BlitzPHP\View\ViewDecoratorTrait;
 
 abstract class AbstractAdapter implements RendererInterface
 {
+	use ViewDecoratorTrait;
+
     /**
      * Données mises à la disposition des vues.
      *

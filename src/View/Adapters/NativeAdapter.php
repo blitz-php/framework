@@ -153,6 +153,8 @@ class NativeAdapter extends AbstractAdapter
             }
         }
 
+		$output = $this->decorate($output);
+
         // Faut-il mettre en cache ?
         if (isset($this->renderVars['options']['cache'])) {
             cache()->write($this->renderVars['cacheName'], $output, (int) $this->renderVars['options']['cache']);
@@ -247,6 +249,17 @@ class NativeAdapter extends AbstractAdapter
     public function getData(): array
     {
         return $this->tempData ?? $this->data;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resetData(): self
+    {
+        $this->data     = [];
+        $this->tempData = [];
+
+        return $this;
     }
 
     /**
