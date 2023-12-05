@@ -42,8 +42,7 @@
         "blitz-php/coding-standard": "^1.3",
         "filp/whoops": "^2.15",
         "kahlan/kahlan": "^5.2",
-        "phpstan/phpstan": "^1.10.2",
-        "scrutinizer/ocular": "^1.8.1"
+        "phpstan/phpstan": "^1.10.2"
     },
     "autoload": {
         "psr-4": {
@@ -51,10 +50,10 @@
         }
     },
     "autoload-dev": {
-        "psr-4": {
-            "Spec\\BlitzPHP\\System\\": "spec/system/",
-            "Spec\\BlitzPHP\\App\\": "spec/application/app/",
-            "Spec\\BlitzPHP\\": "spec/application/"
+		"psr-4": {
+			"Spec\\BlitzPHP\\": "spec/support/application/",
+            "Spec\\BlitzPHP\\App\\": "spec/support/application/app/",
+            "Spec\\BlitzPHP\\System\\": "spec/system/"
         }
     },
     "scripts": {
