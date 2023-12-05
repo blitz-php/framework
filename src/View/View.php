@@ -91,6 +91,9 @@ class View implements Stringable
         if ($key instanceof Closure) {
             $key = Services::container()->call($key);
         }
+        if ($value instanceof Closure) {
+            $value = Services::container()->call($value);
+        }
         if (is_string($key)) {
             $key = [$key => $value];
         }
@@ -100,12 +103,10 @@ class View implements Stringable
 
     /**
      * Recupere et retourne le code html de la vue créée
-     *
-     * @param bool|string $compress
      */
-    public function get($compress = 'auto'): string
+    public function get(bool|string $compress = 'auto', bool $saveData = null): string
     {
-        $output = $this->adapter->render($this->view, $this->options);
+        $output = $this->adapter->render($this->view, $this->options, $saveData);
 
         return $this->compressView($output, $compress);
     }
@@ -113,12 +114,20 @@ class View implements Stringable
     /**
      * Affiche la vue generee au navigateur
      */
-    public function render(): void
+    public function render(bool $saveData = null): void
     {
         $compress = $this->config['compress_output'] ?? 'auto';
 
-        echo $this->get($compress);
+        echo $this->get($compress, $saveData);
     }
+
+	/**
+	 * Construit la sortie en fonction d'une chaîne et de tout données déjà définies.
+	 */
+	public function renderString(string $view, ?array $options = null, bool $saveData = false): string
+	{
+		return $this->adapter->renderString($view, $options, $saveData);
+	}
 
     /**
      * Verifie qu'un fichier de vue existe
@@ -149,29 +158,48 @@ class View implements Stringable
      */
     public function make(string $view, array $data = [], array $options = []): static
     {
-        return $this->addData($data)->setOptions($options)->display($view);
+        return $this->addData($data)->options($options)->display($view);
     }
 
     /**
      * Modifier les options d'affichage
      *
-     * {@internal}
+     * {@deprecated since 1.0 use options() instead}
      */
     public function setOptions(?array $options = []): static
     {
-        $this->options = (array) $options;
-
-        return $this;
+        return $this->options($options ?: []);
     }
+
+	/**
+     * Modifier les options d'affichage
+     *
+     * {@internal}
+     */
+	public function options(array $options = []): static
+	{
+		if (isset($options['layout'])) {
+			$this->layout($options['layout']);
+			unset($options['layout']);
+		}
+
+		$this->options = $options;
+
+		return $this;
+	}
 
     /**
      * Définir la vue à afficher
      *
      * {@internal}
      */
-    public function display(string $view): static
+    public function display(string $view, ?array $options = null): static
     {
         $this->view = $view;
+
+		if ($options !== null) {
+			$this->options($options);
+		}
 
         return $this;
     }
@@ -187,11 +215,11 @@ class View implements Stringable
 
         $data = array_merge(self::$shared, $data);
 
-        $this->adapter->addData($data, $context);
-
-        if (! array_key_exists('errors', $this->getData())) {
-            $this->setValidationErrors();
+		if (! on_test() && ! isset($data['errors'])) {
+            $data['errors'] = $this->setValidationErrors();
         }
+
+        $this->adapter->addData($data, $context);
 
         return $this;
     }
@@ -254,23 +282,29 @@ class View implements Stringable
     {
         unset($data['errors']);
 
-        $data = array_merge(self::$shared, $data);
+		$data = array_merge(self::$shared, $data);
 
-        $this->adapter->setData($data, $context);
+		if (! on_test() && ! isset($data['errors'])) {
+            $data['errors'] = $this->setValidationErrors();
+		}
 
-        if (! array_key_exists('errors', $this->getData())) {
-            $this->setValidationErrors();
-        }
+		$this->adapter->setData($data, $context);
 
         return $this;
     }
 
     /**
-     * Remplacer toutes les données de vue par de nouvelles données
+     * Renvoie les données actuelles qui seront affichées dans la vue.
      */
     public function getData(): array
     {
-        return $this->adapter->getData();
+        $data = $this->adapter->getData();
+
+		if (on_test() && isset($data['errors'])) {
+			unset($data['errors']);
+		}
+
+		return $data;
     }
 
     /**
@@ -367,7 +401,7 @@ class View implements Stringable
     /**
      * Defini les erreurs de validation pour la vue
      */
-    private function setValidationErrors()
+    private function setValidationErrors(): ErrorBag
     {
         $errors = [];
 
@@ -394,6 +428,6 @@ class View implements Stringable
             $session->unmarkFlashdata('error');
         }
 
-        $this->adapter->addData(['errors' => new ErrorBag($errors)]);
+        return new ErrorBag($errors);
     }
 }
