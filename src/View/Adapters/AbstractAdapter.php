@@ -246,9 +246,7 @@ abstract class AbstractAdapter implements RendererInterface
     public function exists(string $view, ?string $ext = null, array $options = []): bool
     {
         try {
-            $this->getRenderedFile($options, $view, $ext);
-
-            return true;
+            return str_contains($this->getRenderedFile($options, $view, $ext), 'Views');
         } catch (ViewException) {
             return false;
         }
@@ -260,6 +258,7 @@ abstract class AbstractAdapter implements RendererInterface
     protected function getRenderedFile(?array $options, string $view, ?string $ext = null): string
     {
         $options = (array) $options;
+		$ext   ??= $this->ext;
 
         $viewPath = $options['viewPath'] ?? $this->viewPath;
         if (! empty($viewPath)) {
@@ -271,7 +270,7 @@ abstract class AbstractAdapter implements RendererInterface
         $file = Helpers::ensureExt($file, $ext);
 
         if (! is_file($file) && $this->locator instanceof LocatorInterface) {
-            $file = $this->locator->locateFile($view, 'Views', $ext ?: $this->ext);
+            $file = $this->locator->locateFile($view, 'Views', $ext);
         }
 
         $file = realpath($file);
