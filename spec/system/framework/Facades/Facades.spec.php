@@ -14,10 +14,12 @@ use BlitzPHP\Facades\Container;
 use BlitzPHP\Facades\Fs;
 use BlitzPHP\Facades\Route;
 use BlitzPHP\Facades\Storage;
+use BlitzPHP\Facades\View;
 use BlitzPHP\Filesystem\Filesystem;
 use BlitzPHP\Filesystem\FilesystemManager;
 use BlitzPHP\Router\RouteBuilder;
 use BlitzPHP\Spec\ReflectionHelper;
+use BlitzPHP\View\View as ViewView;
 
 describe('Facades', function () {
     describe('Container', function () {
@@ -68,6 +70,19 @@ describe('Facades', function () {
 
         it('Execution d\'une methode', function () {
             expect(Storage::exists(__FILE__))->toBeFalsy();
+        });
+    });
+
+    describe('View', function () {
+        it('View', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(View::class, 'accessor');
+
+            expect($accessor())->toBeAnInstanceOf(ViewView::class);
+        });
+
+        it('Execution d\'une methode', function () {
+            expect(View::exists(__FILE__))->toBeFalsy();
+            expect(View::exists('simple'))->toBeTruthy();
         });
     });
 });
