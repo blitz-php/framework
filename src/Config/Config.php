@@ -31,6 +31,13 @@ class Config
     private static array $loaded = [];
 
     /**
+     * Configurations originales issues des fichiers de configuration
+     *
+     * Permet de réinitialiser les configuration par défaut au cas où on aurrait fait des modifications à la volée
+     */
+    private static array $originals = [];
+
+    /**
      * Different registrars decouverts.
      *
      * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
@@ -115,6 +122,22 @@ class Config
     }
 
     /**
+     * Reinitialise une configuration en fonction des donnees initiales issues des fichiers de configurations
+     */
+    public function reset(null|array|string $keys = null): void
+    {
+        if (null !== $keys) {
+            $keys = (array) $keys;
+        } else {
+            $keys = array_keys(self::$loaded);
+        }
+
+        foreach ($keys as $key) {
+            $this->set($key, Arr::dataGet(self::$originals, $key));
+        }
+    }
+
+    /**
      * Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration)
      * Ceci est notament utilse pour definir des configurations à la volée
      */
@@ -162,7 +185,8 @@ class Config
             $this->configurator->addSchema($config, $schema ?: Expect::mixed(), false);
             $this->configurator->merge([$config => $configurations]);
 
-            self::$loaded[$config] = $file;
+            self::$loaded[$config]    = $file;
+            self::$originals[$config] = $this->configurator->get($config);
         }
     }
 

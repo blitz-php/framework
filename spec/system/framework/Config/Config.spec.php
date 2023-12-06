@@ -99,5 +99,41 @@ describe('Config / Config', function () {
 			expect(Config::schema('app'))->toBeAnInstanceOf(Schema::class);
 			expect(Config::schema('appl'))->toBeNull();
 		});
+
+		it('reset', function () {
+			expect($this->config->get('app.environment'))->toBe('testing');
+			expect($this->config->get('app.negotiate_locale'))->toBeTruthy();
+
+			$this->config->set('app.environment', 'production');
+			expect($this->config->get('app.environment'))->toBe('production');
+			$this->config->set('app.negotiate_locale', false);
+			expect($this->config->get('app.negotiate_locale'))->toBeFalsy();
+
+			$this->config->reset('app');
+			expect($this->config->get('app.environment'))->toBe('testing');
+			expect($this->config->get('app.negotiate_locale'))->toBeTruthy();
+		});
+
+		it('reset multple', function () {
+			expect($this->config->get('app.environment'))->toBe('testing');
+			expect($this->config->get('publisher.restrictions'))->toContainKeys([ROOTPATH, WEBROOT]);
+			expect($this->config->get('app.negotiate_locale'))->toBeTruthy();
+
+			$this->config->set('app.environment', 'production');
+			expect($this->config->get('app.environment'))->toBe('production');
+
+			$this->config->set('publisher.restrictions', [WEBROOT => '*']);
+			expect($this->config->get('publisher.restrictions'))->toBe([WEBROOT => '*']);
+
+			$this->config->set('app.negotiate_locale', false);
+			expect($this->config->get('app.negotiate_locale'))->toBeFalsy();
+
+			$this->config->reset(['app.environment', 'publisher']);
+			expect($this->config->get('app.environment'))->toBe('testing');
+			expect($this->config->get('publisher.restrictions'))->toContainKeys([ROOTPATH, WEBROOT]);
+
+			// On a pas reset negotiate_locale, donc on conserve la valeur modifiee
+			expect($this->config->get('app.negotiate_locale'))->toBeFalsy();
+		});
 	});
 });
