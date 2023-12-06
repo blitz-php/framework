@@ -114,12 +114,21 @@ class Config
         $this->configurator->set($key, $value);
     }
 
+	/**
+	 * Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration)
+	 * Ceci est notament utilse pour definir des configurations à la volée
+	 */
+	public function ghost(array|string $key, ?Schema $schema = null): void
+	{
+		$this->load($key, null, $schema, true);
+	}
+
     /**
      * Charger la configuration spécifique dans le scoope
      *
      * @param string|string[] $config
      */
-    public function load($config, ?string $file = null, ?Schema $schema = null)
+    public function load($config, ?string $file = null, ?Schema $schema = null, bool $allow_empty = false)
     {
         if (is_array($config)) {
             foreach ($config as $key => $value) {
@@ -133,12 +142,11 @@ class Config
                     $file = null;
                     $conf = $value;
                 }
-                self::load($conf, $file);
+                self::load($conf, $file, null, $allow_empty);
             }
         } elseif (is_string($config) && ! isset(self::$loaded[$config])) {
-            if (empty($file)) {
-                $file = self::path($config);
-            }
+			$file   ??= self::path($config);
+			$schema ??= self::schema($config);
 
             $configurations = [];
             if (file_exists($file) && ! in_array($file, get_included_files(), true)) {
@@ -147,11 +155,11 @@ class Config
 
             $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations);
 
-            if (empty($schema)) {
-                $schema = self::schema($config);
-            }
+			if (empty($configurations) && ! $allow_empty && (empty($schema) || ! is_a($schema, Schema::class))) {
+				return;
+			}
 
-            $this->configurator->addSchema($config, $schema, false);
+			$this->configurator->addSchema($config, $schema ?: Expect::mixed(), false);
             $this->configurator->merge([$config => $configurations]);
 
             self::$loaded[$config] = $file;
@@ -198,7 +206,7 @@ class Config
     /**
      * Retrouve le schema de configuration d'un groupe
      */
-    public static function schema(string $key): Schema
+    public static function schema(string $key): ?Schema
     {
         $file        = 'schemas' . DS . Helpers::ensureExt($key . '.config', 'php');
         $syst_schema = SYST_PATH . 'Constants' . DS . $file;
@@ -210,11 +218,7 @@ class Config
             $schema = require $app_schema;
         }
 
-        if (empty($schema) || ! ($schema instanceof Schema)) {
-            $schema = Expect::mixed();
-        }
-
-        return $schema;
+        return $schema ?? null;
     }
 
     /**
