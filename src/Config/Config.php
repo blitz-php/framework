@@ -129,11 +129,15 @@ class Config
         if (null !== $keys) {
             $keys = (array) $keys;
         } else {
-            $keys = array_keys(self::$loaded);
+            $keys = array_keys(self::$originals);
         }
 
         foreach ($keys as $key) {
             $this->set($key, Arr::dataGet(self::$originals, $key));
+
+            if (str_starts_with($key, 'app')) {
+                $this->initializeAutoDetect();
+            }
         }
     }
 
@@ -260,9 +264,7 @@ class Config
         ini_set('log_errors', 1);
         ini_set('error_log', LOG_PATH . 'blitz-logs');
 
-        $this->initializeURL();
-        $this->initializeEnvironment();
-        $this->initializeDebugbar();
+        $this->initializeAutoDetect();
 
         self::$initialized = true;
     }
@@ -367,5 +369,15 @@ class Config
         if ($config === 'auto') {
             $this->set('app.show_debugbar', ! is_online());
         }
+    }
+
+    /**
+     * Initialise les donnees qui ont une valeur definie a "auto" et donc dependent de certains facteurs
+     */
+    private function initializeAutoDetect(): void
+    {
+        $this->initializeURL();
+        $this->initializeEnvironment();
+        $this->initializeDebugbar();
     }
 }
