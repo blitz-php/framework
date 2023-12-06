@@ -106,6 +106,8 @@ class View implements Stringable
      */
     public function get(bool|string $compress = 'auto', ?bool $saveData = null): string
     {
+		$saveData ??= ($this->options['save_data'] ?? null);
+
         $output = $this->adapter->render($this->view, $this->options, $saveData);
 
         return $this->compressView($output, $compress);

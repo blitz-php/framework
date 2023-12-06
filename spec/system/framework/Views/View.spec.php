@@ -265,9 +265,28 @@ describe('Views / View', function () {
 		});
 
 		it('setAdapter leve une exception', function () {
+			$config = config()->get('view.adapters.native');
 			config()->set('view.adapters.native', []);
 
 			expect(fn() => new View())->toThrow(new ConfigException());
+
+			config()->set('view.adapters.native', $config);
+		});
+	});
+
+	describe('Options', function () {
+		it('Save data', function () {
+			$view = new View();
+
+			$view->setVar('testString', 'Hello World');
+			$view->display('simple')
+				->options(['save_data' => false]);
+
+			$expected = '<h1>Hello World</h1>';
+
+			expect($view->getData())->toBe(['testString' => 'Hello World']);
+			expect(fn() => $view->render())->toEcho($expected);
+			expect($view->getData())->toBe([]);
 		});
 	});
 });
