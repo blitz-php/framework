@@ -114,14 +114,14 @@ class Config
         $this->configurator->set($key, $value);
     }
 
-	/**
-	 * Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration)
-	 * Ceci est notament utilse pour definir des configurations à la volée
-	 */
-	public function ghost(array|string $key, ?Schema $schema = null): void
-	{
-		$this->load($key, null, $schema, true);
-	}
+    /**
+     * Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration)
+     * Ceci est notament utilse pour definir des configurations à la volée
+     */
+    public function ghost(array|string $key, ?Schema $schema = null): void
+    {
+        $this->load($key, null, $schema, true);
+    }
 
     /**
      * Charger la configuration spécifique dans le scoope
@@ -145,8 +145,8 @@ class Config
                 self::load($conf, $file, null, $allow_empty);
             }
         } elseif (is_string($config) && ! isset(self::$loaded[$config])) {
-			$file   ??= self::path($config);
-			$schema ??= self::schema($config);
+            $file ??= self::path($config);
+            $schema ??= self::schema($config);
 
             $configurations = [];
             if (file_exists($file) && ! in_array($file, get_included_files(), true)) {
@@ -155,11 +155,11 @@ class Config
 
             $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations);
 
-			if (empty($configurations) && ! $allow_empty && (empty($schema) || ! is_a($schema, Schema::class))) {
-				return;
-			}
+            if (empty($configurations) && ! $allow_empty && (empty($schema) || ! is_a($schema, Schema::class))) {
+                return;
+            }
 
-			$this->configurator->addSchema($config, $schema ?: Expect::mixed(), false);
+            $this->configurator->addSchema($config, $schema ?: Expect::mixed(), false);
             $this->configurator->merge([$config => $configurations]);
 
             self::$loaded[$config] = $file;

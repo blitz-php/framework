@@ -22,9 +22,9 @@ if (! function_exists('css_path')) {
         if (! empty($name)) {
             $name = ltrim($name, '/\\');
 
-			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
-				$name .= '.css';
-			}
+            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+                $name .= '.css';
+            }
         }
 
         return WEBROOT . 'css' . DS . str_replace('/', DS, $name);
@@ -44,9 +44,9 @@ if (! function_exists('js_path')) {
         if (! empty($name)) {
             $name = ltrim($name, '/\\');
 
-			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
-				$name .= '.js';
-			}
+            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+                $name .= '.js';
+            }
         }
 
         return WEBROOT . 'js' . DS . str_replace('/', DS, $name);
@@ -84,9 +84,9 @@ if (! function_exists('less_path')) {
         if (! empty($name)) {
             $name = ltrim($name, '/\\');
 
-			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
-				$name .= '.less';
-			}
+            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+                $name .= '.less';
+            }
         }
 
         return WEBROOT . 'less' . DS . str_replace('/', DS, $name);
@@ -250,9 +250,9 @@ if (! function_exists('config_path')) {
         if (! empty($name)) {
             $name = ltrim($name, '/\\');
 
-			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
-				$name .= '.php';
-			}
+            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+                $name .= '.php';
+            }
         }
 
         return CONFIG_PATH . str_replace('/', DS, $name);
@@ -319,9 +319,9 @@ if (! function_exists('helper_path')) {
         if (! empty($name)) {
             $name = ltrim($name, '/\\');
 
-			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
-				$name .= '.php';
-			}
+            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+                $name .= '.php';
+            }
         }
         if ($system === true) {
             return SYST_PATH . 'helpers' . DS . str_replace('/', DS, $name);
@@ -345,9 +345,9 @@ if (! function_exists('library_path')) {
         if (! empty($name)) {
             $name = ltrim($name, '/\\');
 
-			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
-				$name .= '.php';
-			}
+            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+                $name .= '.php';
+            }
         }
 
         if ($system === true) {
@@ -378,10 +378,10 @@ if (! function_exists('middleware_path')) {
             }
         }
         if ($system === true) {
-            return SYST_PATH . 'middlewares' . DS. str_replace('/', DS, $name);
+            return SYST_PATH . 'middlewares' . DS . str_replace('/', DS, $name);
         }
 
-        return APP_PATH . 'middlewares' . DS. str_replace('/', DS, $name);
+        return APP_PATH . 'middlewares' . DS . str_replace('/', DS, $name);
     }
 }
 
