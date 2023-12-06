@@ -20,10 +20,14 @@ if (! function_exists('css_path')) {
     function css_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
+
+			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+				$name .= '.css';
+			}
         }
 
-        return WEBROOT . 'css' . str_replace('/', DS, $name);
+        return WEBROOT . 'css' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -38,10 +42,14 @@ if (! function_exists('js_path')) {
     function js_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
+
+			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+				$name .= '.js';
+			}
         }
 
-        return WEBROOT . 'js' . str_replace('/', DS, $name);
+        return WEBROOT . 'js' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -56,10 +64,10 @@ if (! function_exists('lib_path')) {
     function lib_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
         }
 
-        return WEBROOT . 'lib' . str_replace('/', DS, $name);
+        return WEBROOT . 'lib' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -74,10 +82,14 @@ if (! function_exists('less_path')) {
     function less_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
+
+			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+				$name .= '.less';
+			}
         }
 
-        return WEBROOT . 'less' . str_replace('/', DS, $name);
+        return WEBROOT . 'less' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -92,10 +104,10 @@ if (! function_exists('img_path')) {
     function img_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
         }
 
-        return WEBROOT . 'img' . str_replace('/', DS, $name);
+        return WEBROOT . 'img' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -110,10 +122,10 @@ if (! function_exists('docs_path')) {
     function docs_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
         }
 
-        return WEBROOT . 'docs' . str_replace('/', DS, $name);
+        return WEBROOT . 'docs' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -128,10 +140,10 @@ if (! function_exists('video_path')) {
     function video_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
         }
 
-        return WEBROOT . 'videos' . str_replace('/', DS, $name);
+        return WEBROOT . 'videos' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -218,10 +230,10 @@ if (! function_exists('class_path')) {
     function class_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
         }
 
-        return APP_PATH . 'class' . str_replace('/', DS, $name);
+        return APP_PATH . 'class' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -236,7 +248,11 @@ if (! function_exists('config_path')) {
     function config_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
+
+			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+				$name .= '.php';
+			}
         }
 
         return CONFIG_PATH . str_replace('/', DS, $name);
@@ -301,13 +317,17 @@ if (! function_exists('helper_path')) {
     function helper_path(string $name = '', bool $system = false): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
+
+			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+				$name .= '.php';
+			}
         }
         if ($system === true) {
-            return SYST_PATH . 'helpers' . str_replace('/', DS, $name);
+            return SYST_PATH . 'helpers' . DS . str_replace('/', DS, $name);
         }
 
-        return APP_PATH . 'helpers' . str_replace('/', DS, $name);
+        return APP_PATH . 'helpers' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -323,13 +343,18 @@ if (! function_exists('library_path')) {
     function library_path(string $name = '', bool $system = false): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
-        }
-        if ($system === true) {
-            return SYST_PATH . 'libraries' . str_replace('/', DS, $name);
+            $name = ltrim($name, '/\\');
+
+			if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+				$name .= '.php';
+			}
         }
 
-        return APP_PATH . 'libraries' . str_replace('/', DS, $name);
+        if ($system === true) {
+            return SYST_PATH . 'libraries' . DS . str_replace('/', DS, $name);
+        }
+
+        return APP_PATH . 'libraries' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -346,17 +371,17 @@ if (! function_exists('middleware_path')) {
     function middleware_path(string $name = '', bool $system = false, bool $only = true): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
 
             if ($only === true && ! preg_match('#Middleware\.php$#', $name)) {
                 $name = ucfirst($name) . 'Middleware.php';
             }
         }
         if ($system === true) {
-            return SYST_PATH . 'middlewares' . str_replace('/', DS, $name);
+            return SYST_PATH . 'middlewares' . DS. str_replace('/', DS, $name);
         }
 
-        return APP_PATH . 'middlewares' . str_replace('/', DS, $name);
+        return APP_PATH . 'middlewares' . DS. str_replace('/', DS, $name);
     }
 }
 
@@ -449,13 +474,13 @@ if (! function_exists('lang_path')) {
     function lang_path(string $name = '', bool $system = false): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
         }
         if ($system === true) {
-            return SYST_PATH . 'constants' . DS . 'lang' . str_replace('/', DS, $name);
+            return SYST_PATH . 'constants' . DS . 'lang' . DS . str_replace('/', DS, $name);
         }
 
-        return RESOURCE_PATH . 'lang' . str_replace('/', DS, $name);
+        return RESOURCE_PATH . 'lang' . DS . str_replace('/', DS, $name);
     }
 }
 
@@ -529,10 +554,10 @@ if (! function_exists('partial_path')) {
     function partial_path(string $name = ''): string
     {
         if (! empty($name)) {
-            $name = DS . ltrim($name, '/\\');
+            $name = ltrim($name, '/\\');
         }
 
-        return VIEW_PATH . 'partials' . str_replace('/', DS, $name);
+        return VIEW_PATH . 'partials' . DS . str_replace('/', DS, $name);
     }
 }
 
