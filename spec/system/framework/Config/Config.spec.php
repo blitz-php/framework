@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
+use BlitzPHP\Config\Config;
+use BlitzPHP\Container\Services;
+use BlitzPHP\Exceptions\ConfigException;
+use BlitzPHP\Spec\ReflectionHelper;
+use Nette\Schema\Schema;
+
+describe('Config / Config', function () {
+	beforeEach(function() {
+		$this->config = Services::config();
+	});
+
+    describe('Initialisation', function () {
+        it('La config est toujours initialisee', function () {
+            $initialized  = ReflectionHelper::getPrivateProperty(Config::class, 'initialized');
+            $configurator = ReflectionHelper::getPrivateProperty($this->config, 'configurator');
+            $finalConfig  = ReflectionHelper::getPrivateProperty($configurator, 'finalConfig');
+
+            expect($initialized)->toBeTruthy();
+            expect($finalConfig)->not->toBeNull();
+        });
+
+        it('La config charge bien les fichiers', function () {
+			$loaded  = ReflectionHelper::getPrivateProperty(Config::class, 'loaded');
+
+			expect($loaded)->toBeA('array');
+			expect($loaded)->toContainKey('app');
+			expect($loaded['app'])->toBe(config_path('app'));
+        });
+
+        it('La methode load charge belle et bien le fichier de config', function () {
+			$loaded  = ReflectionHelper::getPrivateProperty(Config::class, 'loaded');
+
+			// Soyons sur que seul les fichiers necessaires sont charges
+			expect($loaded)->not->toContainKeys(['toolbar', 'publisher']);
+
+			$this->config->load(['publisher']);
+			$loaded  = ReflectionHelper::getPrivateProperty(Config::class, 'loaded');
+
+			expect($loaded)->not->toContainKey('toolbar');
+			expect($loaded)->toContainKey('publisher');
+
+			expect($this->config->get('publisher.restrictions'))->toContainKeys([ROOTPATH, WEBROOT]);
+		});
+    });
+
+    describe('Getters et setters', function () {
+        it('has, exists, missing', function () {
+			expect($this->config->has('appl'))->toBeFalsy();
+			expect($this->config->has('app'))->toBeTruthy();
+
+			expect($this->config->exists('app'))->toBeTruthy();
+			expect($this->config->missing('app'))->toBeFalsy();
+        });
+
+        it('get', function () {
+            expect($this->config->get('app.environment'))->toBe('testing');
+            expect(fn() => $this->config->get('app.environement'))->toThrow(new ConfigException());
+            expect($this->config->get('app.environement', 'default'))->toBe('default');
+        });
+
+        it('set', function () {
+			$env = $this->config->get('app.environment');
+
+			$this->config->set('app.environement', 'dev');
+            expect($this->config->get('app.environement'))->toBe('dev');
+
+			$this->config->set('app.environement', $env);
+            expect($this->config->get('app.environement'))->toBe('testing');
+        });
+
+        it('set d\'une config abscente', function () {
+			$this->config->set('appl.environement', 'dev');
+			expect(fn() => $this->config->get('appl.environement'))->toThrow(new ConfigException());
+
+			$this->config->ghost('appl');
+			$this->config->set('appl.environement', 'dev');
+            expect($this->config->get('appl.environement'))->toBe('dev');
+        });
+    });
+
+	describe('Autres', function () {
+		it('path', function () {
+			expect(Config::path('app'))->toBe(config_path('app'));
+			expect(Config::path('appl'))->toBeEmpty();
+		});
+
+		it('schema', function () {
+			expect(Config::schema('app'))->toBeAnInstanceOf(Schema::class);
+			expect(Config::schema('appl'))->toBeNull();
+		});
+	});
+});
