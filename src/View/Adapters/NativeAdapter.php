@@ -267,7 +267,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function extend(string $layout)
     {
-        $this->layout = $layout;
+        $this->setLayout($layout);
     }
 
     /**
