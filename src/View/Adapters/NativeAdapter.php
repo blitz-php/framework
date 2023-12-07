@@ -395,10 +395,8 @@ class NativeAdapter extends AbstractAdapter
 
     /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires.
-     *
-     * @param mixed $saveData
      */
-    public function insert(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function insert(string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         $view = Helpers::ensureExt($view, $this->ext);
         $view = str_replace(' ', '', $view);
@@ -414,20 +412,16 @@ class NativeAdapter extends AbstractAdapter
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires.
      *
      * @alias self::insert()
-     *
-     * @param mixed $saveData
      */
-    public function include(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function include(string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         return $this->insert($view, $data, $options, $saveData);
     }
 
     /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition est remplie.
-     *
-     * @param mixed $saveData
      */
-    public function insertWhen(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function insertWhen(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         if (is_callable($condition)) {
             $condition = $condition();
@@ -444,20 +438,16 @@ class NativeAdapter extends AbstractAdapter
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition est remplie.
      *
      * @alias self::insertWhen()
-     *
-     * @param mixed $saveData
      */
-    public function includeWhen(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function includeWhen(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         return $this->insertWhen($condition, $view, $data, $options, $saveData);
     }
 
     /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition n'est pas remplie.
-     *
-     * @param mixed $saveData
      */
-    public function insertUnless(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function insertUnless(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         if (is_callable($condition)) {
             $condition = $condition();
@@ -470,10 +460,8 @@ class NativeAdapter extends AbstractAdapter
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires lorsqu'une condition n'est pas remplie.
      *
      * @alias self::insertUnless()
-     *
-     * @param mixed $saveData
      */
-    public function includeUnless(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function includeUnless(bool|callable $condition, string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         return $this->insertUnless($condition, $view, $data, $options, $saveData);
     }
@@ -482,20 +470,16 @@ class NativeAdapter extends AbstractAdapter
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
      *
      * @alias self::insertIf()
-     *
-     * @param mixed $saveData
      */
-    public function includeIf(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function includeIf(string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         return $this->insertIf($view, $data, $options, $saveData);
     }
 
     /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
-     *
-     * @param mixed $saveData
      */
-    public function insertIf(string $view, ?array $data = [], ?array $options = null, $saveData = true): string
+    public function insertIf(string $view, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         $view = Helpers::ensureExt($view, $this->ext);
         $view = str_replace(' ', '', $view);
