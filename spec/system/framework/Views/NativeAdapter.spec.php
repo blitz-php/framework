@@ -220,6 +220,32 @@ describe('Views / NativeAdapter', function () {
 		});
 	});
 
+	describe('Methodes speciales', function () {
+		beforeAll(function () {
+			$this->view = new NativeAdapter($this->config);
+		});
+
+		it('title', function() {
+			expect($this->view->getData())->not->toContainKey('title');
+			expect($this->view->title('My Title'))->toBeAnInstanceOf(NativeAdapter::class);
+			expect($this->view->getData())->toContainKey('title');
+			expect($this->view->getData()['title'])->toBe('My Title');
+		});
+
+		it('meta', function() {
+			expect($this->view->meta('description'))->toBeEmpty();
+			expect($this->view->meta('description', 'BlitzPHP'))->toBeAnInstanceOf(NativeAdapter::class);
+			expect($this->view->meta('charset', 'utf-8'))->toBeAnInstanceOf(NativeAdapter::class);
+			expect($this->view->meta('description'))->toBe('BlitzPHP');
+			expect($this->view->meta('charset'))->toBe('utf-8');
+		});
+
+		it('except', function () {
+			expect($this->view->excerpt('methodes speciales'))->toBe('methodes speciales');
+			expect($this->view->excerpt('methodes speciales', 8))->toBe('metho...');
+		});
+	});
+
 	describe('Directives', function () {
 		beforeAll(function () {
 			$this->view = new NativeAdapter($this->config);
