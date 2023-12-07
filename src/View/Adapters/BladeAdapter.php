@@ -68,7 +68,7 @@ class BladeAdapter extends AbstractAdapter
      */
     private function configure(): void
     {
-		if (isset($this->config['configure']) && is_callable($this->config['configure'])) {
+        if (isset($this->config['configure']) && is_callable($this->config['configure'])) {
             $newInstance = $this->config['configure']($this->engine);
             if ($newInstance instanceof Blade) {
                 $this->engine = $newInstance;
