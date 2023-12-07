@@ -219,4 +219,95 @@ describe('Views / NativeAdapter', function () {
 			}
 		});
 	});
+
+	describe('Directives', function () {
+		beforeAll(function () {
+			$this->view = new NativeAdapter($this->config);
+		});
+
+		it('class', function () {
+			expect($this->view->class([]))->toBe('');
+
+			$isActive = false;
+    		$hasError = true;
+
+			expect($this->view->class([
+				'p-4',
+				'font-bold'     => $isActive,
+				'text-gray-500' => ! $isActive,
+				'bg-red'        => $hasError,
+			]))->toBe('class="p-4 text-gray-500 bg-red"');
+		});
+
+		it('style', function () {
+			expect($this->view->style([]))->toBe('');
+
+			$isActive = true;
+
+			expect($this->view->style([
+				'background-color: red',
+				'font-weight: bold' => $isActive,
+			]))->toBe('style="background-color: red; font-weight: bold;"');
+		});
+
+		it('checked', function () {
+			expect($this->view->checked('a'))->toBe('');
+			expect($this->view->checked('true'))->toBe('checked="checked"');
+			expect($this->view->checked('1'))->toBe('checked="checked"');
+			expect($this->view->checked(true))->toBe('checked="checked"');
+			expect($this->view->checked(1))->toBe('checked="checked"');
+			expect($this->view->checked(0))->toBe('');
+			expect($this->view->checked('0'))->toBe('');
+			expect($this->view->checked('false'))->toBe('');
+			expect($this->view->checked(false))->toBe('');
+		});
+
+		it('selected', function () {
+			expect($this->view->selected('a'))->toBe('');
+			expect($this->view->selected('true'))->toBe('selected="selected"');
+			expect($this->view->selected('1'))->toBe('selected="selected"');
+			expect($this->view->selected(true))->toBe('selected="selected"');
+			expect($this->view->selected(1))->toBe('selected="selected"');
+			expect($this->view->selected(0))->toBe('');
+			expect($this->view->selected('0'))->toBe('');
+			expect($this->view->selected('false'))->toBe('');
+			expect($this->view->selected(false))->toBe('');
+		});
+
+		it('disabled', function () {
+			expect($this->view->disabled('a'))->toBe('');
+			expect($this->view->disabled('true'))->toBe('disabled');
+			expect($this->view->disabled('1'))->toBe('disabled');
+			expect($this->view->disabled(true))->toBe('disabled');
+			expect($this->view->disabled(1))->toBe('disabled');
+			expect($this->view->disabled(0))->toBe('');
+			expect($this->view->disabled('0'))->toBe('');
+			expect($this->view->disabled('false'))->toBe('');
+			expect($this->view->disabled(false))->toBe('');
+		});
+
+		it('required', function () {
+			expect($this->view->required('a'))->toBe('');
+			expect($this->view->required('true'))->toBe('required');
+			expect($this->view->required('1'))->toBe('required');
+			expect($this->view->required(true))->toBe('required');
+			expect($this->view->required(1))->toBe('required');
+			expect($this->view->required(0))->toBe('');
+			expect($this->view->required('0'))->toBe('');
+			expect($this->view->required('false'))->toBe('');
+			expect($this->view->required(false))->toBe('');
+		});
+
+		it('readonly', function () {
+			expect($this->view->readonly('a'))->toBe('');
+			expect($this->view->readonly('true'))->toBe('readonly');
+			expect($this->view->readonly('1'))->toBe('readonly');
+			expect($this->view->readonly(true))->toBe('readonly');
+			expect($this->view->readonly(1))->toBe('readonly');
+			expect($this->view->readonly(0))->toBe('');
+			expect($this->view->readonly('0'))->toBe('');
+			expect($this->view->readonly('false'))->toBe('');
+			expect($this->view->readonly(false))->toBe('');
+		});
+	});
 });

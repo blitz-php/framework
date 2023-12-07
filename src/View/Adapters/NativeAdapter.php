@@ -496,6 +496,91 @@ class NativeAdapter extends AbstractAdapter
     }
 
     /**
+     * Compile de manière conditionnelle une chaîne de classe CSS.
+     */
+    public function class(array $classes): string
+    {
+        if ($classes === []) {
+            return '';
+        }
+
+        $class = [];
+
+        foreach ($classes as $key => $value) {
+            if (is_int($key)) {
+                $class[] = $value;
+            } elseif (true === $value) {
+                $class[] = $key;
+            }
+        }
+
+        return 'class="' . implode(' ', $class) . '"';
+    }
+
+    /**
+     * Ajoute conditionnellement des styles CSS en ligne à un élément HTML
+     */
+    public function style(array $styles): string
+    {
+        if ($styles === []) {
+            return '';
+        }
+
+        $style = [];
+
+        foreach ($styles as $key => $value) {
+            if (is_int($key)) {
+                $style[] = $value . ';';
+            } elseif (true === $value) {
+                $style[] = $key . ';';
+            }
+        }
+
+        return 'style="' . implode(' ', $style) . '"';
+    }
+
+    /**
+     * Utiliser pour indiquer facilement si une case à cocher HTML donnée est "cochée".
+     * Indiquera que la case est cochée si la condition fournie est évaluée à true.
+     */
+    public function checked(bool|string $condition): string
+    {
+        return true === filter_var($condition, FILTER_VALIDATE_BOOLEAN) ? 'checked="checked"' : '';
+    }
+
+    /**
+     * Utiliser pour indiquer si une option de sélection donnée doit être "sélectionnée".
+     */
+    public function selected(bool|string $condition): string
+    {
+        return true === filter_var($condition, FILTER_VALIDATE_BOOLEAN) ? 'selected="selected"' : '';
+    }
+
+    /**
+     * Utiliser pour indiquer si un élément donné doit être "désactivé".
+     */
+    public function disabled(bool|string $condition): string
+    {
+        return true === filter_var($condition, FILTER_VALIDATE_BOOLEAN) ? 'disabled' : '';
+    }
+
+    /**
+     * Utiliser pour indiquer si un élément donné doit être "readonly".
+     */
+    public function readonly(bool|string $condition): string
+    {
+        return true === filter_var($condition, FILTER_VALIDATE_BOOLEAN) ? 'readonly' : '';
+    }
+
+    /**
+     * Utiliser pour indiquer si un élément donné doit être "obligatoire".
+     */
+    public function required(bool|string $condition): string
+    {
+        return true === filter_var($condition, FILTER_VALIDATE_BOOLEAN) ? 'required' : '';
+    }
+
+    /**
      * Ajoute un fichier css de librairie a la vue
      */
     public function addLibCss(string ...$src): self
