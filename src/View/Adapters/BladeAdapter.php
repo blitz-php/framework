@@ -36,7 +36,7 @@ class BladeAdapter extends AbstractAdapter
 
         $this->engine = new Blade(
             $this->viewPath ?: VIEW_PATH,
-            $this->config['cache_path'] ?? VIEW_CACHE_PATH . 'blade' . DIRECTORY_SEPARATOR . 'cache'
+            $this->config['cache_path'] ?? VIEW_CACHE_PATH . 'blade' . DIRECTORY_SEPARATOR
         );
 
         $this->configure();
@@ -68,6 +68,13 @@ class BladeAdapter extends AbstractAdapter
      */
     private function configure(): void
     {
+		if (isset($this->config['configure']) && is_callable($this->config['configure'])) {
+            $newInstance = $this->config['configure']($this->engine);
+            if ($newInstance instanceof Blade) {
+                $this->engine = $newInstance;
+            }
+        }
+
         $directives = (array) ($this->config['directives'] ?? []);
 
         foreach ($directives as $name => $callable) {

@@ -16,10 +16,6 @@ use BlitzPHP\Validation\ErrorBag;
 use BlitzPHP\View\View;
 
 describe('Views / View', function () {
-    beforeAll(function () {
-		config()->set('view.decorators', []);
-    });
-
     describe('Donnees', function () {
         it('Peut-on stocker des variable', function () {
             $view = new View();

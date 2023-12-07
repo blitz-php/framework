@@ -16,8 +16,8 @@ use Spec\BlitzPHP\App\Views\BadDecorator;
 use Spec\BlitzPHP\App\Views\WorldDecorator;
 
 describe('Views / Decorator', function () {
-    beforeEach(function () {
-
+    afterAll(function () {
+		config()->set('view.decorators', []);
     });
 
 	it('L\'abscence d\'un decorateur n\'impacte rien', function () {
