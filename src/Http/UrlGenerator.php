@@ -137,9 +137,7 @@ class UrlGenerator
      */
     protected function getPreviousUrlFromSession(): ?string
     {
-        $session = $this->getSession();
-
-        return $session ? $session->previousUrl() : null;
+        return $this->getSession()?->previousUrl();
     }
 
     /**
@@ -228,7 +226,7 @@ class UrlGenerator
     {
         $i = 'index.php';
 
-        return Text::contains($root, $i) ? str_replace('/' . $i, '', $root) : $root;
+        return Text::contains($root, /** @scrutinizer ignore-type */ $i) ? str_replace('/' . $i, '', $root) : $root;
     }
 
     /**
@@ -249,15 +247,11 @@ class UrlGenerator
 
     /**
      * Get the URL to a named route.
-     *
-     * @return false|string
      */
-    public function route(string $name, array $parameters = [], bool $absolute = true)
+    public function route(string $name, array $parameters = [], bool $absolute = true): string
     {
-        $route = $this->routes->reverseRoute($name, ...$parameters);
-
-        if (! $route) {
-            throw HttpException::invalidRedirectRoute($route);
+        if (false === $route = $this->routes->reverseRoute($name, ...$parameters)) {
+            throw HttpException::invalidRedirectRoute($name);
         }
 
         return $absolute ? site_url($route) : $route;
@@ -319,7 +313,7 @@ class UrlGenerator
             $root = $this->cachedRoot;
         }
 
-        $start = Text::startsWith($root, 'http://') ? 'http://' : 'https://';
+        $start = Text::startsWith($root, /** @scrutinizer ignore-type */ 'http://') ? 'http://' : 'https://';
 
         return preg_replace('~' . $start . '~', $scheme, $root, 1);
     }

@@ -582,6 +582,11 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/View/Adapters/BladeAdapter.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Class Jenssegers\\\\Blade\\\\Blade not found\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/View/Adapters/BladeAdapter.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Instantiated class Jenssegers\\\\Blade\\\\Blade not found\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/View/Adapters/BladeAdapter.php',

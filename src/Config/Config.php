@@ -17,7 +17,6 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
-use InvalidArgumentException;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use ReflectionClass;
@@ -159,9 +158,6 @@ class Config
     {
         if (is_array($config)) {
             foreach ($config as $key => $value) {
-                if (! is_string($value) || empty($value)) {
-                    continue;
-                }
                 if (is_string($key)) {
                     $file = $value;
                     $conf = $key;
@@ -169,9 +165,9 @@ class Config
                     $file = null;
                     $conf = $value;
                 }
-                self::load($conf, $file, null, $allow_empty);
+                $this->load($conf, $file, null, $allow_empty);
             }
-        } elseif (is_string($config) && ! isset(self::$loaded[$config])) {
+        } elseif (! isset(self::$loaded[$config])) {
             $file ??= self::path($config);
             $schema ??= self::schema($config);
 
@@ -197,15 +193,12 @@ class Config
     /**
      * Affiche l'exception dû à la mauvaise definition d'une configuration
      *
-     * @param array|string $accepts_values
-     * @param string       $group          (app, data, database, etc.)
+     * @param string $group (app, data, database, etc.)
      */
-    public static function exceptBadConfigValue(string $config_key, $accepts_values, string $group)
+    public static function exceptBadConfigValue(string $config_key, array|string $accepts_values, string $group)
     {
         if (is_array($accepts_values)) {
             $accepts_values = '(Accept values: ' . implode('/', $accepts_values) . ')';
-        } elseif (! is_string($accepts_values)) {
-            throw new InvalidArgumentException('Misuse of the method ' . __METHOD__);
         }
 
         throw new ConfigException("The '{$group}.{$config_key} configuration is not set correctly. {$accepts_values} \n Please edit '{" . self::path($group) . "}' file to correct it");

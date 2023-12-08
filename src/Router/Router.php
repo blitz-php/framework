@@ -197,7 +197,7 @@ class Router implements RouterInterface
             : trim($this->collection->getDefaultNamespace(), '\\') . '\\' . $this->controller;
 
         $controller = preg_replace(
-            ['#(\_)?Controller$#i', '#' . config('app.url_suffix') . '$#i'],
+            ['#(\_)?Controller$#i', '#' . /** @scrutinizer ignore-type */ config('app.url_suffix') . '$#i'],
             '',
             ucfirst($controller)
         );
@@ -377,7 +377,7 @@ class Router implements RouterInterface
                     );
 
                     if ($this->collection->shouldUseSupportedLocalesOnly()
-                        && ! in_array($matched['locale'], config('App')->supportedLocales, true)) {
+                        && ! in_array($matched['locale'], config('app.supported_locales'), true)) {
                         // Lancer une exception pour empêcher l'autorouteur,
                         // si activé, essayer de trouver une route
                         throw PageNotFoundException::localeNotSupported($matched['locale']);

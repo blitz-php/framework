@@ -107,7 +107,7 @@ class Services
         $config  = static::config()->get('autoload');
         $helpers = array_merge(['url'], ($config['helpers'] ?? []));
 
-        return static::$instances[Autoloader::class] = new Autoloader($config, $helpers);
+        return static::$instances[Autoloader::class] = new Autoloader(/** @scrutinizer ignore-type */ $config, $helpers);
     }
 
     /**
@@ -354,7 +354,7 @@ class Services
             return static::$instances[ResponseCache::class];
         }
 
-        return static::$instances[ResponseCache::class] = new ResponseCache(static::cache(), static::config()->get('cache.cache_query_string'));
+        return static::$instances[ResponseCache::class] = new ResponseCache(static::cache(), /** @scrutinizer ignore-type */ static::config()->get('cache.cache_query_string'));
     }
 
     /**
@@ -415,8 +415,8 @@ class Services
             }
         }
 
-        Cookie::setDefaults($cookies = static::config()->get('cookie'));
-        $session = new Store($config, $cookies, Helpers::ipAddress());
+        Cookie::setDefaults($cookies = /** @scrutinizer ignore-type */ static::config()->get('cookie'));
+        $session = new Store((array) $config, (array) $cookies, Helpers::ipAddress());
         $session->setLogger(static::logger());
         $session->setDatabase($db);
 
@@ -436,7 +436,7 @@ class Services
             return static::$instances[FilesystemManager::class];
         }
 
-        return static::$instances[FilesystemManager::class] = new FilesystemManager(static::config()->get('filesystems'));
+        return static::$instances[FilesystemManager::class] = new FilesystemManager(/** @scrutinizer ignore-type */ static::config()->get('filesystems'));
     }
 
     /**
@@ -460,7 +460,7 @@ class Services
             return static::$instances[Toolbar::class];
         }
 
-        $config ??= (object) config('toolbar');
+        $config ??= (object) static::config()->get('toolbar');
 
         return static::$instances[Toolbar::class] = new Toolbar($config);
     }
