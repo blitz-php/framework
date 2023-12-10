@@ -542,6 +542,11 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Unsafe usage of new static\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Middlewares/BaseMiddleware.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Router\\\\AutoRouter\\:\\:\\$methodPos is never read, only written\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Router/AutoRouter.php',

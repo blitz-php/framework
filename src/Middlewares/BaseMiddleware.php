@@ -50,6 +50,11 @@ abstract class BaseMiddleware
         return $this;
     }
 
+    public static function make(...$args): static
+    {
+        return new static(...$args);
+    }
+
     public function __get($name)
     {
         return $this->arguments[$name] ?? null;

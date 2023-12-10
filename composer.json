@@ -61,7 +61,11 @@
             "Composer\\Config::disableProcessTimeout",
             "bash -c \"XDEBUG_MODE=off phpstan analyse\""
         ],
-        "cs": [
+		"phpstan:baseline": [
+            "Composer\\Config::disableProcessTimeout",
+            "bash -c \"XDEBUG_MODE=off phpstan analyse --generate-baseline phpstan-baseline.php\""
+		],
+		"cs": [
             "Composer\\Config::disableProcessTimeout",
             "php-cs-fixer fix --ansi --verbose --dry-run --diff"
         ],

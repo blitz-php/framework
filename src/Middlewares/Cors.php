@@ -22,7 +22,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class Cors extends BaseMiddleware implements MiddlewareInterface
 {
-    protected $config = [
+    protected array $config = [
         'AllowOrigin'      => true,
         'AllowCredentials' => true,
         'AllowMethods'     => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -34,11 +34,9 @@ class Cors extends BaseMiddleware implements MiddlewareInterface
     /**
      * Constructor
      */
-    public function init(array $config = []): static
+    public function __construct(array $config = [])
     {
         $this->config = array_merge($this->config, $config);
-
-        return parent::init($config);
     }
 
     /**

@@ -56,23 +56,24 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      * La manipulation nécessite plus de soin que JSON.
      * - `methods` Les méthodes HTTP à analyser. Par défaut, PUT, POST, PATCH DELETE.
      */
-    public function init(array $options = []): static
+    public function __construct(array $options = [])
     {
         $options += ['json' => true, 'xml' => false, 'methods' => null];
         if ($options['json']) {
             $this->addParser(
                 ['application/json', 'text/json'],
-                Closure::fromCallable([$this, 'decodeJson'])
+                $this->decodeJson(...)
             );
         }
         if ($options['xml']) {
             $this->addParser(
                 ['application/xml', 'text/xml'],
-                Closure::fromCallable([$this, 'decodeXml'])
+                $this->decodeXml(...)
             );
         }
-
-        return parent::init($options);
+        if ($options['methods']) {
+            $this->setMethods($options['methods']);
+        }
     }
 
     /**
