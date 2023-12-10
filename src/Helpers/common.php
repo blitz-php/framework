@@ -425,7 +425,7 @@ if (! function_exists('environment')) {
      *
      * @return bool|string
      */
-    function environment(null|array|string $env)
+    function environment(null|array|string $env = null)
     {
         $current = env('ENVIRONMENT');
         if (empty($current) || $current === 'auto') {
