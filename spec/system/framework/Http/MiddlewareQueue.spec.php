@@ -406,5 +406,38 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue)->toHaveLength(1);
 			expect($queue->current())->toBeAnInstanceOf(DumbMiddleware::class);
         });
+
+		it('register', function () {
+			/** @var MiddlewareQueue $queue */
+			$queue = $this->middleware();
+
+			$aliases = [
+				'sample' => SampleMiddleware::class,
+				'dummy'  => DumbMiddleware::class
+			];
+
+			$cb = function (): void {
+			};
+
+			$config = [
+				'aliases' => $aliases,
+				'globals' => array_keys($aliases),
+				'build' => static function (\BlitzPHP\Http\MiddlewareQueue $queue) use ($cb) {
+					$queue->insertAt(0, $cb);
+				},
+			];
+
+			$queue->register($config);
+
+			expect($queue)->toHaveLength(3);
+			expect(ReflectionHelper::getPrivateProperty($queue, 'aliases'))->toBe($config['aliases']);
+			expect(ReflectionHelper::getPrivateProperty($queue, 'queue'))->toBe([$cb, ...$config['globals']]);
+			$queue->seek(2);
+			expect($queue->current())->toBeAnInstanceOf(DumbMiddleware::class);
+			$queue->rewind();
+			expect($queue->current()->getCallable())->toBe($cb);
+			$queue->next();
+			expect($queue->current())->toBeAnInstanceOf(SampleMiddleware::class);
+		});
 	});
 });

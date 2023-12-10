@@ -652,7 +652,7 @@ class Dispatcher
         $this->middleware = new MiddlewareQueue($this->container, [], $this->request, $this->response);
 
         $this->middleware->append($this->spoofRequestMethod());
-        $this->middleware->register();
+        $this->middleware->register(/** @scrutinizer ignore-type */ config('middlewares'));
     }
 
     protected function outputBufferingStart(): void

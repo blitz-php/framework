@@ -12,5 +12,5 @@
 return [
     'aliases' => [],
     'globals' => [],
-    'build'   => static fn (\BlitzPHP\Http\Middleware $middleware) => null,
+    'build'   => static fn (\BlitzPHP\Http\MiddlewareQueue $queue) => null,
 ];

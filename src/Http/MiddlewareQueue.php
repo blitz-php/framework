@@ -12,7 +12,6 @@
 namespace BlitzPHP\Http;
 
 use BlitzPHP\Container\Container;
-use BlitzPHP\Core\App;
 use BlitzPHP\Middlewares\BaseMiddleware;
 use BlitzPHP\Middlewares\ClosureDecorator;
 use Closure;
@@ -64,8 +63,8 @@ class MiddlewareQueue implements Countable, SeekableIterator
 
     /**
      * Ajoute des alias de middlewares
-	 *
-	 * @param array<string, Closure|MiddlewareInterface|string> $aliases
+     *
+     * @param array<string, Closure|MiddlewareInterface|string> $aliases
      */
     public function aliases(array $aliases): static
     {
@@ -76,8 +75,6 @@ class MiddlewareQueue implements Countable, SeekableIterator
 
     /**
      * Ajoute un middleware a la chaine d'execution
-     *
-     * @param array|callable|object|string $middlewares
      */
     public function add(array|Closure|MiddlewareInterface|string $middleware): static
     {
@@ -295,20 +292,24 @@ class MiddlewareQueue implements Countable, SeekableIterator
      *
      * @internal
      */
-    public function register()
+    public function register(array $config)
     {
-        $config = (object) config('middlewares');
+        $config += [
+            'aliases' => [],
+            'globals' => [],
+            'build'   => static fn () => null,
+        ];
 
-        $this->aliases($config->aliases);
+        $this->aliases($config['aliases']);
 
-        foreach ($config->globals as $middleware) {
+        foreach ($config['globals'] as $middleware) {
             $this->add($middleware);
         }
 
-        if (is_callable($build = $config->build)) {
+        if (is_callable($build = $config['build'])) {
             $this->container->call($build, [
-                'request'    => $this->request,
-                'middleware' => $this,
+                'request' => $this->request,
+                'queue'   => $this,
             ]);
         }
     }
@@ -339,10 +340,10 @@ class MiddlewareQueue implements Countable, SeekableIterator
                 $middleware = $this->container->get($middleware);
             } else {
                 throw new InvalidArgumentException(sprintf(
-					'Middleware, `%s` n\'a pas été trouvé.',
-					$middleware
-				));
-			}
+                    'Middleware, `%s` n\'a pas été trouvé.',
+                    $middleware
+                ));
+            }
 
             if ($middleware instanceof BaseMiddleware) {
                 $middleware->fill(explode(',', $options))->init($this->request->getPath());
