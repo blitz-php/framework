@@ -30,12 +30,9 @@ abstract class BaseMiddleware
      */
     protected string $path;
 
-    public function init(array $arguments = []): static
+    public function init(string $path): static
     {
-        $this->path = $arguments['path'] ?: '/';
-        unset($arguments['path']);
-
-        $this->arguments = array_merge($this->arguments, $arguments);
+        $this->path = $path;
 
         foreach ($this->arguments as $argument => $value) {
             if (! is_string($argument)) {
@@ -69,6 +66,8 @@ abstract class BaseMiddleware
             }
             $this->arguments[$key] = array_shift($params);
         }
+
+        $this->arguments += $params;
 
         return $this;
     }

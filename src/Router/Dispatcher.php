@@ -23,7 +23,8 @@ use BlitzPHP\Debug\Timer;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\ValidationException;
-use BlitzPHP\Http\Middleware;
+use BlitzPHP\Http\MiddlewareQueue;
+use BlitzPHP\Http\MiddlewareRunner;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\Uri;
@@ -93,7 +94,7 @@ class Dispatcher
     protected $router;
 
     /**
-     * @var Middleware
+     * @var MiddlewareQueue
      */
     private $middleware;
 
@@ -244,9 +245,6 @@ class Dispatcher
     {
         $routeMiddlewares = $this->dispatchRoutes($routes);
 
-        // Le bootstrap dans un middleware
-        $this->middleware->alias('blitz', $this->bootApp());
-
         /**
          * Ajouter des middlewares de routes
          */
@@ -254,13 +252,13 @@ class Dispatcher
             $this->middleware->append($middleware);
         }
 
-        $this->middleware->append('blitz');
+        $this->middleware->append($this->bootApp());
 
         // Enregistrer notre URI actuel en tant qu'URI précédent dans la session
         // pour une utilisation plus sûre et plus précise avec la fonction d'assistance `previous_url()`.
         $this->storePreviousURL(current_url(true));
 
-        return $this->middleware->handle($this->request);
+		return (new MiddlewareRunner())->run($this->middleware, $this->request);
     }
 
     /**
@@ -651,10 +649,10 @@ class Dispatcher
      */
     protected function initMiddlewareQueue(): void
     {
-        $this->middleware = new Middleware($this->response, $this->request->getPath());
+        $this->middleware = new MiddlewareQueue($this->container, [], $this->request, $this->response);
 
         $this->middleware->append($this->spoofRequestMethod());
-        $this->middleware->register($this->request);
+        $this->middleware->register();
     }
 
     protected function outputBufferingStart(): void
