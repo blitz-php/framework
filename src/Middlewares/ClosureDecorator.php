@@ -49,7 +49,7 @@ class ClosureDecorator implements MiddlewareInterface
      */
     public function __construct(protected Closure $callable, protected ?Response $response = null)
     {
-		$this->response = $response ?: Services::response();
+        $this->response = $response ?: Services::response();
     }
 
     /**
@@ -59,15 +59,16 @@ class ClosureDecorator implements MiddlewareInterface
     {
         $reflector = new ReflectionFunction($this->callable);
 
-        $parameters = collect($reflector->getParameters())->map(fn(ReflectionParameter $p) => $p->getName())->all();
+        $parameters = collect($reflector->getParameters())->map(static fn (ReflectionParameter $p) => $p->getName())->all();
 
         if (Arr::contains($parameters, ['request', 'response', 'next'])) {
             return ($this->callable)($request, $this->response, [$handler, 'handle']);
-        } else if (Arr::contains($parameters, ['request', 'handler'])) {
-            return ($this->callable)($request, $handler);
-        } else {
-            return $handler->handle($request);
         }
+        if (Arr::contains($parameters, ['request', 'handler'])) {
+            return ($this->callable)($request, $handler);
+        }
+
+        return $handler->handle($request);
     }
 
     /**

@@ -258,7 +258,7 @@ class Dispatcher
         // pour une utilisation plus sûre et plus précise avec la fonction d'assistance `previous_url()`.
         $this->storePreviousURL(current_url(true));
 
-		return (new MiddlewareRunner())->run($this->middleware, $this->request);
+        return (new MiddlewareRunner())->run($this->middleware, $this->request);
     }
 
     /**

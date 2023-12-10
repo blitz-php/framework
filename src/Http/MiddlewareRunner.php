@@ -34,7 +34,7 @@ class MiddlewareRunner implements RequestHandlerInterface
      * {@internal}
      */
     public function run(MiddlewareQueue $queue, ServerRequestInterface $request, ?RequestHandlerInterface $fallback = null): ResponseInterface
-	{
+    {
         $this->queue    = $queue;
         $this->fallback = $fallback;
         $this->queue->rewind();
@@ -47,17 +47,17 @@ class MiddlewareRunner implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-		if ($this->queue->valid()) {
-			$middleware = $this->queue->current();
-			$this->queue->next();
+        if ($this->queue->valid()) {
+            $middleware = $this->queue->current();
+            $this->queue->next();
 
-			return $middleware->process($request, $this);
-		}
+            return $middleware->process($request, $this);
+        }
 
-		if ($this->fallback) {
+        if ($this->fallback) {
             return $this->fallback->handle($request);
         }
 
-		return $this->queue->response();
+        return $this->queue->response();
     }
 }

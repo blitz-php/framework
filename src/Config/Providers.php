@@ -51,18 +51,20 @@ class Providers extends AbstractProvider
     {
         return [
             \BlitzPHP\Autoloader\Autoloader::class        => static fn () => service('autoloader'),
-            \BlitzPHP\Cache\Cache::class                  => static fn () => service('cache'),
-            \BlitzPHP\Translator\Translate::class         => static fn () => service('translator'),
             \BlitzPHP\Autoloader\Locator::class           => static fn () => service('locator'),
-            \BlitzPHP\Mail\Mail::class                    => static fn () => service('mail'),
+            \BlitzPHP\Cache\Cache::class                  => static fn () => service('cache'),
+            \BlitzPHP\Cache\ResponseCache::class          => static fn () => service('responsecache'),
+            \BlitzPHP\Filesystem\FilesystemManager::class => static fn () => service('storage'),
             \BlitzPHP\Http\Negotiator::class              => static fn () => service('negotiator'),
             \BlitzPHP\Http\Redirection::class             => static fn () => service('redirection'),
-            \BlitzPHP\Cache\ResponseCache::class          => static fn () => service('responsecache'),
+            \BlitzPHP\Http\Request::class                 => static fn () => service('request'),
+            \BlitzPHP\Http\Response::class                => static fn () => service('response'),
+            \BlitzPHP\Mail\Mail::class                    => static fn () => service('mail'),
             \BlitzPHP\Router\RouteCollection::class       => static fn () => service('routes'),
             \BlitzPHP\Router\Router::class                => static fn () => service('router'),
             \BlitzPHP\Session\Cookie\CookieManager::class => static fn () => service('cookie'),
             \BlitzPHP\Session\Store::class                => static fn () => service('session'),
-            \BlitzPHP\Filesystem\FilesystemManager::class => static fn () => service('storage'),
+            \BlitzPHP\Translator\Translate::class         => static fn () => service('translator'),
         ];
     }
 }
