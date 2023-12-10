@@ -57,15 +57,17 @@ class MiddlewareQueue implements Countable, SeekableIterator
     /**
      * Ajoute un alias de middleware
      */
-    public function alias(string $alias, callable|object|string $middleware): self
+    public function alias(string $alias, Closure|MiddlewareInterface|string $middleware): static
     {
         return $this->aliases([$alias => $middleware]);
     }
 
     /**
      * Ajoute des alias de middlewares
+	 *
+	 * @param array<string, Closure|MiddlewareInterface|string> $aliases
      */
-    public function aliases(array $aliases): self
+    public function aliases(array $aliases): static
     {
         $this->aliases = array_merge($this->aliases, $aliases);
 
@@ -336,16 +338,11 @@ class MiddlewareQueue implements Countable, SeekableIterator
             if ($this->container->has($middleware)) {
                 $middleware = $this->container->get($middleware);
             } else {
-                /** @var class-string<\Psr\Http\Server\MiddlewareInterface>|null $className */
-                $className = App::className($middleware, 'Middleware', 'Middleware');
-                if ($className === null) {
-                    throw new InvalidArgumentException(sprintf(
-                        'Middleware, `%s` n\'a pas été trouvé.',
-                        $middleware
-                    ));
-                }
-                $middleware = new $className();
-            }
+                throw new InvalidArgumentException(sprintf(
+					'Middleware, `%s` n\'a pas été trouvé.',
+					$middleware
+				));
+			}
 
             if ($middleware instanceof BaseMiddleware) {
                 $middleware->fill(explode(',', $options))->init($this->request->getPath());
