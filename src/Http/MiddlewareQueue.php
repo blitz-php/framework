@@ -346,7 +346,11 @@ class MiddlewareQueue implements Countable, SeekableIterator
             }
 
             if ($middleware instanceof BaseMiddleware) {
-                $middleware->fill(explode(',', $options))->init($this->request->getPath());
+                if (null !== $options) {
+                    $middleware->fill(explode(',', $options));    
+                }
+                
+                $middleware->init($this->request->getPath());
             }
         }
 

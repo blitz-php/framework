@@ -24,14 +24,14 @@ use ReflectionException;
 class ApplicationController extends BaseController
 {
     /**
-     * @var array Données partagées entre toutes les vue chargées à partir d'un controleur
+     * Données partagées entre toutes les vue chargées à partir d'un controleur
      */
-    protected $viewDatas = [];
+    protected array $viewDatas = [];
 
     /**
-     * @var string Layout a utiliser
+     * Layout a utiliser
      */
-    protected $layout;
+    protected string $layout = '';
 
     /**
      * Charge une vue
@@ -50,15 +50,26 @@ class ApplicationController extends BaseController
             ['dirname' => $dirname, 'filename' => $filename] = pathinfo($reflection->getFileName());
             $dirname                                         = str_ireplace('Controllers', 'Views', $dirname);
             $filename                                        = strtolower(str_ireplace('Controller', '', $filename));
-            $path                                            = implode(DS, [$dirname, $filename]) . DS;
+
+            $parts = explode('Views', $dirname);
+            $base  = array_shift($parts);
+            $parts = array_map('strtolower', $parts);
+            $parts = [$base, ...$parts];
+            
+            $dirname = implode('Views', $parts);
+            $path    = implode(DS, [$dirname, $filename]) . DS;
+            
+            if (! is_dir($path)) {
+                $path = implode(DS, [$dirname]) . DS;
+            }
         }
 
         $viewer = Services::viewer();
 
         $viewer->setData($data)->setOptions($options);
 
-        if (! empty($this->layout) && is_string($this->layout)) {
-            $viewer->setLayout($this->layout);
+        if ($this->layout !== '') {
+            $viewer->layout($this->layout);
         }
 
         if (! empty($this->viewDatas) && is_array($this->viewDatas)) {
