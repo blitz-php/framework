@@ -55,10 +55,10 @@ class ApplicationController extends BaseController
             $base  = array_shift($parts);
             $parts = array_map('strtolower', $parts);
             $parts = [$base, ...$parts];
-            
+
             $dirname = implode('Views', $parts);
             $path    = implode(DS, [$dirname, $filename]) . DS;
-            
+
             if (! is_dir($path)) {
                 $path = implode(DS, [$dirname]) . DS;
             }
