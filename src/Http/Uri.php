@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Http;
 
-use BlitzPHP\Exceptions\FrameworkException;
+use BlitzPHP\Exceptions\HttpException;
 use InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 
@@ -43,73 +43,53 @@ class Uri implements UriInterface
      * Liste des segments d'URI.
      *
      * Commence à 1 au lieu de 0
-     *
-     * @var array
      */
-    protected $segments = [];
+    protected array $segments = [];
 
     /**
      * Schéma
-     *
-     * @var string
      */
-    protected $scheme = 'http';
+    protected string $scheme = 'http';
 
     /**
      * Informations utilisateur
-     *
-     * @var string
      */
-    protected $user = '';
+    protected ?string $user = null;
 
     /**
      * Mot de passe
-     *
-     * @var string
      */
-    protected $password = '';
+    protected ?string $password = null;
 
     /**
      * Hôte
-     *
-     * @var string
      */
-    protected $host = '';
+    protected ?string $host = null;
 
     /**
      * Port
-     *
-     * @var int
      */
-    protected $port = 80;
+    protected ?int $port = null;
 
     /**
      * Chemin.
-     *
-     * @var string
      */
-    protected $path = '';
+    protected ?string $path = null;
 
     /**
      * Le nom de n'importe quel fragment.
-     *
-     * @var string
      */
-    protected $fragment = '';
+    protected string $fragment = '';
 
     /**
      * La chaîne de requête.
-     *
-     * @var array
      */
-    protected $query = [];
+    protected array $query = [];
 
     /**
      * Default schemes/ports.
-     *
-     * @var array
      */
-    protected $defaultPorts = [
+    protected array $defaultPorts = [
         'http'  => 80,
         'https' => 443,
         'ftp'   => 21,
@@ -119,10 +99,8 @@ class Uri implements UriInterface
     /**
      * Indique si les mots de passe doivent être affichés dans les appels userInfo/authority.
      * La valeur par défaut est false car les URI apparaissent souvent dans les journaux
-     *
-     * @var bool
      */
-    protected $showPassword = false;
+    protected bool $showPassword = false;
 
     /**
      * Constructeur.
@@ -132,7 +110,6 @@ class Uri implements UriInterface
     public function __construct(?string $uri = null)
     {
         $this->setURI($uri);
-        $this->port = $_SERVER['SERVER_PORT'] ?? 80;
     }
 
     /**
@@ -144,7 +121,7 @@ class Uri implements UriInterface
             $parts = parse_url($uri);
 
             if ($parts === false) {
-                throw new FrameworkException('Impossible de parser l\'URI "' . $uri . '"');
+                throw HttpException::unableToParseURI($uri);
             }
 
             $this->applyParts($parts);
@@ -176,11 +153,9 @@ class Uri implements UriInterface
             $authority = $this->getUserInfo() . '@' . $authority;
         }
 
-        if (! empty($this->port) && ! $ignorePort) {
-            // N'ajoute pas de port s'il s'agit d'un port standard pour ce schéma
-            if ($this->port !== $this->defaultPorts[$this->scheme]) {
-                $authority .= ':' . $this->port;
-            }
+        // N'ajoute pas de port s'il s'agit d'un port standard pour ce schéma
+        if (! empty($this->port) && ! $ignorePort && $this->port !== $this->defaultPorts[$this->scheme]) {
+            $authority .= ':' . $this->port;
         }
 
         $this->showPassword = false;
@@ -193,7 +168,7 @@ class Uri implements UriInterface
      */
     public function getUserInfo(): string
     {
-        $userInfo = $this->user;
+        $userInfo = $this->user ?: '';
 
         if ($this->showPassword === true && ! empty($this->password)) {
             $userInfo .= ':' . $this->password;
@@ -218,13 +193,13 @@ class Uri implements UriInterface
      */
     public function getHost(): string
     {
-        return $this->host;
+        return $this->host ?? '';
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getPort(): int
+    public function getPort(): ?int
     {
         return $this->port;
     }
@@ -234,7 +209,7 @@ class Uri implements UriInterface
      */
     public function getPath(): string
     {
-        return (null === $this->path) ? '' : $this->path;
+        return $this->path ?? '';
     }
 
     /**
@@ -276,7 +251,7 @@ class Uri implements UriInterface
      */
     public function getFragment(): string
     {
-        return null === $this->fragment ? '' : $this->fragment;
+        return $this->fragment ?? '';
     }
 
     /**
@@ -292,17 +267,20 @@ class Uri implements UriInterface
      *
      * @return string La valeur du segment. Si aucun segment n'est trouvé, lance InvalidArgumentError
      */
-    public function getSegment(int $number): string
+    public function getSegment(int $number, string $default = ''): string
     {
+        if ($number < 1) {
+            throw HttpException::uriSegmentOutOfRange($number);
+        }
+        if ($number > count($this->segments) + 1) {
+            throw HttpException::uriSegmentOutOfRange($number);
+        }
+
         // Le segment doit traiter le tableau comme basé sur 1 pour l'utilisateur
         // mais nous devons encore gérer un tableau de base zéro.
         $number--;
 
-        if ($number > count($this->segments)) {
-            throw new FrameworkException('Le segment "' . $number . '" n\'est pas dans l\'interval de segment disponible');
-        }
-
-        return $this->segments[$number] ?? '';
+        return $this->segments[$number] ?? $default;
     }
 
     /**
@@ -313,13 +291,17 @@ class Uri implements UriInterface
      */
     public function setSegment(int $number, $value)
     {
+        if ($number < 1) {
+            throw HTTPException::uriSegmentOutOfRange($number);
+        }
+
+        if ($number > count($this->segments) + 1) {
+            throw HTTPException::uriSegmentOutOfRange($number);
+        }
+
         // Le segment doit traiter le tableau comme basé sur 1 pour l'utilisateur
         // mais nous devons encore gérer un tableau de base zéro.
         $number--;
-
-        if ($number > count($this->segments) + 1) {
-            throw new FrameworkException('Le segment "' . $number . '" n\'est pas dans l\'interval de segment disponible');
-        }
 
         $this->segments[$number] = $value;
         $this->refreshPath();
@@ -341,10 +323,16 @@ class Uri implements UriInterface
      */
     public function __toString(): string
     {
+        $path   = $this->getPath();
+        $scheme = $this->getScheme();
+
+        // Si les hôtes correspondent, il faut supposer que l'URL est relative à l'URL de base.
+        [$scheme, $path] = $this->changeSchemeAndPath($scheme, $path);
+
         return static::createURIString(
-            $this->getScheme(),
+            $scheme,
             $this->getAuthority(),
-            $this->getPath(), // Les URI absolus doivent utiliser un "/" pour un chemin vide
+            $path, // Les URI absolus doivent utiliser un "/" pour un chemin vide
             $this->getQuery(),
             $this->getFragment()
         );
@@ -364,15 +352,17 @@ class Uri implements UriInterface
             $uri .= $authority;
         }
 
-        if ($path) {
-            $uri .= substr($uri, -1, 1) !== '/' ? '/' . ltrim($path, '/') : $path;
+        if (isset($path) && $path !== '') {
+            $uri .= substr($uri, -1, 1) !== '/'
+                ? '/' . ltrim($path, '/')
+                : ltrim($path, '/');
         }
 
-        if ($query) {
+        if ($query !== '' && $query !== null) {
             $uri .= '?' . $query;
         }
 
-        if ($fragment) {
+        if ($fragment !== '' && $fragment !== null) {
             $uri .= '#' . $fragment;
         }
 
@@ -386,7 +376,11 @@ class Uri implements UriInterface
     {
         $parts = parse_url($str);
 
-        if (empty($parts['host']) && ! empty($parts['path'])) {
+        if (! isset($parts['path'])) {
+            $parts['path'] = $this->getPath();
+        }
+
+        if (empty($parts['host']) && $parts['path'] !== '') {
             $parts['host'] = $parts['path'];
             unset($parts['path']);
         }
@@ -406,10 +400,8 @@ class Uri implements UriInterface
      */
     public function setScheme(string $str): self
     {
-        $str = strtolower($str);
-        $str = preg_replace('#:(//)?$#', '', $str);
-
-        $this->scheme = $str;
+        $str          = strtolower($str);
+        $this->scheme = preg_replace('#:(//)?$#', '', $str);
 
         return $this;
     }
@@ -417,9 +409,15 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withScheme(string $scheme): self
+    public function withScheme(string $scheme): static
     {
-        return $this->setScheme($scheme);
+        $uri = clone $this;
+
+        $scheme = strtolower($scheme);
+
+        $uri->scheme = preg_replace('#:(//)?$#', '', $scheme);
+
+        return $uri;
     }
 
     /**
@@ -439,9 +437,13 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withUserInfo(string $user, ?string $password = null): self
+    public function withUserInfo(string $user, ?string $password = null): static
     {
-        return $this->setUserInfo($user, $password);
+        $new = clone $this;
+
+        $new->setUserInfo($user, $password);
+
+        return $new;
     }
 
     /**
@@ -457,9 +459,13 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withHost(string $host): self
+    public function withHost(string $host): static
     {
-        return $this->setHost($host);
+        $new = clone $this;
+
+        $new->setHost($host);
+
+        return $new;
     }
 
     /**
@@ -472,7 +478,7 @@ class Uri implements UriInterface
         }
 
         if ($port <= 0 || $port > 65535) {
-            throw new FrameworkException('Le port "' . $port . '" est invalide');
+            throw HttpException::invalidPort($port);
         }
 
         $this->port = $port;
@@ -483,9 +489,13 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withPort(?int $port): self
+    public function withPort(?int $port): static
     {
-        return $this->setPort($port);
+        $new = clone $this;
+
+        $new->setPort($port);
+
+        return $new;
     }
 
     /**
@@ -495,7 +505,9 @@ class Uri implements UriInterface
     {
         $this->path = $this->filterPath($path);
 
-        $this->segments = explode('/', $this->path);
+        $tempPath = trim($this->path, '/');
+
+        $this->segments = ($tempPath === '') ? [] : explode('/', $tempPath);
 
         return $this;
     }
@@ -503,19 +515,25 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withPath(string $path): self
+    public function withPath(string $path): static
     {
-        return $this->setPath($path);
+        $new = clone $this;
+
+        $new->setPath($path);
+
+        return $new;
     }
 
     /**
      * Définit la partie chemin de l'URI en fonction des segments.
      */
-    public function refreshPath(): self
+    private function refreshPath(): self
     {
         $this->path = $this->filterPath(implode('/', $this->segments));
 
-        $this->segments = explode('/', $this->path);
+        $tempPath = trim($this->path, '/');
+
+        $this->segments = ($tempPath === '') ? [] : explode('/', $tempPath);
 
         return $this;
     }
@@ -527,7 +545,7 @@ class Uri implements UriInterface
     public function setQuery(string $query): self
     {
         if (str_contains($query, '#')) {
-            throw new FrameworkException('La chaine de requete est mal formée');
+            throw HTTPException::malformedQueryString();
         }
 
         // Ne peut pas avoir de début ?
@@ -543,9 +561,13 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withQuery(string $query): self
+    public function withQuery(string $query): static
     {
-        return $this->setQuery($query);
+        $new = clone $this;
+
+        $new->setQuery($query);
+
+        return $new;
     }
 
     /**
@@ -557,6 +579,19 @@ class Uri implements UriInterface
         $query = http_build_query($query);
 
         return $this->setQuery($query);
+    }
+
+    /**
+     * Une méthode pratique pour transmettre un tableau d'éléments en tant que requête
+     * partie de l'URI.
+     */
+    public function withQueryParams(array $query): static
+    {
+        $uri = clone $this;
+
+        $uri->setQueryArray($query);
+
+        return $uri;
     }
 
     /**
@@ -617,9 +652,13 @@ class Uri implements UriInterface
     /**
      * {@inheritDoc}
      */
-    public function withFragment(string $fragment): self
+    public function withFragment(string $fragment): static
     {
-        return $this->setFragment($fragment);
+        $new = clone $this;
+
+        $new->setFragment($fragment);
+
+        return $new;
     }
 
     /**
@@ -636,7 +675,7 @@ class Uri implements UriInterface
         $path = urldecode($path);
 
         // Supprimer les segments de points
-        $path = $this->removeDotSegments($path);
+        $path = self::removeDotSegments($path);
 
         // Correction de certains cas de bord de barre oblique...
         if (str_starts_with($orig, './')) {
@@ -683,20 +722,19 @@ class Uri implements UriInterface
             $this->setScheme('http');
         }
 
-        if (isset($parts['port'])) {
-            if (null !== $parts['port']) {
-                // Les numéros de port valides sont appliqués par les précédents parse_url ou setPort()
-                $port       = $parts['port'];
-                $this->port = $port;
-            }
+        if (isset($parts['port']) && null !== $parts['port']) {
+            // Les numéros de port valides sont appliqués par les précédents parse_url ou setPort()
+            $this->port = $parts['port'];
         }
 
         if (isset($parts['pass'])) {
             $this->password = $parts['pass'];
         }
 
-        if (! empty($parts['path'])) {
-            $this->segments = explode('/', trim($parts['path'], '/'));
+        if (isset($parts['path']) && $parts['path'] !== '') {
+            $tempPath = trim($parts['path'], '/');
+
+            $this->segments = ($tempPath === '') ? [] : explode('/', $tempPath);
         }
     }
 
@@ -730,7 +768,7 @@ class Uri implements UriInterface
             if ($relative->getPath() === '') {
                 $transformed->setPath($this->getPath());
 
-                if ($relative->getQuery()) {
+                if ($relative->getQuery() !== '') {
                     $transformed->setQuery($relative->getQuery());
                 } else {
                     $transformed->setQuery($this->getQuery());
@@ -762,13 +800,13 @@ class Uri implements UriInterface
      */
     protected function mergePaths(self $base, self $reference): string
     {
-        if (! empty($base->getAuthority()) && empty($base->getPath())) {
+        if (! empty($base->getAuthority()) && '' === $base->getPath()) {
             return '/' . ltrim($reference->getPath(), '/ ');
         }
 
         $path = explode('/', $base->getPath());
 
-        if (empty($path[0])) {
+        if ('' === $path[0]) {
             unset($path[0]);
         }
 
@@ -827,5 +865,34 @@ class Uri implements UriInterface
         }
 
         return $output;
+    }
+
+    /**
+     * Modifier le chemin (et le schéma) en supposant que les URI ayant le même hôte que baseURL doivent être relatifs à la configuration du projet.
+     *
+     * @deprecated Cette methode pourrait etre supprimer
+     */
+    private function changeSchemeAndPath(string $scheme, string $path): array
+    {
+        // Vérifier s'il s'agit d'un URI interne
+        $config  = (object) config('app');
+        $baseUri = new self($config->base_url);
+
+        if (substr($this->getScheme(), 0, 4) === 'http' && $this->getHost() === $baseUri->getHost()) {
+            // Vérifier la présence de segments supplémentaires
+            $basePath = trim($baseUri->getPath(), '/') . '/';
+            $trimPath = ltrim($path, '/');
+
+            if ($basePath !== '/' && ! str_starts_with($trimPath, $basePath)) {
+                $path = $basePath . $trimPath;
+            }
+
+            // Vérifier si le protocole HTTPS est forcé
+            if ($config->force_global_secure_requests) {
+                $scheme = 'https';
+            }
+        }
+
+        return [$scheme, $path];
     }
 }

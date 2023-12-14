@@ -37,4 +37,24 @@ class HttpException extends FrameworkException
     {
         return new static($message, 400);
     }
+
+    public static function unableToParseURI(string $uri)
+    {
+        return new static(lang('HTTP.cannotParseURI', [$uri]));
+    }
+
+    public static function uriSegmentOutOfRange(int $segment)
+    {
+        return new static(lang('HTTP.segmentOutOfRange', [$segment]));
+    }
+
+    public static function invalidPort(int $port)
+    {
+        return new static(lang('HTTP.invalidPort', [$port]));
+    }
+
+    public static function malformedQueryString()
+    {
+        return new static(lang('HTTP.malformedQueryString'));
+    }
 }
