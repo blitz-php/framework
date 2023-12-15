@@ -589,11 +589,27 @@ class NativeAdapter extends AbstractAdapter
     }
 
     /**
+     * Génère un champ input caché à utiliser dans les formulaires générés manuellement.
+     */
+    public function csrf(?string $id): string
+    {
+        return csrf_field($id);
+    }
+
+    /**
+     * Générer un champ de formulaire pour usurper le verbe HTTP utilisé par les formulaires.
+     */
+    public function method(string $method): string
+    {
+        return method_field($method);
+    }
+
+    /**
      * Ajoute un fichier css de librairie a la vue
      */
     public function addLibCss(string ...$src): self
     {
-		$this->_lib_styles = array_merge($this->_lib_styles, $src);
+        $this->_lib_styles = array_merge($this->_lib_styles, $src);
 
         return $this;
     }
@@ -603,7 +619,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addCss(string ...$src): self
     {
-		$this->_styles = array_merge($this->_styles, $src);
+        $this->_styles = array_merge($this->_styles, $src);
 
         return $this;
     }
@@ -629,7 +645,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addLibJs(string ...$src): self
     {
-		$this->_lib_scripts = array_merge($this->_lib_scripts, $src);
+        $this->_lib_scripts = array_merge($this->_lib_scripts, $src);
 
         return $this;
     }
@@ -639,7 +655,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addJs(string ...$src): self
     {
-		$this->_scripts = array_merge($this->_scripts, $src);
+        $this->_scripts = array_merge($this->_scripts, $src);
 
         return $this;
     }
@@ -653,7 +669,7 @@ class NativeAdapter extends AbstractAdapter
             lib_scripts(array_unique($this->_lib_scripts));
         }
 
-		if (! empty($this->_scripts)) {
+        if (! empty($this->_scripts)) {
             scripts(array_unique($this->_scripts));
         }
 

@@ -417,6 +417,53 @@ if (! function_exists('stringify_attributes')) {
     }
 }
 
+// ================================= FONCTIONS DE FORMULAIRE ================================= //
+
+if (! function_exists('csrf_token')) {
+    /**
+     * Renvoie la valeur de hachage actuelle pour la protection CSRF.
+     * Peut être utilisé dans les vues lors de la construction manuelle d'input cachées, ou utilisé dans les variables javascript pour l'utilisation de l'API.
+     */
+    function csrf_token(): string
+    {
+        return Services::session()->token();
+    }
+}
+
+if (! function_exists('csrf_field')) {
+    /**
+     * Génère un champ input caché à utiliser dans les formulaires générés manuellement.
+     */
+    function csrf_field(?string $id = null): string
+    {
+        $name = config('security.csrf_token_name', '_token');
+
+        return '<input type="hidden"' . (! empty($id) ? ' id="' . esc($id, 'attr') . '"' : '') . ' name="' . $name . '" value="' . csrf_token() . '">';
+    }
+}
+
+if (! function_exists('csrf_meta')) {
+    /**
+     * Génère une balise méta à utiliser dans les appels javascript.
+     */
+    function csrf_meta(?string $id = null): string
+    {
+        $name = config('security.csrf_header_name', 'X-CSRF-TOKEN');
+
+        return '<meta' . (! empty($id) ? ' id="' . esc($id, 'attr') . '"' : '') . ' name="' . $name . '" content="' . csrf_token() . '">';
+    }
+}
+
+if (! function_exists('method_field')) {
+    /**
+     * Générer un champ de formulaire pour usurper le verbe HTTP utilisé par les formulaires.
+     */
+    function method_field(string $method): string
+    {
+        return '<input type="hidden" name="_method" value="' . $method . '">';
+    }
+}
+
 // ================================= FONCTIONS D'ENVIRONNEMENT D'EXECUTION ================================= //
 
 if (! function_exists('environment')) {
