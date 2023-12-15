@@ -12,6 +12,7 @@
 namespace BlitzPHP\View\Adapters;
 
 use BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector;
+use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Utilities\Helpers;
 use RuntimeException;
 
@@ -479,6 +480,27 @@ class NativeAdapter extends AbstractAdapter
         }
 
         return '';
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
+     */
+    public function insertFirst(array $views, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
+    {
+        foreach ($views as $view) {
+            $view = Helpers::ensureExt($view, $this->ext);
+            $view = str_replace(' ', '', $view);
+
+            if ($view[0] !== '/') {
+                $view = $this->retrievePartialPath($view);
+            }
+
+            if (is_file($view)) {
+                return $this->addData($data)->render($view, $options, $saveData);
+            }
+        }
+
+        throw ViewException::invalidFile(implode(' OR ', $views));
     }
 
     /**
