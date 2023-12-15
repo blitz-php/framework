@@ -362,18 +362,6 @@ class NativeAdapter extends AbstractAdapter
             return;
         }
 
-        $start = $end = '';
-        if ($sectionName === 'css') {
-            $start = "<style type=\"text/css\">\n";
-            $end   = "</style>\n";
-        }
-        if ($sectionName === 'js') {
-            $start = "<script type=\"text/javascript\">\n";
-            $end   = "</script>\n";
-        }
-
-        echo $start;
-
         foreach ($this->sections[$sectionName] as $key => $contents) {
             echo $contents;
 
@@ -381,8 +369,6 @@ class NativeAdapter extends AbstractAdapter
                 unset($this->sections[$sectionName][$key]);
             }
         }
-
-        echo $end;
     }
 
     /**
@@ -585,11 +571,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addLibCss(string ...$src): self
     {
-        foreach ($src as $var) {
-            if (! in_array($var, $this->_lib_styles, true)) {
-                $this->_lib_styles[] = $var;
-            }
-        }
+		$this->_lib_styles = array_merge($this->_lib_styles, $src);
 
         return $this;
     }
@@ -599,11 +581,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addCss(string ...$src): self
     {
-        foreach ($src as $var) {
-            if (! in_array($var, $this->_styles, true)) {
-                $this->_styles[] = $var;
-            }
-        }
+		$this->_styles = array_merge($this->_styles, $src);
 
         return $this;
     }
@@ -611,29 +589,14 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Compile les fichiers de style de l'instance et genere les link:href vers ceux-ci
      */
-    public function stylesBundle(string ...$groups): void
+    public function stylesBundle(): void
     {
-        $groups     = (array) (empty($groups) ? $this->layout ?? 'default' : $groups);
-        $lib_styles = $styles = [];
-
-        foreach ($groups as $group) {
-            $lib_styles = array_merge(
-                $lib_styles,
-                // (array) config('layout.'.$group.'.lib_styles'),
-                $this->_lib_styles
-            );
-            $styles = array_merge(
-                $styles,
-                // (array) config('layout.'.$group.'.styles'),
-                $this->_styles
-            );
+        if (! empty($this->_lib_styles)) {
+            lib_styles(array_unique($this->_lib_styles));
         }
 
-        if (! empty($lib_styles)) {
-            lib_styles(array_unique($lib_styles));
-        }
-        if (! empty($styles)) {
-            styles(array_unique($styles));
+        if (! empty($this->_styles)) {
+            styles(array_unique($this->_styles));
         }
 
         $this->show('css');
@@ -644,11 +607,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addLibJs(string ...$src): self
     {
-        foreach ($src as $var) {
-            if (! in_array($var, $this->_lib_scripts, true)) {
-                $this->_lib_scripts[] = $var;
-            }
-        }
+		$this->_lib_scripts = array_merge($this->_lib_scripts, $src);
 
         return $this;
     }
@@ -658,11 +617,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addJs(string ...$src): self
     {
-        foreach ($src as $var) {
-            if (! in_array($var, $this->_scripts, true)) {
-                $this->_scripts[] = $var;
-            }
-        }
+		$this->_scripts = array_merge($this->_scripts, $src);
 
         return $this;
     }
@@ -670,29 +625,14 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Compile les fichiers de script de l'instance et genere les link:href vers ceux-ci
      */
-    public function scriptsBundle(string ...$groups): void
+    public function scriptsBundle(): void
     {
-        $groups      = (array) (empty($groups) ? $this->layout ?? 'default' : $groups);
-        $lib_scripts = $scripts = [];
-
-        foreach ($groups as $group) {
-            $lib_scripts = array_merge(
-                $lib_scripts,
-                // (array) config('layout.'.$group.'.lib_scripts'),
-                $this->_lib_scripts
-            );
-            $scripts = array_merge(
-                $scripts,
-                // (array) config('layout.'.$group.'.scripts'),
-                $this->_scripts
-            );
+        if (! empty($this->_lib_scripts)) {
+            lib_scripts(array_unique($this->_lib_scripts));
         }
 
-        if (! empty($lib_scripts)) {
-            lib_scripts(array_unique($lib_scripts));
-        }
-        if (! empty($scripts)) {
-            scripts(array_unique($scripts));
+		if (! empty($this->_scripts)) {
+            scripts(array_unique($this->_scripts));
         }
 
         $this->show('js');
