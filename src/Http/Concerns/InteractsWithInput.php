@@ -224,7 +224,7 @@ trait InteractsWithInput
      */
     protected function isEmptyString(string $key): bool
     {
-        $value = $this->data($key);
+        $value = $this->input($key);
 
         return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
     }
@@ -234,7 +234,7 @@ trait InteractsWithInput
      */
     public function keys(): array
     {
-        return array_keys($this->data());
+        return array_keys($this->input());
     }
 
     /**
@@ -244,7 +244,7 @@ trait InteractsWithInput
      */
     public function all($keys = null): array
     {
-        $input = array_replace_recursive($this->data(), $this->allFiles());
+        $input = array_replace_recursive($this->input(), $this->allFiles());
 
         if (! $keys) {
             return $input;
@@ -262,7 +262,7 @@ trait InteractsWithInput
     /**
      * Récupérer un élément d'entrée de la requête.
      */
-    public function data(?string $key = null, mixed $default = null): mixed
+    public function input(?string $key = null, mixed $default = null): mixed
     {
         return Arr::dataGet(
             $this->data + $this->query,
@@ -284,7 +284,7 @@ trait InteractsWithInput
      */
     public function string(string $key, mixed $default = null): Stringable
     {
-        return Text::of($this->data($key, $default));
+        return Text::of($this->input($key, $default));
     }
 
     /**
@@ -294,7 +294,7 @@ trait InteractsWithInput
      */
     public function boolean(?string $key = null, bool $default = false): bool
     {
-        return filter_var($this->data($key, $default), FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -302,7 +302,7 @@ trait InteractsWithInput
      */
     public function integer(string $key, int $default = 0): int
     {
-        return (int) ($this->data($key, $default));
+        return (int) ($this->input($key, $default));
     }
 
     /**
@@ -310,7 +310,7 @@ trait InteractsWithInput
      */
     public function float(string $key, float $default = 0.0): float
     {
-        return (float) ($this->data($key, $default));
+        return (float) ($this->input($key, $default));
     }
 
     /**
@@ -323,7 +323,7 @@ trait InteractsWithInput
         }
 
         if (null === $format) {
-            return Date::parse($this->data($key), $tz);
+            return Date::parse($this->input($key), $tz);
         }
 
         return Date::createFromFormat($format, $this->input($key), $tz);
@@ -347,7 +347,7 @@ trait InteractsWithInput
             return null;
         }
 
-        return $enumClass::tryFrom($this->data($key));
+        return $enumClass::tryFrom($this->input($key));
     }
 
     /**
@@ -355,7 +355,7 @@ trait InteractsWithInput
      */
     public function collect(null|array|string $key = null): Collection
     {
-        return collect(is_array($key) ? $this->only($key) : $this->data($key));
+        return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**
