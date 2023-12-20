@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Http;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @credit CodeIgniter4 Cors <a href="https://github.com/agungsugiarto/codeigniter4-cors">Fluent\Cors\ServiceCors</a>
@@ -38,51 +38,40 @@ class CorsBuilder
             'maxAge'                 => 0,
         ], $options);
 
+        // Normaliser la casse
+        $options['allowedMethods'] = array_map('strtoupper', $options['allowedMethods']);
 
-		// Normalize case
-		$options['allowedMethods'] = array_map('strtoupper', $options['allowedMethods']);
-
-
-		// normalize ['*'] to true
-        if (in_array('*', $options['allowedOrigins'])) {
+        // normalizer ['*'] en true
+        if (in_array('*', $options['allowedOrigins'], true)) {
             $options['allowedOrigins'] = true;
         }
-        if (in_array('*', $options['allowedHeaders'])) {
+        if (in_array('*', $options['allowedHeaders'], true)) {
             $options['allowedHeaders'] = true;
         }
-        if (in_array('*', $options['allowedMethods'])) {
+        if (in_array('*', $options['allowedMethods'], true)) {
             $options['allowedMethods'] = true;
         }
 
         return $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCorsRequest(ServerRequestInterface $request): bool
     {
-        return $request->hasHeader('Origin') && !$this->isSameHost($request);
+        return $request->hasHeader('Origin') && ! $this->isSameHost($request);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPreflightRequest(ServerRequestInterface $request): bool
     {
-		return strtoupper($request->getMethod()) === 'OPTIONS' && $request->hasHeader('Access-Control-Request-Method');
+        return strtoupper($request->getMethod()) === 'OPTIONS' && $request->hasHeader('Access-Control-Request-Method');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handlePreflightRequest(ServerRequestInterface $request): ResponseInterface
     {
         $response = new Response();
 
         $response = $response->withStatus(204);
 
-		return $this->addPreflightRequestHeaders($request, $response);
+        return $this->addPreflightRequestHeaders($request, $response);
     }
 
     public function addPreflightRequestHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -99,9 +88,6 @@ class CorsBuilder
         return $response;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOriginAllowed(ServerRequestInterface $request): bool
     {
         if ($this->options['allowedOrigins'] === true) {
@@ -114,7 +100,7 @@ class CorsBuilder
 
         $origin = $request->getHeaderLine('Origin');
 
-        if (in_array($origin, $this->options['allowedOrigins'])) {
+        if (in_array($origin, $this->options['allowedOrigins'], true)) {
             return true;
         }
 
@@ -127,9 +113,6 @@ class CorsBuilder
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addActualRequestHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $response = $this->configureAllowedOrigin($request, $response);
@@ -142,14 +125,11 @@ class CorsBuilder
         return $response;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function varyHeader(ResponseInterface $response, $header): ResponseInterface
     {
         if (! $response->hasHeader('Vary')) {
             $response = $response->withHeader('Vary', $header);
-        } elseif (! in_array($header, explode(', ', $response->getHeaderLine('Vary')))) {
+        } elseif (! in_array($header, explode(', ', $response->getHeaderLine('Vary')), true)) {
             $response = $response->withHeader('Vary', $response->getHeaderLine('Vary') . ', ' . $header);
         }
 
@@ -159,13 +139,13 @@ class CorsBuilder
     protected function configureAllowedOrigin(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         if ($this->options['allowedOrigins'] === true && ! $this->options['supportsCredentials']) {
-            // Safe+cacheable, allow everything
+            // Sûr+cacheable, tout autoriser
             $response = $response->withHeader('Access-Control-Allow-Origin', '*');
-        } else if ($this->isSingleOriginAllowed()) {
-            // Single origins can be safely set
+        } elseif ($this->isSingleOriginAllowed()) {
+            // Les origines uniques peuvent être définies en toute sécurité
             $response = $response->withHeader('Access-Control-Allow-Origin', array_values($this->options['allowedOrigins'])[0]);
         } else {
-            // For dynamic headers, set the requested Origin header when set and allowed
+            // Pour les en-têtes dynamiques, définir l'en-tête Origin demandé lorsqu'il est défini et autorisé.
             if ($this->isCorsRequest($request) && $this->isOriginAllowed($request)) {
                 $response = $response->withHeader('Access-Control-Allow-Origin', (string) $request->getHeaderLine('Origin'));
             }
@@ -173,7 +153,7 @@ class CorsBuilder
             $response = $this->varyHeader($response, 'Origin');
         }
 
-		return $response;
+        return $response;
     }
 
     protected function isSingleOriginAllowed(): bool
@@ -189,7 +169,7 @@ class CorsBuilder
     {
         if ($this->options['allowedMethods'] === true) {
             $allowMethods = strtoupper($request->getHeaderLine('Access-Control-Request-Method'));
-            $response = $this->varyHeader($response, 'Access-Control-Request-Method');
+            $response     = $this->varyHeader($response, 'Access-Control-Request-Method');
         } else {
             $allowMethods = implode(', ', $this->options['allowedMethods']);
         }
@@ -201,7 +181,7 @@ class CorsBuilder
     {
         if ($this->options['allowedHeaders'] === true) {
             $allowHeaders = $request->getHeaderLine('Access-Control-Request-Headers');
-            $response = $this->varyHeader($response, 'Access-Control-Request-Headers');
+            $response     = $this->varyHeader($response, 'Access-Control-Request-Headers');
         } else {
             $allowHeaders = implode(', ', $this->options['allowedHeaders']);
         }
@@ -215,7 +195,7 @@ class CorsBuilder
             $response = $response->withHeader('Access-Control-Allow-Credentials', 'true');
         }
 
-		return $response;
+        return $response;
     }
 
     protected function configureExposedHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -224,7 +204,7 @@ class CorsBuilder
             $response = $response->withHeader('Access-Control-Expose-Headers', implode(', ', $this->options['exposedHeaders']));
         }
 
-		return $response;
+        return $response;
     }
 
     protected function configureMaxAge(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -233,7 +213,7 @@ class CorsBuilder
             $response = $response->withHeader('Access-Control-Max-Age', (string) $this->options['maxAge']);
         }
 
-		return $response;
+        return $response;
     }
 
     protected function isSameHost(ServerRequestInterface $request): bool

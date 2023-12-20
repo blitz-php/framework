@@ -237,13 +237,13 @@ class ServerRequest implements ServerRequestInterface
             $uri = $config['uri'];
         } else {
             if ($config['url'] !== '') {
-				$config = $this->processUrlOption($config);
-				$uri = new Uri(implode('?', [$config['url'], $config['environment']['QUERY_STRING'] ?? '']));
-            } else if (isset($config['environment']['REQUEST_URI'])) {
-				$uri = new Uri($config['environment']['REQUEST_URI']);
-			} else {
-				$uri = Psr7ServerRequest::getUriFromGlobals();
-			}
+                $config = $this->processUrlOption($config);
+                $uri    = new Uri(implode('?', [$config['url'], $config['environment']['QUERY_STRING'] ?? '']));
+            } elseif (isset($config['environment']['REQUEST_URI'])) {
+                $uri = new Uri($config['environment']['REQUEST_URI']);
+            } else {
+                $uri = Psr7ServerRequest::getUriFromGlobals();
+            }
         }
 
         if (in_array($uri->getHost(), ['localhost', '127.0.0.1'], true)) {
@@ -266,7 +266,7 @@ class ServerRequest implements ServerRequestInterface
         $this->stream = $stream;
 
         $post = $config['post'];
-        if (!(is_array($post) || is_object($post) || $post === null)) {
+        if (! (is_array($post) || is_object($post) || $post === null)) {
             throw new InvalidArgumentException(sprintf(
                 'La clé `post` doit être un tableau, un objet ou null. On a obtenu `%s` à la place.',
                 get_debug_type($post)
@@ -786,7 +786,7 @@ class ServerRequest implements ServerRequestInterface
             return (array) $this->_environment[$name];
         }
 
-		$name = $this->normalizeHeaderName($name);
+        $name = $this->normalizeHeaderName($name);
         if (isset($this->_environment[$name])) {
             return (array) $this->_environment[$name];
         }

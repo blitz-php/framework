@@ -13,8 +13,8 @@ namespace BlitzPHP\Middlewares;
 
 use BlitzPHP\Http\CorsBuilder;
 use BlitzPHP\Utilities\String\Text;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -26,7 +26,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class Cors implements MiddlewareInterface
 {
-	/**
+    /**
      * --------------------------------------------------------------------------
      * En-têtes HTTP autorisés
      * --------------------------------------------------------------------------
@@ -87,28 +87,28 @@ class Cors implements MiddlewareInterface
      * --------------------------------------------------------------------------
      *
      * Indique si la réponse à la demande peut être exposée lorsque l'indicateur d'informations d'identification est vrai.
-	 * Lorsqu'il est utilisé dans le cadre d'une réponse à une demande de contrôle en amont, il indique si la demande proprement dite peut être effectuée en utilisant des informations d'identification.
-	 * Notez que les requêtes GET simples ne sont pas contrôlées au préalable, et donc si une requête est faite pour une ressource avec des informations d'identification, si cet en-tête n'est pas renvoyé avec la ressource, la réponse est ignorée par le navigateur et n'est pas renvoyée au contenu web.
+     * Lorsqu'il est utilisé dans le cadre d'une réponse à une demande de contrôle en amont, il indique si la demande proprement dite peut être effectuée en utilisant des informations d'identification.
+     * Notez que les requêtes GET simples ne sont pas contrôlées au préalable, et donc si une requête est faite pour une ressource avec des informations d'identification, si cet en-tête n'est pas renvoyé avec la ressource, la réponse est ignorée par le navigateur et n'est pas renvoyée au contenu web.
      */
     public bool $supportsCredentials = false;
 
-	protected CorsBuilder $cors;
+    protected CorsBuilder $cors;
 
-	/**
+    /**
      * Constructor.
      */
     public function __construct(array $config = [])
     {
-		$params = (array) config('cors', []);
-		$config = array_merge($params, $config);
+        $params = (array) config('cors', []);
+        $config = array_merge($params, $config);
 
-		foreach ($config as $key => $value) {
-			$key = Text::camel($key);
+        foreach ($config as $key => $value) {
+            $key = Text::camel($key);
 
-			if (property_exists($this, $key)) {
-				$this->{$key} = $value;
-			}
-		}
+            if (property_exists($this, $key)) {
+                $this->{$key} = $value;
+            }
+        }
 
         $this->cors = new CorsBuilder([
             'allowedHeaders'         => $this->allowedHeaders,
@@ -121,27 +121,27 @@ class Cors implements MiddlewareInterface
         ]);
     }
 
-	/**
+    /**
      * Execution du middleware
      */
-	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-	{
-		if ($this->cors->isPreflightRequest($request)) {
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        if ($this->cors->isPreflightRequest($request)) {
             $response = $this->cors->handlePreflightRequest($request);
 
             return $this->cors->varyHeader($response, 'Access-Control-Request-Method');
         }
 
-		$response = $handler->handle($request);
+        $response = $handler->handle($request);
 
-		if ($request->getMethod() === 'OPTIONS') {
+        if ($request->getMethod() === 'OPTIONS') {
             $response = $this->cors->varyHeader($response, 'Access-Control-Request-Method');
         }
 
-		if (! $response->hasHeader('Access-Control-Allow-Origin')) {
-            $response =  $this->cors->addActualRequestHeaders($request, $response);
+        if (! $response->hasHeader('Access-Control-Allow-Origin')) {
+            $response = $this->cors->addActualRequestHeaders($request, $response);
         }
 
-		return $response;
-	}
+        return $response;
+    }
 }

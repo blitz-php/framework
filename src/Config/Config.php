@@ -148,7 +148,7 @@ class Config
     {
         $this->load($key, null, $schema, true);
 
-		return $this;
+        return $this;
     }
 
     /**
