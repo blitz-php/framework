@@ -76,7 +76,10 @@
         "sa": "@analyze",
         "style": "@cs:fix",
         "test": "kahlan",
-        "test:cov": "kahlan --coverage=3 --reporter=verbose --clover=scrutinizer.xml"
+        "test:cov": [
+			"Composer\\Config::disableProcessTimeout",
+			"kahlan --coverage=3 --reporter=verbose --clover=scrutinizer.xml"
+		]
     },
     "scripts-descriptions": {
         "analyze": "Lance l'analyse statique du code du framework",

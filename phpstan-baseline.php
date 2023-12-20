@@ -127,11 +127,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Http/Response.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property BlitzPHP\\\\Http\\\\ServerRequest\\:\\:\\$uploadedFiles \\(array\\<BlitzPHP\\\\Filesystem\\\\Files\\\\UploadedFile\\>\\) does not accept array\\<array\\<BlitzPHP\\\\Filesystem\\\\Files\\\\UploadedFile\\>\\|Psr\\\\Http\\\\Message\\\\UploadedFileInterface\\>\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Http/ServerRequest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Access to constant DEBUG_SERVER on an unknown class PHPMailer\\\\PHPMailer\\\\SMTP\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
