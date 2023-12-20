@@ -144,9 +144,11 @@ class Config
      * Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration)
      * Ceci est notament utilse pour definir des configurations à la volée
      */
-    public function ghost(array|string $key, ?Schema $schema = null): void
+    public function ghost(array|string $key, ?Schema $schema = null): static
     {
         $this->load($key, null, $schema, true);
+
+		return $this;
     }
 
     /**

@@ -756,6 +756,10 @@ class ServerRequest implements ServerRequestInterface
      */
     public function hasHeader(string $name): bool
     {
+        if (isset($this->_environment[$name])) {
+            return true;
+        }
+
         if (isset($this->_environment[$this->normalizeHeaderName($name)])) {
             return true;
         }
@@ -778,7 +782,11 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getHeader(string $name): array
     {
-        $name = $this->normalizeHeaderName($name);
+        if (isset($this->_environment[$name])) {
+            return (array) $this->_environment[$name];
+        }
+
+		$name = $this->normalizeHeaderName($name);
         if (isset($this->_environment[$name])) {
             return (array) $this->_environment[$name];
         }
