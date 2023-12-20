@@ -32,6 +32,7 @@ use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ResponseEmitter;
 use BlitzPHP\Http\ServerRequest;
+use BlitzPHP\Http\ServerRequestFactory;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Http\UrlGenerator;
 use BlitzPHP\Mail\Mail;
@@ -330,7 +331,7 @@ class Services
             return static::$instances[Request::class];
         }
 
-        return static::$instances[Request::class] = new Request();
+        return static::$instances[Request::class] = ServerRequestFactory::fromGlobals();
     }
 
     /**
