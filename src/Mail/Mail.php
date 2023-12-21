@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Mail;
 
+use BlitzPHP\Contracts\Mail\MailerInterface;
 use BlitzPHP\Mail\Adapters\AbstractAdapter;
 use BlitzPHP\Mail\Adapters\PHPMailer;
 use BlitzPHP\Mail\Adapters\SymfonyMailer;
@@ -349,7 +350,7 @@ class Mail implements MailerInterface
 
         $view = view($path . $view, $data);
         if (! empty($this->config['template'])) {
-            $view->setLayout($this->config['template']);
+            $view->layout($this->config['template']);
         }
 
         return $this->html($view->get(false));

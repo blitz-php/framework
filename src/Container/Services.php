@@ -13,10 +13,10 @@ namespace BlitzPHP\Container;
 
 use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Autoloader\Locator;
-use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Config\Config;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Database\ConnectionResolverInterface;
 use BlitzPHP\Contracts\Security\EncrypterInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;

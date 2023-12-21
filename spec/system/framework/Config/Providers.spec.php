@@ -27,7 +27,7 @@ describe('Config / Providers', function () {
 		expect($classes)->toBeA('array');
 
 		expect($definitions)->toContainKeys($classes + $interfaces);
-		expect($interfaces)->toContain(\BlitzPHP\Autoloader\LocatorInterface::class);
+		expect($interfaces)->toContain(\BlitzPHP\Contracts\Autoloader\LocatorInterface::class);
 		expect($classes)->toContain(\BlitzPHP\Autoloader\Autoloader::class);
 	});
 });

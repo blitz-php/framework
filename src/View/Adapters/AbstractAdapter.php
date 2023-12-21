@@ -11,11 +11,11 @@
 
 namespace BlitzPHP\View\Adapters;
 
-use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
+use BlitzPHP\Contracts\View\RendererInterface;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Utilities\Helpers;
-use BlitzPHP\View\RendererInterface;
 use BlitzPHP\View\ViewDecoratorTrait;
 
 abstract class AbstractAdapter implements RendererInterface

@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Event;
 
-use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Event\EventListenerInterface;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
 

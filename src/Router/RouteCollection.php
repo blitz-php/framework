@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Router;
 
-use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Exceptions\RouterException;
 use Closure;

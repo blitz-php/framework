@@ -11,7 +11,7 @@
 
 namespace Spec\BlitzPHP\App\Views;
 
-use BlitzPHP\View\ViewDecoratorInterface;
+use BlitzPHP\Contracts\View\ViewDecoratorInterface;
 
 /**
  * Cette classe n'est utilisée que pour fournir un point de référence pendant les tests afin de s'assurer que les choses fonctionnent comme prévu.

@@ -13,8 +13,8 @@ namespace BlitzPHP\Cli\Console;
 
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
-use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\CLIException;
 use BlitzPHP\Traits\SingletonTrait;

@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\View;
 
+use BlitzPHP\Contracts\View\ViewDecoratorInterface;
 use BlitzPHP\Exceptions\ViewException;
 
 trait ViewDecoratorTrait

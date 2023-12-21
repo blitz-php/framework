@@ -12,9 +12,11 @@
 namespace BlitzPHP\View;
 
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\View\RendererInterface;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Validation\ErrorBag;
+use BlitzPHP\View\Adapters\AbstractAdapter;
 use BlitzPHP\View\Adapters\BladeAdapter;
 use BlitzPHP\View\Adapters\LatteAdapter;
 use BlitzPHP\View\Adapters\NativeAdapter;
@@ -38,6 +40,8 @@ class View implements Stringable
 
     /**
      * Liste des adapters pris en comptes
+	 *
+	 * @var array<string, class-string<AbstractAdapter>>
      */
     public static array $validAdapters = [
         'native' => NativeAdapter::class,

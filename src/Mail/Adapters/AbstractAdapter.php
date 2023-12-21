@@ -12,7 +12,7 @@
 namespace BlitzPHP\Mail\Adapters;
 
 use BadMethodCallException;
-use BlitzPHP\Mail\MailerInterface;
+use BlitzPHP\Contracts\Mail\MailerInterface;
 use BlitzPHP\Utilities\String\Text;
 use InvalidArgumentException;
 use RuntimeException;

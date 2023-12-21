@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Autoloader\LocatorInterface;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 
 /**
  * Recherche tous les contrôleurs dans un namespace pour la liste des routes automatiques.

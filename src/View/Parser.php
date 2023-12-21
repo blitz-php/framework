@@ -458,7 +458,7 @@ class Parser extends NativeAdapter
      * @param string $leftDelimiter
      * @param string $rightDelimiter
      */
-    public function setDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): RendererInterface
+    public function setDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): static
     {
         $this->leftDelimiter  = $leftDelimiter;
         $this->rightDelimiter = $rightDelimiter;
@@ -472,7 +472,7 @@ class Parser extends NativeAdapter
      * @param string $leftDelimiter
      * @param string $rightDelimiter
      */
-    public function setConditionalDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): RendererInterface
+    public function setConditionalDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): static
     {
         $this->leftConditionalDelimiter  = $leftDelimiter;
         $this->rightConditionalDelimiter = $rightDelimiter;
