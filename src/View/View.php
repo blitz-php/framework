@@ -40,8 +40,8 @@ class View implements Stringable
 
     /**
      * Liste des adapters pris en comptes
-	 *
-	 * @var array<string, class-string<AbstractAdapter>>
+     *
+     * @var array<string, class-string<AbstractAdapter>>
      */
     public static array $validAdapters = [
         'native' => NativeAdapter::class,

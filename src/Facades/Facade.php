@@ -19,13 +19,13 @@ abstract class Facade
 
     public static function __callStatic(string $name, array $arguments = [])
     {
-		if (is_string($accessor = static::accessor())) {
-			$accessor = service($accessor);
-		}
+        if (is_string($accessor = static::accessor())) {
+            $accessor = service($accessor);
+        }
 
-		if ( ! is_object($accessor)) {
-			throw new InvalidArgumentException(sprintf('La methode `%s::accessor` doit retourner un object ou le nom d\'un service.', static::class));
-		}
+        if (! is_object($accessor)) {
+            throw new InvalidArgumentException(sprintf('La methode `%s::accessor` doit retourner un object ou le nom d\'un service.', static::class));
+        }
 
         return $accessor->{$name}(...$arguments);
     }
