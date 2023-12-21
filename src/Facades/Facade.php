@@ -11,13 +11,23 @@
 
 namespace BlitzPHP\Facades;
 
+use InvalidArgumentException;
+
 abstract class Facade
 {
-    abstract protected static function accessor(): object;
+    abstract protected static function accessor(): object|string;
 
     public static function __callStatic(string $name, array $arguments = [])
     {
-        return static::accessor()->{$name}(...$arguments);
+		if (is_string($accessor = static::accessor())) {
+			$accessor = service($accessor);
+		}
+
+		if ( ! is_object($accessor)) {
+			throw new InvalidArgumentException(sprintf('La methode `%s::accessor` doit retourner un object ou le nom d\'un service.', static::class));
+		}
+
+        return $accessor->{$name}(...$arguments);
     }
 
     public function __call(string $name, array $arguments = [])
