@@ -25,6 +25,25 @@ use BlitzPHP\Utilities\Helpers;
 
 // =================================  ================================= //
 
+if (! function_exists('url')) {
+    /**
+     * Générer une url pour l'application.
+     *
+     * @return UrlGenerator|string
+     */
+    function url(?string $path = null, mixed $parameters = [], ?bool $secure = null)
+    {
+		/** @var UrlGenerator $generator */
+        $generator = service(UrlGenerator::class);
+
+        if (null === $path) {
+            return $generator;
+        }
+
+        return $generator->to($path, $parameters, $secure);
+    }
+}
+
 if (! function_exists('site_url')) {
     /**
      * Renvoie une URL de site telle que définie par la configuration de l'application.
@@ -106,10 +125,7 @@ if (! function_exists('previous_url')) {
      */
     function previous_url(bool $returnObject = false)
     {
-        /** @var UrlGenerator $generator */
-        $generator = service(UrlGenerator::class);
-
-        $referer = $generator->previous();
+        $referer = url()->previous();
 
         return $returnObject ? Services::uri($referer) : $referer;
     }
@@ -482,6 +498,18 @@ if (! function_exists('route')) {
     function route(string $method, ...$params)
     {
         return Services::routes()->reverseRoute($method, ...$params);
+    }
+}
+
+if (! function_exists('action')) {
+    /**
+     * Obtenir l'URL d'une action du contrôleur.
+     *
+     * @return false|string
+     */
+    function action(array|string $action, array $parameters = [])
+    {
+		return url()->action($action, $parameters);
     }
 }
 
