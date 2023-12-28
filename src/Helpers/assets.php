@@ -475,7 +475,7 @@ if (! function_exists('mix')) {
     /**
      * Obtenez le chemin d'accès à un fichier Mix versionné.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     function mix(string $path, string $manifestDirectory = ''): string
     {

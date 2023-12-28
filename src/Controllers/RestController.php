@@ -118,7 +118,7 @@ class RestController extends BaseController
      *
      * Ceci permet aux classes filles de specifier comment elles doivent gerer les exceptions lors de la methode remap
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     protected function manageException(Throwable $ex)
     {
@@ -172,7 +172,7 @@ class RestController extends BaseController
      * @param int|string|null $code    Code d'erreur personnalisé, spécifique à l'API
      * @param array           $errors  La liste des erreurs rencontrées
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     final protected function respondFail(?string $message = "Une erreur s'est produite", ?int $status = StatusCode::INTERNAL_ERROR, null|int|string $code = null, array $errors = [])
     {
@@ -204,7 +204,7 @@ class RestController extends BaseController
      *
      * @param mixed|null $result Les données renvoyées par l'API
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
     final protected function respondSuccess(?string $message = 'Resultat', $result = null, ?int $status = StatusCode::OK)
     {

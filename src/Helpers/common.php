@@ -233,7 +233,7 @@ if (! function_exists('logger')) {
      *
      * @param int|string $level
      *
-     * @return \BlitzPHP\Debug\Logger|void
+     * @return BlitzPHP\Debug\Logger|void
      */
     function logger($level = null, ?string $message = null, array $context = [])
     {
@@ -259,7 +259,7 @@ if (! function_exists('cache')) {
      *
      * @param mixed|null $value
      *
-     * @return \BlitzPHP\Cache\Cache|bool|mixed
+     * @return BlitzPHP\Cache\Cache|bool|mixed
      */
     function cache(?string $key = null, $value = null)
     {
@@ -961,7 +961,7 @@ if (! function_exists('view')) {
     /**
      * Charge une vue
      *
-     * @return \BlitzPHP\View\View
+     * @return BlitzPHP\View\View
      */
     function view(string $view, array $data = [], array $options = [])
     {
@@ -1024,7 +1024,7 @@ if (! function_exists('to_stream')) {
      *
      * @uses GuzzleHttp\Psr7\stream_for
      *
-     * @throws \InvalidArgumentException si l'argument $resource n'est pas valide.
+     * @throws InvalidArgumentException si l'argument $resource n'est pas valide.
      */
     function to_stream($resource = '', array $options = []): Psr\Http\Message\StreamInterface
     {

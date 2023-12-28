@@ -1,21 +1,21 @@
 <?php
 /**
- * @var \BlitzPHP\Debug\Toolbar $this
- * @var int                     $totalTime
- * @var int                     $totalMemory
- * @var string                  $url
- * @var string                  $method
- * @var bool                    $isAJAX
- * @var int                     $startTime
- * @var int                     $totalTime
- * @var int                     $totalMemory
- * @var float                   $segmentDuration
- * @var int                     $segmentCount
- * @var string                  $blitzVersion
- * @var array                   $collectors
- * @var array                   $vars
- * @var array                   $styles
- * @var \BlitzPHP\View\Parser   $parser
+ * @var BlitzPHP\Debug\Toolbar $this
+ * @var int                    $totalTime
+ * @var int                    $totalMemory
+ * @var string                 $url
+ * @var string                 $method
+ * @var bool                   $isAJAX
+ * @var int                    $startTime
+ * @var int                    $totalTime
+ * @var int                    $totalMemory
+ * @var float                  $segmentDuration
+ * @var int                    $segmentCount
+ * @var string                 $blitzVersion
+ * @var array                  $collectors
+ * @var array                  $vars
+ * @var array                  $styles
+ * @var BlitzPHP\View\Parser   $parser
  */
 ?>
 <style type="text/css">/* BlitzPHP - Debug bar ======== Credit: CodeIgniter - https://codeigniter.com */<?= preg_replace('#[\r\n\t ]+#', ' ', file_get_contents(__DIR__ . '/toolbar.css')) ?></style>

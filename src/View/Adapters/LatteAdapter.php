@@ -24,7 +24,7 @@ class LatteAdapter extends AbstractAdapter
     /**
      * Instance Latte
      *
-     * @var \Latte\Engine
+     * @var Engine
      */
     private $latte;
 

@@ -29,11 +29,11 @@ if (! function_exists('url')) {
     /**
      * Générer une url pour l'application.
      *
-     * @return UrlGenerator|string
+     * @return string|UrlGenerator
      */
     function url(?string $path = null, mixed $parameters = [], ?bool $secure = null)
     {
-		/** @var UrlGenerator $generator */
+        /** @var UrlGenerator $generator */
         $generator = service(UrlGenerator::class);
 
         if (null === $path) {
@@ -93,7 +93,7 @@ if (! function_exists('current_url')) {
      *
      * @param bool $returnObject True pour renvoyer un objet au lieu d'une chaîne
      *
-     * @return \BlitzPHP\Http\Uri|string
+     * @return BlitzPHP\Http\Uri|string
      */
     function current_url(bool $returnObject = false, ?ServerRequest $request = null)
     {
@@ -121,7 +121,7 @@ if (! function_exists('previous_url')) {
      * Si ce n'est pas disponible, cependant, nous utiliserons une URL épurée de $_SERVER['HTTP_REFERER']
      * qui peut être défini par l'utilisateur, il n'est donc pas fiable et n'est pas défini par certains navigateurs/serveurs.
      *
-     * @return \BlitzPHP\Http\Uri|mixed|string
+     * @return BlitzPHP\Http\Uri|mixed|string
      */
     function previous_url(bool $returnObject = false)
     {
@@ -509,7 +509,7 @@ if (! function_exists('action')) {
      */
     function action(array|string $action, array $parameters = [])
     {
-		return url()->action($action, $parameters);
+        return url()->action($action, $parameters);
     }
 }
 

@@ -596,7 +596,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param string[] $types Les types à vérifier.
      *
-     * @see \BlitzPHP\Http\ServerRequest::is()
+     * @see ServerRequest::is()
      */
     public function isAll(array $types): bool
     {
