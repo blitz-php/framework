@@ -30,6 +30,7 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Http\Uri;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
+use BlitzPHP\Validation\ErrorBag;
 use Closure;
 use Exception;
 use InvalidArgumentException;
@@ -748,7 +749,7 @@ class Dispatcher
             return $this->formatResponse($response->withStatus($code), [
                 'success' => false,
                 'code'    => $code,
-                'errors'  => $errors,
+                'errors'  => $errors instanceof ErrorBag ? $errors->all() : (array) $errors,
             ]);
         }
 

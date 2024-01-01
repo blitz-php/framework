@@ -26,7 +26,7 @@ class ValidationException extends BaseValidationException
     protected $code = StatusCode::BAD_REQUEST;
 
     /**
-     * Set errors
+     * {@inheritDoc}
      */
     public function setErrors(?RakitErrorBag $errors): self
     {
@@ -34,4 +34,12 @@ class ValidationException extends BaseValidationException
 
         return $this;
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getErrors(): ?ErrorBag
+	{
+		return $this->errors;
+	}
 }
