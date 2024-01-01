@@ -549,7 +549,7 @@ class Dispatcher
      *
      * Cela permet au fournisseur une détection plus sûre et plus fiable de la fonction previous_url().
      *
-     * @param \BlitzPHP\Http\Uri|string $uri
+     * @param string|Uri $uri
      */
     public function storePreviousURL($uri)
     {

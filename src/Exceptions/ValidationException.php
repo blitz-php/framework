@@ -35,11 +35,11 @@ class ValidationException extends BaseValidationException
         return $this;
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function getErrors(): ?ErrorBag
-	{
-		return $this->errors;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function getErrors(): ?ErrorBag
+    {
+        return $this->errors;
+    }
 }

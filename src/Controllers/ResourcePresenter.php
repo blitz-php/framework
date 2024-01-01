@@ -21,7 +21,7 @@ class ResourcePresenter extends ApplicationController
     /**
      * Présenter une vue des objets de ressource
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function index()
     {

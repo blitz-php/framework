@@ -93,7 +93,7 @@ if (! function_exists('current_url')) {
      *
      * @param bool $returnObject True pour renvoyer un objet au lieu d'une chaîne
      *
-     * @return BlitzPHP\Http\Uri|string
+     * @return string|Uri
      */
     function current_url(bool $returnObject = false, ?ServerRequest $request = null)
     {
@@ -121,7 +121,7 @@ if (! function_exists('previous_url')) {
      * Si ce n'est pas disponible, cependant, nous utiliserons une URL épurée de $_SERVER['HTTP_REFERER']
      * qui peut être défini par l'utilisateur, il n'est donc pas fiable et n'est pas défini par certains navigateurs/serveurs.
      *
-     * @return BlitzPHP\Http\Uri|mixed|string
+     * @return mixed|string|Uri
      */
     function previous_url(bool $returnObject = false)
     {
