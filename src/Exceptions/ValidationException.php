@@ -40,6 +40,10 @@ class ValidationException extends BaseValidationException
      */
     public function getErrors(): ?ErrorBag
     {
+        if ($this->errors instanceof RakitErrorBag) {
+            $this->errors = ErrorBag::fromBase($this->errors);
+        }
+
         return $this->errors;
     }
 }
