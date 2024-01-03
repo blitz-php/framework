@@ -191,7 +191,7 @@ class Redirection extends Response
         }
 
         if (! empty($errors)) {
-			$this->session->flashErrors($errors, $key);
+            $this->session->flashErrors($errors, $key);
         }
 
         return $this;

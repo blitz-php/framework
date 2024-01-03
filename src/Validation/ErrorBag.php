@@ -20,6 +20,6 @@ class ErrorBag extends DimtrovichErrorBag
      */
     public function empty(): bool
     {
-        return $this->count() == 0;
+        return $this->count() === 0;
     }
 }
