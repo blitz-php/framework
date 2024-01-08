@@ -18,7 +18,7 @@ return Expect::structure([
     'expanded'               => Expect::bool()->default(false),
     'rich_theme'             => Expect::string()->default('original.css'),
     'rich_folder'            => Expect::bool()->default(false),
-    'rich_sort'              => Expect::int()->default(\Kint\Renderer\AbstractRenderer::SORT_FULL),
+    'rich_sort'              => Expect::int()->default(Kint\Renderer\AbstractRenderer::SORT_FULL),
     'rich_value_plugins'     => Expect::arrayOf('string', 'string'),
     'rich_tab_plugins'       => Expect::arrayOf('string', 'string'),
     'cli_colors'             => Expect::bool()->default(true),

@@ -1028,7 +1028,7 @@ if (! function_exists('to_stream')) {
      */
     function to_stream($resource = '', array $options = []): Psr\Http\Message\StreamInterface
     {
-        return \GuzzleHttp\Psr7\Utils::streamFor($resource, $options);
+        return GuzzleHttp\Psr7\Utils::streamFor($resource, $options);
     }
 }
 
