@@ -20,8 +20,8 @@ class Validator extends BaseValidator
      */
     protected static string $validationClass = Validation::class;
 
-    public static function validate(array $data, array $rules, array $messages = []): array
+    public static function validate(array $data, array $rules, array $messages = [], array $attributes = []): array
     {
-        return static::make($data, $rules, $messages)->validate();
+        return static::make($data, $rules, $messages, $attributes)->validate();
     }
 }
