@@ -185,9 +185,9 @@ class Redirection extends Response
      */
     public function withErrors(array|ErrorBag|string|Validation $errors, string $key = 'default'): static
     {
-		if ($errors instanceof Validation) {
-			$errors = $errors->errors();
-		}
+        if ($errors instanceof Validation) {
+            $errors = $errors->errors();
+        }
         if ($errors instanceof ErrorBag) {
             $errors = $errors->toArray();
         } elseif (is_string($errors)) {

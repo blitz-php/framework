@@ -30,7 +30,7 @@ class Validation extends BaseValidation
      */
     public function errors(): ErrorBag
     {
-		return ErrorBag::fromBase(parent::errors());
+        return ErrorBag::fromBase(parent::errors());
     }
 
     /**
