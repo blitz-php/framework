@@ -16,6 +16,7 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Validation\ErrorBag;
+use BlitzPHP\Validation\Validation;
 use GuzzleHttp\Psr7\UploadedFile;
 
 /**
@@ -182,8 +183,11 @@ class Redirection extends Response
     /**
      * Ajoute des erreurs à la session en tant que Flashdata.
      */
-    public function withErrors(array|ErrorBag|string $errors, string $key = 'default'): static
+    public function withErrors(array|ErrorBag|string|Validation $errors, string $key = 'default'): static
     {
+		if ($errors instanceof Validation) {
+			$errors = $errors->errors();
+		}
         if ($errors instanceof ErrorBag) {
             $errors = $errors->toArray();
         } elseif (is_string($errors)) {
