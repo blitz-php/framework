@@ -23,7 +23,7 @@ class ValidationException extends BaseValidationException
      *
      * @var int
      */
-    protected $code = StatusCode::BAD_REQUEST;
+    protected $code = StatusCode::UNPROCESSABLE_ENTITY;
 
     /**
      * {@inheritDoc}
