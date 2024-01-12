@@ -42,6 +42,13 @@ class MiddlewareQueue implements Countable, SeekableIterator
     protected array $aliases = [];
 
     /**
+     * Groupes de middlewares
+	 *
+	 * @var array<string, array>
+     */
+    protected array $groups = [];
+
+    /**
      * Constructor
      *
      * @param array $middleware Liste des middlewares initiaux
@@ -69,6 +76,18 @@ class MiddlewareQueue implements Countable, SeekableIterator
     public function aliases(array $aliases): static
     {
         $this->aliases = array_merge($this->aliases, $aliases);
+
+        return $this;
+    }
+
+    /**
+     * Ajoute des groupes de middlewares
+     *
+     * @param array<string, array> $groups
+     */
+    public function groups(array $groups): static
+    {
+        $this->groups = array_merge($this->groups, $groups);
 
         return $this;
     }
@@ -295,12 +314,14 @@ class MiddlewareQueue implements Countable, SeekableIterator
     public function register(array $config)
     {
         $config += [
-            'aliases' => [],
-            'globals' => [],
-            'build'   => static fn () => null,
+			'aliases' => [],
+			'globals' => [],
+			'groups'  => [],
+			'build'   => static fn () => null,
         ];
 
         $this->aliases($config['aliases']);
+        $this->groups($config['groups']);
 
         foreach ($config['globals'] as $middleware) {
             $this->add($middleware);
@@ -313,6 +334,32 @@ class MiddlewareQueue implements Countable, SeekableIterator
             ]);
         }
     }
+
+	/**
+	 * Resout les groups pour definir les middlewares
+	 *
+	 * @internal
+	 */
+	public function resolveGroups()
+	{
+		foreach ($this->queue as $queue) {
+			if (is_string($queue) && !empty($this->groups[$queue])) {
+				if (! is_array($this->groups[$queue])) {
+					continue;
+				}
+
+				$i = array_search($queue, $this->queue);
+				$j = 0;
+
+				unset($this->queue[$i]);
+
+				foreach ($this->groups[$queue] as $middleware) {
+					$this->insertAt(($i + $j), $middleware);
+					$j++;
+				}
+			}
+		}
+	}
 
     /**
      * {@internal}

@@ -67,4 +67,41 @@ describe('Http / MiddlewareRunner', function () {
 
 		expect($log)->toBe(['one', 'two', 'three']);
 	});
+
+	it("Groupe de middlewares", function () {
+		$log = [];
+        $one = function ($request, $handler) use (&$log) {
+            $log[] = 'one';
+
+            return $handler->handle($request);
+        };
+        $two = function ($request, $handler) use (&$log) {
+            $log[] = 'two';
+
+            return $handler->handle($request);
+        };
+        $three = function ($request, $handler) use (&$log) {
+            $log[] = 'three';
+
+            return $handler->handle($request);
+        };
+        $four = function ($request, $handler) use (&$log) {
+            $log[] = 'four';
+
+            return $handler->handle($request);
+        };
+
+		$groups = [
+			'web' => [$two, $three],
+			'api' => [$four],
+		];
+
+        $this->queue->groups($groups)->add('web')->add($one)->add(['api']);
+
+		$runner = new MiddlewareRunner();
+        $result = $runner->run($this->queue, $this->request);
+        expect($result)->toBeAnInstanceOf(Response::class);
+
+		expect($log)->toBe(['two', 'three', 'one', 'four']);
+	});
 });

@@ -38,6 +38,7 @@ class MiddlewareRunner implements RequestHandlerInterface
         $this->queue    = $queue;
         $this->fallback = $fallback;
         $this->queue->rewind();
+		$this->queue->resolveGroups();
 
         return $this->handle($request);
     }
