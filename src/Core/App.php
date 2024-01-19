@@ -198,7 +198,7 @@ class App
             $relativePath = Uri::createURIString(null, null, $full->getPath(), $full->getQuery(), $full->getFragment());
         }
 
-        $relativePath = URI::removeDotSegments($relativePath);
+        $relativePath = Uri::removeDotSegments($relativePath);
 
         // Construire l'URL complète basée sur $config et $relativePath
         $url = rtrim($config->base_url, '/ ') . '/';

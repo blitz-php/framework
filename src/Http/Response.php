@@ -671,7 +671,7 @@ class Response implements ResponseInterface
         }
 
         if (! array_key_exists($code, $this->_statusCodes) && empty($reasonPhrase)) {
-            throw HttPException::unkownStatusCode($code);
+            throw HttpException::unkownStatusCode($code);
         }
 
         $this->_status = $code;

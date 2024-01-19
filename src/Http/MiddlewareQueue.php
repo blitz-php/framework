@@ -43,8 +43,8 @@ class MiddlewareQueue implements Countable, SeekableIterator
 
     /**
      * Groupes de middlewares
-	 *
-	 * @var array<string, array>
+     *
+     * @var array<string, array>
      */
     protected array $groups = [];
 
@@ -314,10 +314,10 @@ class MiddlewareQueue implements Countable, SeekableIterator
     public function register(array $config)
     {
         $config += [
-			'aliases' => [],
-			'globals' => [],
-			'groups'  => [],
-			'build'   => static fn () => null,
+            'aliases' => [],
+            'globals' => [],
+            'groups'  => [],
+            'build'   => static fn () => null,
         ];
 
         $this->aliases($config['aliases']);
@@ -335,31 +335,31 @@ class MiddlewareQueue implements Countable, SeekableIterator
         }
     }
 
-	/**
-	 * Resout les groups pour definir les middlewares
-	 *
-	 * @internal
-	 */
-	public function resolveGroups()
-	{
-		foreach ($this->queue as $queue) {
-			if (is_string($queue) && !empty($this->groups[$queue])) {
-				if (! is_array($this->groups[$queue])) {
-					continue;
-				}
+    /**
+     * Resout les groups pour definir les middlewares
+     *
+     * @internal
+     */
+    public function resolveGroups()
+    {
+        foreach ($this->queue as $queue) {
+            if (is_string($queue) && ! empty($this->groups[$queue])) {
+                if (! is_array($this->groups[$queue])) {
+                    continue;
+                }
 
-				$i = array_search($queue, $this->queue);
-				$j = 0;
+                $i = array_search($queue, $this->queue, true);
+                $j = 0;
 
-				unset($this->queue[$i]);
+                unset($this->queue[$i]);
 
-				foreach ($this->groups[$queue] as $middleware) {
-					$this->insertAt(($i + $j), $middleware);
-					$j++;
-				}
-			}
-		}
-	}
+                foreach ($this->groups[$queue] as $middleware) {
+                    $this->insertAt(($i + $j), $middleware);
+                    $j++;
+                }
+            }
+        }
+    }
 
     /**
      * {@internal}

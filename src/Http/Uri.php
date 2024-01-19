@@ -292,11 +292,11 @@ class Uri implements UriInterface
     public function setSegment(int $number, $value)
     {
         if ($number < 1) {
-            throw HTTPException::uriSegmentOutOfRange($number);
+            throw HttpException::uriSegmentOutOfRange($number);
         }
 
         if ($number > count($this->segments) + 1) {
-            throw HTTPException::uriSegmentOutOfRange($number);
+            throw HttpException::uriSegmentOutOfRange($number);
         }
 
         // Le segment doit traiter le tableau comme basé sur 1 pour l'utilisateur
@@ -545,7 +545,7 @@ class Uri implements UriInterface
     public function setQuery(string $query): self
     {
         if (str_contains($query, '#')) {
-            throw HTTPException::malformedQueryString();
+            throw HttpException::malformedQueryString();
         }
 
         // Ne peut pas avoir de début ?

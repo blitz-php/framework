@@ -267,7 +267,7 @@ class RestController extends BaseController
         $config = array_merge(['base_url' => base_url()], $this->config->jwt ?? [], $config);
 
         if ('bearer' === $authType) {
-            return JWT::decode($token, $config);
+            return Jwt::decode($token, $config);
         }
 
         return null;
