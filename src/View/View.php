@@ -241,6 +241,10 @@ class View implements Stringable
             $key = [$key => $value];
         }
 
+		if (isset($key['errors'])) {
+			$this->withErrors($key['errors']);
+		}
+
         return $this->addData($key, $context);
     }
 
@@ -264,7 +268,7 @@ class View implements Stringable
             $errors = new ErrorBag($messages);
         }
 
-        $this->share('errors', $errors);
+		$this->adapter->setVar('errors', $errors);
 
         return $this;
     }
