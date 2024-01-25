@@ -756,15 +756,15 @@ class Dispatcher
         return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
     }
 
-	/**
-	 * Verifie que la requete est xhr/fetch pour eviter d'afficher la toolbar dans la reponse
-	 */
-	private function isAjaxRequest(): bool
-	{
-		return $this->request->expectsJson() ||
-				$this->request->isJson() ||
-				$this->request->is('ajax') ||
-				$this->request->hasHeader('Hx-Request') ||
-				Text::contains($this->response->getType(), ['/json', '+json']);
-	}
+    /**
+     * Verifie que la requete est xhr/fetch pour eviter d'afficher la toolbar dans la reponse
+     */
+    private function isAjaxRequest(): bool
+    {
+        return $this->request->expectsJson()
+                || $this->request->isJson()
+                || $this->request->is('ajax')
+                || $this->request->hasHeader('Hx-Request')
+                || Text::contains($this->response->getType(), ['/json', '+json']);
+    }
 }
