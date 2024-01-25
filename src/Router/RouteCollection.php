@@ -970,25 +970,9 @@ class RouteCollection implements RouteCollectionInterface
                 'as' => $routeName . '.index',
             ]);
         }
-        if (in_array('show', $methods, true)) {
-            $this->get($name . '/show/' . $id, $newName . '::show/$1', $options + [
-                'as' => $routeName . '.view',
-            ]);
-            $this->get($name . '/' . $id, $newName . '::show/$1', $options + [
-                'as' => $routeName . '.show',
-            ]);
-        }
         if (in_array('new', $methods, true)) {
             $this->get($name . '/new', $newName . '::new', $options + [
                 'as' => $routeName . '.new',
-            ]);
-        }
-        if (in_array('create', $methods, true)) {
-            $this->post($name . '/create', $newName . '::create', $options + [
-                'as' => $routeName . '.create',
-            ]);
-            $this->post($name, $newName . '::create', $options + [
-                'as' => $routeName . '.store',
             ]);
         }
         if (in_array('edit', $methods, true)) {
@@ -1009,6 +993,22 @@ class RouteCollection implements RouteCollectionInterface
         if (in_array('delete', $methods, true)) {
             $this->post($name . '/delete/' . $id, $newName . '::delete/$1', $options + [
                 'as' => $routeName . '.delete',
+            ]);
+        }
+        if (in_array('create', $methods, true)) {
+            $this->post($name . '/create', $newName . '::create', $options + [
+                'as' => $routeName . '.create',
+            ]);
+            $this->post($name, $newName . '::create', $options + [
+                'as' => $routeName . '.store',
+            ]);
+        }
+        if (in_array('show', $methods, true)) {
+            $this->get($name . '/show/' . $id, $newName . '::show/$1', $options + [
+                'as' => $routeName . '.view',
+            ]);
+            $this->get($name . '/' . $id, $newName . '::show/$1', $options + [
+                'as' => $routeName . '.show',
             ]);
         }
 
