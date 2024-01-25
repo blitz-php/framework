@@ -588,7 +588,7 @@ class Dispatcher
      */
     protected function sendResponse()
     {
-        if (! ($this->request->expectsJson() || $this->request->isJson() || Text::contains($this->response->getType(), ['/json', '+json']))) {
+        if (! $this->isAjaxRequest()) {
             $this->response = Services::toolbar()->prepare(
                 $this->getPerformanceStats(),
                 $this->request,
@@ -745,7 +745,7 @@ class Dispatcher
             throw $e;
         }
 
-        if ($this->request->expectsJson() || $this->request->isJson() || Text::contains($this->response->getType(), ['/json', '+json'])) {
+        if ($this->isAjaxRequest()) {
             return $this->formatResponse($response->withStatus($code), [
                 'success' => false,
                 'code'    => $code,
@@ -755,4 +755,16 @@ class Dispatcher
 
         return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
     }
+
+	/**
+	 * Verifie que la requete est xhr/fetch pour eviter d'afficher la toolbar dans la reponse
+	 */
+	private function isAjaxRequest(): bool
+	{
+		return $this->request->expectsJson() ||
+				$this->request->isJson() ||
+				$this->request->is('ajax') ||
+				$this->request->hasHeader('Hx-Request') ||
+				Text::contains($this->response->getType(), ['/json', '+json']);
+	}
 }
