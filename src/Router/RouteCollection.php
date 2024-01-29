@@ -15,6 +15,7 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Exceptions\RouterException;
+use BlitzPHP\Utilities\String\Text;
 use Closure;
 use InvalidArgumentException;
 
@@ -822,6 +823,8 @@ class RouteCollection implements RouteCollectionInterface
             unset($options['controller']);
         }
 
+		$newName = Text::convertTo($newName, 'pascalcase');
+
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
         // nous avons besoin d'un endroit pour les stocker.
         $id = $options['placeholder'] ?? $this->placeholders[$this->defaultPlaceholder] ?? '(:segment)';
@@ -939,6 +942,8 @@ class RouteCollection implements RouteCollectionInterface
             $newName = ucfirst(esc(strip_tags($options['controller'])));
             unset($options['controller']);
         }
+
+		$newName = Text::convertTo($newName, 'pascalcase');
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
         // nous avons besoin d'un endroit pour les stocker.
