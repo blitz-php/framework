@@ -244,10 +244,11 @@ describe('Views / View', function () {
 
 			$view->withErrors('invalid error');
 
-			$shared = ReflectionHelper::getPrivateProperty($view, 'shared');
+			$adapter  = ReflectionHelper::getPrivateProperty($view, 'adapter');
+			$tempData = ReflectionHelper::getPrivateProperty($adapter, 'tempData');
 
-			expect($shared)->toContainKey('errors');
-			expect($shared['errors'])->toBeAnInstanceOf(ErrorBag::class);
+			expect($tempData)->toContainKey('errors');
+			expect($tempData['errors'])->toBeAnInstanceOf(ErrorBag::class);
 		});
 
 		it('first', function () {

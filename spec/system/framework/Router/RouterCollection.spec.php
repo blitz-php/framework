@@ -574,11 +574,11 @@ describe('RouteCollection', function () {
 
             expect($routes->getRoutes())->toBe([
                 'photos'             => '\Photos::index',
-                'photos/show/(.*)'   => '\Photos::show/$1',
-                'photos/(.*)'        => '\Photos::show/$1',
                 'photos/new'         => '\Photos::new',
                 'photos/edit/(.*)'   => '\Photos::edit/$1',
                 'photos/remove/(.*)' => '\Photos::remove/$1',
+                'photos/show/(.*)'   => '\Photos::show/$1',
+                'photos/(.*)'        => '\Photos::show/$1',
             ]);
 
             $routes = getCollector();
@@ -586,10 +586,10 @@ describe('RouteCollection', function () {
             $routes->presenter('photos');
 
             expect($routes->getRoutes())->toBe([
-                'photos/create'      => '\Photos::create',
-                'photos'             => '\Photos::create',
                 'photos/update/(.*)' => '\Photos::update/$1',
                 'photos/delete/(.*)' => '\Photos::delete/$1',
+                'photos/create'      => '\Photos::create',
+                'photos'             => '\Photos::create',
             ]);
         });
 

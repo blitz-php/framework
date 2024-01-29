@@ -181,11 +181,11 @@ describe('RouteBuilder', function () {
 
             expect($this->routes->getRoutes())->toBe([
                 'photos'             => '\Photos::index',
-                'photos/show/(.*)'   => '\Photos::show/$1',
-                'photos/(.*)'        => '\Photos::show/$1',
                 'photos/new'         => '\Photos::new',
                 'photos/edit/(.*)'   => '\Photos::edit/$1',
                 'photos/remove/(.*)' => '\Photos::remove/$1',
+                'photos/show/(.*)'   => '\Photos::show/$1',
+                'photos/(.*)'        => '\Photos::show/$1',
             ]);
         });
     });
