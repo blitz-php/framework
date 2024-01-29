@@ -35,9 +35,9 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      * Validation des donnees de la requete
      *
      * @param array|class-string<DataValidation> $rules
-	 * @param array $messages Si $rules est une chaine (representant) la classe de validation,
-	 * 						  alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
-	 * 						  Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
+     * @param array                              $messages Si $rules est une chaine (representant) la classe de validation,
+     *                                                     alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
+     *                                                     Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
      */
     public function validate(array|string $rules, array $messages = []): ValidatedInput
     {
@@ -55,9 +55,9 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      * Cree un validateur avec les donnees de la requete actuelle
      *
      * @param array|class-string<DataValidation> $rules
-	 * @param array $messages Si $rules est une chaine (representant) la classe de validation,
-	 * 						  alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
-	 * 						  Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
+     * @param array                              $messages Si $rules est une chaine (representant) la classe de validation,
+     *                                                     alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
+     *                                                     Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
      */
     public function validation(array|string $rules, array $messages = []): Validation
     {

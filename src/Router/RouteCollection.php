@@ -823,7 +823,7 @@ class RouteCollection implements RouteCollectionInterface
             unset($options['controller']);
         }
 
-		$newName = Text::convertTo($newName, 'pascalcase');
+        $newName = Text::convertTo($newName, 'pascalcase');
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
         // nous avons besoin d'un endroit pour les stocker.
@@ -943,7 +943,7 @@ class RouteCollection implements RouteCollectionInterface
             unset($options['controller']);
         }
 
-		$newName = Text::convertTo($newName, 'pascalcase');
+        $newName = Text::convertTo($newName, 'pascalcase');
 
         // Afin de permettre la personnalisation des valeurs d'identifiant autorisées
         // nous avons besoin d'un endroit pour les stocker.

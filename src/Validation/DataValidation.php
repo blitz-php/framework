@@ -27,16 +27,16 @@ abstract class DataValidation
      */
     protected string $source = 'all';
 
-	/**
-	 * Parametres supplementaires transmis pour aider à la validation des données
-	 *
-	 * Par exemple, on peut spécifier (au niveau du contrôleur) l'ID à ignorer pour la règle `unique`.
-	 *
-	 * @var array<string,mixed>
-	 *
-	 * @internal N'est pas destiné à être utilisé ou modifié par le développeur
-	 */
-	protected array $params = [];
+    /**
+     * Parametres supplementaires transmis pour aider à la validation des données
+     *
+     * Par exemple, on peut spécifier (au niveau du contrôleur) l'ID à ignorer pour la règle `unique`.
+     *
+     * @var array<string,mixed>
+     *
+     * @internal N'est pas destiné à être utilisé ou modifié par le développeur
+     */
+    protected array $params = [];
 
     /**
      * Regles de validation
@@ -85,12 +85,12 @@ abstract class DataValidation
 
     /**
      * @internal
-	 *
-	 * @param array<string,mixed> $params Parametres supplementaires transmis pour aider à la validation des données
+     *
+     * @param array<string,mixed> $params Parametres supplementaires transmis pour aider à la validation des données
      */
     public function process(Request $request, array $params = []): Validation
     {
-		$this->params = $params;
+        $this->params = $params;
 
         $validation = new Validation();
 
@@ -102,13 +102,15 @@ abstract class DataValidation
         return $validation;
     }
 
-	/**
-	 * Getter magic pour acceder aux paramètres supplementaires de validation
-	 *
-	 * @return mixed
-	 */
-	public function __get($name)
-	{
-		return $this->params[$name] ?? null;
-	}
+    /**
+     * Getter magic pour acceder aux paramètres supplementaires de validation
+     *
+     * @param mixed $name
+     *
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->params[$name] ?? null;
+    }
 }
