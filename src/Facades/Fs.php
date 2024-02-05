@@ -58,7 +58,7 @@ use BlitzPHP\Container\Services;
  * @method static int                                         size(string $path)                                                                          Obtenir la taille de fichier d'un fichier donné.
  * @method static string                                      type(string $path)                                                                          Obtenir le type de fichier d'un fichier donné.
  *
- * @see \BlitzPHP\Filesystem\FilesystemManager
+ * @see \BlitzPHP\Filesystem\Filesystem
  */
 final class Fs extends Facade
 {

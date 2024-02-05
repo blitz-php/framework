@@ -1077,8 +1077,14 @@ if (! function_exists('tap')) {
 if (! function_exists('last')) {
     /**
      * Recupere le dernier element d'un tableau
+     *
+     * @template T
+     *
+     * @param array<T> $array
+     *
+     * @return false|T
      */
-    function last(array|object $array)
+    function last(array $array)
     {
         return end($array);
     }

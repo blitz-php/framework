@@ -14,15 +14,15 @@ namespace BlitzPHP\Facades;
 use BlitzPHP\Container\Services;
 
 /**
- * @method static void emergency(string|Stringable $message, array $context = []) Le système est inutilisable.
- * @method static void action(string|Stringable $message, array $context = []) Des mesures doivent être prises immédiatement.
- * @method static void critical(string|Stringable $message, array $context = []) Conditions critiques.
- * @method static void error(string|Stringable $message, array $context = []) Erreurs d'exécution qui ne nécessitent pas d'action immédiate, mais qui doivent être enregistrées et surveillées.
- * @method static void warning(string|Stringable $message, array $context = []) Événements exceptionnels qui ne sont pas des erreurs.
- * @method static void notice(string|Stringable $message, array $context = []) Des événements normaux mais significatifs.
- * @method static void info(string|Stringable $message, array $context = []) Événements intéressants.
- * @method static void debug(string|Stringable $message, array $context = []) Informations détaillées sur le débogage.
+ * @method static void action(string|Stringable $message, array $context = [])                 Des mesures doivent être prises immédiatement.
+ * @method static void critical(string|Stringable $message, array $context = [])               Conditions critiques.
+ * @method static void debug(string|Stringable $message, array $context = [])                  Informations détaillées sur le débogage.
+ * @method static void emergency(string|Stringable $message, array $context = [])              Le système est inutilisable.
+ * @method static void error(string|Stringable $message, array $context = [])                  Erreurs d'exécution qui ne nécessitent pas d'action immédiate, mais qui doivent être enregistrées et surveillées.
+ * @method static void info(string|Stringable $message, array $context = [])                   Événements intéressants.
  * @method static void log(int|string $level, string|Stringable $message, array $context = []) Enregistrements avec un niveau arbitraire.
+ * @method static void notice(string|Stringable $message, array $context = [])                 Des événements normaux mais significatifs.
+ * @method static void warning(string|Stringable $message, array $context = [])                Événements exceptionnels qui ne sont pas des erreurs.
  *
  * @see \BlitzPHP\Debug\Logger
  */
