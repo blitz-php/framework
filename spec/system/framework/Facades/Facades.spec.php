@@ -9,10 +9,16 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Cache\Cache as CacheCache;
+use BlitzPHP\Config\Config as ConfigConfig;
 use BlitzPHP\Container\Container as ContainerContainer;
+use BlitzPHP\Debug\Logger;
+use BlitzPHP\Facades\Cache;
+use BlitzPHP\Facades\Config;
 use BlitzPHP\Facades\Container;
 use BlitzPHP\Facades\Facade;
 use BlitzPHP\Facades\Fs;
+use BlitzPHP\Facades\Log;
 use BlitzPHP\Facades\Route;
 use BlitzPHP\Facades\Storage;
 use BlitzPHP\Facades\View;
@@ -128,7 +134,43 @@ describe('Facades', function () {
 		});
 	});
 
-    describe('Container', function () {
+    describe('Cache', function () {
+        it('Cache', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(Cache::class, 'accessor');
+
+            expect($accessor())->toBeAnInstanceOf(CacheCache::class);
+        });
+
+        it('Execution d\'une methode', function () {
+			expect(Cache::set('foo', 'bar'))->toBeTruthy();
+			expect(Cache::get('foo'))->toBe('bar');
+			expect(Cache::delete('foo'))->toBeTruthy();
+			expect(Cache::has('foo'))->toBeFalsy();
+        });
+    });
+
+	describe('Config', function () {
+        it('Container', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(Config::class, 'accessor');
+
+            expect($accessor())->toBeAnInstanceOf(ConfigConfig::class);
+        });
+
+        it('Execution d\'une methode', function () {
+			$lang = config('app.language');
+
+			expect(Config::has('app.language'))->toBeTruthy();
+			expect(Config::get('app.language'))->toBe($lang);
+
+			Config::set('app.language', 'jp');
+			expect(Config::get('app.language'))->toBe('jp');
+
+			Config::reset();
+			expect(Config::get('app.language'))->toBe($lang);
+		});
+    });
+
+	describe('Container', function () {
         it('Container', function () {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Container::class, 'accessor');
 
@@ -149,6 +191,22 @@ describe('Facades', function () {
 
         it('Execution d\'une methode', function () {
             expect(Fs::exists(__FILE__))->toBeTruthy();
+        });
+    });
+
+    describe('Log', function () {
+        it('Log', function () {
+            $accessor = ReflectionHelper::getPrivateMethodInvoker(Log::class, 'accessor');
+
+            expect($accessor())->toBeAnInstanceOf(Logger::class);
+        });
+
+        it('Execution d\'une methode', function () {
+			Log::debug('test file ' . __FILE__);
+
+			/** @var \Symfony\Component\Finder\SplFileInfo $file */
+			$file = last(Fs::files(storage_path('logs')));
+			expect($file->getContents())->toMatch(fn($actual) => str_contains($actual, 'test file ' . __FILE__));
         });
     });
 
