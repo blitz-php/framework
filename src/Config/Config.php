@@ -239,7 +239,13 @@ class Config
             $schema = require $syst_schema;
         } elseif (file_exists($app_schema)) {
             $schema = require $app_schema;
-        }
+        } else {
+			$paths = Services::locator()->search('Config/schemas/' . $key);
+
+			if (isset($paths[0]) && file_exists($path[0])) {
+				$schema = require $paths[0];
+			}
+		}
 
         return $schema ?? null;
     }
