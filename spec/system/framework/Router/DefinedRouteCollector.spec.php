@@ -46,25 +46,25 @@ describe('DefinedRouteCollector', function () {
 
         $expected = [
             [
-                'method'  => 'get',
+                'method'  => 'GET',
                 'route'   => 'journals',
                 'name'    => 'journals',
                 'handler' => '\App\Controllers\Blogs',
             ],
             [
-                'method'  => 'get',
+                'method'  => 'GET',
                 'route'   => 'product/([0-9]+)',
                 'name'    => 'product/([0-9]+)',
                 'handler' => '\App\Controllers\Catalog::productLookupByID/$1',
             ],
             [
-                'method'  => 'get',
+                'method'  => 'GET',
                 'route'   => 'feed',
                 'name'    => 'feed',
                 'handler' => '(Closure)',
             ],
             [
-                'method'  => 'get',
+                'method'  => 'GET',
                 'route'   => 'about',
                 'name'    => 'about',
                 'handler' => '(View) pages/about',
@@ -90,19 +90,19 @@ describe('DefinedRouteCollector', function () {
 
         $expected = [
             [
-                'method'  => 'get',
+                'method'  => 'GET',
                 'route'   => 'login',
                 'name'    => 'loginShow',
                 'handler' => '\\App\\Controllers\\AuthController::showLogin',
             ],
             [
-                'method'  => 'get',
+                'method'  => 'GET',
                 'route'   => 'logout',
                 'name'    => 'logout',
                 'handler' => '\\App\\Controllers\\AuthController::logout',
             ],
             [
-                'method'  => 'post',
+                'method'  => 'POST',
                 'route'   => 'login',
                 'name'    => 'login',
                 'handler' => '\\App\\Controllers\\AuthController::login',

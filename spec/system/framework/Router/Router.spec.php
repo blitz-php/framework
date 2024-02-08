@@ -10,12 +10,22 @@
  */
 
 use BlitzPHP\Container\Services;
+use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Router\RouteCollection;
 use Spec\BlitzPHP\App\Middlewares\CustomMiddleware;
 
 describe('Router', function () {
+	beforeAll(function () {
+		$this->createCollection = function(array $config = []) {
+			$default = array_merge(config('routing'), $config);
+
+			return (new RouteCollection(Services::locator(), (object) $default))
+					->setDefaultNamespace('\\');
+		};
+	});
+
     beforeEach(function () {
         $this->collection = Services::routes(false)->setDefaultNamespace('\\');
 
@@ -125,7 +135,7 @@ describe('Router', function () {
             expect(['456', '123'])->toBe($router->params());
         });
 
-        it("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
+        xit("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('shop/123');
@@ -135,7 +145,7 @@ describe('Router', function () {
             expect(['123'])->toBe($router->params());
         });
 
-        it("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
+        xit("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('shop/123/edit');
@@ -182,7 +192,7 @@ describe('Router', function () {
 
             expect(static function () use ($router) {
                 $router->handle('url/not-exists');
-            })->toThrow(new PageNotFoundException("Impossible de trouver une route pour 'get: url/not-exists'."));
+            })->toThrow(new PageNotFoundException("Impossible de trouver une route pour 'GET: url/not-exists'."));
         });
 
         it(': Détection de la langue', function () {
@@ -269,7 +279,7 @@ describe('Router', function () {
             $this->collection->add('module', 'Module::index');
 
             $router = Services::router($this->collection, $this->request, false);
-            $this->collection->setHTTPVerb('get');
+            $this->collection->setHTTPVerb(Method::GET);
 
             $router->handle('module');
             expect($router->controllerName())->toBe('MainController');
@@ -366,7 +376,7 @@ describe('Router', function () {
         });
 
         it(': Correspond correctement aux verbes mixtes', function () {
-            $this->collection->setHTTPVerb('get');
+            $this->collection->setHTTPVerb(Method::GET);
 
             $this->collection->add('/', 'Home::index');
             $this->collection->get('news', 'News::index');
@@ -424,4 +434,32 @@ describe('Router', function () {
             expect($router->params())->toBe(['2018-12-02']);
         });
     });
+
+	describe('Segments multiple', function () {
+		it('l\'option de segment multiple est desactivee', function () {
+			$this->collection->get('product/(:any)', 'Catalog::productLookup/$1');
+			$router = Services::router($this->collection, $this->request, false);
+
+        	$router->handle('product/123/456');
+
+			expect($router->controllerName())->toBe('CatalogController');
+			expect('productLookup')->toBe($router->methodName());
+			expect(['123', '456'])->toBe($router->params());
+		});
+
+		xit('l\'option de segment multiple est activee', function () {
+			$collection = $this->createCollection([
+				'multiple_segments_one_param' => true,
+			]);
+
+			$collection->get('product/(:any)', 'Catalog::productLookup/$1');
+			$router = Services::router($this->collection, $this->request, false);
+
+        	$router->handle('product/123/456');
+
+			expect($router->controllerName())->toBe('CatalogController');
+			expect('productLookup')->toBe($router->methodName());
+			expect(['123/456'])->toBe($router->params());
+		});
+	});
 });

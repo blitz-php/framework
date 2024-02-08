@@ -9,8 +9,10 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Enums\Method;
 use BlitzPHP\Router\RouteBuilder;
 use BlitzPHP\Spec\ReflectionHelper;
+use Spec\BlitzPHP\App\Controllers\HomeController;
 
 describe('RouteBuilder', function () {
     beforeEach(function () {
@@ -25,6 +27,18 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRoutes())->toBe([
                 'home' => '\my\controller',
             ]);
+        });
+
+        it('map', function () {
+            $this->builder->map([
+				'product/(:num)'      => 'CatalogController::productLookupById',
+				'product/(:alphanum)' => 'CatalogController::productLookupByName',
+			]);
+
+            expect($this->routes->getRoutes())->toBe([
+				"product/([0-9]+)" => '\CatalogController::productLookupById',
+				"product/([a-zA-Z0-9]+)" => '\CatalogController::productLookupByName'
+			]);
         });
     });
 
@@ -239,14 +253,76 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRoutes())->toBe(['here' => '\there::formIndex']);
 
             ReflectionHelper::setPrivateProperty($this->builder, 'collection', $this->routes->setHTTPVerb('POST'));
-            $this->builder->form('here', 'there::index');
-            expect($this->routes->getRoutes())->toBe(['here' => '\there::processIndex']);
+
+			expect($this->routes->getRoutes())->toBe(['here' => '\there::processIndex']);
         });
+
+		it('form en definissant uniquement la methode', function () {
+			$this->builder->controller('there')->group(function() {
+				$this->builder->form('here', 'index');
+			});
+
+            expect($this->routes->getRoutes())->toBe(['here' => '\there::formIndex']);
+
+            ReflectionHelper::setPrivateProperty($this->builder, 'collection', $this->routes->setHTTPVerb('POST'));
+
+			expect($this->routes->getRoutes())->toBe(['here' => '\there::processIndex']);
+        });
+
+        it('form en utilisant un tableau', function () {
+            $this->builder->form('here', [HomeController::class, 'index']);
+            expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::formIndex']);
+
+            ReflectionHelper::setPrivateProperty($this->builder, 'collection', $this->routes->setHTTPVerb('POST'));
+
+			expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::processIndex']);
+        });
+
+        it('form en utilisant un tableau à un element', function () {
+            $this->builder->form('here', [HomeController::class]);
+            expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::formIndex']);
+
+            ReflectionHelper::setPrivateProperty($this->builder, 'collection', $this->routes->setHTTPVerb('POST'));
+
+			expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::processIndex']);
+        });
+
+        it('form en utilisant une closure', function () {
+            $this->builder->form('here', static fn() => 'Hello World');
+
+			$match = $this->routes->getRoutes();
+
+			expect($match)->toContainKey('here');
+			expect($match['here'])->toBeAnInstanceOf('Closure');
+
+            ReflectionHelper::setPrivateProperty($this->builder, 'collection', $this->routes->setHTTPVerb('POST'));
+
+			$match = $this->routes->getRoutes();
+
+			expect($match)->toContainKey('here');
+			expect($match['here'])->toBeAnInstanceOf('Closure');
+		});
+
+        it('form en utilisant une closure et l\'option unique', function () {
+            $this->builder->form('here', static fn() => 'Hello World', ['unique' => true]);
+
+			$match = $this->routes->getRoutes();
+
+			expect($match)->toContainKey('here');
+			expect($match['here'])->toBeAnInstanceOf('Closure');
+
+            ReflectionHelper::setPrivateProperty($this->builder, 'collection', $this->routes->setHTTPVerb('POST'));
+
+			$match = $this->routes->getRoutes();
+
+			expect($match)->toContainKey('here');
+			expect($match['here'])->toBeAnInstanceOf('Closure');
+		});
 
         it('Route de vue', function () {
             $this->builder->view('here', 'hello');
 
-            $route = $this->routes->getRoutes('get')['here'];
+            $route = $this->routes->getRoutes(Method::GET)['here'];
             expect($route)->toBeAnInstanceOf('closure');
 
             // Testez que la route n'est pas disponible dans aucun autre verbe
