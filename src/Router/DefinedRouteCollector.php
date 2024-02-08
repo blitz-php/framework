@@ -39,18 +39,7 @@ final class DefinedRouteCollector
             return $this->cachedRoutes;
         }
 
-        $methods = [
-            'get',
-            'head',
-            'post',
-            'patch',
-            'put',
-            'delete',
-            'options',
-            'trace',
-            'connect',
-            'cli',
-        ];
+        $methods = Router::HTTP_METHODS;
 
         $definedRoutes = [];
 

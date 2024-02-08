@@ -49,6 +49,12 @@ final class AutoRouter implements AutoRouterInterface
      */
     private array $params = [];
 
+	 /**
+     *  Whether to translate dashes in URIs for controller/method to CamelCase.
+     *  E.g., blog-controller -> BlogController
+     */
+    private bool $translateUriToCamelCase;
+
     /**
      * Namespace des controleurs
      */
@@ -80,6 +86,24 @@ final class AutoRouter implements AutoRouterInterface
     private ?int $paramPos = null;
 
     /**
+     * Carte des segments URI et des namespace.
+     *
+     * La clé est le premier segment URI. La valeur est le namespace du contrôleur.
+     * Ex.,
+     *   [
+     *       'blog' => 'Acme\Blog\Controllers',
+     *   ]
+     *
+     * @var array [ uri_segment => namespace ]
+     */
+    private array $moduleRoutes;
+
+    /**
+     * URI courant
+     */
+    private ?string $uri = null;
+
+    /**
      * Constructeur
      *
      * @param class-string[] $protectedControllers Liste des contrôleurs enregistrés pour le verbe CLI qui ne doivent pas être accessibles sur le Web.
@@ -96,6 +120,10 @@ final class AutoRouter implements AutoRouterInterface
         private bool $translateURIDashes
     ) {
         $this->namespace = rtrim($namespace, '\\');
+
+		$routingConfig                 = (object) config('routing');
+        $this->moduleRoutes            = $routingConfig->module_routes;
+        $this->translateUriToCamelCase = $routingConfig->translate_uri_to_camel_case;
 
         // Definir les valeurs par defaut
         $this->controller = $this->defaultController;
@@ -126,7 +154,7 @@ final class AutoRouter implements AutoRouterInterface
 
         $controllerPos = -1;
 
-        while ($segments !== []) {
+		while ($segments !== []) {
             $segment = array_shift($segments);
             $controllerPos++;
 
@@ -137,11 +165,13 @@ final class AutoRouter implements AutoRouterInterface
                 return false;
             }
 
-            $controller .= '\\' . $class;
+            $controller = $this->makeController($controller . '\\' . $class);
 
-            if (class_exists($controller)) {
+			if (class_exists($controller)) {
                 $this->controller    = $controller;
                 $this->controllerPos = $controllerPos;
+
+				$this->checkUriForController($controller);
 
                 // Le premier élément peut être un nom de méthode.
                 $this->params = $segments;
@@ -223,7 +253,8 @@ final class AutoRouter implements AutoRouterInterface
      */
     public function getRoute(string $uri, string $httpVerb): array
     {
-        $httpVerb = strtolower($httpVerb);
+		$this->uri = $uri;
+        $httpVerb  = strtolower($httpVerb);
 
         // Reinitialise les parametres de la methode du controleur.
         $this->params = [];
@@ -234,10 +265,9 @@ final class AutoRouter implements AutoRouterInterface
         $this->segments = $this->createSegments($uri);
 
         // Verifier les routes de modules
-        $routingConfig = (object) config()->get('routing');
-        if ($this->segments !== [] && array_key_exists($this->segments[0], $routingConfig->module_routes)) {
+        if ($this->segments !== [] && array_key_exists($this->segments[0], $this->moduleRoutes)) {
             $uriSegment      = array_shift($this->segments);
-            $this->namespace = rtrim($routingConfig->module_routes[$uriSegment], '\\');
+            $this->namespace = rtrim($this->moduleRoutes[$uriSegment], '\\');
         }
 
         if ($this->searchFirstController()) {
@@ -262,7 +292,7 @@ final class AutoRouter implements AutoRouterInterface
         /** @var string[] $params */
         $params = $this->params;
 
-        $methodParam = array_shift($params);
+		$methodParam = array_shift($params);
 
         $method = '';
         if ($methodParam !== null) {
@@ -324,6 +354,20 @@ final class AutoRouter implements AutoRouterInterface
         $this->setDirectory();
 
         return [$this->directory, $this->controllerName(), $this->methodName(), $this->params];
+    }
+
+    /**
+     * @internal Juste pour les tests.
+     *
+     * @return array<string, int|null>
+     */
+    public function getPos(): array
+    {
+        return [
+            'controller' => $this->controllerPos,
+            'method'     => $this->methodPos,
+            'params'     => $this->paramPos,
+        ];
     }
 
     private function checkParameters(string $uri): void
@@ -392,6 +436,44 @@ final class AutoRouter implements AutoRouterInterface
     }
 
     /**
+     * Vérifier l'URI du contrôleur pour $translateUriToCamelCase
+     *
+     * @param string $classname Nom de classe du contrôleur généré à partir de l'URI.
+     * 					La casse peut être un peu incorrecte.
+     */
+    private function checkUriForController(string $classname): void
+    {
+        if ($this->translateUriToCamelCase === false) {
+            return;
+        }
+
+        if (! in_array(ltrim($classname, '\\'), get_declared_classes(), true)) {
+            throw new PageNotFoundException(
+                '"' . $classname . '" n\'a pas été trouvé.'
+            );
+        }
+    }
+
+    /**
+     * Vérifier l'URI pour la méthode $translateUriToCamelCase
+     *
+     * @param string $method Nom de la méthode du contrôleur généré à partir de l'URI.
+     * 							La casse peut être un peu incorrecte.
+     */
+    private function checkUriForMethod(string $method): void
+    {
+        if ($this->translateUriToCamelCase === false) {
+            return;
+        }
+
+        if (! in_array($method, get_class_methods($this->controller), true)) {
+            throw new PageNotFoundException(
+                '"' . $this->controller . '::' . $method . '()" n\'a pas été trouvé.'
+            );
+        }
+    }
+
+    /**
      * Renvoie true si la chaîne $segment fournie représente un segment d'espace de noms/répertoire valide conforme à PSR-4
      *
      * La regex vient de https://www.php.net/manual/en/language.variables.basics.php
@@ -403,9 +485,43 @@ final class AutoRouter implements AutoRouterInterface
 
     private function translateURIDashes(string $segment): string
     {
-        return $this->translateURIDashes
-            ? str_replace('-', '_', $segment)
-            : $segment;
+        if ($this->translateUriToCamelCase) {
+            if (strtolower($segment) !== $segment) {
+                throw new PageNotFoundException(
+                    'AutoRouter interdit l\'accès à l\'URI'
+                    . ' contenant des lettres majuscules ("' . $segment . '")'
+                    . ' lorsque $translateUriToCamelCase est activé.'
+                    . ' Veuillez utiliser le tiret.'
+                    . ' URI:' . $this->uri
+                );
+            }
+
+            if (str_contains($segment, '--')) {
+                throw new PageNotFoundException(
+                    'AutoRouter interdit l\'accès à l\'URI'
+                    . ' contenant un double tiret ("' . $segment . '")'
+                    . ' lorsque $translateUriToCamelCase est activé.'
+                    . ' Veuillez utiliser le tiret simple.'
+                    . ' URI:' . $this->uri
+                );
+            }
+
+            return str_replace(
+                ' ',
+                '',
+                ucwords(
+                    preg_replace('/[\-]+/', ' ', $segment)
+                )
+            );
+        }
+
+        $segment = ucfirst($segment);
+
+        if ($this->translateURIDashes) {
+            return str_replace('-', '_', $segment);
+        }
+
+        return $segment;
     }
 
     /**
@@ -479,8 +595,6 @@ final class AutoRouter implements AutoRouterInterface
 
     /**
      * Construit un nom de contrôleur valide
-     *
-     * @deprecated 1.0
      */
     public function makeController(string $name): string
     {

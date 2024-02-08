@@ -15,6 +15,7 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\AutoRouterInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Router\RouterInterface;
+use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\RouterException;
@@ -31,6 +32,22 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class Router implements RouterInterface
 {
+	/**
+     * List of allowed HTTP methods (and CLI for command line use).
+     */
+    public const HTTP_METHODS = [
+        Method::GET,
+        Method::HEAD,
+        Method::POST,
+        Method::PATCH,
+        Method::PUT,
+        Method::DELETE,
+        Method::OPTIONS,
+        Method::TRACE,
+        Method::CONNECT,
+        'CLI',
+    ];
+
     /**
      * Une instance de la classe RouteCollection.
      *
@@ -343,7 +360,7 @@ class Router implements RouterInterface
         foreach ($routes as $routeKey => $handler) {
             $routeKey = $routeKey === '/'
                 ? $routeKey
-                : ltrim($routeKey, '/ ');
+                : ltrim((string) $routeKey, '/ ');
 
             $matchedKey = $routeKey;
 
@@ -406,7 +423,12 @@ class Router implements RouterInterface
                     $handler = implode('::', $handler);
                 }
 
-                [$controller] = explode('::', $handler);
+                if (str_contains($handler, '::')) {
+                    [$controller, $methodAndParams] = explode('::', $handler);
+                } else {
+                    $controller      = $handler;
+                    $methodAndParams = '';
+                }
 
                 // Vérifie `/` dans le nom du contrôleur
                 if (str_contains($controller, '/')) {
@@ -419,14 +441,29 @@ class Router implements RouterInterface
                         throw RouterException::dynamicController($handler);
                     }
 
-                    // Utilisation de back-references
-                    $handler = preg_replace('#^' . $routeKey . '$#u', $handler, $uri);
+                    if (config('routing.multiple_segments_one_param') === false) {
+                        // Utilisation de back-references
+                        $segments = explode('/', preg_replace('#^' . $routeKey . '$#u', $handler, $uri));
+                    } else {
+                        if (str_contains($methodAndParams, '/')) {
+                            [$method, $handlerParams] = explode('/', $methodAndParams, 2);
+                            $params                   = explode('/', $handlerParams);
+                            $handlerSegments          = array_merge([$controller . '::' . $method], $params);
+                        } else {
+                            $handlerSegments = [$handler];
+                        }
+
+                        $segments = [];
+
+                        foreach ($handlerSegments as $segment) {
+                            $segments[] = $this->replaceBackReferences($segment, $matches);
+                        }
+                    }
                 } else {
-                    array_shift($matches);
-                    $handler .= '/' . implode('/', $matches);
+                    $segments = explode('/', $handler);
                 }
 
-                $this->setRequest(explode('/', $handler));
+                $this->setRequest($segments);
 
                 $this->setMatchedRoute($matchedKey, $handler);
 
@@ -435,6 +472,24 @@ class Router implements RouterInterface
         }
 
         return false;
+    }
+
+    /**
+     * Replace string `$n` with `$matches[n]` value.
+     */
+    private function replaceBackReferences(string $input, array $matches): string
+    {
+        $pattern = '/\$([1-' . count($matches) . '])/u';
+
+        return preg_replace_callback(
+            $pattern,
+            static function ($match) use ($matches) {
+                $index = (int) $match[1];
+
+                return $matches[$index] ?? '';
+            },
+            $input
+        );
     }
 
     /**

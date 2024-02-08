@@ -18,8 +18,8 @@ use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Http\ResponsableInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Support\Responsable;
-use BlitzPHP\Core\App;
 use BlitzPHP\Debug\Timer;
+use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\ValidationException;
@@ -386,19 +386,6 @@ class Dispatcher
     }
 
     /**
-     * Détermine le chemin à utiliser pour que nous essayions d'acheminer vers, en fonction
-     * de l'entrée de l'utilisateur (setPath), ou le chemin CLI/IncomingRequest.
-     *
-     * @deprecated 0.10.0
-     */
-    protected function determinePath(): string
-    {
-        $path = $this->request->getPath();
-
-        return preg_replace('#^' . App::getUri()->getPath() . '#i', '', $path);
-    }
-
-    /**
      * Maintenant que tout a été configuré, cette méthode tente d'exécuter le
      * méthode du contrôleur et lancez le script. S'il n'en est pas capable, le fera
      * afficher l'erreur Page introuvable appropriée.
@@ -497,7 +484,9 @@ class Dispatcher
                 $this->method     = $override[1];
 
                 $controller = $this->createController($this->request, $this->response);
-                $returned   = $this->runController($controller);
+                $returned   = $controller->{$this->method}($e->getMessage());
+
+                $this->timer->stop('controller');
             }
 
             unset($override);
@@ -685,9 +674,9 @@ class Dispatcher
             $post = $request->getParsedBody();
 
             // Ne fonctionne qu'avec les formulaires POST
-            if ($request->getMethod() === 'POST' && ! empty($post['_method'])) {
+            if ($request->getMethod() === Method::POST && ! empty($post['_method'])) {
                 // Accepte seulement PUT, PATCH, DELETE
-                if (in_array($post['_method'], ['PUT', 'PATCH', 'DELETE'], true)) {
+                if (in_array($post['_method'], [Method::PUT, Method::PATCH, Method::DELETE], true)) {
                     $request = $request->withMethod($post['_method']);
                 }
             }

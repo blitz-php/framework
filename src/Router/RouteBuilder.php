@@ -136,11 +136,6 @@ final class RouteBuilder
         throw new BadMethodCallException(sprintf('La méthode %s::%s n\'existe pas.', self::class, $method));
     }
 
-    public function configure(callable $callback)
-    {
-        $callback($this);
-    }
-
     /**
      * Limite les routes à un ENVIRONNEMENT spécifié ou ils ne fonctionneront pas.
      */
@@ -157,7 +152,7 @@ final class RouteBuilder
         $this->attributes = [];
 
         if (isset($options['unique'])) {
-            $this->match(['get', 'post'], $from, $to, $options);
+			$this->collection->form($from, $to, $options);
 
             return;
         }

@@ -14,6 +14,7 @@ namespace BlitzPHP\Router;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Utilities\String\Text;
 use Closure;
@@ -68,7 +69,7 @@ class RouteCollection implements RouteCollectionInterface
      * Un appelable qui sera affiché
      * lorsque la route ne peut pas être matchée.
      *
-     * @var Closure|string
+     * @var (Closure(string): (ResponseInterface|string|void))|string
      */
     protected $override404;
 
@@ -109,16 +110,17 @@ class RouteCollection implements RouteCollectionInterface
      * ```
      */
     protected array $routes = [
-        '*'       => [],
-        'options' => [],
-        'get'     => [],
-        'head'    => [],
-        'post'    => [],
-        'put'     => [],
-        'delete'  => [],
-        'trace'   => [],
-        'connect' => [],
-        'cli'     => [],
+        '*'             => [],
+        Method::OPTIONS => [],
+        Method::GET     => [],
+        Method::HEAD    => [],
+        Method::POST    => [],
+        Method::PATCH   => [],
+        Method::PUT     => [],
+        Method::DELETE  => [],
+        Method::TRACE   => [],
+        Method::CONNECT => [],
+        'CLI'           => [],
     ];
 
     /**
@@ -131,16 +133,17 @@ class RouteCollection implements RouteCollectionInterface
      * ]
      */
     protected array $routesNames = [
-        '*'       => [],
-        'options' => [],
-        'get'     => [],
-        'head'    => [],
-        'post'    => [],
-        'put'     => [],
-        'delete'  => [],
-        'trace'   => [],
-        'connect' => [],
-        'cli'     => [],
+        '*'             => [],
+        Method::OPTIONS => [],
+        Method::GET     => [],
+        Method::HEAD    => [],
+        Method::POST    => [],
+        Method::PATCH   => [],
+        Method::PUT     => [],
+        Method::DELETE  => [],
+        Method::TRACE   => [],
+        Method::CONNECT => [],
+        'CLI'           => [],
     ];
 
     /**
@@ -168,17 +171,7 @@ class RouteCollection implements RouteCollectionInterface
      * La liste par défaut des méthodes HTTP (et CLI pour l'utilisation de la ligne de commande)
      * qui est autorisé si aucune autre méthode n'est fournie.
      */
-    protected array $defaultHTTPMethods = [
-        'options',
-        'get',
-        'head',
-        'post',
-        'put',
-        'delete',
-        'trace',
-        'connect',
-        'cli',
-    ];
+    protected array $defaultHTTPMethods = Router::HTTP_METHODS;
 
     /**
      * Le nom du groupe de route courant
@@ -394,7 +387,7 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
      *
-     * @param callable|null $callable
+     * @param callable|string|null $callable
      */
     public function fallback($callable = null): self
     {
@@ -475,6 +468,13 @@ class RouteCollection implements RouteCollectionInterface
         return $this->defaultNamespace;
     }
 
+	/**
+     * Pour `klinge route:list`
+     *
+     * @return array<string, string>
+     *
+     * @internal
+     */
     public function getPlaceholders(): array
     {
         return $this->placeholders;
@@ -526,6 +526,8 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * {@inheritDoc}
+	 *
+	 * @internal
      */
     public function getRegisteredControllers(?string $verb = '*'): array
     {
@@ -619,7 +621,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setHTTPVerb(string $verb): self
     {
-        $this->HTTPVerb = strtolower($verb);
+        $this->HTTPVerb = strtoupper($verb);
 
         return $this;
     }
@@ -663,10 +665,10 @@ class RouteCollection implements RouteCollectionInterface
             $routeName  = $to;
             $routeKey   = $this->routesNames['*'][$routeName];
             $redirectTo = [$routeKey => $this->routes['*'][$routeKey]['handler']];
-        } elseif (array_key_exists($to, $this->routesNames['get'])) {
+        } elseif (array_key_exists($to, $this->routesNames[Method::GET])) {
             $routeName  = $to;
-            $routeKey   = $this->routesNames['get'][$routeName];
-            $redirectTo = [$routeKey => $this->routes['get'][$routeKey]['handler']];
+            $routeKey   = $this->routesNames[Method::GET][$routeName];
+            $redirectTo = [$routeKey => $this->routes[Method::GET][$routeKey]['handler']];
         } else {
             // La route nommee n'a pas ete trouvée
             $redirectTo = $to;
@@ -1026,7 +1028,7 @@ class RouteCollection implements RouteCollectionInterface
      * Exemple:
      *  $route->match( ['get', 'post'], 'users/(:num)', 'users/$1);
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $toe
      */
     public function match(array $verbs = [], string $from = '', $to = '', ?array $options = null): self
     {
@@ -1046,11 +1048,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes GET.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function get(string $from, $to, ?array $options = null): self
     {
-        $this->create('get', $from, $to, $options);
+        $this->create(Method::GET, $from, $to, $options);
 
         return $this;
     }
@@ -1058,11 +1060,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes POST.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function post(string $from, $to, ?array $options = null): self
     {
-        $this->create('post', $from, $to, $options);
+        $this->create(Method::POST, $from, $to, $options);
 
         return $this;
     }
@@ -1070,11 +1072,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes PUT.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function put(string $from, $to, ?array $options = null): self
     {
-        $this->create('put', $from, $to, $options);
+        $this->create(Method::PUT, $from, $to, $options);
 
         return $this;
     }
@@ -1082,11 +1084,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes DELETE.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function delete(string $from, $to, ?array $options = null): self
     {
-        $this->create('delete', $from, $to, $options);
+        $this->create(Method::DELETE, $from, $to, $options);
 
         return $this;
     }
@@ -1094,11 +1096,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes HEAD.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function head(string $from, $to, ?array $options = null): self
     {
-        $this->create('head', $from, $to, $options);
+        $this->create(Method::HEAD, $from, $to, $options);
 
         return $this;
     }
@@ -1106,11 +1108,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes PATCH.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function patch(string $from, $to, ?array $options = null): self
     {
-        $this->create('patch', $from, $to, $options);
+        $this->create(Method::PATCH, $from, $to, $options);
 
         return $this;
     }
@@ -1118,11 +1120,11 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes OPTIONS.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function options(string $from, $to, ?array $options = null): self
     {
-        $this->create('options', $from, $to, $options);
+        $this->create(Method::OPTIONS, $from, $to, $options);
 
         return $this;
     }
@@ -1130,21 +1132,21 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes GET et POST.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function form(string $from, $to, ?array $options = null): self
     {
-        return $this->match(['GET', 'POST'], $from, $to, $options);
+        return $this->match([Method::GET, Method::POST], $from, $to, $options);
     }
 
     /**
      * Spécifie une route qui n'est disponible que pour les requêtes de ligne de commande.
      *
-     * @param array|Closure|string $to
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function cli(string $from, $to, ?array $options = null): self
     {
-        $this->create('cli', $from, $to, $options);
+        $this->create('CLI', $from, $to, $options);
 
         return $this;
     }
@@ -1163,7 +1165,7 @@ class RouteCollection implements RouteCollectionInterface
 
         $routeOptions = array_merge($options, ['view' => $view]);
 
-        $this->create('get', $from, $to, $routeOptions);
+        $this->create(Method::GET, $from, $to, $routeOptions);
 
         return $this;
     }
@@ -1336,7 +1338,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     protected function loadRoutesOptions(?string $verb = null): array
     {
-        $verb = strtolower($verb ?: $this->getHTTPVerb());
+        $verb ??= $this->getHTTPVerb();
 
         $options = $this->routesOptions[$verb] ?? [];
 
@@ -1589,6 +1591,9 @@ class RouteCollection implements RouteCollectionInterface
         return str_replace(['/', '\\', '_', '.', ' '], '.', $name);
     }
 
+	/**
+     * @param (Closure(mixed...): (ResponseInterface|string|void))|string $handler
+     */
     private function getControllerName(Closure|string $handler): ?string
     {
         if (! is_string($handler)) {
