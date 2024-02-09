@@ -542,11 +542,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Middlewares/BaseMiddleware.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Property BlitzPHP\\\\Router\\\\AutoRouter\\:\\:\\$methodPos is never read, only written\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Router/AutoRouter.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$request \\(BlitzPHP\\\\Http\\\\Request\\) does not accept Psr\\\\Http\\\\Message\\\\ServerRequestInterface\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',

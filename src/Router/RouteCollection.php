@@ -19,6 +19,7 @@ use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Utilities\String\Text;
 use Closure;
 use InvalidArgumentException;
+use Psr\Http\Message\ResponseInterface;
 
 class RouteCollection implements RouteCollectionInterface
 {
@@ -1028,7 +1029,7 @@ class RouteCollection implements RouteCollectionInterface
      * Exemple:
      *  $route->match( ['get', 'post'], 'users/(:num)', 'users/$1);
      *
-     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $toe
+     * @param array|(Closure(mixed...): (ResponseInterface|string|void))|string $to
      */
     public function match(array $verbs = [], string $from = '', $to = '', ?array $options = null): self
     {

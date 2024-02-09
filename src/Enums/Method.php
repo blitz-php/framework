@@ -2,6 +2,8 @@
 
 namespace BlitzPHP\Enums;
 
+use InvalidArgumentException;
+
 /**
  * Liste des methodes http
  */
@@ -94,20 +96,21 @@ abstract class Method
     public static function fromName(string $name): string
     {
         return match (strtolower($name)) {
-            'connect' => self::CONNECT,
-            'delete'  => self::DELETE,
-            'get'     => self::GET,
-            'head'    => self::HEAD,
-            'options' => self::OPTIONS,
-            'patch'   => self::PATCH,
-            'post'    => self::POST,
-            'put'     => self::PUT,
-            'trace'   => self::TRACE,
+			'connect' => self::CONNECT,
+			'delete'  => self::DELETE,
+			'get'     => self::GET,
+			'head'    => self::HEAD,
+			'options' => self::OPTIONS,
+			'patch'   => self::PATCH,
+			'post'    => self::POST,
+			'put'     => self::PUT,
+			'trace'   => self::TRACE,
+			default   => throw new InvalidArgumentException('Nom de methode inconnu')
         };
     }
 
     /**
-     * Returns all HTTP methods.
+     * Renvoie la liste de toutes les methodes HTTP.
      *
      * @return list<string>
      */

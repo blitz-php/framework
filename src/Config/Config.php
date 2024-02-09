@@ -242,7 +242,7 @@ class Config
         } else {
 			$paths = Services::locator()->search('Config/schemas/' . $key);
 
-			if (isset($paths[0]) && file_exists($path[0])) {
+			if (isset($paths[0]) && file_exists($paths[0])) {
 				$schema = require $paths[0];
 			}
 		}

@@ -297,7 +297,9 @@ final class AutoRouter implements AutoRouterInterface
         $method = '';
         if ($methodParam !== null) {
             $method = $httpVerb . ucfirst($this->translateURIDashes($methodParam));
-        }
+
+			$this->checkUriForMethod($method);
+		}
 
         if ($methodParam !== null && method_exists($this->controller, $method)) {
             // Methode trouvee.
