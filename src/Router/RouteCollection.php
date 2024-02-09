@@ -469,7 +469,7 @@ class RouteCollection implements RouteCollectionInterface
         return $this->defaultNamespace;
     }
 
-	/**
+    /**
      * Pour `klinge route:list`
      *
      * @return array<string, string>
@@ -527,8 +527,8 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * {@inheritDoc}
-	 *
-	 * @internal
+     *
+     * @internal
      */
     public function getRegisteredControllers(?string $verb = '*'): array
     {
@@ -1592,7 +1592,7 @@ class RouteCollection implements RouteCollectionInterface
         return str_replace(['/', '\\', '_', '.', ' '], '.', $name);
     }
 
-	/**
+    /**
      * @param (Closure(mixed...): (ResponseInterface|string|void))|string $handler
      */
     private function getControllerName(Closure|string $handler): ?string

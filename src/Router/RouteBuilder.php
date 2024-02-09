@@ -152,7 +152,7 @@ final class RouteBuilder
         $this->attributes = [];
 
         if (isset($options['unique'])) {
-			$this->collection->form($from, $to, $options);
+            $this->collection->form($from, $to, $options);
 
             return;
         }

@@ -111,4 +111,57 @@ describe('DefinedRouteCollector', function () {
 
         expect($expected)->toBe($definedRoutes);
     });
+
+    it('Test de collection avec l\'option $reset = false', function () {
+        $routes = $this->getCollector();
+        $routes->get('journals', 'Blogs');
+        $routes->get('product/(:num)', 'Catalog::productLookupByID/$1');
+        $routes->get('feed', static fn () => 'A Closure route.');
+        $routes->view('about', 'pages/about');
+
+        $collector = new DefinedRouteCollector($routes);
+
+		$expected = [
+            [
+                'method'  => 'GET',
+                'route'   => 'journals',
+                'name'    => 'journals',
+                'handler' => '\App\Controllers\Blogs',
+            ],
+            [
+                'method'  => 'GET',
+                'route'   => 'product/([0-9]+)',
+                'name'    => 'product/([0-9]+)',
+                'handler' => '\App\Controllers\Catalog::productLookupByID/$1',
+            ],
+            [
+                'method'  => 'GET',
+                'route'   => 'feed',
+                'name'    => 'feed',
+                'handler' => '(Closure)',
+            ],
+            [
+                'method'  => 'GET',
+                'route'   => 'about',
+                'name'    => 'about',
+                'handler' => '(View) pages/about',
+            ],
+        ];
+
+        $definedRoutes = [];
+
+        foreach ($collector->collect() as $route) {
+            $definedRoutes[] = $route;
+        }
+
+        expect($definedRoutes)->toBe($expected);
+
+		$definedRoutes = [];
+
+        foreach ($collector->collect(false) as $route) {
+            $definedRoutes[] = $route;
+        }
+
+        expect($definedRoutes)->toBe($expected);
+    });
 });

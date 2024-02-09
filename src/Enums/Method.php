@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Enums;
 
 use InvalidArgumentException;
@@ -9,7 +18,7 @@ use InvalidArgumentException;
  */
 abstract class Method
 {
-	/**
+    /**
      * Sûr : Non
      * Idempotent : Non
      * Cacheable : Non
@@ -90,22 +99,19 @@ abstract class Method
      */
     public const TRACE = 'TRACE';
 
-	/**
-     * @param string $name
-     */
     public static function fromName(string $name): string
     {
         return match (strtolower($name)) {
-			'connect' => self::CONNECT,
-			'delete'  => self::DELETE,
-			'get'     => self::GET,
-			'head'    => self::HEAD,
-			'options' => self::OPTIONS,
-			'patch'   => self::PATCH,
-			'post'    => self::POST,
-			'put'     => self::PUT,
-			'trace'   => self::TRACE,
-			default   => throw new InvalidArgumentException('Nom de methode inconnu')
+            'connect' => self::CONNECT,
+            'delete'  => self::DELETE,
+            'get'     => self::GET,
+            'head'    => self::HEAD,
+            'options' => self::OPTIONS,
+            'patch'   => self::PATCH,
+            'post'    => self::POST,
+            'put'     => self::PUT,
+            'trace'   => self::TRACE,
+            default   => throw new InvalidArgumentException('Nom de methode inconnu')
         };
     }
 

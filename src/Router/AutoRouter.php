@@ -49,8 +49,8 @@ final class AutoRouter implements AutoRouterInterface
      */
     private array $params = [];
 
-	 /**
-     *  Whether to translate dashes in URIs for controller/method to CamelCase.
+    /**
+     *  Indique si on doit traduire les tirets de l'URL pour les controleurs/methodes en CamelCase.
      *  E.g., blog-controller -> BlogController
      */
     private bool $translateUriToCamelCase;
@@ -121,7 +121,7 @@ final class AutoRouter implements AutoRouterInterface
     ) {
         $this->namespace = rtrim($namespace, '\\');
 
-		$routingConfig                 = (object) config('routing');
+        $routingConfig                 = (object) config('routing');
         $this->moduleRoutes            = $routingConfig->module_routes;
         $this->translateUriToCamelCase = $routingConfig->translate_uri_to_camel_case;
 
@@ -154,7 +154,7 @@ final class AutoRouter implements AutoRouterInterface
 
         $controllerPos = -1;
 
-		while ($segments !== []) {
+        while ($segments !== []) {
             $segment = array_shift($segments);
             $controllerPos++;
 
@@ -167,11 +167,11 @@ final class AutoRouter implements AutoRouterInterface
 
             $controller = $this->makeController($controller . '\\' . $class);
 
-			if (class_exists($controller)) {
+            if (class_exists($controller)) {
                 $this->controller    = $controller;
                 $this->controllerPos = $controllerPos;
 
-				$this->checkUriForController($controller);
+                $this->checkUriForController($controller);
 
                 // Le premier élément peut être un nom de méthode.
                 $this->params = $segments;
@@ -253,7 +253,7 @@ final class AutoRouter implements AutoRouterInterface
      */
     public function getRoute(string $uri, string $httpVerb): array
     {
-		$this->uri = $uri;
+        $this->uri = $uri;
         $httpVerb  = strtolower($httpVerb);
 
         // Reinitialise les parametres de la methode du controleur.
@@ -292,14 +292,14 @@ final class AutoRouter implements AutoRouterInterface
         /** @var string[] $params */
         $params = $this->params;
 
-		$methodParam = array_shift($params);
+        $methodParam = array_shift($params);
 
         $method = '';
         if ($methodParam !== null) {
             $method = $httpVerb . ucfirst($this->translateURIDashes($methodParam));
 
-			$this->checkUriForMethod($method);
-		}
+            $this->checkUriForMethod($method);
+        }
 
         if ($methodParam !== null && method_exists($this->controller, $method)) {
             // Methode trouvee.
@@ -441,7 +441,7 @@ final class AutoRouter implements AutoRouterInterface
      * Vérifier l'URI du contrôleur pour $translateUriToCamelCase
      *
      * @param string $classname Nom de classe du contrôleur généré à partir de l'URI.
-     * 					La casse peut être un peu incorrecte.
+     *                          La casse peut être un peu incorrecte.
      */
     private function checkUriForController(string $classname): void
     {
@@ -460,7 +460,7 @@ final class AutoRouter implements AutoRouterInterface
      * Vérifier l'URI pour la méthode $translateUriToCamelCase
      *
      * @param string $method Nom de la méthode du contrôleur généré à partir de l'URI.
-     * 							La casse peut être un peu incorrecte.
+     *                       La casse peut être un peu incorrecte.
      */
     private function checkUriForMethod(string $method): void
     {

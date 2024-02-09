@@ -50,7 +50,7 @@ class CliOutputHelper
     {
         // Make sure we clean up after ourselves:
         if (is_dir($dirname = pathinfo(static::$ou, PATHINFO_DIRNAME))) {
-            Fs::deleteDirectories($dirname);
+            Fs::cleanDirectory($dirname);
         }
     }
 

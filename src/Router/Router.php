@@ -32,7 +32,7 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class Router implements RouterInterface
 {
-	/**
+    /**
      * List of allowed HTTP methods (and CLI for command line use).
      */
     public const HTTP_METHODS = [
