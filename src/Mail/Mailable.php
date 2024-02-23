@@ -85,7 +85,9 @@ abstract class Mailable
      */
     public function from(): array
     {
-        return [];
+        $from = config('mail.from');
+
+        return [$from['address'] ?? '', $from['name'] ?? ''];
     }
 
     /**
@@ -159,7 +161,7 @@ abstract class Mailable
         $data = [];
 
         foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
-            $data[$prop->getName()] = $prop->getValue();
+            $data[$prop->getName()] = $prop->getValue($this);
         }
 
         return array_merge($data, $this->with());
