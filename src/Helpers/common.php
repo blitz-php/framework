@@ -1019,8 +1019,8 @@ if (! function_exists('to_stream')) {
      * - metadata : Tableau de métadonnées personnalisées.
      * - size : Taille du flux.
      *
-     * @param bool|callable|float|int|\Iterator|\Psr\Http\Message\StreamInterface|resource|string|null $resource Données du corps de l'entité
-     * @param array                                                                                    $options  Additional options
+     * @param bool|callable|float|int|Iterator|Psr\Http\Message\StreamInterface|resource|string|null $resource Données du corps de l'entité
+     * @param array                                                                                  $options  Additional options
      *
      * @uses GuzzleHttp\Psr7\stream_for
      *
