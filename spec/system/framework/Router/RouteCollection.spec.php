@@ -1402,6 +1402,26 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/test/1/2');
         });
 
+        it('Reverse route avec des queries string', function () {
+            $routes = getCollector();
+
+            $routes->get('test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
+
+            $match = $routes->reverseRoute('testRouter', 1, 2, ['query' => 'string']);
+
+            expect($match)->toBe('/test/1/2?query=string');
+        });
+
+		it('Reverse route avec des queries string et la locale', function () {
+			$routes = getCollector();
+
+            $routes->add('{locale}/contact', 'myController::goto');
+
+            $match = $routes->reverseRoute('myController::goto', ['foo' => 'bar', 'baz' => 'faa']);
+
+            expect($match)->toBe('/en/contact?foo=bar&baz=faa');
+        });
+
         it('Reverse route avec une route nommee et la locale', function () {
             $routes = getCollector();
 

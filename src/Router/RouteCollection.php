@@ -1192,6 +1192,14 @@ class RouteCollection implements RouteCollectionInterface
             return false;
         }
 
+        $queries = [];
+
+        if (is_array($last = array_pop($params))) {
+            $queries = $last;
+        } elseif (null !== $last) {
+            $params[] = $last;
+        }
+
         $name = $this->formatRouteName($search);
 
         // Les routes nommées ont une priorité plus élevée.
@@ -1201,7 +1209,7 @@ class RouteCollection implements RouteCollectionInterface
 
                 $from = $this->routes[$verb][$routeKey]['from'];
 
-                return $this->buildReverseRoute($from, $params);
+                return $this->buildReverseRoute($from, $params, $queries);
             }
         }
 
@@ -1243,7 +1251,7 @@ class RouteCollection implements RouteCollectionInterface
                     continue;
                 }
 
-                return $this->buildReverseRoute($from, $params);
+                return $this->buildReverseRoute($from, $params, $queries);
             }
         }
 
@@ -1284,7 +1292,7 @@ class RouteCollection implements RouteCollectionInterface
      * @param array $params Un ou plusieurs paramètres à transmettre à la route.
      *                      Le dernier paramètre vous permet de définir la locale.
      */
-    protected function buildReverseRoute(string $from, array $params): string
+    protected function buildReverseRoute(string $from, array $params, array $queries = []): string
     {
         $locale = null;
 
@@ -1296,9 +1304,13 @@ class RouteCollection implements RouteCollectionInterface
                 $locale = $params[0] ?? null;
             }
 
-            $from = $this->replaceLocale($from, $locale);
+            $from = '/' . ltrim($this->replaceLocale($from, $locale), '/');
 
-            return '/' . ltrim($from, '/');
+            if ($queries !== []) {
+                $from .= '?' . http_build_query($queries);
+            }
+
+            return $from;
         }
 
         // Les paramètres régionaux sont passés ?
@@ -1329,9 +1341,13 @@ class RouteCollection implements RouteCollectionInterface
             $from = substr_replace($from, $params[$index], $pos, strlen($placeholder));
         }
 
-        $from = $this->replaceLocale($from, $locale);
+        $from = '/' . ltrim($this->replaceLocale($from, $locale), '/');
 
-        return '/' . ltrim($from, '/');
+        if ($queries !== []) {
+            $from .= '?' . http_build_query($queries);
+        }
+
+        return $from;
     }
 
     /**
