@@ -15,6 +15,7 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\LoadException;
+use BlitzPHP\Filesystem\Files\Mimes;
 use BlitzPHP\Http\Concerns\ResponseTrait;
 use BlitzPHP\Session\Cookie\CookieCollection;
 use DateTime;
@@ -59,330 +60,19 @@ class Response implements ResponseInterface
      *
      * @var array<int, string>
      */
-    protected $_statusCodes = [
-        // 1xx: Informational
-        100 => 'Continue',
-        101 => 'Switching Protocols',
-        102 => 'Processing', // http://www.iana.org/go/rfc2518
-        103 => 'Early Hints', // http://www.ietf.org/rfc/rfc8297.txt
-        // 2xx: Success
-        200 => 'OK',
-        201 => 'Created',
-        202 => 'Accepted',
-        203 => 'Non-Authoritative Information', // 1.1
-        204 => 'No Content',
-        205 => 'Reset Content',
-        206 => 'Partial Content',
-        207 => 'Multi-Status', // http://www.iana.org/go/rfc4918
-        208 => 'Already Reported', // http://www.iana.org/go/rfc5842
-        226 => 'IM Used', // 1.1; http://www.ietf.org/rfc/rfc3229.txt
-        // 3xx: Redirection
-        300 => 'Multiple Choices',
-        301 => 'Moved Permanently',
-        302 => 'Found', // Formerly 'Moved Temporarily'
-        303 => 'See Other', // 1.1
-        304 => 'Not Modified',
-        305 => 'Use Proxy', // 1.1
-        306 => 'Switch Proxy', // No longer used
-        307 => 'Temporary Redirect', // 1.1
-        308 => 'Permanent Redirect', // 1.1; Experimental; http://www.ietf.org/rfc/rfc7238.txt
-        // 4xx: Client error
-        400 => 'Bad Request',
-        401 => 'Unauthorized',
-        402 => 'Payment Required',
-        403 => 'Forbidden',
-        404 => 'Not Found',
-        405 => 'Method Not Allowed',
-        406 => 'Not Acceptable',
-        407 => 'Proxy Authentication Required',
-        408 => 'Request Timeout',
-        409 => 'Conflict',
-        410 => 'Gone',
-        411 => 'Length Required',
-        412 => 'Precondition Failed',
-        413 => 'Content Too Large', // https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
-        414 => 'URI Too Long', // https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
-        415 => 'Unsupported Media Type',
-        416 => 'Requested Range Not Satisfiable',
-        417 => 'Expectation Failed',
-        418 => "I'm a teapot", // April's Fools joke; http://www.ietf.org/rfc/rfc2324.txt
-        // 419 (Authentication Timeout) is a non-standard status code with unknown origin
-        421 => 'Misdirected Request', // http://www.iana.org/go/rfc7540 Section 9.1.2
-        422 => 'Unprocessable Content', // https://www.iana.org/assignments/http-status-codes/http-status-codes.xml
-        423 => 'Locked', // http://www.iana.org/go/rfc4918
-        424 => 'Failed Dependency', // http://www.iana.org/go/rfc4918
-        425 => 'Too Early', // https://datatracker.ietf.org/doc/draft-ietf-httpbis-replay/
-        426 => 'Upgrade Required',
-        428 => 'Precondition Required', // 1.1; http://www.ietf.org/rfc/rfc6585.txt
-        429 => 'Too Many Requests', // 1.1; http://www.ietf.org/rfc/rfc6585.txt
-        431 => 'Request Header Fields Too Large', // 1.1; http://www.ietf.org/rfc/rfc6585.txt
-        444 => 'Connection Closed Without Response',
-        451 => 'Unavailable For Legal Reasons', // http://tools.ietf.org/html/rfc7725
-        499 => 'Client Closed Request', // http://lxr.nginx.org/source/src/http/ngx_http_request.h#0133
-        // 5xx: Server error
-        500 => 'Internal Server Error',
-        501 => 'Not Implemented',
-        502 => 'Bad Gateway',
-        503 => 'Service Unavailable',
-        504 => 'Gateway Timeout',
-        505 => 'HTTP Version Not Supported',
-        506 => 'Variant Also Negotiates', // 1.1; http://www.ietf.org/rfc/rfc2295.txt
-        507 => 'Insufficient Storage', // http://www.iana.org/go/rfc4918
-        508 => 'Loop Detected', // http://www.iana.org/go/rfc5842
-        510 => 'Not Extended', // http://www.ietf.org/rfc/rfc2774.txt
-        511 => 'Network Authentication Required', // http://www.ietf.org/rfc/rfc6585.txt
-        599 => 'Network Connect Timeout Error', // https://httpstatuses.com/599
-    ];
+    protected array $_statusCodes = StatusCode::VALID_CODES;
 
     /**
      * Contient la clé de type pour les mappages de type mime pour les types mime connus.
      *
      * @var array<string, mixed>
      */
-    protected $_mimeTypes = [
-        'html'    => ['text/html', '*/*'],
-        'json'    => 'application/json',
-        'xml'     => ['application/xml', 'text/xml'],
-        'xhtml'   => ['application/xhtml+xml', 'application/xhtml', 'text/xhtml'],
-        'webp'    => 'image/webp',
-        'rss'     => 'application/rss+xml',
-        'ai'      => 'application/postscript',
-        'bcpio'   => 'application/x-bcpio',
-        'bin'     => 'application/octet-stream',
-        'ccad'    => 'application/clariscad',
-        'cdf'     => 'application/x-netcdf',
-        'class'   => 'application/octet-stream',
-        'cpio'    => 'application/x-cpio',
-        'cpt'     => 'application/mac-compactpro',
-        'csh'     => 'application/x-csh',
-        'csv'     => ['text/csv', 'application/vnd.ms-excel'],
-        'dcr'     => 'application/x-director',
-        'dir'     => 'application/x-director',
-        'dms'     => 'application/octet-stream',
-        'doc'     => 'application/msword',
-        'docx'    => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'drw'     => 'application/drafting',
-        'dvi'     => 'application/x-dvi',
-        'dwg'     => 'application/acad',
-        'dxf'     => 'application/dxf',
-        'dxr'     => 'application/x-director',
-        'eot'     => 'application/vnd.ms-fontobject',
-        'eps'     => 'application/postscript',
-        'exe'     => 'application/octet-stream',
-        'ez'      => 'application/andrew-inset',
-        'flv'     => 'video/x-flv',
-        'gtar'    => 'application/x-gtar',
-        'gz'      => 'application/x-gzip',
-        'bz2'     => 'application/x-bzip',
-        '7z'      => 'application/x-7z-compressed',
-        'hal'     => ['application/hal+xml', 'application/vnd.hal+xml'],
-        'haljson' => ['application/hal+json', 'application/vnd.hal+json'],
-        'halxml'  => ['application/hal+xml', 'application/vnd.hal+xml'],
-        'hdf'     => 'application/x-hdf',
-        'hqx'     => 'application/mac-binhex40',
-        'ico'     => 'image/x-icon',
-        'ips'     => 'application/x-ipscript',
-        'ipx'     => 'application/x-ipix',
-        'js'      => 'application/javascript',
-        'jsonapi' => 'application/vnd.api+json',
-        'latex'   => 'application/x-latex',
-        'jsonld'  => 'application/ld+json',
-        'kml'     => 'application/vnd.google-earth.kml+xml',
-        'kmz'     => 'application/vnd.google-earth.kmz',
-        'lha'     => 'application/octet-stream',
-        'lsp'     => 'application/x-lisp',
-        'lzh'     => 'application/octet-stream',
-        'man'     => 'application/x-troff-man',
-        'me'      => 'application/x-troff-me',
-        'mif'     => 'application/vnd.mif',
-        'ms'      => 'application/x-troff-ms',
-        'nc'      => 'application/x-netcdf',
-        'oda'     => 'application/oda',
-        'otf'     => 'font/otf',
-        'pdf'     => 'application/pdf',
-        'pgn'     => 'application/x-chess-pgn',
-        'pot'     => 'application/vnd.ms-powerpoint',
-        'pps'     => 'application/vnd.ms-powerpoint',
-        'ppt'     => 'application/vnd.ms-powerpoint',
-        'pptx'    => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'ppz'     => 'application/vnd.ms-powerpoint',
-        'pre'     => 'application/x-freelance',
-        'prt'     => 'application/pro_eng',
-        'ps'      => 'application/postscript',
-        'roff'    => 'application/x-troff',
-        'scm'     => 'application/x-lotusscreencam',
-        'set'     => 'application/set',
-        'sh'      => 'application/x-sh',
-        'shar'    => 'application/x-shar',
-        'sit'     => 'application/x-stuffit',
-        'skd'     => 'application/x-koan',
-        'skm'     => 'application/x-koan',
-        'skp'     => 'application/x-koan',
-        'skt'     => 'application/x-koan',
-        'smi'     => 'application/smil',
-        'smil'    => 'application/smil',
-        'sol'     => 'application/solids',
-        'spl'     => 'application/x-futuresplash',
-        'src'     => 'application/x-wais-source',
-        'step'    => 'application/STEP',
-        'stl'     => 'application/SLA',
-        'stp'     => 'application/STEP',
-        'sv4cpio' => 'application/x-sv4cpio',
-        'sv4crc'  => 'application/x-sv4crc',
-        'svg'     => 'image/svg+xml',
-        'svgz'    => 'image/svg+xml',
-        'swf'     => 'application/x-shockwave-flash',
-        't'       => 'application/x-troff',
-        'tar'     => 'application/x-tar',
-        'tcl'     => 'application/x-tcl',
-        'tex'     => 'application/x-tex',
-        'texi'    => 'application/x-texinfo',
-        'texinfo' => 'application/x-texinfo',
-        'tr'      => 'application/x-troff',
-        'tsp'     => 'application/dsptype',
-        'ttc'     => 'font/ttf',
-        'ttf'     => 'font/ttf',
-        'unv'     => 'application/i-deas',
-        'ustar'   => 'application/x-ustar',
-        'vcd'     => 'application/x-cdlink',
-        'vda'     => 'application/vda',
-        'xlc'     => 'application/vnd.ms-excel',
-        'xll'     => 'application/vnd.ms-excel',
-        'xlm'     => 'application/vnd.ms-excel',
-        'xls'     => 'application/vnd.ms-excel',
-        'xlsx'    => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'xlw'     => 'application/vnd.ms-excel',
-        'zip'     => 'application/zip',
-        'aif'     => 'audio/x-aiff',
-        'aifc'    => 'audio/x-aiff',
-        'aiff'    => 'audio/x-aiff',
-        'au'      => 'audio/basic',
-        'kar'     => 'audio/midi',
-        'mid'     => 'audio/midi',
-        'midi'    => 'audio/midi',
-        'mp2'     => 'audio/mpeg',
-        'mp3'     => 'audio/mpeg',
-        'mpga'    => 'audio/mpeg',
-        'ogg'     => 'audio/ogg',
-        'oga'     => 'audio/ogg',
-        'spx'     => 'audio/ogg',
-        'ra'      => 'audio/x-realaudio',
-        'ram'     => 'audio/x-pn-realaudio',
-        'rm'      => 'audio/x-pn-realaudio',
-        'rpm'     => 'audio/x-pn-realaudio-plugin',
-        'snd'     => 'audio/basic',
-        'tsi'     => 'audio/TSP-audio',
-        'wav'     => 'audio/x-wav',
-        'aac'     => 'audio/aac',
-        'asc'     => 'text/plain',
-        'c'       => 'text/plain',
-        'cc'      => 'text/plain',
-        'css'     => 'text/css',
-        'etx'     => 'text/x-setext',
-        'f'       => 'text/plain',
-        'f90'     => 'text/plain',
-        'h'       => 'text/plain',
-        'hh'      => 'text/plain',
-        'htm'     => ['text/html', '*/*'],
-        'ics'     => 'text/calendar',
-        'm'       => 'text/plain',
-        'rtf'     => 'text/rtf',
-        'rtx'     => 'text/richtext',
-        'sgm'     => 'text/sgml',
-        'sgml'    => 'text/sgml',
-        'tsv'     => 'text/tab-separated-values',
-        'tpl'     => 'text/template',
-        'txt'     => 'text/plain',
-        'text'    => 'text/plain',
-        'avi'     => 'video/x-msvideo',
-        'fli'     => 'video/x-fli',
-        'mov'     => 'video/quicktime',
-        'movie'   => 'video/x-sgi-movie',
-        'mpe'     => 'video/mpeg',
-        'mpeg'    => 'video/mpeg',
-        'mpg'     => 'video/mpeg',
-        'qt'      => 'video/quicktime',
-        'viv'     => 'video/vnd.vivo',
-        'vivo'    => 'video/vnd.vivo',
-        'ogv'     => 'video/ogg',
-        'webm'    => 'video/webm',
-        'mp4'     => 'video/mp4',
-        'm4v'     => 'video/mp4',
-        'f4v'     => 'video/mp4',
-        'f4p'     => 'video/mp4',
-        'm4a'     => 'audio/mp4',
-        'f4a'     => 'audio/mp4',
-        'f4b'     => 'audio/mp4',
-        'gif'     => 'image/gif',
-        'ief'     => 'image/ief',
-        'jpg'     => 'image/jpeg',
-        'jpeg'    => 'image/jpeg',
-        'jpe'     => 'image/jpeg',
-        'pbm'     => 'image/x-portable-bitmap',
-        'pgm'     => 'image/x-portable-graymap',
-        'png'     => 'image/png',
-        'pnm'     => 'image/x-portable-anymap',
-        'ppm'     => 'image/x-portable-pixmap',
-        'ras'     => 'image/cmu-raster',
-        'rgb'     => 'image/x-rgb',
-        'tif'     => 'image/tiff',
-        'tiff'    => 'image/tiff',
-        'xbm'     => 'image/x-xbitmap',
-        'xpm'     => 'image/x-xpixmap',
-        'xwd'     => 'image/x-xwindowdump',
-        'psd'     => [
-            'application/photoshop',
-            'application/psd',
-            'image/psd',
-            'image/x-photoshop',
-            'image/photoshop',
-            'zz-application/zz-winassoc-psd',
-        ],
-        'ice'          => 'x-conference/x-cooltalk',
-        'iges'         => 'model/iges',
-        'igs'          => 'model/iges',
-        'mesh'         => 'model/mesh',
-        'msh'          => 'model/mesh',
-        'silo'         => 'model/mesh',
-        'vrml'         => 'model/vrml',
-        'wrl'          => 'model/vrml',
-        'mime'         => 'www/mime',
-        'pdb'          => 'chemical/x-pdb',
-        'xyz'          => 'chemical/x-pdb',
-        'javascript'   => 'application/javascript',
-        'form'         => 'application/x-www-form-urlencoded',
-        'file'         => 'multipart/form-data',
-        'xhtml-mobile' => 'application/vnd.wap.xhtml+xml',
-        'atom'         => 'application/atom+xml',
-        'amf'          => 'application/x-amf',
-        'wap'          => ['text/vnd.wap.wml', 'text/vnd.wap.wmlscript', 'image/vnd.wap.wbmp'],
-        'wml'          => 'text/vnd.wap.wml',
-        'wmlscript'    => 'text/vnd.wap.wmlscript',
-        'wbmp'         => 'image/vnd.wap.wbmp',
-        'woff'         => 'application/x-font-woff',
-        'appcache'     => 'text/cache-manifest',
-        'manifest'     => 'text/cache-manifest',
-        'htc'          => 'text/x-component',
-        'rdf'          => 'application/xml',
-        'crx'          => 'application/x-chrome-extension',
-        'oex'          => 'application/x-opera-extension',
-        'xpi'          => 'application/x-xpinstall',
-        'safariextz'   => 'application/octet-stream',
-        'webapp'       => 'application/x-web-app-manifest+json',
-        'vcf'          => 'text/x-vcard',
-        'vtt'          => 'text/vtt',
-        'mkv'          => 'video/x-matroska',
-        'pkpass'       => 'application/vnd.apple.pkpass',
-        'ajax'         => 'text/html',
-        'bmp'          => 'image/bmp',
-    ];
+    protected array $_mimeTypes = Mimes::MAP;
 
     /**
      * Code de statut à envoyer au client
-     *
-     * @var int
      */
-    protected $_status = 200;
+    protected int $_status = StatusCode::OK;
 
     /**
      * Objet de fichier pour le fichier à lire comme réponse
@@ -396,22 +86,18 @@ class Response implements ResponseInterface
      *
      * @var array<int>
      */
-    protected $_fileRange = [];
+    protected array $_fileRange = [];
 
     /**
      * Le jeu de caractères avec lequel le corps de la réponse est encodé
-     *
-     * @var string
      */
-    protected $_charset = 'UTF-8';
+    protected string $_charset = 'UTF-8';
 
     /**
      * Contient toutes les directives de cache qui seront converties
      * dans les en-têtes lors de l'envoi de la requête
-     *
-     * @var array
      */
-    protected $_cacheDirectives = [];
+    protected array $_cacheDirectives = [];
 
     /**
      * Collecte de cookies à envoyer au client
@@ -422,17 +108,13 @@ class Response implements ResponseInterface
 
     /**
      * Phrase de raison
-     *
-     * @var string
      */
-    protected $_reasonPhrase = 'OK';
+    protected string $_reasonPhrase = 'OK';
 
     /**
      * Options du mode flux.
-     *
-     * @var string
      */
-    protected $_streamMode = 'wb+';
+    protected string $_streamMode = 'wb+';
 
     /**
      * Cible de flux ou objet de ressource.
@@ -533,8 +215,8 @@ class Response implements ResponseInterface
     /**
      * Effectuez une redirection vers une nouvelle URL, en deux versions : en-tête ou emplacement.
      *
-     * @param string $uri  L'URI vers laquelle rediriger
-     * @param int    $code Le type de redirection, par défaut à 302
+     * @param string   $uri  L'URI vers laquelle rediriger
+     * @param int|null $code Le type de redirection, par défaut à 302
      *
      * @throws HttpException Pour un code d'état invalide.
      */
