@@ -17,7 +17,7 @@ use Dimtrovich\Validation\Rule as DimtrovichRule;
 /**
  * {@inheritDoc}
  *
- * @method static \BlitzPHP\Database\Validation\Rules\Exists exists(string $table, ?string $column = null)
+ * @method static \BlitzPHP\Database\Validation\Rules\Exists  exists(string $table, ?string $column = null)
  * @method static \BlitzPHP\Dataabase\Validation\Rules\Unique unique(string $table, ?string $column = null, mixed $ignore = null)
  */
 abstract class Rule extends DimtrovichRule

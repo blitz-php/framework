@@ -15,7 +15,6 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\LoadException;
-use BlitzPHP\Filesystem\Files\Mimes;
 use BlitzPHP\Http\Concerns\ResponseTrait;
 use BlitzPHP\Session\Cookie\CookieCollection;
 use DateTime;
