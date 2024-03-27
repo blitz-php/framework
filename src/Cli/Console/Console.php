@@ -170,7 +170,7 @@ class Console extends Application
      */
     public function commandExists(string $commandName): bool
     {
-        return !empty($this->_commands[$commandName]);
+        return ! empty($this->_commands[$commandName]);
     }
 
     /**

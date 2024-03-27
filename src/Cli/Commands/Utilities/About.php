@@ -71,38 +71,35 @@ class About extends Command
         $this->center('Information générales sur votre application', ['fg' => Color::YELLOW]);
         $this->border();
 
-
         collect(static::$data)
-            ->map(fn ($items) => collect($items)
-                ->map(function ($value) {
-                    if (is_array($value)) {
-                        return [$value];
-                    }
+            ->map(
+                static fn ($items) => collect($items)
+                    ->map(static function ($value) {
+                        if (is_array($value)) {
+                            return [$value];
+                        }
 
-                    if (is_string($value)) {
-                        $value = Container::make($value);
-                    }
+                        if (is_string($value)) {
+                            $value = Container::make($value);
+                        }
 
-                    return collect(Container::call($value))
-                        ->map(fn ($value, $key) => [$key, $value])
-                        ->values()
-                        ->all();
-                })->flatten(1)
+                        return collect(Container::call($value))
+                            ->map(static fn ($value, $key) => [$key, $value])
+                            ->values()
+                            ->all();
+                    })->flatten(1)
             )
-            ->sortBy(function ($data, $key) {
-                $index = array_search($key, ['Environnement', 'Cache', 'Gestionnaires']);
+            ->sortBy(static function ($data, $key) {
+                $index = array_search($key, ['Environnement', 'Cache', 'Gestionnaires'], true);
 
                 return $index === false ? 99 : $index;
             })
-            ->filter(function ($data, $key) {
-                return $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections()) : true;
-            })
+            ->filter(fn ($data, $key) => $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections(), true) : true)
             ->pipe(fn ($data) => $this->display($data));
-
 
         return EXIT_SUCCESS;
     }
-    
+
     /**
      * Affiche les informations sur l'application.
      */
@@ -120,8 +117,8 @@ class About extends Command
             $this->newLine();
 
             $this->justify($section, '', ['first' => ['fg' => Color::GREEN]]);
- 
-            $data->pipe(fn ($data) => $section !== 'Environnement' ? $data->sort() : $data)->each(function ($detail) {
+
+            $data->pipe(static fn ($data) => $section !== 'Environnement' ? $data->sort() : $data)->each(function ($detail) {
                 [$label, $value] = $detail;
 
                 $this->justify($label, value($value, false));
@@ -157,14 +154,14 @@ class About extends Command
 
         $config = (object) Config::display();
 
-        static::addToSection('Environnement', fn () => [
+        static::addToSection('Environnement', static fn () => [
             'Nom de l\'application' => $config->appName,
-            'Version de BlitzPHP' => $config->blitzVersion,
-            'Version de PHP'      => PHP_VERSION,
+            'Version de BlitzPHP'   => $config->blitzVersion,
+            'Version de PHP'        => PHP_VERSION,
             // 'Composer Version' => $this->composer->getVersion() ?? '<fg=yellow;options=bold>-</>',
-            'Environnement'      => $config->environment,
-            'Mode debug'       => static::format(config('app.debug'), console: $formatEnabledStatus),
-            'URL'              => Text::of($config->baseURL)->replace(['http://', 'https://'], ''),
+            'Environnement' => $config->environment,
+            'Mode debug'    => static::format(config('app.debug'), console: $formatEnabledStatus),
+            'URL'           => Text::of($config->baseURL)->replace(['http://', 'https://'], ''),
             // 'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
         ]);
 
@@ -175,11 +172,12 @@ class About extends Command
             'Vues' => static::format($this->hasPhpFiles(storage_path('framework/cache/views')), console: $formatCachedStatus),
         ]);
 
-        static::addToSection('Gestionnaires', fn () => array_filter([
-            'Cache'    => config('cache.handler'),
+        static::addToSection('Gestionnaires', static fn () => array_filter([
+            'Cache'           => config('cache.handler'),
             'Base de données' => config('database.default'),
-            'Logs'     => function ($json) {
+            'Logs'            => static function ($json) {
                 $handlers = [];
+
                 foreach (config('log.handlers') as $k => $v) {
                     $handlers[] = $k;
                 }
@@ -198,23 +196,23 @@ class About extends Command
      */
     protected function hasPhpFiles(string $path): bool
     {
-        return count(glob($path.'/*.php')) > 0;
+        return count(glob($path . '/*.php')) > 0;
     }
 
     /**
      * Ajoute des données supplémentaires à la sortie de la commande "about".
      *
-     * @param  callable|string|array  $data
+     * @param array|callable|string $data
      */
     public static function add(string $section, $data, ?string $value = null): void
     {
-        static::$customDataResolvers[] = fn () => static::addToSection($section, $data, $value);
+        static::$customDataResolvers[] = static fn () => static::addToSection($section, $data, $value);
     }
 
     /**
      * Ajoute des données supplémentaires à la sortie de la commande "about".
-     * 
-     * @param  callable|string|array  $data
+     *
+     * @param array|callable|string $data
      */
     protected static function addToSection(string $section, $data, ?string $value = null): void
     {
@@ -243,16 +241,18 @@ class About extends Command
     /**
      * Matérialise une fonction qui formate une valeur donnée pour la sortie CLI ou JSON.
      *
-     * @param  (\Closure(mixed):(mixed))|null  $console
-     * @param  (\Closure(mixed):(mixed))|null  $json
-     * @return \Closure(bool):mixed
+     * @param (Closure(mixed):(mixed))|null $console
+     * @param (Closure(mixed):(mixed))|null $json
+     *
+     * @return Closure(bool):mixed
      */
-    public static function format(mixed $value, Closure $console = null, Closure $json = null)
+    public static function format(mixed $value, ?Closure $console = null, ?Closure $json = null)
     {
-        return function ($isJson) use ($value, $console, $json) {
+        return static function ($isJson) use ($value, $console, $json) {
             if ($isJson === true && $json instanceof Closure) {
                 return value($json, $value);
-            } elseif ($isJson === false && $console instanceof Closure) {
+            }
+            if ($isJson === false && $console instanceof Closure) {
                 return value($console, $value);
             }
 

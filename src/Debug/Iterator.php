@@ -20,14 +20,14 @@ class Iterator
 {
     /**
      * Stocke les tests que nous devons exécuter.
-     * 
+     *
      * @var array<string, Closure>
      */
     protected array $tests = [];
 
     /**
      * Stocke les résultats de chacun des tests.
-     * 
+     *
      * @var array<string, array>
      */
     protected array $results = [];
@@ -47,8 +47,8 @@ class Iterator
     }
 
     /**
-     * Exécute tous les tests qui ont été ajoutés, en enregistrant le temps nécessaire pour exécuter 
-     * le nombre d'itérations souhaité et l'utilisation approximative de la mémoire utilisée au cours 
+     * Exécute tous les tests qui ont été ajoutés, en enregistrant le temps nécessaire pour exécuter
+     * le nombre d'itérations souhaité et l'utilisation approximative de la mémoire utilisée au cours
      * de ces itérations.
      */
     public function run(int $iterations = 1000, bool $output = true): ?string

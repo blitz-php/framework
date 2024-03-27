@@ -74,7 +74,7 @@ class ConfigCheck extends Command
 
         return EXIT_SUCCESS;
     }
-    
+
     /**
      * Obtiens le dump de la config via la function d() de Kint
      */

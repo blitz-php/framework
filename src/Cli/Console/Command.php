@@ -436,8 +436,8 @@ abstract class Command
     final public function border(?int $length = null, string $char = '-'): self
     {
         $length = $length ?: ($this->terminal->width() ?: 100);
-        $str = str_repeat($char, $length);
-        $str = substr($str, 0, $length);
+        $str    = str_repeat($char, $length);
+        $str    = substr($str, 0, $length);
 
         return $this->comment($str, true);
     }
@@ -557,9 +557,9 @@ abstract class Command
         return new ProgressBar($total, $this->writer);
     }
 
-	/**
-	 * Ecrit deux textes de maniere justifiee dans la console (l'un a droite, l'autre a gauche)
-	 */
+    /**
+     * Ecrit deux textes de maniere justifiee dans la console (l'un a droite, l'autre a gauche)
+     */
     final public function justify(string $first, ?string $second = '', array $options = []): self
     {
         $options = [
@@ -592,9 +592,9 @@ abstract class Command
         return $this->write($first . ' ' . str_repeat((string) $options['sep'], $dashWidth) . ' ' . $second)->eol();
     }
 
-	/**
-	 * Ecrit un texte au centre de la console
-	 */
+    /**
+     * Ecrit un texte au centre de la console
+     */
     final public function center(string $text, array $options = []): self
     {
         $sep = $options['sep'] ?? ' ';
@@ -604,7 +604,7 @@ abstract class Command
         $dashWidth -= 2;
         $dashWidth = (int) ($dashWidth / 2);
 
-        $text = $this->color->line($text, $options);
+        $text     = $this->color->line($text, $options);
         $repeater = str_repeat($sep, $dashWidth);
 
         return $this->write($repeater . ' ' . $text . ' ' . $repeater)->eol();
