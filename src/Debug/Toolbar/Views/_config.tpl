@@ -5,6 +5,10 @@
 <table>
 	<tbody>
 		<tr>
+			<td>Nom de l'application:</td>
+			<td>{ appName }</td>
+		</tr>
+		<tr>
 			<td>Version BlitzPHP:</td>
 			<td>{ blitzVersion }</td>
 		</tr>

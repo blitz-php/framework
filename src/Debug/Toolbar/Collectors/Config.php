@@ -34,6 +34,7 @@ class Config
             'phpVersion'    => PHP_VERSION,
             'os'            => PHP_OS_FAMILY,
             'phpSAPI'       => PHP_SAPI,
+            'appName'       => $config->name ?? '',
             'environment'   => $config->environment ?? 'dev',
             'baseURL'       => $config->base_url ?? '',
             'documentRoot'  => $_SERVER['DOCUMENT_ROOT'] ?? WEBROOT,
