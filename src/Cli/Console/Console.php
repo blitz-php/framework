@@ -130,7 +130,7 @@ class Console extends Application
     protected array $_commands = [];
 
     /**
-     * @param bool $suppress Defini si on doit suppriemer les information du header (nom/version du framework) ou pas
+     * @param bool $suppress Defini si on doit supprimer les information du header (nom/version du framework) ou pas
      */
     public function __construct(private bool $suppress = false)
     {
@@ -147,9 +147,9 @@ class Console extends Application
      * Appelle une commande deja enregistree
      * Utile pour executer une commande dans une autre commande ou dans un controleur
      */
-    public static function call(string $commandName, array $arguments = [], array $options = [])
+    public function call(string $commandName, array $arguments = [], array $options = [])
     {
-        $action = self::instance()->_commands[$commandName] ?? null;
+        $action = $this->_commands[$commandName] ?? null;
 
         if ($action === null) {
             throw CLIException::commandNotFound($commandName);
@@ -163,6 +163,14 @@ class Console extends Application
         }
 
         return $action($arguments, $options, true);
+    }
+
+    /**
+     * Verifie si une commande existe dans la liste des commandes enregistrees
+     */
+    public function commandExists(string $commandName): bool
+    {
+        return !empty($this->_commands[$commandName]);
     }
 
     /**
@@ -306,7 +314,7 @@ class Console extends Application
 
             $suppress = $suppress ?: $console->suppress;
             if (! $suppress) {
-                $console->start($instance->service);
+                $console->start($instance);
             }
 
             $parameters = $command->values(false);
@@ -347,9 +355,13 @@ class Console extends Application
      *
      * @return void
      */
-    protected function start(string $service)
+    protected function start(Command $command)
     {
-        $service = trim($service);
+        if ($command->suppress) {
+            return;
+        }
+
+        $service = trim($command->service);
         $message = static::APP_NAME . ' Command Line Interface';
         if ('' !== $service) {
             $message .= ' | ' . $service;
@@ -357,7 +369,7 @@ class Console extends Application
 
         $eq_str = str_repeat('=', strlen($message));
 
-        $this->io()->write($eq_str . "\n" . $message . "\n" . $eq_str . "\n", true);
+        $command->eol()->write($eq_str . "\n" . $message . "\n" . $eq_str . "\n")->eol();
     }
 
     /**

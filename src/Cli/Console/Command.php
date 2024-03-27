@@ -33,6 +33,7 @@ use Psr\Log\LoggerInterface;
  * @property array           $options
  * @property array           $required
  * @property string          $service
+ * @property bool            $supress
  * @property string          $usage
  * @property string          $version
  */
@@ -126,6 +127,11 @@ abstract class Command
     protected $required = [];
 
     /**
+     * Defini si on doit supprimer les information du header (nom/version du framework) ou pas
+     */
+    protected bool $suppress = false;
+
+    /**
      * @var Interactor
      */
     protected $io;
@@ -149,6 +155,11 @@ abstract class Command
      * @var Cursor
      */
     protected $cursor;
+
+    /**
+     * @var Terminal
+     */
+    protected $terminal;
 
     /**
      * Arguments recus apres executions
@@ -211,7 +222,7 @@ abstract class Command
     /**
      * Recupere la valeur d'un argument lors de l'execution de la commande
      */
-    final protected function argument(string $name, mixed $default = null): mixed
+    final public function argument(string $name, mixed $default = null): mixed
     {
         return $this->_arguments[$name] ?? $default;
     }
@@ -219,7 +230,7 @@ abstract class Command
     /**
      * @deprecated 1.1 Utilisez argument() a la place
      */
-    final protected function getArg(string $name, mixed $default = null)
+    final public function getArg(string $name, mixed $default = null)
     {
         return $this->argument($name, $default);
     }
@@ -227,7 +238,7 @@ abstract class Command
     /**
      * Recupere la valeur d'une option lors de l'execution de la commande
      */
-    final protected function option(string $name, mixed $default = null): mixed
+    final public function option(string $name, mixed $default = null): mixed
     {
         return $this->_options[$name] ?? $default;
     }
@@ -235,7 +246,7 @@ abstract class Command
     /**
      * @deprecated 1.1 Utilisez option() a la place
      */
-    final protected function getOption(string $name, mixed $default = null)
+    final public function getOption(string $name, mixed $default = null)
     {
         return $this->option($name, $default);
     }
@@ -243,7 +254,7 @@ abstract class Command
     /**
      * Recupere la valeur d'un parametre (option ou argument) lors de l'execution de la commande.
      */
-    final protected function param(string $name, mixed $default = null): mixed
+    final public function param(string $name, mixed $default = null): mixed
     {
         $params = array_merge($this->_arguments, $this->_options);
 
@@ -253,7 +264,7 @@ abstract class Command
     /**
      * @deprecated 1.1 Utilisez param() a la place
      */
-    final protected function getParam(string $name, mixed $default = null)
+    final public function getParam(string $name, mixed $default = null)
     {
         return $this->param($name, $default);
     }
@@ -261,7 +272,7 @@ abstract class Command
     /**
      * Ecrit un message dans une couleur spécifique
      */
-    final protected function colorize(string $message, string $color): self
+    final public function colorize(string $message, string $color): self
     {
         $this->writer->colors('<' . $color . '>' . $message . '</end><eol>');
 
@@ -271,7 +282,7 @@ abstract class Command
     /**
      * Ecrit un message de reussite
      */
-    final protected function ok(string $message, bool $eol = false): self
+    final public function ok(string $message, bool $eol = false): self
     {
         $this->writer->ok($message, $eol);
 
@@ -281,7 +292,7 @@ abstract class Command
     /**
      * Ecrit un message d'echec
      */
-    final protected function fail(string $message, bool $eol = false): self
+    final public function fail(string $message, bool $eol = false): self
     {
         $this->writer->error($message, $eol);
 
@@ -291,7 +302,7 @@ abstract class Command
     /**
      * Ecrit un message de succes
      */
-    final protected function success(string $message, bool $badge = true, string $label = 'SUCCESS'): self
+    final public function success(string $message, bool $badge = true, string $label = 'SUCCESS'): self
     {
         if (! $badge) {
             $this->writer->okBold($label);
@@ -305,7 +316,7 @@ abstract class Command
     /**
      * Ecrit un message d'avertissement
      */
-    final protected function warning(string $message, bool $badge = true, string $label = 'WARNING'): self
+    final public function warning(string $message, bool $badge = true, string $label = 'WARNING'): self
     {
         if (! $badge) {
             $this->writer->warnBold($label);
@@ -319,7 +330,7 @@ abstract class Command
     /**
      * Ecrit un message d'information
      */
-    final protected function info(string $message, bool $badge = true, string $label = 'INFO'): self
+    final public function info(string $message, bool $badge = true, string $label = 'INFO'): self
     {
         if (! $badge) {
             $this->writer->infoBold($label);
@@ -333,7 +344,7 @@ abstract class Command
     /**
      * Ecrit un message d'erreur
      */
-    final protected function error(string $message, bool $badge = true, string $label = 'ERROR'): self
+    final public function error(string $message, bool $badge = true, string $label = 'ERROR'): self
     {
         if (! $badge) {
             $this->writer->errorBold($label);
@@ -347,9 +358,13 @@ abstract class Command
     /**
      * Ecrit la tâche actuellement en cours d'execution
      */
-    final protected function task(string $task): self
+    final public function task(string $task, ?int $sleep = null): self
     {
         $this->write('>> ' . $task, true);
+
+        if ($sleep !== null) {
+            sleep($sleep);
+        }
 
         return $this;
     }
@@ -357,7 +372,7 @@ abstract class Command
     /**
      * Écrit EOL n fois.
      */
-    final protected function eol(int $n = 1): self
+    final public function eol(int $n = 1): self
     {
         $this->writer->eol($n);
 
@@ -367,7 +382,7 @@ abstract class Command
     /**
      * Écrit une nouvelle ligne vide (saut de ligne).
      */
-    final protected function newLine(): self
+    final public function newLine(): self
     {
         return $this->eol(1);
     }
@@ -378,7 +393,7 @@ abstract class Command
      * @param array[] $rows   Tableau de tableaux associés.
      * @param array   $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
      */
-    final protected function table(array $rows, array $styles = []): self
+    final public function table(array $rows, array $styles = []): self
     {
         $this->writer->table($rows, $styles);
 
@@ -388,7 +403,7 @@ abstract class Command
     /**
      * Écrit le texte formaté dans stdout ou stderr.
      */
-    final protected function write(string $texte, bool $eol = false): self
+    final public function write(string $texte, bool $eol = false): self
     {
         $this->writer->write($texte, $eol);
 
@@ -398,7 +413,7 @@ abstract class Command
     /**
      * Écrit le texte de maniere commentée.
      */
-    final protected function comment(string $text, bool $eol = false): self
+    final public function comment(string $text, bool $eol = false): self
     {
         $this->writer->comment($text, $eol);
 
@@ -408,7 +423,7 @@ abstract class Command
     /**
      * Efface la console
      */
-    final protected function clear(): self
+    final public function clear(): self
     {
         $this->cursor->clear();
 
@@ -418,19 +433,13 @@ abstract class Command
     /**
      * Affiche une bordure en pointillés
      */
-    final protected function border(?int $length = null, string $char = '-'): self
+    final public function border(?int $length = null, string $char = '-'): self
     {
-        if ($length === null) {
-            $terminal = new Terminal();
-            $length   = $terminal->width() ?: 100;
-        }
-
+        $length = $length ?: ($this->terminal->width() ?: 100);
         $str = str_repeat($char, $length);
         $str = substr($str, 0, $length);
 
-        $this->comment($str, true);
-
-        return $this;
+        return $this->comment($str, true);
     }
 
     /**
@@ -438,7 +447,7 @@ abstract class Command
      *
      * @param mixed $data
      */
-    final protected function json($data): self
+    final public function json($data): self
     {
         $this->write(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), true);
 
@@ -448,7 +457,7 @@ abstract class Command
     /**
      * Effectue des tabulations
      */
-    final protected function tab(int $repeat = 1): self
+    final public function tab(int $repeat = 1): self
     {
         $this->write(str_repeat("\t", $repeat));
 
@@ -465,7 +474,7 @@ abstract class Command
      *
      * @return mixed Entrée utilisateur ou valeur par défaut.
      */
-    final protected function choice(string $text, array $choices, $default = null, bool $case = false): mixed
+    final public function choice(string $text, array $choices, $default = null, bool $case = false): mixed
     {
         return $this->io->choice($text, $choices, $default, $case);
     }
@@ -480,7 +489,7 @@ abstract class Command
      *
      * @return mixed Entrée utilisateur ou valeur par défaut.
      */
-    final protected function choices(string $text, array $choices, $default = null, bool $case = false): mixed
+    final public function choices(string $text, array $choices, $default = null, bool $case = false): mixed
     {
         return $this->io->choices($text, $choices, $default, $case);
     }
@@ -490,7 +499,7 @@ abstract class Command
      *
      * @param string $default `y|n`
      */
-    final protected function confirm(string $text, string $default = 'y'): bool
+    final public function confirm(string $text, string $default = 'y'): bool
     {
         return $this->io->confirm($text, $default);
     }
@@ -503,7 +512,7 @@ abstract class Command
      * @param int           $retry   Combien de fois encore pour réessayer en cas d'échec.
      * @param mixed|null    $default
      */
-    final protected function prompt(string $text, $default = null, ?callable $fn = null, int $retry = 3): mixed
+    final public function prompt(string $text, $default = null, ?callable $fn = null, int $retry = 3): mixed
     {
         return $this->io->prompt($text, $default, $fn, $retry);
     }
@@ -515,7 +524,7 @@ abstract class Command
      *                             Tout message d'exception est imprimé en tant qu'erreur.
      * @param int           $retry Combien de fois encore pour réessayer en cas d'échec.
      */
-    final protected function promptHidden(string $text, ?callable $fn = null, int $retry = 3): mixed
+    final public function promptHidden(string $text, ?callable $fn = null, int $retry = 3): mixed
     {
         return $this->io->promptHidden($text, $fn, $retry);
     }
@@ -527,17 +536,78 @@ abstract class Command
      *
      * @throws CLIException
      */
-    final protected function call(string $command, array $arguments = [], array $options = [])
+    final public function call(string $command, array $arguments = [], array $options = [])
     {
         return $this->app->call($command, $arguments, $options);
     }
 
     /**
+     * Peut etre utiliser par la commande pour verifier si une commande existe dans la liste des commandes enregistrees
+     */
+    final public function commandExists(string $commandName): bool
+    {
+        return $this->app->commandExists($commandName);
+    }
+
+    /**
      * Initialise une bar de progression
      */
-    final protected function progress(?int $total = null): ProgressBar
+    final public function progress(?int $total = null): ProgressBar
     {
         return new ProgressBar($total, $this->writer);
+    }
+
+	/**
+	 * Ecrit deux textes de maniere justifiee dans la console (l'un a droite, l'autre a gauche)
+	 */
+    final public function justify(string $first, ?string $second = '', array $options = []): self
+    {
+        $options = [
+            'first'  => $options['first'] ?? [],
+            'second' => ($options['second'] ?? []) + ['bold' => 1],
+            'sep'    => (string) ($options['sep'] ?? '.'),
+        ];
+
+        $second = trim((string) $second);
+        $first  = trim($first);
+
+        $firstLength  = strlen($first);
+        $secondLength = strlen($second);
+
+        if (preg_match('/^\\x1b(?:.+)m(.+)\\x1b(?:.+)m$/', $first, $matches)) {
+            $firstLength = strlen($matches[1]);
+        }
+        if (preg_match('/^\\x1b(?:.+)m(.+)\\x1b(?:.+)m$/', $second, $matches)) {
+            $secondLength = strlen($matches[1]);
+        }
+
+        $dashWidth = ($this->terminal->width() ?: 100) - ($firstLength + $secondLength);
+        $dashWidth -= $second === '' ? 1 : 2;
+
+        $first = $this->color->line($first, $options['first']);
+        if ($second !== '') {
+            $second = $this->color->line($second, $options['second']);
+        }
+
+        return $this->write($first . ' ' . str_repeat((string) $options['sep'], $dashWidth) . ' ' . $second)->eol();
+    }
+
+	/**
+	 * Ecrit un texte au centre de la console
+	 */
+    final public function center(string $text, array $options = []): self
+    {
+        $sep = $options['sep'] ?? ' ';
+        unset($options['sep']);
+
+        $dashWidth = ($this->terminal->width() ?: 100) - strlen($text);
+        $dashWidth -= 2;
+        $dashWidth = (int) ($dashWidth / 2);
+
+        $text = $this->color->line($text, $options);
+        $repeater = str_repeat($sep, $dashWidth);
+
+        return $this->write($repeater . ' ' . $text . ' ' . $repeater)->eol();
     }
 
     /**
@@ -565,10 +635,11 @@ abstract class Command
      */
     private function initProps()
     {
-        $this->io     = $this->app->io();
-        $this->writer = $this->io->writer();
-        $this->reader = $this->io->reader();
-        $this->color  = $this->writer->colorizer();
-        $this->cursor = $this->writer->cursor();
+        $this->io       = $this->app->io();
+        $this->writer   = $this->io->writer();
+        $this->reader   = $this->io->reader();
+        $this->color    = $this->writer->colorizer();
+        $this->cursor   = $this->writer->cursor();
+        $this->terminal = new Terminal();
     }
 }

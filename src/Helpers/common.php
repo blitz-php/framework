@@ -183,7 +183,8 @@ if (! function_exists('command')) {
         }
 
         ob_start();
-        Console::call($command, $args, $params);
+
+        service(Console::class)->call($command, $args, $params);
 
         return ob_get_clean();
     }
