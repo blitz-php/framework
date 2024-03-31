@@ -960,7 +960,10 @@ if (! function_exists('view_exist')) {
 
 if (! function_exists('view')) {
     /**
-     * Charge une vue
+     * Saisit la classe compatible avec le RendererInterface et lui demande d'effectuer le rendu de la vue spécifiée.
+	 * Fournit simplement une méthode de commodité qui peut être utilisée dans les contrôleurs, les bibliothèques et les routes sous forme de closure.
+     *
+     * NOTE : Ne fournit pas d'échappement des données, ce qui doit être géré manuellement par le développeur.
      *
      * @return BlitzPHP\View\View
      */
@@ -968,6 +971,22 @@ if (! function_exists('view')) {
     {
         return Services::viewer()->make($view, $data, $options);
     }
+}
+
+if (! function_exists('component')) {
+	/**
+     * Les composants de vue sont utilisées dans les vues pour insérer des morceaux de HTML qui sont gérés par d'autres classes.
+     *
+     * @throws ReflectionException
+     */
+	function component(array|string $library, array|string|null $params = null, int $ttl = 0, ?string $cacheName = null): string
+	{
+		if (is_array($library)) {
+			$library = implode('::', $library);
+		}
+
+		return Services::componentLoader()->render($library, $params, $ttl, $cacheName);
+	}
 }
 
 if (! function_exists('flash')) {
