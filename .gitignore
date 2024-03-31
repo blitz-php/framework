@@ -114,4 +114,5 @@ scrutinizer.xml
 **/logs/**
 **/debugbar/**
 **/cache/**
+!spec/system/cache/**
 **/storage/framework/session
