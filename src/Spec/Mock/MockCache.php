@@ -59,7 +59,7 @@ class MockCache extends BaseHandler implements CacheInterface
         }
 
         $key = $this->_key($key);
-		$ttl = $ttl instanceof DateInterval ? $ttl->s : $ttl;
+        $ttl = $ttl instanceof DateInterval ? $ttl->s : $ttl;
 
         $this->cache[$key]       = $value;
         $this->expirations[$key] = $ttl > 0 ? Date::now()->getTimestamp() + $ttl : null;
@@ -116,11 +116,11 @@ class MockCache extends BaseHandler implements CacheInterface
             return false;
         }
 
-		if (false !== $this->set($key, $increment = $data + $offset)) {
-			return $increment;
-		}
+        if (false !== $this->set($key, $increment = $data + $offset)) {
+            return $increment;
+        }
 
-		return false;
+        return false;
     }
 
     /**
@@ -139,10 +139,10 @@ class MockCache extends BaseHandler implements CacheInterface
         }
 
         if (false !== $this->set($key, $decrement = $data - $offset)) {
-			return $decrement;
-		}
+            return $decrement;
+        }
 
-		return false;
+        return false;
     }
 
     /**
