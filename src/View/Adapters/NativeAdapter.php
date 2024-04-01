@@ -484,19 +484,22 @@ class NativeAdapter extends AbstractAdapter
 
     /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
+     *
+     * @alias self::insertFisrt()
+     */
+    public function includeFirst(array $views, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
+    {
+        return $this->insertFirst($views, $data, $options, $saveData);
+    }
+
+    /**
+     * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
      */
     public function insertFirst(array $views, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         foreach ($views as $view) {
-            $view = Helpers::ensureExt($view, $this->ext);
-            $view = str_replace(' ', '', $view);
-
-            if ($view[0] !== '/') {
-                $view = $this->retrievePartialPath($view);
-            }
-
-            if (is_file($view)) {
-                return $this->addData($data)->render($view, $options, $saveData);
+            if ('' !== $output = $this->includeIf($view, $data, $options, $saveData)) {
+                return $output;
             }
         }
 

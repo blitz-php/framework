@@ -13,29 +13,29 @@ namespace BlitzPHP\Exceptions;
 
 class ViewException extends FrameworkException
 {
-    public static function invalidCellMethod(string $class, string $method)
+    public static function invalidComponentMethod(string $class, string $method)
     {
-        return new static(lang('View.invalidCellMethod', ['class' => $class, 'method' => $method]));
+        return new static(lang('View.invalidComponentMethod', ['class' => $class, 'method' => $method]));
     }
 
-    public static function missingCellParameters(string $class, string $method)
+    public static function missingComponentParameters(string $class, string $method)
     {
-        return new static(lang('View.missingCellParameters', ['class' => $class, 'method' => $method]));
+        return new static(lang('View.missingComponentParameters', ['class' => $class, 'method' => $method]));
     }
 
-    public static function invalidCellParameter(string $key)
+    public static function invalidComponentParameter(string $key)
     {
-        return new static(lang('View.invalidCellParameter', [$key]));
+        return new static(lang('View.invalidComponentParameter', [$key]));
     }
 
-    public static function noCellClass()
+    public static function noComponentClass()
     {
-        return new static(lang('View.noCellClass'));
+        return new static(lang('View.noComponentClass'));
     }
 
-    public static function invalidCellClass(?string $class = null)
+    public static function invalidComponentClass(?string $class = null)
     {
-        return new static(lang('View.invalidCellClass', [$class]));
+        return new static(lang('View.invalidComponentClass', [$class]));
     }
 
     public static function tagSyntaxError(string $output)

@@ -48,6 +48,7 @@ use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
+use BlitzPHP\View\Components\ComponentLoader;
 use BlitzPHP\View\View;
 use Psr\Log\LoggerInterface;
 use stdClass;
@@ -131,6 +132,19 @@ class Services
         }
 
         return static::$instances[Cache::class] = new Cache($config);
+    }
+
+    /**
+     * Les composants sont destinées à vous permettre d'insérer du HTML dans la vue
+     * qui a été généré par n'importe quel appel dans le système.
+     */
+    public static function componentLoader(bool $shared = true): ComponentLoader
+    {
+        if (true === $shared && isset(static::$instances[ComponentLoader::class])) {
+            return static::$instances[ComponentLoader::class];
+        }
+
+        return static::$instances[ComponentLoader::class] = new ComponentLoader(static::cache());
     }
 
     /**
