@@ -2,6 +2,8 @@ name: Kahlan
 
 on:
   push:
+    branches:
+      - 'devs'
     paths:
       - 'src/**.php'
       - 'spec/**.php'
@@ -10,6 +12,8 @@ on:
       - .github/workflows/test-kahlan.yml
 
   pull_request:
+    branches:
+      - 'devs'
     paths:
       - 'src/**.php'
       - 'spec/**.php'
@@ -46,4 +50,3 @@ jobs:
         run: composer install --no-interaction
       - name: Run Kahlan
         run: vendor/bin/kahlan --reporter=verbose --clover=clover.xml
-      
