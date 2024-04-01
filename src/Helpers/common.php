@@ -461,6 +461,10 @@ if (! function_exists('method_field')) {
      */
     function method_field(string $method): string
     {
+		if (!in_array($method = strtoupper($method), ['PUT', 'POST', 'DELETE', 'PATCH'], true)) {
+			throw new InvalidArgumentException(sprintf('Methode %s invalide', $method));
+		}
+
         return '<input type="hidden" name="_method" value="' . $method . '">';
     }
 }

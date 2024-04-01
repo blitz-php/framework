@@ -9,6 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\View\Adapters\NativeAdapter;
 
@@ -56,7 +57,7 @@ describe('Views / NativeAdapter', function () {
         	expect($view->render('extend_two'))->toMatch(fn($actual) => str_contains($actual, $expected));
         });
 
-        it("Une erreur syntaxique dans la fermeture d'une section leve une exception", function () {
+        it("Une erreur syntaxique dans la closure d'une section leve une exception", function () {
             $view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -81,6 +82,78 @@ describe('Views / NativeAdapter', function () {
 			$expected = "<title>Bienvenue sur BlitzPHP!</title>\n<h1>Bienvenue sur BlitzPHP!</h1>\n<p>Hello World</p>";
 
             expect($view->render('extend_reuse_section'))->toMatch(fn($actual) => str_contains($actual, $expected));
+        });
+    });
+
+    describe('Inclusion', function () {
+        it('include fonctionne normalement', function () {
+            $view = new NativeAdapter($this->config);
+
+        	$view->setVar('testString', 'Hello World');
+
+ 	       	$content = $view->render('extend_include');
+
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+        });
+
+		it('includeWhen', function () {
+            $view = new NativeAdapter($this->config);
+
+        	$view->setVar('testString', 'Hello World');
+
+ 	       	$content = $view->render('extend_include_when');
+
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+			expect($content)->toMatch(fn($actual) => !str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>{teststring}</h1>'));
+        });
+
+		it('includeUnless', function () {
+            $view = new NativeAdapter($this->config);
+
+        	$view->setVar('testString', 'Hello World');
+
+ 	       	$content = $view->render('extend_include_unless');
+
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+        });
+
+		it('includeIf', function () {
+            $view = new NativeAdapter($this->config);
+
+        	$view->setVar('testString', 'Hello World');
+
+ 	       	$content = $view->render('extend_include_if');
+
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+        });
+
+		it('includeFirst', function () {
+            $view = new NativeAdapter($this->config);
+
+        	$view->setVar('testString', 'Hello World');
+
+ 	       	$content = $view->render('extend_include_first');
+
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>{teststring}</h1>'));
+        });
+
+		it('includeFirst leve  une exception si on ne trouve aucune vue', function () {
+            $view = new NativeAdapter($this->config);
+
+        	$view->setVar('testString', 'Hello World');
+
+ 	       	expect(fn() => $view->render('extend_include_first_throw'))->toThrow(new ViewException());
         });
     });
 
@@ -334,6 +407,11 @@ describe('Views / NativeAdapter', function () {
 			expect($this->view->readonly('0'))->toBe('');
 			expect($this->view->readonly('false'))->toBe('');
 			expect($this->view->readonly(false))->toBe('');
+		});
+
+		it('method', function () {
+			expect($this->view->method('post'))->toBe('<input type="hidden" name="_method" value="POST">');
+			expect(fn() => $this->view->method('test'))->toThrow(new InvalidArgumentException());
 		});
 	});
 });

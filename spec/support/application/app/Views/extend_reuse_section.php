@@ -1,9 +1,7 @@
 <?= $this->extend('layout_welcome') ?>
 
-<?= $this->section('page_title') ?>
-<?= $pageTitle ?>
-<?= $this->endSection() ?>
+<?= $this->section('page_title', $pageTitle) ?>
 
-<?= $this->section('content') ?>
+<?= $this->begin('content') ?>
 <?= $testString ?>
-<?= $this->endSection() ?>
+<?= $this->end() ?>
