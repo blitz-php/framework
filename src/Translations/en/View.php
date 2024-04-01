@@ -16,6 +16,6 @@ return [
     'invalidComponentParameter'  => '{0} is not a valid param name.',
     'noComponentClass'           => 'No view component class provided.',
     'invalidComponentClass'      => 'Unable to locate view component class: {0}.',
-    'tagSyntaxError'        => 'You have a syntax error in your Parser tags: {0}',
-    'invalidDecoratorClass' => '"{0}" is not a valid View Decorator.',
+    'tagSyntaxError'             => 'You have a syntax error in your Parser tags: {0}',
+    'invalidDecoratorClass'      => '"{0}" is not a valid View Decorator.',
 ];

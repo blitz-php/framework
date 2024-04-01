@@ -52,7 +52,7 @@ class MockCache extends BaseHandler implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
+    public function set(string $key, mixed $value, null|DateInterval|int $ttl = null): bool
     {
         if ($this->bypass) {
             return false;
@@ -147,13 +147,13 @@ class MockCache extends BaseHandler implements CacheInterface
         return true;
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function clearGroup(string $group): bool
-	{
-		return $this->deleteMatching($group) > 0;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public function clearGroup(string $group): bool
+    {
+        return $this->deleteMatching($group) > 0;
+    }
 
     /**
      * {@inheritDoc}
@@ -169,7 +169,7 @@ class MockCache extends BaseHandler implements CacheInterface
      * Renvoie des informations détaillées sur l'élément spécifique du cache.
      *
      * @return array|null Retourne null si l'élément n'existe pas, sinon array<string, mixed>
-     * 						avec au moins la clé 'expire' pour une expiration absolue (ou null).
+     *                    avec au moins la clé 'expire' pour une expiration absolue (ou null).
      */
     public function getMetaData(string $key): ?array
     {
@@ -192,7 +192,7 @@ class MockCache extends BaseHandler implements CacheInterface
 
     /**
      * Indique à la classe d'ignorer toutes les demandes de mise en cache d'un élément,
-	 * et de toujours "manquer" lorsqu'on vérifie la présence de données existantes.
+     * et de toujours "manquer" lorsqu'on vérifie la présence de données existantes.
      */
     public function bypass(bool $bypass = true): self
     {
@@ -212,7 +212,7 @@ class MockCache extends BaseHandler implements CacheInterface
      */
     public function assertHas(string $key): void
     {
-		expect($this->get($key))->not->toBeNull();
+        expect($this->get($key))->not->toBeNull();
         // Assert::assertNotNull($this->get($key), "Le cache n'a pas un élément nommé: `{$key}`");
     }
 
@@ -228,7 +228,7 @@ class MockCache extends BaseHandler implements CacheInterface
             $this->assertHas($key);
         }
 
-		expect($this->get($key))->toBe($value);
+        expect($this->get($key))->toBe($value);
         // Assert::assertSame($value, $this->get($key), "L'élément `{$key}` du cache ne correspond pas à la valeur attendue. Trouvée: " . print_r($value, true));
     }
 
@@ -237,7 +237,7 @@ class MockCache extends BaseHandler implements CacheInterface
      */
     public function assertMissing(string $key): void
     {
-		expect($this->cache)->not->toContainKey($key);
+        expect($this->cache)->not->toContainKey($key);
         // Assert::assertArrayNotHasKey($key, $this->cache, "L'élément en cache nommé `{$key}` existe.");
     }
 }

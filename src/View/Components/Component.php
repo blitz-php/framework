@@ -28,17 +28,17 @@ use Stringable;
  */
 class Component implements Stringable
 {
-	use PropertiesTrait;
+    use PropertiesTrait;
 
     /**
      * Nom de la vue a rendre.
-	 * Si vide, il sera determiné en fonction du nom de la classe de composant.
+     * Si vide, il sera determiné en fonction du nom de la classe de composant.
      */
     protected string $view = '';
 
     /**
-	 * Responsable de la conversion de la vue en HTML.
-	 * Peut etre modifier par les classes filles dans certains cas, mais pas tous.
+     * Responsable de la conversion de la vue en HTML.
+     * Peut etre modifier par les classes filles dans certains cas, mais pas tous.
      */
     public function render(): string
     {
@@ -57,9 +57,9 @@ class Component implements Stringable
 
     /**
      * rend actuellement la vue et renvoie le code HTML.
-	 * Afin de permettre l'accès aux propriétés et méthodes publiques à partir de la vue,
-	 * cette méthode extrait $data dans le champ d'application actuel et capture le tampon de
-	 * sortie au lieu de s'appuyer sur le service de vue.
+     * Afin de permettre l'accès aux propriétés et méthodes publiques à partir de la vue,
+     * cette méthode extrait $data dans le champ d'application actuel et capture le tampon de
+     * sortie au lieu de s'appuyer sur le service de vue.
      *
      * @throws LogicException
      */
@@ -118,7 +118,7 @@ class Component implements Stringable
 
     /**
      * Permet au développeur de définir les propriétés calculées comme des méthodes
-	 * avec `get` préfixé au nom de la propriété protégée/privée.
+     * avec `get` préfixé au nom de la propriété protégée/privée.
      */
     private function includeComputedProperties(array $properties): array
     {

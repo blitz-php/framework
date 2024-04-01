@@ -43,7 +43,7 @@ use ReflectionMethod;
  */
 class ComponentLoader
 {
-	/**
+    /**
      * @param CacheInterface $cache Instance du Cache
      */
     public function __construct(protected CacheInterface $cache)
@@ -53,14 +53,14 @@ class ComponentLoader
     /**
      * Rendre un composant, en renvoyant son corps sous forme de chaîne.
      *
-     * @param string $library Nom de la classe et de la méthode du composant.
-     * @param array|string|null $params Paramètres à passer à la méthode.
-     * @param int $ttl Nombre de secondes pour la mise en cache de la cellule.
-     * @param string|null $cacheName Nom de l'élément mis en cache.
+     * @param string            $library   Nom de la classe et de la méthode du composant.
+     * @param array|string|null $params    Paramètres à passer à la méthode.
+     * @param int               $ttl       Nombre de secondes pour la mise en cache de la cellule.
+     * @param string|null       $cacheName Nom de l'élément mis en cache.
      *
      * @throws ReflectionException
      */
-    public function render(string $library, array|string|null $params = null, int $ttl = 0, ?string $cacheName = null): string
+    public function render(string $library, null|array|string $params = null, int $ttl = 0, ?string $cacheName = null): string
     {
         [$instance, $method] = $this->determineClass($library);
 
@@ -102,7 +102,7 @@ class ComponentLoader
      * S'il s'agit d'une chaîne, elle doit être au format "clé1=valeur clé2=valeur".
      * Elle sera divisée et renvoyée sous forme de tableau.
      */
-    public function prepareParams(array|string|null $params): array
+    public function prepareParams(null|array|string $params): array
     {
         if ($params === null || $params === '' || $params === []) {
             return [];
@@ -112,7 +112,7 @@ class ComponentLoader
             $newParams = [];
             $separator = ' ';
 
-            if (strpos($params, ',') !== false) {
+            if (str_contains($params, ',')) {
                 $separator = ',';
             }
 
@@ -147,7 +147,7 @@ class ComponentLoader
         $library = str_replace('::', ':', $library);
 
         //  Les composants contrôlées peuvent être appelées avec le seul nom de la classe, c'est pourquoi il faut ajouter une méthode par défaut
-        if (strpos($library, ':') === false) {
+        if (! str_contains($library, ':')) {
             $library .= ':render';
         }
 
@@ -159,23 +159,23 @@ class ComponentLoader
 
         //  localise et renvoie une instance du composant
         try {
-			$object = Services::container()->get($class);
-		} catch (NotFoundException) {
-			$locator = Services::locator();
+            $object = Services::container()->get($class);
+        } catch (NotFoundException) {
+            $locator = Services::locator();
 
-			if (false === $path = $locator->locateFile($class, 'Components')) {
-				throw ViewException::invalidComponentClass($class);
-			}
-			if (false === $_class = $locator->findQualifiedNameFromPath($path)) {
-				throw ViewException::invalidComponentClass($class);
-			}
+            if (false === $path = $locator->locateFile($class, 'Components')) {
+                throw ViewException::invalidComponentClass($class);
+            }
+            if (false === $_class = $locator->findQualifiedNameFromPath($path)) {
+                throw ViewException::invalidComponentClass($class);
+            }
 
-			try {
-				$object = Services::container()->get($_class);
-			} catch (NotFoundException) {
-				throw ViewException::invalidComponentClass($class);
-			}
-		}
+            try {
+                $object = Services::container()->get($_class);
+            } catch (NotFoundException) {
+                throw ViewException::invalidComponentClass($class);
+            }
+        }
 
         if (! is_object($object)) {
             throw ViewException::invalidComponentClass($class);
@@ -197,7 +197,7 @@ class ComponentLoader
     final protected function renderComponent(Component $instance, string $method, array $params): string
     {
         // Ne permet de définir que des propriétés publiques, ou des propriétés protégées/privées
-		// qui ont une méthode pour les obtenir (get<Foo>Property()).
+        // qui ont une méthode pour les obtenir (get<Foo>Property()).
         $publicProperties  = $instance->getPublicProperties();
         $privateProperties = array_column($instance->getNonPublicProperties(['view']), 'name');
         $publicParams      = array_intersect_key($params, $publicProperties);
@@ -210,13 +210,13 @@ class ComponentLoader
         }
 
         // Remplir toutes les propriétés publiques qui ont été passées,
-		// mais seulement celles qui se trouvent dans le tableau $pulibcProperties.
+        // mais seulement celles qui se trouvent dans le tableau $pulibcProperties.
         $instance = $instance->fill($publicParams);
 
         //  S'il existe des propriétés protégées/privées, nous devons les envoyer à la méthode mount().
         if (method_exists($instance, 'mount')) {
             //  si des $params ont des clés qui correspondent au nom d'un argument de la méthode mount,
-			// passer ces variables à la méthode.
+            // passer ces variables à la méthode.
             $mountParams = $this->getMethodParams($instance, 'mount', $params);
             $instance->mount(...$mountParams);
         }
@@ -260,7 +260,7 @@ class ComponentLoader
     final protected function renderSimpleClass($instance, string $method, array $params, string $class): string
     {
         // Essayez de faire correspondre la liste de paramètres qui nous a été fournie avec le nom
-		// du paramètre dans la méthode de callback.
+        // du paramètre dans la méthode de callback.
         $refMethod  = new ReflectionMethod($instance, $method);
         $paramCount = $refMethod->getNumberOfParameters();
         $refParams  = $refMethod->getParameters();

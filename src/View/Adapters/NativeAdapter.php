@@ -482,7 +482,7 @@ class NativeAdapter extends AbstractAdapter
         return '';
     }
 
-     /**
+    /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
      *
      * @alias self::insertFisrt()
@@ -492,15 +492,15 @@ class NativeAdapter extends AbstractAdapter
         return $this->insertFirst($views, $data, $options, $saveData);
     }
 
-	/**
+    /**
      * Utilisé dans les vues de mise en page pour inclure des vues supplémentaires si elle existe.
      */
     public function insertFirst(array $views, ?array $data = [], ?array $options = null, ?bool $saveData = null): string
     {
         foreach ($views as $view) {
             if ('' !== $output = $this->includeIf($view, $data, $options, $saveData)) {
-				return $output;
-			}
+                return $output;
+            }
         }
 
         throw ViewException::invalidFile(implode(' OR ', $views));
