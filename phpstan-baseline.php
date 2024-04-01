@@ -2,6 +2,11 @@
 
 $ignoreErrors = [];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method BlitzPHP\\\\Traits\\\\Mixins\\\\HigherOrderCollectionProxy\\:\\:__invoke\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Cli/Commands/Utilities/About.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Ahc\\\\Cli\\\\Output\\\\Writer\\:\\:errorBold\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Cli/Console/Command.php',
@@ -28,7 +33,7 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Ahc\\\\Cli\\\\Application\\|Ahc\\\\Cli\\\\IO\\\\Interactor\\:\\:write\\(\\)\\.$#',
-	'count' => 2,
+	'count' => 1,
 	'path' => __DIR__ . '/src/Cli/Console/Console.php',
 ];
 $ignoreErrors[] = [
@@ -552,14 +557,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to method getKeyName\\(\\) on an unknown class BlitzPHP\\\\Wolke\\\\Model\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Validation/Rules/Unique.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Parameter \\$entity of method BlitzPHP\\\\Validation\\\\Rules\\\\Unique\\:\\:ignoreModel\\(\\) has invalid type BlitzPHP\\\\Wolke\\\\Model\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Validation/Rules/Unique.php',
+	'message' => '#^Function expect not found\\.$#',
+	'count' => 3,
+	'path' => __DIR__ . '/src/Spec/Mock/MockCache.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to method directive\\(\\) on an unknown class Jenssegers\\\\Blade\\\\Blade\\.$#',

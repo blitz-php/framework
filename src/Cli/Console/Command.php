@@ -33,7 +33,7 @@ use Psr\Log\LoggerInterface;
  * @property array           $options
  * @property array           $required
  * @property string          $service
- * @property bool            $supress
+ * @property bool            $suppress
  * @property string          $usage
  * @property string          $version
  */
