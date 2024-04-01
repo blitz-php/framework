@@ -174,8 +174,34 @@ class About extends Command
 
         static::addToSection('Gestionnaires', static fn () => array_filter([
             'Cache'           => config('cache.handler'),
-            'Base de données' => config('database.default'),
-            'Logs'            => static function ($json) {
+            'Base de données' => static function () {
+                if (empty($connection = config('database.connection'))) {
+                    return null;
+                }
+
+                if ($connection === 'auto') {
+                    $connection = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
+                }
+                if (! config()->has($connection)) {
+                    $connection = 'default';
+                }
+
+                if (empty($config = config('database.' . $connection))) {
+                    return $connection;
+                }
+
+                $output = str_ireplace('pdo', '', $config['driver']) . '/' . $config['host'];
+
+                if (! empty($config['port'])) {
+                    $output .= ':' . $config['port'];
+                }
+                if (! empty($config['username'])) {
+                    $output .= '@' . $config['username'];
+                }
+
+                return $connection . ' [' . $output . ']';
+            },
+            'Logs' => static function ($json) {
                 $handlers = [];
 
                 foreach (config('log.handlers') as $k => $v) {
@@ -184,7 +210,7 @@ class About extends Command
 
                 return implode(', ', $handlers);
             },
-            'Mail'    => config('mail.handler'),
+            'Mail'    => config('mail.handler') . ' [' . config('mail.protocol') . ']',
             'Session' => config('session.handler'),
         ]));
 
