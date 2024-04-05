@@ -62,6 +62,11 @@ class About extends Command
     protected static array $customDataResolvers = [];
 
     /**
+     * Elements deja afficher
+     */
+    protected static array $displayed = [];
+
+    /**
      * {@inheritDoc}
      */
     public function execute(array $params)
@@ -120,8 +125,10 @@ class About extends Command
 
             $data->pipe(static fn ($data) => $section !== 'Environnement' ? $data->sort() : $data)->each(function ($detail) {
                 [$label, $value] = $detail;
-
-                $this->justify($label, value($value, false));
+                if (! in_array($label, static::$displayed, true)) {
+                    $this->justify($label, value($value, false));
+                    static::$displayed[] = $label;
+                }
             });
         });
     }
@@ -173,35 +180,8 @@ class About extends Command
         ]);
 
         static::addToSection('Gestionnaires', static fn () => array_filter([
-            'Cache'           => config('cache.handler'),
-            'Base de données' => static function () {
-                if (empty($connection = config('database.connection'))) {
-                    return null;
-                }
-
-                if ($connection === 'auto') {
-                    $connection = on_test() ? 'test' : (on_prod() ? 'production' : 'development');
-                }
-                if (! config()->has($connection)) {
-                    $connection = 'default';
-                }
-
-                if (empty($config = config('database.' . $connection))) {
-                    return $connection;
-                }
-
-                $output = str_ireplace('pdo', '', $config['driver']) . '/' . $config['host'];
-
-                if (! empty($config['port'])) {
-                    $output .= ':' . $config['port'];
-                }
-                if (! empty($config['username'])) {
-                    $output .= '@' . $config['username'];
-                }
-
-                return $connection . ' [' . $output . ']';
-            },
-            'Logs' => static function ($json) {
+            'Cache' => config('cache.handler'),
+            'Logs'  => static function ($json) {
                 $handlers = [];
 
                 foreach (config('log.handlers') as $k => $v) {
@@ -210,7 +190,7 @@ class About extends Command
 
                 return implode(', ', $handlers);
             },
-            'Mail'    => config('mail.handler') . ' [' . config('mail.protocol') . ']',
+            'Mail'    => config('mail.handler'),
             'Session' => config('session.handler'),
         ]));
 

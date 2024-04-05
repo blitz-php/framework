@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Cli\Commands\Utilities;
 
+use Ahc\Cli\Output\Color;
 use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Container\Services;
 
@@ -34,6 +35,8 @@ class Namespaces extends Command
      * @var string Description
      */
     protected $description = 'Vérifie que vos namespaces sont correctement configurés.';
+
+    protected $service = 'Service de configuration';
 
     /**
      * @var array Options de la commande
@@ -64,6 +67,9 @@ class Namespaces extends Command
                 'Trouvé?'   => $namespace[2] ? 'Oui' : 'Manque',
             ];
         }
+
+        $this->center('Namespaces disponible dans votre application', ['fg' => Color::CYAN]);
+        $this->border();
 
         $this->table($table);
     }
