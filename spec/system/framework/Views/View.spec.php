@@ -62,6 +62,23 @@ describe('Views / View', function () {
             expect($view->getData())->toBe($expected);
         });
 
+        it("with", function () {
+			$view = new View();
+
+        	$expected = [
+				'fee' => 'fi',
+				'foo' => 'bar',
+				'bar' => 'baz',
+			];
+
+			$view->with('fee', 'fi')->with([
+				'foo' => 'bar',
+				'bar' => 'baz',
+			]);
+
+            expect($view->getData())->toBe($expected);
+        });
+
         it("setData ecrase les donnees", function () {
 			$view = new View();
 
@@ -249,6 +266,31 @@ describe('Views / View', function () {
 
 			expect($tempData)->toContainKey('errors');
 			expect($tempData['errors'])->toBeAnInstanceOf(ErrorBag::class);
+
+
+			$view     = new View();
+			$view->with('errors','invalid error');
+
+			$adapter  = ReflectionHelper::getPrivateProperty($view, 'adapter');
+			$tempData = ReflectionHelper::getPrivateProperty($adapter, 'tempData');
+
+			expect($tempData)->toContainKey('errors');
+			expect($tempData['errors'])->toBeAnInstanceOf(ErrorBag::class);
+
+
+			$view     = new View();
+
+			$view->withErrors($errors = [
+				'login'    => 'please enter your email address',
+				'password' => 'please enter your password'
+			]);
+
+			$adapter  = ReflectionHelper::getPrivateProperty($view, 'adapter');
+			$tempData = ReflectionHelper::getPrivateProperty($adapter, 'tempData');
+
+			expect($tempData)->toContainKey('errors');
+			expect($tempData['errors'])->toBeAnInstanceOf(ErrorBag::class);
+			expect($tempData['errors']->toArray())->toBe($errors);
 		});
 
 		it('first', function () {
@@ -277,13 +319,37 @@ describe('Views / View', function () {
 
 			$view->setVar('testString', 'Hello World');
 			$view->display('simple')
-				->options(['save_data' => false]);
+				->setOptions(['save_data' => false]);
 
 			$expected = '<h1>Hello World</h1>';
 
 			expect($view->getData())->toBe(['testString' => 'Hello World']);
 			expect(fn() => $view->render())->toEcho($expected);
 			expect($view->getData())->toBe([]);
+		});
+
+		it('Layout', function () {
+			$view = new View();
+
+			$view->setVar('testString', 'Hello World');
+			$view->display('simple_layout')
+				->setLayout('layout');
+
+			expect(fn() => $view->render())->toMatchEcho(function($actual) {
+				return str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>');
+			});
+		});
+
+		it('Layout a travers options', function () {
+			$view = new View();
+
+			$view->setVar('testString', 'Hello World');
+			$view->display('simple_layout')
+				->options(['layout' => 'layout']);
+
+			expect(fn() => $view->render())->toMatchEcho(function($actual) {
+				return str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>');
+			});
 		});
 	});
 });
