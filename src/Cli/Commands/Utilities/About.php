@@ -62,6 +62,11 @@ class About extends Command
     protected static array $customDataResolvers = [];
 
     /**
+     * Elements deja afficher
+     */
+    protected static array $displayed = [];
+
+    /**
      * {@inheritDoc}
      */
     public function execute(array $params)
@@ -120,8 +125,10 @@ class About extends Command
 
             $data->pipe(static fn ($data) => $section !== 'Environnement' ? $data->sort() : $data)->each(function ($detail) {
                 [$label, $value] = $detail;
-
-                $this->justify($label, value($value, false));
+                if (! in_array($label, static::$displayed, true)) {
+                    $this->justify($label, value($value, false));
+                    static::$displayed[] = $label;
+                }
             });
         });
     }
@@ -173,9 +180,8 @@ class About extends Command
         ]);
 
         static::addToSection('Gestionnaires', static fn () => array_filter([
-            'Cache'           => config('cache.handler'),
-            'Base de données' => config('database.default'),
-            'Logs'            => static function ($json) {
+            'Cache' => config('cache.handler'),
+            'Logs'  => static function ($json) {
                 $handlers = [];
 
                 foreach (config('log.handlers') as $k => $v) {

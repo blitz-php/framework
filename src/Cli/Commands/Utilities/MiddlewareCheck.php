@@ -35,6 +35,8 @@ class MiddlewareCheck extends Command
      */
     protected $description = 'Vérifiez les middleware d\'une route.';
 
+    protected $service = 'Service de configuration';
+
     /**
      * Arguments de la commande
      *

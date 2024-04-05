@@ -170,7 +170,7 @@ class View implements Stringable
     /**
      * Modifier les options d'affichage
      *
-     * {@deprecated since 1.0 use options() instead}
+     * @deprecated since 1.0 use options() instead
      */
     public function setOptions(?array $options = []): static
     {
@@ -242,7 +242,7 @@ class View implements Stringable
         }
 
         if (isset($key['errors'])) {
-            $this->withErrors($key['errors']);
+            return $this->withErrors($key['errors']);
         }
 
         return $this->addData($key, $context);

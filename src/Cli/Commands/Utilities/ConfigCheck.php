@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Cli\Commands\Utilities;
 
+use Ahc\Cli\Output\Color;
 use BlitzPHP\Cli\Console\Command;
 use Kint\Kint;
 
@@ -63,13 +64,58 @@ class ConfigCheck extends Command
             $this->fail('Aucune configuration trouvée pour: ' . $file);
         }
 
-        $this->writer->warn('Valeurs de la configuration ' . $this->color->ok($file));
-        $this->eol()->border()->eol();
+        $this->center('Valeurs de la configuration ' . $this->color->ok($file));
 
-        if (defined('KINT_DIR') && Kint::$enabled_mode !== false) {
-            $this->write($this->getKintDump($config));
-        } else {
-            $this->colorize($this->getVarDump($config), 'cyan');
+        $this->border()->eol();
+
+        $others = [];
+
+        foreach ($config as $key => $val) {
+            $options = ['fg' => Color::CYAN];
+
+            if (is_scalar($val)) {
+                if (is_bool($val)) {
+                    if ($val === true) {
+                        $options['fg'] = Color::GREEN;
+                        $val           = 'Enabled';
+                    } else {
+                        $options['fg'] = Color::YELLOW;
+                        $val           = 'Disabled';
+                    }
+                } elseif ('' === $val) {
+                    $others[$key] = $val;
+
+                    continue;
+                }
+
+                $this->justify($key, $val, ['second' => $options]);
+            } else {
+                if (empty($val = (array) $val)) {
+                    $others[$key] = $val;
+
+                    continue;
+                }
+                if (array_is_list($val)) {
+                    $options = ['fg' => Color::PURPLE];
+                    $this->justify($key, implode(', ', array_values($val)), ['second' => $options]);
+                } else {
+                    $others[$key] = $val;
+
+                    continue;
+                }
+            }
+        }
+
+        if ($others !== []) {
+            $this->eol()->task('Autres configuration')->eol();
+
+            if (defined('KINT_DIR') && Kint::$enabled_mode !== false) {
+                $this->write($this->getKintDump($others));
+            } else {
+                $this->write(
+                    $this->color->line($this->getVarDump($others), ['fg' => Color::CYAN])
+                );
+            }
         }
 
         return EXIT_SUCCESS;
