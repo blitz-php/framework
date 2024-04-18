@@ -36,7 +36,8 @@
         "monolog/monolog": "^3.0",
         "nette/schema": "^1.2",
         "php-di/php-di": "^7.0",
-        "psr/http-server-middleware": "^1.0"
+        "psr/http-server-middleware": "^1.0",
+        "spatie/invade": "^2.0"
     },
     "require-dev": {
         "blitz-php/coding-standard": "^1.3",
