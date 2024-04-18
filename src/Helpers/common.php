@@ -24,7 +24,6 @@ use BlitzPHP\Loader\Load;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
-use BlitzPHP\Utilities\Support\Invader;
 
 // ================================= FONCTIONS UTIILITAIRES ESSENTIELLES ================================= //
 
@@ -1111,20 +1110,5 @@ if (! function_exists('last')) {
     function last(array $array)
     {
         return end($array);
-    }
-}
-
-if (! function_exists('invade')) {
-    /**
-     * Cette classe offre une fonction d'invasion qui vous permettra de lire / écrire des propriétés privées d'un objet.
-     * Il vous permettra également de définir, obtenir et appeler des méthodes privées.
-     *
-     * @return Invader
-     *
-     * @see https://github.com/spatie/invade/blob/main/src/Invader.php
-     */
-    function invade(object $object)
-    {
-        return Invader::make($object);
     }
 }
