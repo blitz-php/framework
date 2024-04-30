@@ -378,13 +378,13 @@ class View implements Stringable
         return $this;
     }
 
-	/**
-	 * Recupere l'adapter utilisé pour générer les vues
-	 */
-	public function getAdapter(): RendererInterface
-	{
-		return $this->adapter;
-	}
+    /**
+     * Recupere l'adapter utilisé pour générer les vues
+     */
+    public function getAdapter(): RendererInterface
+    {
+        return $this->adapter;
+    }
 
     /**
      * Renvoie les données de performances qui ont pu être collectées lors de l'exécution.

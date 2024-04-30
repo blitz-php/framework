@@ -20,10 +20,10 @@ use DI\ContainerBuilder;
 /**
  * Conteneur d’injection de dépendances.
  *
- * @method string debugEntry(string $name) Obtenir les informations de débogage de l'entrée.
- * @method array  getKnownEntryNames()                       Obtenez des entrées de conteneur définies.
- * @method object injectOn(object $instance)                 Injectez toutes les dépendances sur une instance existante.
- * @method void   set(string $name, mixed $value)            Définissez un objet ou une valeur dans le conteneur.
+ * @method string debugEntry(string $name)        Obtenir les informations de débogage de l'entrée.
+ * @method array  getKnownEntryNames()            Obtenez des entrées de conteneur définies.
+ * @method object injectOn(object $instance)      Injectez toutes les dépendances sur une instance existante.
+ * @method void   set(string $name, mixed $value) Définissez un objet ou une valeur dans le conteneur.
  */
 class Container implements ContainerInterface
 {
@@ -75,8 +75,8 @@ class Container implements ContainerInterface
         return $this->container->has($name);
     }
 
-	/**
-	 * Construire une entrée du conteneur par son nom.
+    /**
+     * Construire une entrée du conteneur par son nom.
      *
      * Cette méthode se comporte comme get() sauf qu'elle résout l'entrée à chaque fois.
      * Par exemple, si l'entrée est une classe, une nouvelle instance sera créée à chaque fois.
@@ -84,32 +84,34 @@ class Container implements ContainerInterface
      * Cette méthode permet au conteneur de se comporter comme une usine.
      *
      * @template T
-     * @param string|class-string<T> $name Nom de l'entrée ou nom de la classe.
-     * @param array $parameters Paramètres optionnels à utiliser pour construire l'entrée.
-	 * 							Utilisez ceci pour forcer des paramètres spécifiques à des valeurs spécifiques.
-	 * 							Les paramètres non définis dans ce tableau seront résolus à l'aide du conteneur.
+     *
+     * @param class-string<T>|string $name       Nom de l'entrée ou nom de la classe.
+     * @param array                  $parameters Paramètres optionnels à utiliser pour construire l'entrée.
+     *                                           Utilisez ceci pour forcer des paramètres spécifiques à des valeurs spécifiques.
+     *                                           Les paramètres non définis dans ce tableau seront résolus à l'aide du conteneur.
+     *
      * @return mixed|T
-	 */
-	public function make(string $name, array $parameters = []): mixed
-	{
-		return $this->container->make($name, $parameters);
-	}
+     */
+    public function make(string $name, array $parameters = []): mixed
+    {
+        return $this->container->make($name, $parameters);
+    }
 
-	/**
-	 * Appelle la fonction donnée en utilisant les paramètres donnés.
-	 * Les paramètres manquants seront résolus à partir du conteneur.
-	 *
-	 * @param callable|array|string $callable Fonction à appeler.
-	 * @param array $parameters Paramètres facultatifs à utiliser pour construire l'entrée.
- 	 *                          Utilisez ceci pour forcer des paramètres spécifiques à des valeurs spécifiques.
- 	 *                          Les paramètres non définis dans ce tableau seront résolus en utilisant le conteneur.
-	 *							Peut être indexé par les noms de paramètre ou non indexé (même ordre que les paramètres).
- 	 *                          Le tableau peut également contenir des définitions DI, par ex. DI\get().
-	 */
-	public function call(array|callable|string $callback, array $parameters = []): mixed
-	{
-		return $this->container->call($callback, $parameters);
-	}
+    /**
+     * Appelle la fonction donnée en utilisant les paramètres donnés.
+     * Les paramètres manquants seront résolus à partir du conteneur.
+     *
+     * @param array|callable|string $callable   Fonction à appeler.
+     * @param array                 $parameters Paramètres facultatifs à utiliser pour construire l'entrée.
+     *                                          Utilisez ceci pour forcer des paramètres spécifiques à des valeurs spécifiques.
+     *                                          Les paramètres non définis dans ce tableau seront résolus en utilisant le conteneur.
+     *                                          Peut être indexé par les noms de paramètre ou non indexé (même ordre que les paramètres).
+     *                                          Le tableau peut également contenir des définitions DI, par ex. DI\get().
+     */
+    public function call(array|callable|string $callback, array $parameters = []): mixed
+    {
+        return $this->container->call($callback, $parameters);
+    }
 
     /**
      * Defini un element au conteneur sous forme de factory
