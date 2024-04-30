@@ -379,6 +379,14 @@ class View implements Stringable
     }
 
     /**
+     * Recupere l'adapter utilisé pour générer les vues
+     */
+    public function getAdapter(): RendererInterface
+    {
+        return $this->adapter;
+    }
+
+    /**
      * Renvoie les données de performances qui ont pu être collectées lors de l'exécution.
      * Utilisé principalement dans la barre d'outils de débogage.
      *

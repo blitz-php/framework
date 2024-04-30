@@ -17,7 +17,6 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Http\ResponsableInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
-use BlitzPHP\Contracts\Support\Responsable;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\PageNotFoundException;
@@ -605,7 +604,7 @@ class Dispatcher
             return $returned;
         }
 
-        if ($returned instanceof Responsable) {
+        if ($returned instanceof ResponsableInterface) {
             return $returned->toResponse($this->request);
         }
 
