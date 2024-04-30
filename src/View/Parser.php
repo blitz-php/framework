@@ -454,11 +454,8 @@ class Parser extends NativeAdapter
 
     /**
      * Over-ride the substitution field delimiters.
-     *
-     * @param string $leftDelimiter
-     * @param string $rightDelimiter
      */
-    public function setDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): static
+    public function setDelimiters(string $leftDelimiter = '{', string $rightDelimiter = '}'): static
     {
         $this->leftDelimiter  = $leftDelimiter;
         $this->rightDelimiter = $rightDelimiter;
@@ -468,11 +465,8 @@ class Parser extends NativeAdapter
 
     /**
      * Over-ride the substitution conditional delimiters.
-     *
-     * @param string $leftDelimiter
-     * @param string $rightDelimiter
      */
-    public function setConditionalDelimiters($leftDelimiter = '{', $rightDelimiter = '}'): static
+    public function setConditionalDelimiters(string $leftDelimiter = '{', string $rightDelimiter = '}'): static
     {
         $this->leftConditionalDelimiter  = $leftDelimiter;
         $this->rightConditionalDelimiter = $rightDelimiter;
@@ -483,15 +477,9 @@ class Parser extends NativeAdapter
     /**
      * Handles replacing a pseudo-variable with the actual content. Will double-check
      * for escaping brackets.
-     *
-     * @param array|string $pattern
-     * @param string       $content
-     * @param string       $template
      */
-    protected function replaceSingle($pattern, $content, $template, bool $escape = false): string
+    protected function replaceSingle(array|string $pattern, string $content, string $template, bool $escape = false): string
     {
-        $content = (string) $content;
-
         // Replace the content in the template
         return preg_replace_callback($pattern, function ($matches) use ($content, $escape) {
             // Check for {! !} syntax to not escape this one.
@@ -604,10 +592,8 @@ class Parser extends NativeAdapter
     /**
      * Scans the template for any parser plugins, and attempts to execute them.
      * Plugins are delimited by {+ ... +}
-     *
-     * @return string
      */
-    protected function parsePlugins(string $template)
+    protected function parsePlugins(string $template): string
     {
         foreach ($this->plugins as $plugin => $callable) {
             // Paired tags are enclosed in an array in the config array.
@@ -657,10 +643,8 @@ class Parser extends NativeAdapter
 
     /**
      * Makes a new plugin available during the parsing of the template.
-     *
-     * @return $this
      */
-    public function addPlugin(string $alias, callable $callback, bool $isPair = false)
+    public function addPlugin(string $alias, callable $callback, bool $isPair = false): self
     {
         $this->plugins[$alias] = $isPair ? [$callback] : $callback;
 
@@ -669,10 +653,8 @@ class Parser extends NativeAdapter
 
     /**
      * Removes a plugin from the available plugins.
-     *
-     * @return $this
      */
-    public function removePlugin(string $alias)
+    public function removePlugin(string $alias): self
     {
         unset($this->plugins[$alias]);
 
