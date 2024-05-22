@@ -163,7 +163,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      */
     private static function normalizeServer(array $server, ?callable $apacheRequestHeaderCallback = null): array
     {
-        if (null === $apacheRequestHeaderCallback && is_callable('apache_request_headers')) {
+        if (null === $apacheRequestHeaderCallback && function_exists('apache_request_headers')) {
             $apacheRequestHeaderCallback = 'apache_request_headers';
         }
 

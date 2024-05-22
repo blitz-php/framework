@@ -245,7 +245,7 @@ class Negotiator
     protected function match(array $acceptable, string $supported, bool $enforceTypes = false): bool
     {
         $supported = $this->parseHeader($supported);
-        if (is_array($supported) && count($supported) === 1) {
+        if (count($supported) === 1) {
             $supported = $supported[0];
         }
 

@@ -101,7 +101,7 @@ class Container implements ContainerInterface
      * Appelle la fonction donnée en utilisant les paramètres donnés.
      * Les paramètres manquants seront résolus à partir du conteneur.
      *
-     * @param array|callable|string $callable   Fonction à appeler.
+     * @param array|callable|string $callback   Fonction à appeler.
      * @param array                 $parameters Paramètres facultatifs à utiliser pour construire l'entrée.
      *                                          Utilisez ceci pour forcer des paramètres spécifiques à des valeurs spécifiques.
      *                                          Les paramètres non définis dans ce tableau seront résolus en utilisant le conteneur.

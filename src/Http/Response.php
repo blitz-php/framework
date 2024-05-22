@@ -1342,7 +1342,7 @@ class Response implements ResponseInterface
             if (isset($contentType)) {
                 $new = $new->withType($contentType);
             }
-            $name = $options['name'] ?: $file->getFileName();
+            $name = $options['name'] ?: $file->getFilename();
             $new  = $new->withDownload($name)
                 ->withHeader('Content-Transfer-Encoding', 'binary');
         }

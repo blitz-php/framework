@@ -60,13 +60,11 @@ class App
         $fullname        = '\\' . str_replace('/', '\\', $type . '\\' . $name) . $suffix;
 
         $base = $plugin ?: APP_NAMESPACE;
-        if ($base !== null) {
-            $base = str_replace('/', '\\', rtrim($base, '\\'));
+        $base = str_replace('/', '\\', rtrim($base, '\\'));
 
-            if (static::_classExistsInBase($fullname, $base)) {
-                /** @var class-string */
-                return $base . $fullname;
-            }
+        if (static::_classExistsInBase($fullname, $base)) {
+            /** @var class-string */
+            return $base . $fullname;
         }
 
         if ($plugin || ! static::_classExistsInBase($fullname, 'BlitzPHP')) {

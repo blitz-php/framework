@@ -17,7 +17,12 @@ parameters:
 			- src/Debug/Toolbar/Views/toolbar.tpl.php
 	scanDirectories:
 		- src/Helpers
-	checkMissingIterableValueType: false
-	checkGenericClassInNonGenericObjectType: false
+	ignoreErrors:
+		-
+			identifier: property.phpDocType
+		-
+			identifier: method.childParameterType
 	checkMissingCallableSignature: true
 	treatPhpDocTypesAsCertain: false
+	strictRules:
+		allRules: false

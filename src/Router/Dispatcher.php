@@ -232,7 +232,7 @@ class Dispatcher
             return $this->response;
         }
 
-        $this->sendResponse();
+        return $this->sendResponse();
     }
 
     /**
