@@ -1520,7 +1520,7 @@ class ServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         if (in_array($name, $this->emulatedAttributes, true)) {
-            $new->{$name} = $value;
+            // $new->{$name} = $value;
         } else {
             $new->attributes[$name] = $value;
         }
