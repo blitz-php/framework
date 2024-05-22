@@ -216,7 +216,7 @@ if (! function_exists('config')) {
             }
         }
 
-		return;
+        return null;
     }
 }
 

@@ -72,8 +72,8 @@ class RedirectException extends Exception implements ResponsableInterface
         return $this->response;
     }
 
-	public function toResponse(ServerRequestInterface $request): ResponseInterface
-	{
-		return $this->getResponse();
-	}
+    public function toResponse(ServerRequestInterface $request): ResponseInterface
+    {
+        return $this->getResponse();
+    }
 }
