@@ -215,6 +215,8 @@ if (! function_exists('config')) {
                 $config->set($k, $v);
             }
         }
+
+		return;
     }
 }
 

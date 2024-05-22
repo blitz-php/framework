@@ -213,7 +213,7 @@ class Logger implements LoggerInterface
         $filename  = strtolower($this->config->name ?: 'application');
         $extension = $options->extension ?: '.log';
 
-        if ($options->dayly_rotation ?: true === true) {
+        if (($options->dayly_rotation ?: true) === true) {
             $handler = new RotatingFileHandler($directory . $filename . $extension, $options->max_files ?: 0, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);
         } else {
             $handler = new StreamHandler($directory . $filename . $extension, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);

@@ -71,7 +71,7 @@ abstract class Command
     /**
      * la description des options de la commande
      *
-     * @var array
+     * @var array<string, mixed>
      *
      * @example
      * `[
@@ -83,7 +83,7 @@ abstract class Command
     /**
      * La description des arguments de la commande
      *
-     * @var array
+     * @var array<string, mixed>
      *
      * @example
      * `[

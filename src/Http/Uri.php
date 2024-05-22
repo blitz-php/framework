@@ -722,7 +722,7 @@ class Uri implements UriInterface
             $this->setScheme('http');
         }
 
-        if (isset($parts['port']) && null !== $parts['port']) {
+        if (isset($parts['port'])) {
             // Les numéros de port valides sont appliqués par les précédents parse_url ou setPort()
             $this->port = $parts['port'];
         }

@@ -99,7 +99,7 @@ class About extends Command
 
                 return $index === false ? 99 : $index;
             })
-            ->filter(fn ($data, $key) => $this->option('only') ? in_array($this->toSearchKeyword($key), $this->sections(), true) : true)
+            ->filter(fn ($data, $key) => ((bool) $this->option('only')) ? in_array($this->toSearchKeyword($key), $this->sections(), true) : true)
             ->pipe(fn ($data) => $this->display($data));
 
         return EXIT_SUCCESS;
@@ -110,7 +110,7 @@ class About extends Command
      */
     protected function display(Collection $data): void
     {
-        $this->option('json') ? $this->displayJson($data) : $this->displayDetail($data);
+        ((bool) $this->option('json')) ? $this->displayJson($data) : $this->displayDetail($data);
     }
 
     /**

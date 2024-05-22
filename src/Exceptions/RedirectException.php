@@ -16,6 +16,7 @@ use BlitzPHP\Contracts\Http\ResponsableInterface;
 use Exception;
 use LogicException;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
 /**
@@ -70,4 +71,9 @@ class RedirectException extends Exception implements ResponsableInterface
 
         return $this->response;
     }
+
+	public function toResponse(ServerRequestInterface $request): ResponseInterface
+	{
+		return $this->getResponse();
+	}
 }
