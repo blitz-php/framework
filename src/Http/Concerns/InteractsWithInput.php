@@ -276,15 +276,23 @@ trait InteractsWithInput
      */
     public function str(string $key, mixed $default = null): Stringable
     {
-        return Text::of($this->input($key, $default));
+        if (null === $value = $this->string($key, $default)) {
+            return null;
+        }
+
+        return Text::of($value);
     }
 
     /**
      * Récupérez l'entrée de la requête en tant que chaine de caractere.
      */
-    public function string(string $key, mixed $default = null): string
+    public function string(string $key, mixed $default = null): ?string
     {
-        return $this->str($key, $default)->value();
+        if (null === $value = $this->input($key, $default)) {
+            return null;
+        }
+
+        return (string) $value;
     }
 
     /**
