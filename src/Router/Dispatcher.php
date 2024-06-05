@@ -609,17 +609,17 @@ class Dispatcher
             return $returned->toResponse($this->request);
         }
 
-		if ($returned instanceof Arrayable) {
-			$returned = $returned->toArray();
-		}
+        if ($returned instanceof Arrayable) {
+            $returned = $returned->toArray();
+        }
 
         if (is_object($returned)) {
-			if (method_exists($returned, 'toArray')) {
-			    $returned = $returned->toArray();
+            if (method_exists($returned, 'toArray')) {
+                $returned = $returned->toArray();
             } elseif (method_exists($returned, 'toJSON')) {
                 $returned = $returned->toJSON();
             } elseif (method_exists($returned, '__toString')) {
-	            $returned = $returned->__toString();
+                $returned = $returned->__toString();
             } else {
                 $returned = (array) $returned;
             }
