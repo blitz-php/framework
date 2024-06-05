@@ -2,6 +2,17 @@
 
 Toutes les modifications notables apportées à `:package_name` seront documentées dans ce fichier.
 
+## 0.11.1 - 2024-06-05
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+### What's Changed
+
+#### Others (Only for checking. Remove this category)
+
+* Devs by @dimtrovich in https://github.com/blitz-php/framework/pull/15
+
+**Full Changelog**: https://github.com/blitz-php/framework/compare/0.11.0...0.11.1
+
 ## 0.11.0 - 2024-05-22
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
