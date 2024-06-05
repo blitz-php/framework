@@ -17,6 +17,7 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Http\ResponsableInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\PageNotFoundException;
@@ -608,13 +609,17 @@ class Dispatcher
             return $returned->toResponse($this->request);
         }
 
+        if ($returned instanceof Arrayable) {
+            $returned = $returned->toArray();
+        }
+
         if (is_object($returned)) {
-            if (method_exists($returned, '__toString')) {
-                $returned = $returned->__toString();
-            } elseif (method_exists($returned, 'toArray')) {
+            if (method_exists($returned, 'toArray')) {
                 $returned = $returned->toArray();
             } elseif (method_exists($returned, 'toJSON')) {
                 $returned = $returned->toJSON();
+            } elseif (method_exists($returned, '__toString')) {
+                $returned = $returned->__toString();
             } else {
                 $returned = (array) $returned;
             }
