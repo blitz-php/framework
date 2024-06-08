@@ -323,6 +323,7 @@ describe('RouteCollection', function () {
 
         it('Groupes imbriqués avec option externe et interne', function () {
             $routes = getCollector();
+
             $routes->group(
                 'admin',
                 ['middlewares' => ['csrf']],
@@ -339,12 +340,34 @@ describe('RouteCollection', function () {
                 }
             );
 
+			$routes->group(
+                'users',
+                ['middlewares' => ['group:admin']],
+                static function ($routes) {
+                    $routes->get('dashboard', static function () {});
+
+                    $routes->group(
+                        'profile',
+                        ['middlewares' => ['can:view-profile']],
+                        static function ($routes) {
+                            $routes->get('/', static function () {});
+                        }
+                    );
+                }
+            );
+
             expect($routes->getRoutesOptions())->toBe([
                 'admin/dashboard' => [
                     'middlewares' => ['csrf'],
                 ],
                 'admin/profile' => [
                     'middlewares' => ['csrf', 'honeypot'],
+                ],
+                'users/dashboard' => [
+                    'middlewares' => ['group:admin'],
+                ],
+                'users/profile' => [
+                    'middlewares' => ['group:admin', 'can:view-profile'],
                 ],
             ]);
         });

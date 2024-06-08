@@ -1405,11 +1405,20 @@ class RouteCollection implements RouteCollectionInterface
         $options = array_merge($this->currentOptions ?? [], $options ?? []);
 
         if (isset($options['middleware'])) {
+            $options['middleware'] = (array) $options['middleware'];
+
             if (! isset($options['middlewares'])) {
-                $options['middlewares'] = (array) $options['middleware'];
+                $options['middlewares'] = $options['middleware'];
+            } else {
+                $options['middlewares'] = array_merge($options['middlewares'], $options['middleware']);
             }
+
             unset($options['middleware']);
         }
+
+		if (isset($options['middlewares'])) {
+			$options['middlewares'] = array_unique($options['middlewares']);
+		}
 
         if (is_string($to) && isset($options['controller'])) {
             $to = str_replace($options['controller'] . '::', '', $to);

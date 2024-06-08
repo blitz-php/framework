@@ -125,6 +125,13 @@ describe('RouteBuilder', function () {
                     $routes->get('/', static function () {});
                 });
             });
+			$this->builder->prefix('users')->middlewares('group:admin')->group(function () {
+				$this->builder->get('dashboard', static function () {});
+
+				$this->builder->prefix('profile')->middlewares('can:view-profile')->group(static function ($routes) {
+                    $routes->get('/', static function () {});
+                });
+			});
 
             expect($this->routes->getRoutesOptions())->toBe([
                 'admin/dashboard' => [
@@ -132,6 +139,12 @@ describe('RouteBuilder', function () {
                 ],
                 'admin/profile' => [
                     'middlewares' => ['csrf', 'honeypot'],
+                ],
+				'users/dashboard' => [
+                    'middlewares' => ['group:admin'],
+                ],
+                'users/profile' => [
+                    'middlewares' => ['group:admin', 'can:view-profile'],
                 ],
             ]);
         });
