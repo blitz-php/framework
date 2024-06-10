@@ -75,7 +75,7 @@ class Component implements Stringable
             $viewName  = Text::convertTo(Helpers::classBasename(static::class), 'toKebab');
             $directory = dirname((new ReflectionClass($this))->getFileName()) . DIRECTORY_SEPARATOR;
 
-            $possibleView1 = $directory . substr($viewName, 0, strrpos($viewName, '.component')) . '.php';
+            $possibleView1 = $directory . substr($viewName, 0, strrpos($viewName, '-component')) . '.php';
             $possibleView2 = $directory . $viewName . '.php';
         }
 

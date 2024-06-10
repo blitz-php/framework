@@ -13,6 +13,16 @@ use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Spec\Mock\MockCache;
 use BlitzPHP\View\Components\ComponentLoader;
+use Spec\BlitzPHP\App\Views\Components\AdditionComponent;
+use Spec\BlitzPHP\App\Views\Components\AwesomeComponent;
+use Spec\BlitzPHP\App\Views\Components\BadComponent;
+use Spec\BlitzPHP\App\Views\Components\ColorsComponent;
+use Spec\BlitzPHP\App\Views\Components\GreetingComponent;
+use Spec\BlitzPHP\App\Views\Components\ListerComponent;
+use Spec\BlitzPHP\App\Views\Components\MultiplierComponent;
+use Spec\BlitzPHP\App\Views\Components\RenderedExtraDataNotice;
+use Spec\BlitzPHP\App\Views\Components\RenderedNotice;
+use Spec\BlitzPHP\App\Views\Components\SimpleNotice;
 
 describe('Views / Component', function () {
     describe('Composants simples', function () {
@@ -28,6 +38,10 @@ describe('Views / Component', function () {
 		describe('prepareParams', function () {
 			it('PrepareParams retourne un tableau vide lorsqu\'on lui passe une chaine vide', function () {
 				expect($this->component->prepareParams(''))->toBe([]);
+			});
+
+			it('PrepareParams retourne un tableau vide lorsqu\'on lui passe un parametre invalide', function () {
+				expect($this->component->prepareParams(1.023))->toBe([]);
 			});
 
 			it('PrepareParams retourne le tableau qu\'on lui passe', function () {
@@ -199,6 +213,101 @@ describe('Views / Component', function () {
 				expect($this->component->render('StarterComponent::hello'))->toBe('Hello World!');
 				expect($this->component->render('StarterComponent::hello', ['name' => 'BlitzPHP']))->toBe('Hello BlitzPHP!');
 			});
+		});
+	});
+
+	describe('Composants contrôlés', function () {
+		it('Rendu du composant avec les valeurs par défaut', function () {
+			expect(component(GreetingComponent::class))->toBe('Hello World');
+		});
+
+		it('Rendu du composant avec la vue ayant le meme nom que la classe', function () {
+			expect(component(AwesomeComponent::class))->toMatch(fn($actual) => str_contains($actual, 'Found!'));
+		});
+
+		it('Rendu du composant avec une vue nommee', function () {
+			expect(component(SimpleNotice::class))->toMatch(fn($actual) => str_contains($actual, '4, 8, 15, 16, 23, 42'));
+		});
+
+		it('Rendu du composant a travers la methode render()', function () {
+			expect(component(RenderedNotice::class))->toMatch(fn($actual) => str_contains($actual, '4, 8, 15, 16, 23, 42'));
+		});
+
+		it('Rendu du composant a travers la methode render() et des donnees supplementaires', function () {
+			expect(component(RenderedExtraDataNotice::class))->toMatch(fn($actual) => str_contains($actual, '42, 23, 16, 15, 8, 4'));
+		});
+
+		it('Leve une exception si on ne trouve aucune vue pour le composant', function () {
+			expect(fn() => component(BadComponent::class))
+				->toThrow(new LogicException('Impossible de localiser le fichier de vue pour le composant "Spec\\BlitzPHP\\App\\Views\\Components\\BadComponent".'));
+		});
+
+		it('Rendu du composant avec des parametres', function () {
+			expect(component(GreetingComponent::class, 'greeting=Hi, name=Blitz PHP'))->toBe('Hi Blitz PHP');
+
+			// Il n'est pas possible de modifier les proprietes de base du composant, comme `view`.
+			expect(component(GreetingComponent::class, 'greeting=Hi, name=Blitz PHP, view=foo'))->toBe('Hi Blitz PHP');
+		});
+
+		it('Rendu d\'un composant ayant une methode personnalisee', function () {
+			expect(component('Spec\BlitzPHP\App\Views\Components\GreetingComponent::sayHello', 'greeting=Hi, name=Blitz PHP'))->toBe('Well, Hi Blitz PHP');
+		});
+
+		it('Leve une exception si on la methodde personnalisee qu\'on souhaite n\'existe pas dans le composant', function () {
+			expect(fn() => component('Spec\BlitzPHP\App\Views\Components\GreetingComponent::sayGoodbye'))
+				->toThrow(new ViewException(lang('View.invalidComponentMethod', [
+					'class'  => GreetingComponent::class,
+					'method' => 'sayGoodbye',
+				])));
+		});
+
+		it('Rendu d\'un composant ayant des proprietes calculees', function () {
+			expect(component(ListerComponent::class, ['items' => ['one', 'two', 'three']]))
+				->toMatch(fn($actual) => str_contains($actual, '-one -two -three'));
+		});
+
+		it('Rendu d\'un composant ayant des methodes publiques', function () {
+			expect(component(ColorsComponent::class, ['color' => 'red']))
+				->toMatch(fn($actual) => str_contains($actual, 'warm'));
+
+			expect(component(ColorsComponent::class, ['color' => 'purple']))
+				->toMatch(fn($actual) => str_contains($actual, 'cool'));
+		});
+
+		it('Montage du composant avec les valeurs par defaut', function () {
+			expect(component(MultiplierComponent::class))
+				->toMatch(fn($actual) => str_contains($actual, '4'));
+
+			expect(component(AdditionComponent::class))
+				->toMatch(fn($actual) => str_contains($actual, '2'));
+		});
+
+		it('Montage du composant avec d\'autres valeurs', function () {
+			expect(component(MultiplierComponent::class, ['value' => 3, 'multiplier' => 3]))
+				->toMatch(fn($actual) => str_contains($actual, '9'));
+		});
+
+		it('Montage du composant avec des parametres', function () {
+			expect(component(AdditionComponent::class, ['value' => 3]))
+				->toMatch(fn($actual) => str_contains($actual, '3'));
+		});
+
+		it('Montage du composant avec des valeurs et parametres de montage', function () {
+			expect(component(AdditionComponent::class, ['value' => 3, 'number' => 4, 'skipAddition' => false]))
+				->toMatch(fn($actual) => str_contains($actual, '7'));
+
+			expect(component(AdditionComponent::class, ['value' => 3, 'number' => 4, 'skipAddition' => true]))
+				->toMatch(fn($actual) => str_contains($actual, '3'));
+		});
+
+		it('Montage du composant avec des parametres manquant', function () {
+			// Ne fourni aucun parametres
+			expect(component(AdditionComponent::class, ['value' => 3]))
+				->toMatch(fn($actual) => str_contains($actual, '3'));
+
+			// Saute un parametre dans la liste des parametres
+			expect(component(AdditionComponent::class, ['value' => 3, $skipAddition = true]))
+				->toMatch(fn($actual) => str_contains($actual, '3'));
 		});
 	});
 });
