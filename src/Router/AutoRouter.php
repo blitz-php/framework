@@ -158,7 +158,7 @@ final class AutoRouter implements AutoRouterInterface
             $segment = array_shift($segments);
             $controllerPos++;
 
-            $class = $this->translateURIDashes(ucfirst($segment));
+            $class = $this->translateURI($segment);
 
             // dès que nous rencontrons un segment qui n'est pas compatible PSR-4, arrêter la recherche
             if (! $this->isValidSegment($class)) {
@@ -205,7 +205,7 @@ final class AutoRouter implements AutoRouterInterface
             }
 
             $namespaces = array_map(
-                fn ($segment) => $this->translateURIDashes(ucfirst($segment)),
+                fn ($segment) => $this->translateURI($segment),
                 $segments
             );
 
@@ -296,7 +296,7 @@ final class AutoRouter implements AutoRouterInterface
 
         $method = '';
         if ($methodParam !== null) {
-            $method = $httpVerb . ucfirst($this->translateURIDashes($methodParam));
+            $method = $httpVerb . $this->translateURI($methodParam);
 
             $this->checkUriForMethod($method);
         }
@@ -344,11 +344,11 @@ final class AutoRouter implements AutoRouterInterface
 
         // Assurez-vous que les segments URI pour le contrôleur et la méthode
         // ne contiennent pas de soulignement lorsque $translateURIDashes est true.
-        $this->checkUnderscore($uri);
+        $this->checkUnderscore();
 
         // Verifier le nombre de parametres
         try {
-            $this->checkParameters($uri);
+            $this->checkParameters();
         } catch (MethodNotFoundException $e) {
             throw PageNotFoundException::controllerNotFound($this->controller, $this->method);
         }
@@ -372,18 +372,18 @@ final class AutoRouter implements AutoRouterInterface
         ];
     }
 
-    private function checkParameters(string $uri): void
+    private function checkParameters(): void
     {
         try {
             $refClass = new ReflectionClass($this->controller);
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             throw PageNotFoundException::controllerNotFound($this->controller, $this->method);
         }
 
         try {
             $refMethod = $refClass->getMethod($this->method);
             $refParams = $refMethod->getParameters();
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             throw new MethodNotFoundException();
         }
 
@@ -395,7 +395,7 @@ final class AutoRouter implements AutoRouterInterface
             throw new PageNotFoundException(
                 'Le nombre de param dans l\'URI est supérieur aux paramètres de la méthode du contrôleur.'
                 . ' Handler:' . $this->controller . '::' . $this->method
-                . ', URI:' . $uri
+                . ', URI:' . $this->uri
             );
         }
     }
@@ -415,7 +415,7 @@ final class AutoRouter implements AutoRouterInterface
         }
     }
 
-    private function checkUnderscore(string $uri): void
+    private function checkUnderscore(): void
     {
         if ($this->translateURIDashes === false) {
             return;
@@ -431,7 +431,7 @@ final class AutoRouter implements AutoRouterInterface
                     . ' quand $translate_uri_dashes est activé.'
                     . ' Veuillez utiliser les tiret.'
                     . ' Handler:' . $this->controller . '::' . $this->method
-                    . ', URI:' . $uri
+                    . ', URI:' . $this->uri
                 );
             }
         }
@@ -468,7 +468,13 @@ final class AutoRouter implements AutoRouterInterface
             return;
         }
 
-        if (! in_array($method, get_class_methods($this->controller), true)) {
+        if (
+			// Par exemple, si `getSomeMethod()` existe dans le contrôleur, seul l'URI `controller/some-method` devrait être accessible.
+			// Mais si un visiteur navigue vers l'URI `controller/somemethod`, `getSomemethod()` sera vérifié, et `method_exists()` retournera true parce que les noms de méthodes en PHP sont insensibles à la casse.
+            method_exists($this->controller, $method)
+            // Mais nous n'autorisons pas `controller/somemethod`, donc vérifiez le nom exact de la méthode.
+			&& ! in_array($method, get_class_methods($this->controller), true)
+		) {
             throw new PageNotFoundException(
                 '"' . $this->controller . '::' . $method . '()" n\'a pas été trouvé.'
             );
@@ -485,7 +491,7 @@ final class AutoRouter implements AutoRouterInterface
         return (bool) preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/', $segment);
     }
 
-    private function translateURIDashes(string $segment): string
+    private function translateURI(string $segment): string
     {
         if ($this->translateUriToCamelCase) {
             if (strtolower($segment) !== $segment) {

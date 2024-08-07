@@ -11,6 +11,7 @@
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Enums\Method;
+use BlitzPHP\Exceptions\BadRequestException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Router\RouteCollection;
@@ -70,6 +71,14 @@ describe('Router', function () {
             expect(static function () use ($router) {
                 $router->handle('0');
             })->toThrow(new PageNotFoundException());
+        });
+
+		it('Caracteres non autorisés', function () {
+            $router = Services::router($this->collection, $this->request, false);
+
+            expect(static function () use ($router) {
+                $router->handle('test/%3Ca%3E');
+            })->toThrow(new BadRequestException());
         });
 
         it("Mappages d'URI vers le contrôleur", function () {
@@ -293,17 +302,23 @@ describe('Router', function () {
         });
 
         it(': Expression régulière avec Unicode', function () {
-            $this->collection->get('news/([a-z0-9\x{0980}-\x{09ff}-]+)', 'News::view/$1');
+            config()->set('app.permitted_uri_chars', 'a-z 0-9~%.:_\-\x{0980}-\x{09ff}');
+
+			$this->collection->get('news/([a-z0-9\x{0980}-\x{09ff}-]+)', 'News::view/$1');
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('news/a0%E0%A6%80%E0%A7%BF-');
             expect($router->controllerName())->toBe('NewsController');
             expect($router->methodName())->toBe('view');
             expect($router->params())->toBe(['a0ঀ৿-']);
+
+			config()->reset('app.permitted_uri_chars');
         });
 
         it(': Espace réservé d\'expression régulière avec Unicode', function () {
-            $this->collection->addPlaceholder('custom', '[a-z0-9\x{0980}-\x{09ff}-]+');
+            config()->set('app.permitted_uri_chars', 'a-z 0-9~%.:_\-\x{0980}-\x{09ff}');
+
+			$this->collection->addPlaceholder('custom', '[a-z0-9\x{0980}-\x{09ff}-]+');
             $this->collection->get('news/(:custom)', 'News::view/$1');
             $router = Services::router($this->collection, $this->request, false);
 
@@ -311,6 +326,8 @@ describe('Router', function () {
             expect($router->controllerName())->toBe('NewsController');
             expect($router->methodName())->toBe('view');
             expect($router->params())->toBe(['a0ঀ৿-']);
+
+			config()->reset('app.permitted_uri_chars');
         });
     });
 

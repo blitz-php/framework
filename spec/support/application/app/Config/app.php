@@ -10,14 +10,15 @@
  */
 
 return [
-    'base_url'                     => BASE_URL,
-    'url_suffix'                   => '',
-    'environment'                  => 'testing',
-    'use_absolute_link'            => true,
-    'language'                     => 'en',
-    'negotiate_locale'             => true,
-    'supported_locales'            => ['en', 'fr'],
-    'timezone'                     => 'Africa/Douala',
-    'charset'                      => 'UTF-8',
-    'force_global_secure_requests' => false,
+	'base_url'                     => BASE_URL,
+	'url_suffix'                   => '',
+	'environment'                  => 'testing',
+	'use_absolute_link'            => true,
+	'language'                     => 'en',
+	'negotiate_locale'             => true,
+	'supported_locales'            => ['en', 'fr'],
+	'timezone'                     => 'Africa/Douala',
+	'charset'                      => 'UTF-8',
+	'force_global_secure_requests' => false,
+	'permitted_uri_chars'          => 'a-z 0-9~%.:_\-',
 ];

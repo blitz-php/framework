@@ -251,9 +251,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Normaliser la chaîne de chemin dans routesFile
-        if (false !== $realpath = realpath($routesFile)) {
-            $routesFile = $realpath;
-        }
+		$routesFile = realpath($routesFile) ?: $routesFile;
 
         // Incluez le fichier routesFile s'il n'existe pas.
         // Ne conserver que pour les fins BC pour l'instant.
@@ -562,7 +560,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function getRoutes(?string $verb = null, bool $includeWildcard = true): array
     {
-        if (empty($verb)) {
+        if ($verb === null || $verb === '') {
             $verb = $this->getHTTPVerb();
         }
 
@@ -1033,7 +1031,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function match(array $verbs = [], string $from = '', $to = '', ?array $options = null): self
     {
-        if (empty($from) || empty($to)) {
+        if ($from === '' || empty($to)) {
             throw new InvalidArgumentException('Vous devez fournir les paramètres : $from, $to.');
         }
 
@@ -1159,9 +1157,9 @@ class RouteCollection implements RouteCollectionInterface
     public function view(string $from, string $view, array $options = []): self
     {
         $to = static fn (...$data) => Services::viewer()
-            ->setData(['segments' => $data] + $options, 'raw')
+            ->setData(['segments' => $data], 'raw')
             ->display($view)
-            ->setOptions($options)
+            ->options($options)
             ->render();
 
         $routeOptions = array_merge($options, ['view' => $view]);
