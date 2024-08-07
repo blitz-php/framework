@@ -14,14 +14,14 @@ use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\UploadedFileInterface;
 
-describe('Http / UploadedFileFactory', function () {
-	beforeAll(function () {
+describe('Http / UploadedFileFactory', function (): void {
+	beforeAll(function (): void {
 		$this->filename = TEMP_PATH . 'uploadedfile-factory-file-test.txt';
 		$this->factory  = new UploadedFileFactory();
 	});
 
-	describe('UploadedFileFactoryInterface', function () {
-		it('create stream resource', function () {
+	describe('UploadedFileFactoryInterface', function (): void {
+		it('create stream resource', function (): void {
 			file_put_contents($this->filename, 'it works');
 			$stream = new Stream(Utils::tryFopen($this->filename, 'r'));
 
@@ -34,8 +34,8 @@ describe('Http / UploadedFileFactory', function () {
 		});
 	});
 
-	describe('makeUploadedFile', function () {
-		it('makeUploadedFile', function () {
+	describe('makeUploadedFile', function (): void {
+		it('makeUploadedFile', function (): void {
 			$files = [
 				'name'     => 'file.txt',
 				'type'     => 'text/plain',
@@ -53,7 +53,7 @@ describe('Http / UploadedFileFactory', function () {
 			expect($expected->getClientMediaType())->toBe($files['type']);
 		});
 
-		it('makeUploadedFile genere une erreur', function () {
+		it('makeUploadedFile genere une erreur', function (): void {
 			$files = [
 				'name'     => 'file.txt',
 				'type'     => 'text/plain',
@@ -67,8 +67,8 @@ describe('Http / UploadedFileFactory', function () {
 		});
 	});
 
-	describe('normalizeUploadedFile', function () {
-		it("Création d'un fichier téléchargé à partir de la spécification d'un fichier plat", function () {
+	describe('normalizeUploadedFile', function (): void {
+		it("Création d'un fichier téléchargé à partir de la spécification d'un fichier plat", function (): void {
 			$files = [
 				'avatar' => [
 					'tmp_name' => 'phpUxcOty',
@@ -86,7 +86,7 @@ describe('Http / UploadedFileFactory', function () {
 			expect($normalised['avatar']->getClientFilename())->toBe('my-avatar.png');
 		});
 
-		it("Traverse les spécifications de fichiers imbriqués pour extraire le fichier téléchargé", function () {
+		it("Traverse les spécifications de fichiers imbriqués pour extraire le fichier téléchargé", function (): void {
 			$files = [
 				'my-form' => [
 					'details' => [
@@ -107,7 +107,7 @@ describe('Http / UploadedFileFactory', function () {
 			expect($normalised['my-form']['details']['avatar']->getClientFilename())->toBe('my-avatar.png');
 		});
 
-		it("Traverse les spécifications de fichiers imbriqués pour extraire le fichier téléchargé", function () {
+		it("Traverse les spécifications de fichiers imbriqués pour extraire le fichier téléchargé", function (): void {
 			$files = [
 				'my-form' => [
 					'details' => [
@@ -150,7 +150,7 @@ describe('Http / UploadedFileFactory', function () {
 			expect($normalised['my-form']['details']['avatars'][2]->getClientFilename())->toBe('file3.txt');
 		});
 
-		it("Traverse les spécifications de fichiers imbriqués pour extraire le fichier téléchargé", function () {
+		it("Traverse les spécifications de fichiers imbriqués pour extraire le fichier téléchargé", function (): void {
 			$files = [
 				'slide-shows' => [
 					'tmp_name' => [

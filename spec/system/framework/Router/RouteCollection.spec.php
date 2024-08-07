@@ -40,13 +40,13 @@ function setRequestMethod(string $method): void
     Services::set(Request::class, Services::request()->withMethod($method));
 }
 
-describe('RouteCollection', function () {
-    beforeEach(function () {
+describe('RouteCollection', function (): void {
+    beforeEach(function (): void {
         // Services::reset(false);
     });
 
-    describe('Ajout de route', function () {
-        it('Test de base', function () {
+    describe('Ajout de route', function (): void {
+        it('Test de base', function (): void {
             $routes = getCollector();
             $routes->add('home', '\my\controller');
 
@@ -55,7 +55,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test de base avec un callback', function () {
+        it('Test de base avec un callback', function (): void {
             $routes = getCollector();
             $routes->add('home', [HomeController::class, 'index']);
 
@@ -64,7 +64,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test de base avec un callback et des parametres', function () {
+        it('Test de base avec un callback et des parametres', function (): void {
             $routes = getCollector();
             $routes->add('product/(:num)/(:num)', [[HomeController::class, 'index'], '$2/$1']);
 
@@ -73,7 +73,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test de base avec un callback avec des parametres sans la chaine de definition', function () {
+        it('Test de base avec un callback avec des parametres sans la chaine de definition', function (): void {
             $routes = getCollector();
             $routes->add('product/(:num)/(:num)', [HomeController::class, 'index']);
 
@@ -82,7 +82,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it("Ajout du namespace par défaut quand il n'a pas été défini", function () {
+        it("Ajout du namespace par défaut quand il n'a pas été défini", function (): void {
             $routes = getCollector();
             $routes->add('home', 'controller');
 
@@ -91,7 +91,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it("Ignorer le namespace par défaut lorsqu'il existe", function () {
+        it("Ignorer le namespace par défaut lorsqu'il existe", function (): void {
             $routes = getCollector();
             $routes->add('home', 'my\controller');
 
@@ -100,7 +100,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ajout avec un slash en debut de chaine', function () {
+        it('Ajout avec un slash en debut de chaine', function (): void {
             $routes = getCollector();
             $routes->add('/home', 'controller');
 
@@ -110,8 +110,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Correspondance des verbes HTTP', function () {
-        it('Match fonctionne avec la methode HTTP actuel', function () {
+    describe('Correspondance des verbes HTTP', function (): void {
+        it('Match fonctionne avec la methode HTTP actuel', function (): void {
             setRequestMethod('GET');
 
             $routes = getCollector();
@@ -122,7 +122,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Match ignore les methodes HTTP invalide', function () {
+        it('Match ignore les methodes HTTP invalide', function (): void {
             setRequestMethod('GET');
 
             $routes = getCollector();
@@ -131,7 +131,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe([]);
         });
 
-        it('Match supporte plusieurs methodes', function () {
+        it('Match supporte plusieurs methodes', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -145,7 +145,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('Add fonctionne avec un tableau de verbes HTTP', function () {
+        it('Add fonctionne avec un tableau de verbes HTTP', function (): void {
             setRequestMethod('POST');
 
             $routes = getCollector();
@@ -156,7 +156,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Add remplace les placeholders par defaut avec les bons regex', function () {
+        it('Add remplace les placeholders par defaut avec les bons regex', function (): void {
             $routes = getCollector();
             $routes->add('home/(:any)', 'controller');
 
@@ -165,7 +165,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Add remplace les placeholders personnalisés avec les bons regex', function () {
+        it('Add remplace les placeholders personnalisés avec les bons regex', function (): void {
             $routes = getCollector();
             $routes->addPlaceholder('smiley', ':-)');
             $routes->add('home/(:smiley)', 'controller');
@@ -175,7 +175,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Add reconnait le namespace par défaut', function () {
+        it('Add reconnait le namespace par défaut', function (): void {
             $routes = getCollector();
             $routes->setDefaultNamespace('\Spec\BlitzPHP\App\Controllers');
             $routes->add('home', 'HomeController');
@@ -186,8 +186,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Setters', function () {
-        it('Modification du namespace par defaut', function () {
+    describe('Setters', function (): void {
+        it('Modification du namespace par defaut', function (): void {
             $routes = getCollector();
             $routes->setDefaultNamespace('Apps');
 
@@ -205,35 +205,35 @@ describe('RouteCollection', function () {
         	expect($router->handle('/'))->toBe($expects);
         });
 
-        it('Modification du controleur par defaut', function () {
+        it('Modification du controleur par defaut', function (): void {
             $routes = getCollector();
             $routes->setDefaultController('kishimoto');
 
             expect($routes->getDefaultController())->toBe('kishimotoController');
         });
 
-        it('Modification de la methode par defaut', function () {
+        it('Modification de la methode par defaut', function (): void {
             $routes = getCollector();
             $routes->setDefaultMethod('minatoNavigation');
 
             expect($routes->getDefaultMethod())->toBe('minatoNavigation');
         });
 
-        it('TranslateURIDashes', function () {
+        it('TranslateURIDashes', function (): void {
             $routes = getCollector();
             $routes->setTranslateURIDashes(true);
 
             expect($routes->shouldTranslateURIDashes())->toBeTruthy();
         });
 
-        it('AutoRoute', function () {
+        it('AutoRoute', function (): void {
             $routes = getCollector();
             $routes->setAutoRoute(true);
 
             expect($routes->shouldAutoRoute())->toBeTruthy();
         });
 
-		it('useSupportedLocalesOnly', function () {
+		it('useSupportedLocalesOnly', function (): void {
 			config()->set('app.supported_locales', ['en']);
 			setRequestMethod(Method::GET);
 
@@ -257,8 +257,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Groupement', function () {
-        it('Les regroupements de routes fonctionne', function () {
+    describe('Groupement', function (): void {
+        it('Les regroupements de routes fonctionne', function (): void {
             $routes = getCollector();
             $routes->group('admin', static function ($routes): void {
                 $routes->add('users/list', '\UsersController::list');
@@ -269,7 +269,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Netoyage du nom de groupe', function () {
+        it('Netoyage du nom de groupe', function (): void {
             $routes = getCollector();
             $routes->group('<script>admin', static function ($routes): void {
                 $routes->add('users/list', '\UsersController::list');
@@ -280,7 +280,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Les groupes sont capable de modifier les options', function () {
+        it('Les groupes sont capable de modifier les options', function (): void {
             $routes = getCollector();
             $routes->group(
                 'admin',
@@ -295,16 +295,16 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Groupes imbriqués avec options externes et sans options internes', function () {
+        it('Groupes imbriqués avec options externes et sans options internes', function (): void {
             $routes = getCollector();
             $routes->group(
                 'admin',
                 ['namespace' => 'Admin', 'middlewares' => ['csrf']],
-                static function ($routes) {
-                    $routes->get('dashboard', static function () {});
+                static function ($routes): void {
+                    $routes->get('dashboard', static function (): void {});
 
-                    $routes->group('profile', static function ($routes) {
-                        $routes->get('/', static function () {});
+                    $routes->group('profile', static function ($routes): void {
+                        $routes->get('/', static function (): void {});
                     });
                 }
             );
@@ -321,20 +321,20 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Groupes imbriqués avec option externe et interne', function () {
+        it('Groupes imbriqués avec option externe et interne', function (): void {
             $routes = getCollector();
 
             $routes->group(
                 'admin',
                 ['middlewares' => ['csrf']],
-                static function ($routes) {
-                    $routes->get('dashboard', static function () {});
+                static function ($routes): void {
+                    $routes->get('dashboard', static function (): void {});
 
                     $routes->group(
                         'profile',
                         ['middlewares' => ['honeypot']],
-                        static function ($routes) {
-                            $routes->get('/', static function () {});
+                        static function ($routes): void {
+                            $routes->get('/', static function (): void {});
                         }
                     );
                 }
@@ -343,14 +343,14 @@ describe('RouteCollection', function () {
 			$routes->group(
                 'users',
                 ['middlewares' => ['group:admin']],
-                static function ($routes) {
-                    $routes->get('dashboard', static function () {});
+                static function ($routes): void {
+                    $routes->get('dashboard', static function (): void {});
 
                     $routes->group(
                         'profile',
                         ['middlewares' => ['can:view-profile']],
-                        static function ($routes) {
-                            $routes->get('/', static function () {});
+                        static function ($routes): void {
+                            $routes->get('/', static function (): void {});
                         }
                     );
                 }
@@ -372,19 +372,19 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Groupes imbriqués sans option externe avec option interne', function () {
+        it('Groupes imbriqués sans option externe avec option interne', function (): void {
             $routes = getCollector();
             $routes->group(
                 'admin',
                 ['middlewares' => ['csrf']],
-                static function ($routes) {
-                    $routes->get('dashboard', static function () {});
+                static function ($routes): void {
+                    $routes->get('dashboard', static function (): void {});
 
                     $routes->group(
                         'profile',
                         ['namespace' => 'Admin'],
-                        static function ($routes) {
-                            $routes->get('/', static function () {});
+                        static function ($routes): void {
+                            $routes->get('/', static function (): void {});
                         }
                     );
                 }
@@ -401,11 +401,11 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Le regroupement fonctionne avec une chaîne de préfixe vide', function () {
+        it('Le regroupement fonctionne avec une chaîne de préfixe vide', function (): void {
             $routes = getCollector();
             $routes->group(
                 '',
-                static function ($routes) {
+                static function ($routes): void {
                     $routes->add('users/list', '\UsersController::list');
                 }
             );
@@ -415,7 +415,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Le regroupement imbriqué fonctionne avec un préfixe vide', function () {
+        it('Le regroupement imbriqué fonctionne avec un préfixe vide', function (): void {
             $routes = getCollector();
 
             $routes->add('verify/begin', '\VerifyController::begin');
@@ -440,7 +440,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Le regroupement imbriqué sans préfixe racine', function () {
+        it('Le regroupement imbriqué sans préfixe racine', function (): void {
             $collections = [
 				['admin', '/', [
 					'admin/users/list'   => '\UsersController::list',
@@ -482,8 +482,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Options', function () {
-        it('Options', function () {
+    describe('Options', function (): void {
+        it('Options', function (): void {
             $routes = getCollector();
 
             // les options doivent être déclarées séparément, pour ne pas confondre PHPCBF
@@ -500,7 +500,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutesOptions('administrator'))->toBe($options);
         });
 
-        it('Options pour les different verbes', function () {
+        it('Options pour les different verbes', function (): void {
             $routes = getCollector();
 
             // les options doivent être déclarées séparément, pour ne pas confondre PHPCBF
@@ -541,7 +541,7 @@ describe('RouteCollection', function () {
             expect($options)->toBe(['as' => 'admin2', 'foo' => 'baz2', 'bar' => 'baz']);
         });
 
-        it('Options de groupes avec des middlewares simple', function () {
+        it('Options de groupes avec des middlewares simple', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -559,7 +559,7 @@ describe('RouteCollection', function () {
             expect($routes->getFiltersForRoute('admin/bosses'))->toBe([]);
         });
 
-        it('Options de groupes avec des middlewares et les parametres', function () {
+        it('Options de groupes avec des middlewares et les parametres', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -576,7 +576,7 @@ describe('RouteCollection', function () {
             expect($routes->getFiltersForRoute('admin/users'))->toBe(['role:admin,manager']);
         });
 
-        it('Options de decalage', function () {
+        it('Options de decalage', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -585,7 +585,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe($expected);
         });
 
-        it('Options de routes identiques pour deux routes', function () {
+        it('Options de routes identiques pour deux routes', function (): void {
            $collections = [
 				[
 					[
@@ -648,8 +648,8 @@ describe('RouteCollection', function () {
 		});
     });
 
-    describe('Resource & presenter', function () {
-        it('Échafaudages de ressources correctement', function () {
+    describe('Resource & presenter', function (): void {
+        it('Échafaudages de ressources correctement', function (): void {
             $routes = getCollector();
             $routes->setHTTPVerb('get');
             $routes->resource('photos');
@@ -694,7 +694,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Échafaudages de ressources d\'API correctement', function () {
+        it('Échafaudages de ressources d\'API correctement', function (): void {
             $routes = getCollector();
             $routes->setHTTPVerb('get');
             $routes->resource('api/photos', ['controller' => 'Photos']);
@@ -739,7 +739,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Échafaudages correct de presenter', function () {
+        it('Échafaudages correct de presenter', function (): void {
             $routes = getCollector();
             $routes->setHTTPVerb('get');
             $routes->presenter('photos');
@@ -765,7 +765,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ressources avec un controleur personnalisé', function () {
+        it('Ressources avec un controleur personnalisé', function (): void {
             setRequestMethod('get');
             $routes = getCollector();
             $routes->resource('photos', ['controller' => '<script>gallery']);
@@ -778,7 +778,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ressources avec un placeholder personnalisé', function () {
+        it('Ressources avec un placeholder personnalisé', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
             $routes->resource('photos', ['placeholder' => ':num']);
@@ -791,7 +791,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ressources avec le placeholder par defaut', function () {
+        it('Ressources avec le placeholder par defaut', function (): void {
             setRequestMethod('get');
             $routes = getCollector();
 
@@ -806,7 +806,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ressources avec un bug du placeholder par defaut', function () {
+        it('Ressources avec un bug du placeholder par defaut', function (): void {
             setRequestMethod('get');
             $routes = getCollector();
 
@@ -821,7 +821,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ressources avec l\'option <only>', function () {
+        it('Ressources avec l\'option <only>', function (): void {
             setRequestMethod('get');
             $routes = getCollector();
 
@@ -832,7 +832,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ressources avec l\'option <except>', function () {
+        it('Ressources avec l\'option <except>', function (): void {
             setRequestMethod('get');
             $routes = getCollector();
 
@@ -844,7 +844,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Ressources avec l\'option <websafe>', function () {
+        it('Ressources avec l\'option <websafe>', function (): void {
             $routes = getCollector()->setHTTPVerb(Method::POST);
 
             $routes->resource('photos', ['websafe' => true]);
@@ -857,8 +857,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Creation a partir des verbes http appropries', function () {
-        it('GET', function () {
+    describe('Creation a partir des verbes http appropries', function (): void {
+        it('GET', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -867,7 +867,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('POST', function () {
+        it('POST', function (): void {
             $routes = getCollector(Method::POST);
 
             $routes->post('here', 'there');
@@ -875,7 +875,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('GET n\'autorise pas d\'autres methodes', function () {
+        it('GET n\'autorise pas d\'autres methodes', function (): void {
             $routes = getCollector();
             $routes->setHTTPVerb('GET');
 
@@ -885,7 +885,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('PUT', function () {
+        it('PUT', function (): void {
             $routes = getCollector(Method::PUT);
 
             $routes->put('here', 'there');
@@ -893,7 +893,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('DELETE', function () {
+        it('DELETE', function (): void {
             $routes = getCollector(Method::DELETE);
 
             $routes->delete('here', 'there');
@@ -901,7 +901,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('HEAD', function () {
+        it('HEAD', function (): void {
             $routes = getCollector(Method::HEAD);
 
             $routes->head('here', 'there');
@@ -909,7 +909,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('PATCH', function () {
+        it('PATCH', function (): void {
             $routes = getCollector(Method::PATCH);
 
             $routes->patch('here', 'there');
@@ -917,7 +917,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('OPTIONS', function () {
+        it('OPTIONS', function (): void {
             $routes = getCollector(Method::OPTIONS);
 
             $routes->options('here', 'there');
@@ -925,7 +925,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('CLI', function () {
+        it('CLI', function (): void {
             $routes = getCollector('CLI');
 
             $routes->cli('here', 'there');
@@ -933,7 +933,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('Route de vue', function () {
+        it('Route de vue', function (): void {
             $routes = getCollector();
 
             $routes->view('here', 'hello');
@@ -953,7 +953,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes('cli'))->not->toContainKey('here');
         });
 
-        it('Restriction d\'environnement', function () {
+        it('Restriction d\'environnement', function (): void {
             setRequestMethod(Method::GET);
             $routes = getCollector();
 
@@ -973,7 +973,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-		it('Form', function () {
+		it('Form', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -988,8 +988,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Routes nommées', function () {
-        it('Route nommée', function () {
+    describe('Routes nommées', function (): void {
+        it('Route nommée', function (): void {
             $routes = getCollector();
 
             $routes->add('users', 'Users::index', ['as' => 'namedRoute']);
@@ -999,7 +999,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('namedRoute2'))->toBe('/profil');
         });
 
-        it('Route nommée avec la locale', function () {
+        it('Route nommée avec la locale', function (): void {
             $routes = getCollector();
 
             $routes->add('{locale}/users', 'Users::index', ['as' => 'namedRoute']);
@@ -1007,7 +1007,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('namedRoute'))->toBe('/en/users');
         });
 
-        it('Route nommée avec les parametres', function () {
+        it('Route nommée avec les parametres', function (): void {
             $routes = getCollector();
 
             // @TODO Ne mettez aucun espace réservé après (:any).
@@ -1019,7 +1019,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/path/string/to/13');
         });
 
-        it('Route nommée avec les parametres et la locale', function () {
+        it('Route nommée avec les parametres et la locale', function (): void {
             $routes = getCollector();
 
             // @TODO Ne mettez aucun espace réservé après (:any).
@@ -1031,7 +1031,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/en/path/string/to/13');
         });
 
-        it('Route nommée avec la meme URI mais differentes methodes', function () {
+        it('Route nommée avec la meme URI mais differentes methodes', function (): void {
             $routes = getCollector();
 
             $routes->get('user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
@@ -1055,7 +1055,7 @@ describe('RouteCollection', function () {
             expect('/user/insert')->toBe($match3);
         });
 
-        it('Route nommée avec la locale, la meme URI mais differentes methodes', function () {
+        it('Route nommée avec la locale, la meme URI mais differentes methodes', function (): void {
             $routes = getCollector();
 
             $routes->get('{locale}/user/insert', 'myController::goto/$1/$2', ['as' => 'namedRoute1']);
@@ -1079,7 +1079,7 @@ describe('RouteCollection', function () {
             expect('/en/user/insert')->toBe($match3);
         });
 
-        it('Route nommée avec un pipe dans la regex', function () {
+        it('Route nommée avec un pipe dans la regex', function (): void {
             $routes = getCollector();
 
             $routes->get('/system/(this|that)', 'myController::system/$1', ['as' => 'pipedRoute']);
@@ -1089,8 +1089,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Redirection', function () {
-        it('Ajout de redirection', function () {
+    describe('Redirection', function (): void {
+        it('Ajout de redirection', function (): void {
             $routes = getCollector();
 
             // Le deuxième paramètre est soit le nouvel URI vers lequel rediriger, soit le nom d'une route nommée.
@@ -1106,7 +1106,7 @@ describe('RouteCollection', function () {
             expect($routes->getRedirectCode('bosses'))->toBe(0);
         });
 
-        it('Ajout de redirection avec une route nommee', function () {
+        it('Ajout de redirection avec une route nommee', function (): void {
             $routes = getCollector();
 
             $routes->add('zombies', 'Zombies::index', ['as' => 'namedRoute']);
@@ -1122,7 +1122,7 @@ describe('RouteCollection', function () {
             expect($routes->getRedirectCode('users'))->toBe(307);
         });
 
-        it('Ajout de redirection avec la methode GET', function () {
+        it('Ajout de redirection avec la methode GET', function (): void {
             $routes = getCollector();
 
             $routes->get('zombies', 'Zombies::index', ['as' => 'namedRoute']);
@@ -1138,7 +1138,7 @@ describe('RouteCollection', function () {
             expect($routes->getRedirectCode('users'))->toBe(307);
         });
 
-		it('Ajout de redirection permanante', function () {
+		it('Ajout de redirection permanante', function (): void {
             $routes = getCollector();
 
             // Le deuxième paramètre est soit le nouvel URI vers lequel rediriger, soit le nom d'une route nommée.
@@ -1154,8 +1154,8 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Sous domaines', function () {
-        it('Hostname', function () {
+    describe('Sous domaines', function (): void {
+        it('Hostname', function (): void {
             $_SERVER['HTTP_HOST'] = 'example.com';
 
             $routes = getCollector();
@@ -1168,7 +1168,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Sous domaine', function () {
+        it('Sous domaine', function (): void {
             $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
             $routes = getCollector();
@@ -1181,7 +1181,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Sous domaine absent', function () {
+        it('Sous domaine absent', function (): void {
             $_SERVER['HTTP_HOST'] = 'www.example.com';
 
             $routes = getCollector();
@@ -1194,7 +1194,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test avec des sous domaines differents', function () {
+        it('Test avec des sous domaines differents', function (): void {
             $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
             $routes = getCollector();
@@ -1207,7 +1207,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test avec le sous domaine www', function () {
+        it('Test avec le sous domaine www', function (): void {
             $routes = getCollector();
 
             $_SERVER['HTTP_HOST'] = 'www.example.com';
@@ -1220,7 +1220,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test avec le sous domaine .co', function () {
+        it('Test avec le sous domaine .co', function (): void {
             $routes = getCollector();
 
             $_SERVER['HTTP_HOST'] = 'example.co.uk';
@@ -1233,7 +1233,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test avec de differents sous domaine absent', function () {
+        it('Test avec de differents sous domaine absent', function (): void {
             $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
             $routes = getCollector();
@@ -1246,7 +1246,7 @@ describe('RouteCollection', function () {
             ]);
         });
 
-        it('Test sans sous domaine et le point', function () {
+        it('Test sans sous domaine et le point', function (): void {
             $_SERVER['HTTP_HOST'] = 'example.com';
 
             $routes = getCollector();
@@ -1256,7 +1256,7 @@ describe('RouteCollection', function () {
             expect($routes->getRoutes())->toBe([]);
         });
 
-        it('Test avec les sous domaine en ordre', function () {
+        it('Test avec les sous domaine en ordre', function (): void {
             $_SERVER['HTTP_HOST'] = 'adm.example.com';
 
             $routes = getCollector();
@@ -1270,8 +1270,8 @@ describe('RouteCollection', function () {
         });
     });
 
-	describe('Modules', function () {
-		it('Decouverte des routes de modules', function () {
+	describe('Modules', function (): void {
+		it('Decouverte des routes de modules', function (): void {
 			$config = ['SampleSpace' => TEST_PATH . 'support/module'];
 
 			setRequestMethod(Method::GET);
@@ -1285,7 +1285,7 @@ describe('RouteCollection', function () {
 	        expect($match['testing'])->toBe('\TestController::index');
 		});
 
-		it('La decouverte des routes de modules autorise l\'application a modifier une route', function () {
+		it('La decouverte des routes de modules autorise l\'application a modifier une route', function (): void {
 			$config = ['SampleSpace' => TEST_PATH . 'support/module'];
 
         	$routes = getCollector(Method::GET, $config);
@@ -1299,15 +1299,15 @@ describe('RouteCollection', function () {
 		});
 	});
 
-    describe('Fallback', function () {
-        it('Fallback', function () {
+    describe('Fallback', function (): void {
+        it('Fallback', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
             expect($routes->get404Override())->toBeNull();
         });
 
-        it('Fallback sous forme de chaine', function () {
+        it('Fallback sous forme de chaine', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -1315,7 +1315,7 @@ describe('RouteCollection', function () {
             expect($routes->get404Override())->toBe('Explode');
         });
 
-        it('Fallback sous forme de callback', function () {
+        it('Fallback sous forme de callback', function (): void {
             setRequestMethod('GET');
             $routes = getCollector();
 
@@ -1326,15 +1326,15 @@ describe('RouteCollection', function () {
         });
     });
 
-    describe('Routage inversé', function () {
-        it('Reverse route avec une chaine vide', function () {
+    describe('Routage inversé', function (): void {
+        it('Reverse route avec une chaine vide', function (): void {
             $routes = getCollector();
             $routes->add('/', 'Home::index');
 
             expect($routes->reverseRoute(''))->toBeFalsy();
         });
 
-        it('Reverse route simple', function () {
+        it('Reverse route simple', function (): void {
             $routes = getCollector();
 
             // @TODO Ne mettez aucun espace réservé après (:any).
@@ -1346,7 +1346,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/path/string/to/13');
         });
 
-        it('Reverse route avec la locale', function () {
+        it('Reverse route avec la locale', function (): void {
             $routes = getCollector();
 
             // @TODO Ne mettez aucun espace réservé après (:any).
@@ -1358,7 +1358,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/en/path/string/to/13');
         });
 
-        it('Reverse route retourne false lorsque le nombre de parametres est incorrect', function () {
+        it('Reverse route retourne false lorsque le nombre de parametres est incorrect', function (): void {
             $routes = getCollector();
 
             // @TODO Ne mettez aucun espace réservé après (:any).
@@ -1370,7 +1370,7 @@ describe('RouteCollection', function () {
             expect($match)->toBeFalsy();
         });
 
-        it('Reverse route retourne false lorsqu\'il y\'a pas de correspondance', function () {
+        it('Reverse route retourne false lorsqu\'il y\'a pas de correspondance', function (): void {
             $routes = getCollector();
 
             // @TODO Ne mettez aucun espace réservé après (:any).
@@ -1382,19 +1382,19 @@ describe('RouteCollection', function () {
             expect($match)->toBeFalsy();
         });
 
-        it('Reverse route leve une exception en cas de mauvais types de parametres', function () {
+        it('Reverse route leve une exception en cas de mauvais types de parametres', function (): void {
             $routes = getCollector();
 
             // @TODO Ne mettez aucun espace réservé après (:any).
             // 		 Parce que le nombre de paramètres transmis à la méthode du contrôleur peut changer.
             $routes->add('path/(:any)/to/(:num)', 'myController::goto/$1/$2');
 
-            expect(static function () use ($routes) {
+            expect(static function () use ($routes): void {
                 $routes->reverseRoute('myController::goto', 13, 'string');
             })->toThrow(new RouterException());
         });
 
-        it('Reverse route simple avec la locale', function () {
+        it('Reverse route simple avec la locale', function (): void {
             $routes = getCollector();
 
             $routes->add('{locale}/contact', 'myController::goto');
@@ -1404,7 +1404,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/en/contact');
         });
 
-        it('Reverse route avec le namespace par defaut', function () {
+        it('Reverse route avec le namespace par defaut', function (): void {
             $routes = getCollector();
             $routes->setDefaultNamespace('App\Controllers');
 
@@ -1415,7 +1415,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/admin/15/gallery12');
         });
 
-        it('Reverse route avec une route nommee', function () {
+        it('Reverse route avec une route nommee', function (): void {
             $routes = getCollector();
 
             $routes->get('test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
@@ -1425,7 +1425,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/test/1/2');
         });
 
-        it('Reverse route avec des queries string', function () {
+        it('Reverse route avec des queries string', function (): void {
             $routes = getCollector();
 
             $routes->get('test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
@@ -1435,7 +1435,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/test/1/2?query=string');
         });
 
-		it('Reverse route avec des queries string et la locale', function () {
+		it('Reverse route avec des queries string et la locale', function (): void {
 			$routes = getCollector();
 
             $routes->add('{locale}/contact', 'myController::goto');
@@ -1445,7 +1445,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/en/contact?foo=bar&baz=faa');
         });
 
-        it('Reverse route avec une route nommee et la locale', function () {
+        it('Reverse route avec une route nommee et la locale', function (): void {
             $routes = getCollector();
 
             $routes->get('{locale}/test/(:segment)/(:segment)', 'TestController::test/$1/$2', ['as' => 'testRouter']);
@@ -1455,7 +1455,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/en/test/1/2');
         });
 
-        it('Reverse route avec une closure', function () {
+        it('Reverse route avec une closure', function (): void {
             $routes = getCollector();
 
             $routes->add('login', static function (): void {
@@ -1466,7 +1466,7 @@ describe('RouteCollection', function () {
             expect($match)->toBe('/login');
         });
 
-        it('Reverse route avec une closure qui ne correspond pas', function () {
+        it('Reverse route avec une closure qui ne correspond pas', function (): void {
             $routes = getCollector();
 
             $routes->add('login', static function (): void {
@@ -1477,7 +1477,7 @@ describe('RouteCollection', function () {
             expect($match)->toBeFalsy();
         });
 
-        it('Routage inversé avec correspondance de sous-domaine', function () {
+        it('Routage inversé avec correspondance de sous-domaine', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.example.com';
 
 			setRequestMethod(Method::GET);
@@ -1488,7 +1488,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('doc_item', 'sth'))->toBe('/i/sth');
         });
 
-        it('Routage inversé sans correspondance de sous-domaine', function () {
+        it('Routage inversé sans correspondance de sous-domaine', function (): void {
             $_SERVER['HTTP_HOST'] = 'dev.example.com';
 
 			setRequestMethod(Method::GET);
@@ -1499,7 +1499,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('doc_item', 'sth'))->toBeFalsy();
         });
 
-        it('Routage inversé sans sous-domaine', function () {
+        it('Routage inversé sans sous-domaine', function (): void {
             $_SERVER['HTTP_HOST'] = 'example.com';
 
 			setRequestMethod(Method::GET);
@@ -1510,7 +1510,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('doc_item', 'sth'))->toBeFalsy();
         });
 
-		it('Routage inversé avec correspondance de sous-domaine generique', function () {
+		it('Routage inversé avec correspondance de sous-domaine generique', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.example.com';
 
 			setRequestMethod(Method::GET);
@@ -1521,7 +1521,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('doc_item', 'sth'))->toBe('/i/sth');
         });
 
-        it('Routage inversé sans sous-domaine generique', function () {
+        it('Routage inversé sans sous-domaine generique', function (): void {
             $_SERVER['HTTP_HOST'] = 'example.com';
 
 			setRequestMethod(Method::GET);
@@ -1532,7 +1532,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('doc_item', 'sth'))->toBeFalsy();
         });
 
-		it('Routage inversé sans sous-domaine correspondant', function () {
+		it('Routage inversé sans sous-domaine correspondant', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.example.com';
 
 			setRequestMethod(Method::GET);
@@ -1543,7 +1543,7 @@ describe('RouteCollection', function () {
             expect($routes->reverseRoute('doc_item', 'sth'))->toBeFalsy();
         });
 
-        it('Routage inversé sans sous-domaine avec le hostname', function () {
+        it('Routage inversé sans sous-domaine avec le hostname', function (): void {
             $_SERVER['HTTP_HOST'] = 'example.com';
 
 			setRequestMethod(Method::GET);
@@ -1555,8 +1555,8 @@ describe('RouteCollection', function () {
         });
     });
 
-	describe('Surchage du router', function () {
-        it('Zero comme chemin URI', function () {
+	describe('Surchage du router', function (): void {
+        it('Zero comme chemin URI', function (): void {
             $routes = getCollector();
 			$routes->setDefaultNamespace('App\Controllers');
 
@@ -1569,7 +1569,7 @@ describe('RouteCollection', function () {
             expect($router->handle('/0'))->toBe($expects);
         });
 
-		it('Écrasement de routes dans différents sous-domaines', function () {
+		it('Écrasement de routes dans différents sous-domaines', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.domain.com';
 			setRequestMethod(Method::GET);
 
@@ -1584,7 +1584,7 @@ describe('RouteCollection', function () {
 			expect($router->handle('/'))->toBe($expects);
         });
 
-		it('Route écrasant deux règles', function () {
+		it('Route écrasant deux règles', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.domain.com';
 			setRequestMethod(Method::GET);
 
@@ -1601,7 +1601,7 @@ describe('RouteCollection', function () {
 			expect($router->handle('/'))->toBe($expects);
         });
 
-		it('Écrasement de deux règles par le router, le dernier s\'applique', function () {
+		it('Écrasement de deux règles par le router, le dernier s\'applique', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.domain.com';
 			setRequestMethod(Method::GET);
 
@@ -1616,7 +1616,7 @@ describe('RouteCollection', function () {
 			expect($router->handle('/'))->toBe($expects);
         });
 
-		it('Écrasement de la route lorsque le sous-domaine correspond', function () {
+		it('Écrasement de la route lorsque le sous-domaine correspond', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.domain.com';
 			setRequestMethod(Method::GET);
 
@@ -1631,7 +1631,7 @@ describe('RouteCollection', function () {
 			expect($router->handle('/'))->toBe($expects);
         });
 
-		it('Écrasement de la route lorsque le nom d\'hote correspond', function () {
+		it('Écrasement de la route lorsque le nom d\'hote correspond', function (): void {
             $_SERVER['HTTP_HOST'] = 'doc.domain.com';
 			setRequestMethod(Method::GET);
 
@@ -1647,8 +1647,8 @@ describe('RouteCollection', function () {
         });
 	});
 
-	describe('Priorite de route', function () {
-		it('Priorité detectée', function () {
+	describe('Priorite de route', function (): void {
+		it('Priorité detectée', function (): void {
 			$collection = getCollector();
 
 			expect(ReflectionHelper::getPrivateProperty($collection, 'prioritizeDetected'))->toBeFalsy();
@@ -1660,7 +1660,7 @@ describe('RouteCollection', function () {
 			expect(ReflectionHelper::getPrivateProperty($collection, 'prioritizeDetected'))->toBeTruthy();
 		});
 
-		it('Valeur de la priorité', function () {
+		it('Valeur de la priorité', function (): void {
 			$collection = getCollector();
 
 			$collection->add('string', 'Controller::method', ['priority' => 'string']);
@@ -1674,8 +1674,8 @@ describe('RouteCollection', function () {
         });
 	});
 
-	describe('RegisteredController', function () {
-		it('GetRegisteredControllers Retourne le contrôleur pour le verbe HTTP', function () {
+	describe('RegisteredController', function (): void {
+		it('GetRegisteredControllers Retourne le contrôleur pour le verbe HTTP', function (): void {
 			$collection = getCollector();
 
 			$collection->get('test', '\App\Controllers\Hello::get');
@@ -1696,7 +1696,7 @@ describe('RouteCollection', function () {
 			expect($routes)->toBe($expects);
 		});
 
-		it('GetRegisteredControllers Renvoie deux contrôleurs', function () {
+		it('GetRegisteredControllers Renvoie deux contrôleurs', function (): void {
 			$collection = getCollector();
 
 			$collection->post('test', '\App\Controllers\Test::post');
@@ -1712,7 +1712,7 @@ describe('RouteCollection', function () {
 			expect($routes)->toBe($expects);
 		});
 
-		it('GetRegisteredControllers renvoie un seul contrôleur lorsque deux routes ont des méthodes différentes', function () {
+		it('GetRegisteredControllers renvoie un seul contrôleur lorsque deux routes ont des méthodes différentes', function (): void {
 			$collection = getCollector();
 
 			$collection->post('test', '\App\Controllers\Test::test');
@@ -1727,7 +1727,7 @@ describe('RouteCollection', function () {
 			expect($routes)->toBe($expects);
 		});
 
-		it('GetRegisteredControllers Renvoie tous les contrôleurs', function () {
+		it('GetRegisteredControllers Renvoie tous les contrôleurs', function (): void {
 			$collection = getCollector();
 
 			$collection->get('test', '\App\Controllers\HelloGet::get');
@@ -1745,7 +1745,7 @@ describe('RouteCollection', function () {
 			expect($routes)->toBe($expects);
 		});
 
-		it('GetRegisteredControllers Retourne le contrôleur par la méthode Add', function () {
+		it('GetRegisteredControllers Retourne le contrôleur par la méthode Add', function (): void {
 			$collection = getCollector();
 
 			$collection->get('test', '\App\Controllers\Hello::get');
@@ -1761,7 +1761,7 @@ describe('RouteCollection', function () {
 			expect($routes)->toBe($expects);
 		});
 
-		it('GetRegisteredControllers ne renvoie pas de closures', function () {
+		it('GetRegisteredControllers ne renvoie pas de closures', function (): void {
 			$collection = getCollector();
 
 			$collection->get('feed', static function (): void {
@@ -1775,14 +1775,14 @@ describe('RouteCollection', function () {
 		});
 	});
 
-	describe('FQCN', function () {
+	describe('FQCN', function (): void {
 		$n = [
 			'with \\ prefix'    => ['Spec\BlitzPHP\App\Controllers'],
 			'without \\ prefix' => ['Spec\BlitzPHP\App\Controllers'],
 		];
 
-		it('ControllerName renvoie le FQCN via AutoRoute', function () use ($n) {
-			foreach ($n as $k => [$namespace]) {
+		it('ControllerName renvoie le FQCN via AutoRoute', function () use ($n): void {
+			foreach ($n as [$namespace]) {
 				$routes = getCollector();
 				$routes->setAutoRoute(true);
 				$routes->setDefaultNamespace($namespace);
@@ -1795,9 +1795,9 @@ describe('RouteCollection', function () {
 			}
 		});
 
-		it('ControllerName renvoie le FQCN sans AutoRoute', function () use ($n) {
+		it('ControllerName renvoie le FQCN sans AutoRoute', function () use ($n): void {
 			setRequestMethod(Method::GET);
-			foreach ($n as $k => [$namespace]) {
+			foreach ($n as [$namespace]) {
 				$routes = getCollector();
 				$routes->setAutoRoute(false);
 				$routes->setDefaultNamespace($namespace);

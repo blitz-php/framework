@@ -24,27 +24,27 @@ use Spec\BlitzPHP\App\Views\Components\RenderedExtraDataNotice;
 use Spec\BlitzPHP\App\Views\Components\RenderedNotice;
 use Spec\BlitzPHP\App\Views\Components\SimpleNotice;
 
-describe('Views / Component', function () {
-    describe('Composants simples', function () {
-		beforeAll(function () {
+describe('Views / Component', function (): void {
+    describe('Composants simples', function (): void {
+		beforeAll(function (): void {
 			$this->cache     = new MockCache();
 			$this->cache->init();
 			$this->component = new ComponentLoader($this->cache);
 		});
-		afterAll(function () {
+		afterAll(function (): void {
 			$this->cache->clear();
 		});
 
-		describe('prepareParams', function () {
-			it('PrepareParams retourne un tableau vide lorsqu\'on lui passe une chaine vide', function () {
+		describe('prepareParams', function (): void {
+			it('PrepareParams retourne un tableau vide lorsqu\'on lui passe une chaine vide', function (): void {
 				expect($this->component->prepareParams(''))->toBe([]);
 			});
 
-			it('PrepareParams retourne un tableau vide lorsqu\'on lui passe un parametre invalide', function () {
+			it('PrepareParams retourne un tableau vide lorsqu\'on lui passe un parametre invalide', function (): void {
 				expect($this->component->prepareParams(1.023))->toBe([]);
 			});
 
-			it('PrepareParams retourne le tableau qu\'on lui passe', function () {
+			it('PrepareParams retourne le tableau qu\'on lui passe', function (): void {
 				$object = [
 					'one'   => 'two',
 					'three' => 'four',
@@ -54,7 +54,7 @@ describe('Views / Component', function () {
 				expect($this->component->prepareParams([]))->toBe([]);
 			});
 
-			it('PrepareParams parse une chaine bien formatee et retourne le tableau correspondant', function () {
+			it('PrepareParams parse une chaine bien formatee et retourne le tableau correspondant', function (): void {
 				$params   = 'one=two three=four';
 				$expected = [
 					'one'   => 'two',
@@ -63,7 +63,7 @@ describe('Views / Component', function () {
 				expect($this->component->prepareParams($params))->toBe($expected);
 			});
 
-			it('PrepareParams parse une chaine bien formatee suivant les convension et retourne le tableau correspondant', function () {
+			it('PrepareParams parse une chaine bien formatee suivant les convension et retourne le tableau correspondant', function (): void {
 				$params   = 'one=2, three=4.15';
 				$expected = [
 					'one'   => '2',
@@ -88,17 +88,17 @@ describe('Views / Component', function () {
 			});
 		});
 
-		describe('render', function () {
-			it('Affichage du rendu avec les classes namespaced', function () {
+		describe('render', function (): void {
+			it('Affichage du rendu avec les classes namespaced', function (): void {
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::hello'))->toBe('Hello');
 			});
 
-			it('Affichage du rendu de deux composants avec le meme nom-court', function () {
+			it('Affichage du rendu de deux composants avec le meme nom-court', function (): void {
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::hello'))->toBe('Hello');
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\OtherComponents\SampleClass::hello'))->toBe('Good-bye!');
 			});
 
-			it('Affichage du rendu avec les parametres sous forme de chaine valide', function () {
+			it('Affichage du rendu avec les parametres sous forme de chaine valide', function (): void {
 				$params   = 'one=two,three=four';
 				$expected = [
 					'one'   => 'two',
@@ -107,7 +107,7 @@ describe('Views / Component', function () {
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::echobox', $params))->toBe(implode(',', $expected));
 			});
 
-			it('Affichage du rendu avec les methodes statiques', function () {
+			it('Affichage du rendu avec les methodes statiques', function (): void {
 				$params   = 'one=two,three=four';
 				$expected = [
 					'one'   => 'two',
@@ -116,48 +116,48 @@ describe('Views / Component', function () {
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::staticEcho', $params))->toBe(implode(',', $expected));
 			});
 
-			it('Parametres vide', function () {
+			it('Parametres vide', function (): void {
 				$params   = [];
 				$expected = [];
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::staticEcho', $params))->toBe(implode(',', $expected));
 			});
 
-			it('Pas de parametres', function () {
+			it('Pas de parametres', function (): void {
 				$expected = [];
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::staticEcho'))->toBe(implode(',', $expected));
 			});
 
-			it('Composant sans parametres', function () {
+			it('Composant sans parametres', function (): void {
 				$params   = ',';
 				$expected = 'Hello World';
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::index', $params))->toBe($expected);
 			});
 		});
 
-		describe('Exceptions', function () {
-			it('Classe de composant manquante', function () {
+		describe('Exceptions', function (): void {
+			it('Classe de composant manquante', function (): void {
 				$params   = 'one=two,three=four';
 				expect(fn() => $this->component->render('::echobox', $params))->toThrow(new ViewException());
 			});
 
-			it('Methode de composant manquante', function () {
+			it('Methode de composant manquante', function (): void {
 				$params   = 'one=two,three=four';
 				expect(fn() => $this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::', $params))->toThrow(new ViewException());
 			});
 
-			it('Mauvaise classe de composant', function () {
+			it('Mauvaise classe de composant', function (): void {
 				$params   = 'one=two,three=four';
 				expect(fn() => $this->component->render('\Spec\BlitzPHP\App\Views\GoodLuck::', $params))->toThrow(new ViewException());
 			});
 
-			it('Mauvaise methode de composant', function () {
+			it('Mauvaise methode de composant', function (): void {
 				$params   = 'one=two,three=four';
 				expect(fn() => $this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::notThere', $params))->toThrow(new ViewException());
 			});
 		});
 
-		describe('Mise en cache', function () {
-			it('Rendu avec cache actif', function () {
+		describe('Mise en cache', function (): void {
+			it('Rendu avec cache actif', function (): void {
 				$params   = 'one=two,three=four';
 				$expected = [
 					'one'   => 'two',
@@ -169,7 +169,7 @@ describe('Views / Component', function () {
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::echobox', $params, 1, 'rememberme'))->toBe(implode(',', $expected));
 		   });
 
-		   it('Rendu avec cache actif', function () {
+		   it('Rendu avec cache actif', function (): void {
 				$params   = 'one=two,three=four';
 				$expected = [
 					'one'   => 'two',
@@ -184,8 +184,8 @@ describe('Views / Component', function () {
 			});
 		});
 
-		describe('Parametres', function () {
-			it('Les parametres correspondent', function () {
+		describe('Parametres', function (): void {
+			it('Les parametres correspondent', function (): void {
 				$params = [
 					'p1' => 'one',
 					'p2' => 'two',
@@ -196,64 +196,64 @@ describe('Views / Component', function () {
 				expect($this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::work', $params))->toBe($expected);
 		   });
 
-		   it('Les parametres ne correspondent pas', function () {
+		   it('Les parametres ne correspondent pas', function (): void {
 				$params   = 'p1=one,p2=two,p3=three';
 				expect(fn() => $this->component->render('\Spec\BlitzPHP\App\Views\SampleClass::work', $params))->toThrow(new ViewException());
 			   });
 		});
 
-		describe('Autres', function () {
-			it('initialize', function () {
+		describe('Autres', function (): void {
+			it('initialize', function (): void {
 				expect(
 					$this->component->render('Spec\BlitzPHP\App\Views\SampleClassWithInitialize::index')
 				)->toBe(Response::class);
 			});
 
-			it('Parvient a trouver le composant', function () {
+			it('Parvient a trouver le composant', function (): void {
 				expect($this->component->render('StarterComponent::hello'))->toBe('Hello World!');
 				expect($this->component->render('StarterComponent::hello', ['name' => 'BlitzPHP']))->toBe('Hello BlitzPHP!');
 			});
 		});
 	});
 
-	describe('Composants contrôlés', function () {
-		it('Rendu du composant avec les valeurs par défaut', function () {
+	describe('Composants contrôlés', function (): void {
+		it('Rendu du composant avec les valeurs par défaut', function (): void {
 			expect(component(GreetingComponent::class))->toBe('Hello World');
 		});
 
-		it('Rendu du composant avec la vue ayant le meme nom que la classe', function () {
+		it('Rendu du composant avec la vue ayant le meme nom que la classe', function (): void {
 			expect(component(AwesomeComponent::class))->toMatch(fn($actual) => str_contains($actual, 'Found!'));
 		});
 
-		it('Rendu du composant avec une vue nommee', function () {
+		it('Rendu du composant avec une vue nommee', function (): void {
 			expect(component(SimpleNotice::class))->toMatch(fn($actual) => str_contains($actual, '4, 8, 15, 16, 23, 42'));
 		});
 
-		it('Rendu du composant a travers la methode render()', function () {
+		it('Rendu du composant a travers la methode render()', function (): void {
 			expect(component(RenderedNotice::class))->toMatch(fn($actual) => str_contains($actual, '4, 8, 15, 16, 23, 42'));
 		});
 
-		it('Rendu du composant a travers la methode render() et des donnees supplementaires', function () {
+		it('Rendu du composant a travers la methode render() et des donnees supplementaires', function (): void {
 			expect(component(RenderedExtraDataNotice::class))->toMatch(fn($actual) => str_contains($actual, '42, 23, 16, 15, 8, 4'));
 		});
 
-		it('Leve une exception si on ne trouve aucune vue pour le composant', function () {
+		it('Leve une exception si on ne trouve aucune vue pour le composant', function (): void {
 			expect(fn() => component(BadComponent::class))
 				->toThrow(new LogicException('Impossible de localiser le fichier de vue pour le composant "Spec\\BlitzPHP\\App\\Views\\Components\\BadComponent".'));
 		});
 
-		it('Rendu du composant avec des parametres', function () {
+		it('Rendu du composant avec des parametres', function (): void {
 			expect(component(GreetingComponent::class, 'greeting=Hi, name=Blitz PHP'))->toBe('Hi Blitz PHP');
 
 			// Il n'est pas possible de modifier les proprietes de base du composant, comme `view`.
 			expect(component(GreetingComponent::class, 'greeting=Hi, name=Blitz PHP, view=foo'))->toBe('Hi Blitz PHP');
 		});
 
-		it('Rendu d\'un composant ayant une methode personnalisee', function () {
+		it('Rendu d\'un composant ayant une methode personnalisee', function (): void {
 			expect(component('Spec\BlitzPHP\App\Views\Components\GreetingComponent::sayHello', 'greeting=Hi, name=Blitz PHP'))->toBe('Well, Hi Blitz PHP');
 		});
 
-		it('Leve une exception si on la methodde personnalisee qu\'on souhaite n\'existe pas dans le composant', function () {
+		it('Leve une exception si on la methodde personnalisee qu\'on souhaite n\'existe pas dans le composant', function (): void {
 			expect(fn() => component('Spec\BlitzPHP\App\Views\Components\GreetingComponent::sayGoodbye'))
 				->toThrow(new ViewException(lang('View.invalidComponentMethod', [
 					'class'  => GreetingComponent::class,
@@ -261,12 +261,12 @@ describe('Views / Component', function () {
 				])));
 		});
 
-		it('Rendu d\'un composant ayant des proprietes calculees', function () {
+		it('Rendu d\'un composant ayant des proprietes calculees', function (): void {
 			expect(component(ListerComponent::class, ['items' => ['one', 'two', 'three']]))
 				->toMatch(fn($actual) => str_contains($actual, '-one -two -three'));
 		});
 
-		it('Rendu d\'un composant ayant des methodes publiques', function () {
+		it('Rendu d\'un composant ayant des methodes publiques', function (): void {
 			expect(component(ColorsComponent::class, ['color' => 'red']))
 				->toMatch(fn($actual) => str_contains($actual, 'warm'));
 
@@ -274,7 +274,7 @@ describe('Views / Component', function () {
 				->toMatch(fn($actual) => str_contains($actual, 'cool'));
 		});
 
-		it('Montage du composant avec les valeurs par defaut', function () {
+		it('Montage du composant avec les valeurs par defaut', function (): void {
 			expect(component(MultiplierComponent::class))
 				->toMatch(fn($actual) => str_contains($actual, '4'));
 
@@ -282,17 +282,17 @@ describe('Views / Component', function () {
 				->toMatch(fn($actual) => str_contains($actual, '2'));
 		});
 
-		it('Montage du composant avec d\'autres valeurs', function () {
+		it('Montage du composant avec d\'autres valeurs', function (): void {
 			expect(component(MultiplierComponent::class, ['value' => 3, 'multiplier' => 3]))
 				->toMatch(fn($actual) => str_contains($actual, '9'));
 		});
 
-		it('Montage du composant avec des parametres', function () {
+		it('Montage du composant avec des parametres', function (): void {
 			expect(component(AdditionComponent::class, ['value' => 3]))
 				->toMatch(fn($actual) => str_contains($actual, '3'));
 		});
 
-		it('Montage du composant avec des valeurs et parametres de montage', function () {
+		it('Montage du composant avec des valeurs et parametres de montage', function (): void {
 			expect(component(AdditionComponent::class, ['value' => 3, 'number' => 4, 'skipAddition' => false]))
 				->toMatch(fn($actual) => str_contains($actual, '7'));
 
@@ -300,7 +300,7 @@ describe('Views / Component', function () {
 				->toMatch(fn($actual) => str_contains($actual, '3'));
 		});
 
-		it('Montage du composant avec des parametres manquant', function () {
+		it('Montage du composant avec des parametres manquant', function (): void {
 			// Ne fourni aucun parametres
 			expect(component(AdditionComponent::class, ['value' => 3]))
 				->toMatch(fn($actual) => str_contains($actual, '3'));

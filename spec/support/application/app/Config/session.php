@@ -1,5 +1,6 @@
 <?php
 
+use BlitzPHP\Session\Handlers\ArrayHandler;
 /**
  * This file is part of Blitz PHP framework.
  *
@@ -8,9 +9,8 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
 return [
-    'handler'            => \BlitzPHP\Session\Handlers\ArrayHandler::class,
+    'handler'            => ArrayHandler::class,
     'cookie_name'        => 'blitz_session',
     'expiration'         => 7200,
     'savePath'           => FRAMEWORK_STORAGE_PATH . 'session',

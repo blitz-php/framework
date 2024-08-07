@@ -1,5 +1,6 @@
 <?php
 
+use Kint\Renderer\AbstractRenderer;
 /**
  * This file is part of Blitz PHP framework.
  *
@@ -8,7 +9,6 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
 return [
     'plugins'                => [],
     'depth_limit'            => 6,
@@ -16,7 +16,7 @@ return [
     'expanded'               => false,
     'rich_theme'             => 'original.css',
     'rich_folder'            => false,
-    'rich_sort'              => \Kint\Renderer\AbstractRenderer::SORT_FULL,
+    'rich_sort'              => AbstractRenderer::SORT_FULL,
     'rich_value_plugins'     => [],
     'rich_tab_plugins'       => [],
     'cli_colors'             => true,

@@ -12,16 +12,16 @@
 use BlitzPHP\Container\Services;
 use BlitzPHP\View\Parser;
 
-describe('Views / Parser', function () {
-    beforeAll(function () {
+describe('Views / Parser', function (): void {
+    beforeAll(function (): void {
         $this->parser = new Parser(config('view'), Services::locator());
     });
 
-	afterEach(function () {
+	afterEach(function (): void {
 		$this->parser->resetData();
 	});
 
-	it('Delimiters', function () {
+	it('Delimiters', function (): void {
 		// S'assurer que les délimiteurs par défaut sont présents
         expect($this->parser->leftDelimiter)->toBe('{');
         expect($this->parser->rightDelimiter)->toBe('}');
@@ -41,12 +41,12 @@ describe('Views / Parser', function () {
 		expect($this->parser->rightDelimiter)->toBe('}');
 	});
 
-	it('Parse un template', function () {
+	it('Parse un template', function (): void {
 		$this->parser->setVar('teststring', 'Hello World');
         expect($this->parser->render('template1'))->toBe("<h1>Hello World</h1>\n");
 	});
 
-	it('Parse une chaine de caractere', function () {
+	it('Parse une chaine de caractere', function (): void {
 		$data = [
             'title' => 'Page Title',
             'body'  => 'Lorem ipsum dolor sit amet.',
@@ -60,7 +60,7 @@ describe('Views / Parser', function () {
         expect($this->parser->renderString($template))->toBe($result);
 	});
 
-	it('Parse une chaine de caractere avec des donnees manquantes', function () {
+	it('Parse une chaine de caractere avec des donnees manquantes', function (): void {
 		$data = [
             'title' => 'Page Title',
             'body'  => 'Lorem ipsum dolor sit amet.',
@@ -74,7 +74,7 @@ describe('Views / Parser', function () {
         expect($this->parser->renderString($template))->toBe($result);
 	});
 
-	it('Parse une chaine de caractere avec des donnees non utilisées', function () {
+	it('Parse une chaine de caractere avec des donnees non utilisées', function (): void {
 		$data = [
             'title' => 'Page Title',
             'body'  => 'Lorem ipsum dolor sit amet.',
@@ -89,11 +89,11 @@ describe('Views / Parser', function () {
 		expect($this->parser->renderString($template))->toBe($result);
 	});
 
-	it('Pas de template', function () {
+	it('Pas de template', function (): void {
 		expect($this->parser->renderString(''))->toBe('');
 	});
 
-	it('Parse un simple tableau', function () {
+	it('Parse un simple tableau', function (): void {
 		$data = [
             'title'  => 'Super Heroes',
             'powers' => [
@@ -110,7 +110,7 @@ describe('Views / Parser', function () {
 		expect($this->parser->renderString($template))->toBe("Super Heroes\nyes\nno");
 	});
 
-	it('Parse un tableau mutidimentionnel', function () {
+	it('Parse un tableau mutidimentionnel', function (): void {
 		$data = [
             'powers' => [
                 [
@@ -126,7 +126,7 @@ describe('Views / Parser', function () {
 		expect($this->parser->renderString($template))->toBe("yes\nno\nsecond: yes no");
 	});
 
-	it('Parse un tableau de tableau', function () {
+	it('Parse un tableau de tableau', function (): void {
 		$data = [
             'title'  => 'Super Heroes',
             'powers' => [
@@ -149,7 +149,7 @@ describe('Views / Parser', function () {
 		expect($this->parser->renderString($template))->toBe("Super Heroes\nyes\nplane broomstick");
 	});
 
-	it('Parse un tableau d\'objet', function () {
+	it('Parse un tableau d\'objet', function (): void {
 		$eagle       = new stdClass();
         $eagle->name = 'Baldy';
         $eagle->home = 'Rockies';
@@ -175,7 +175,7 @@ describe('Views / Parser', function () {
 		expect($this->parser->renderString($template))->toBe('Owl and Class: stdClass work at Resource');
 	});
 
-	it('Parse les bloucles', function () {
+	it('Parse les bloucles', function (): void {
 		$data = [
             'title'  => 'Super Heroes',
             'powers' => [
@@ -191,7 +191,7 @@ describe('Views / Parser', function () {
 		expect($this->parser->renderString($template))->toBe("Super Heroes\nTom Dick Henry ");
 	});
 
-	it('Parse les bloucles avec des parantheses', function () {
+	it('Parse les bloucles avec des parantheses', function (): void {
 		$data = [
             'title'  => 'Super Heroes',
             'powers' => [
@@ -207,7 +207,7 @@ describe('Views / Parser', function () {
 		expect($this->parser->renderString($template))->toBe("Super Heroes\n(Tom) (Dick) (Henry) ");
 	});
 
-	it("Parse les bloucles d'objets", function () {
+	it("Parse les bloucles d'objets", function (): void {
 		$obj1 = new stdClass();
         $obj2 = new stdClass();
         $obj3 = new stdClass();

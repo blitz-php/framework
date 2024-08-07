@@ -15,8 +15,8 @@ use BlitzPHP\Http\MiddlewareRunner;
 use BlitzPHP\Http\Response;
 use Psr\Http\Message\ResponseInterface;
 
-describe('Http / MiddlewareRunner', function () {
-    beforeAll(function () {
+describe('Http / MiddlewareRunner', function (): void {
+    beforeAll(function (): void {
 		$this->request    = Services::request();
 		$this->response   = Services::response();
 		$this->container  = Services::container();
@@ -29,11 +29,11 @@ describe('Http / MiddlewareRunner', function () {
         };
     });
 
-	beforeEach(function() {
+	beforeEach(function(): void {
 		$this->queue = $this->middleware();
 	});
 
-	it("Execution d'un seul middleware", function () {
+	it("Execution d'un seul middleware", function (): void {
 		$this->queue->add($this->ok);
 
         $runner = new MiddlewareRunner();
@@ -42,7 +42,7 @@ describe('Http / MiddlewareRunner', function () {
 		expect($result)->toBeAnInstanceOf(ResponseInterface::class);
 	});
 
-	it("Execution de middlewares en sequence", function () {
+	it("Execution de middlewares en sequence", function (): void {
 		$log = [];
         $one = function ($request, $handler) use (&$log) {
             $log[] = 'one';
@@ -68,7 +68,7 @@ describe('Http / MiddlewareRunner', function () {
 		expect($log)->toBe(['one', 'two', 'three']);
 	});
 
-	it("Groupe de middlewares", function () {
+	it("Groupe de middlewares", function (): void {
 		$log = [];
         $one = function ($request, $handler) use (&$log) {
             $log[] = 'one';

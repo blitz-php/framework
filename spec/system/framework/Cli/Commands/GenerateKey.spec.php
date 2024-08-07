@@ -18,8 +18,8 @@ function resetEnvironment(): void
     unset($_ENV['encryption.key'], $_SERVER['encryption.key']);
 }
 
-describe('Commandes / GenerateKey', function () {
-    beforeEach(function () {
+describe('Commandes / GenerateKey', function (): void {
+    beforeEach(function (): void {
         COH::setUp();
 
         $this->envPath       = ROOTPATH . '.env';
@@ -32,7 +32,7 @@ describe('Commandes / GenerateKey', function () {
         resetEnvironment();
     });
 
-    afterEach(function () {
+    afterEach(function (): void {
         COH::tearDown();
 
         if (is_file($this->envPath)) {
@@ -46,15 +46,15 @@ describe('Commandes / GenerateKey', function () {
         resetEnvironment();
     });
 
-    beforeAll(function () {
+    beforeAll(function (): void {
         COH::setUpBeforeClass();
     });
 
-    afterAll(function () {
+    afterAll(function (): void {
         COH::tearDownAfterClass();
     });
 
-    it(': GenerateKey affiche la clé codée', function () {
+    it(': GenerateKey affiche la clé codée', function (): void {
         command('key:generate --show');
         expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'hex2bin:'));
 
@@ -65,7 +65,7 @@ describe('Commandes / GenerateKey', function () {
         expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'hex2bin:'));
     });
 
-    it(': GenerateKey génère une nouvelle la clé', function () {
+    it(': GenerateKey génère une nouvelle la clé', function (): void {
         command('key:generate');
         expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
         expect(file_get_contents($this->envPath))->toMatch(static fn ($actual) => str_contains($actual, env('encryption.key')));
@@ -82,7 +82,7 @@ describe('Commandes / GenerateKey', function () {
         expect(file_get_contents($this->envPath))->toMatch(static fn ($actual) => str_contains($actual, 'hex2bin:'));
     });
 
-    it(": Le fichier .env.example n'existe pas", function () {
+    it(": Le fichier .env.example n'existe pas", function (): void {
         rename(ROOTPATH . '.env.example', ROOTPATH . 'lostenv');
         command('key:generate');
         rename(ROOTPATH . 'lostenv', ROOTPATH . '.env.example');
@@ -91,7 +91,7 @@ describe('Commandes / GenerateKey', function () {
         expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'Erreur dans la configuration'));
     });
 
-    it(': Le fichier .env existe mais il est vide', function () {
+    it(': Le fichier .env existe mais il est vide', function (): void {
         file_put_contents($this->envPath, '');
 
         command('key:generate');
@@ -100,7 +100,7 @@ describe('Commandes / GenerateKey', function () {
         expect(file_get_contents($this->envPath))->toBe("\nencryption.key = " . env('encryption.key'));
     });
 
-    it(': Clé générée lorsque la nouvelle clé hexadécimale est ensuite commentée', function () {
+    it(': Clé générée lorsque la nouvelle clé hexadécimale est ensuite commentée', function (): void {
         command('key:generate');
         $key = env('encryption.key', '');
 
@@ -119,7 +119,7 @@ describe('Commandes / GenerateKey', function () {
         // expect($key)->not->toBe(env('encryption.key', $key)); // Échec du remplacement de la clé commentée.
     });
 
-    it(': Clé générée lorsque la nouvelle clé base64 est ensuite commentée', function () {
+    it(': Clé générée lorsque la nouvelle clé base64 est ensuite commentée', function (): void {
         command('key:generate --prefix=base64');
         $key = env('encryption.key', '');
 

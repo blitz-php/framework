@@ -16,9 +16,9 @@ use BlitzPHP\Http\ServerRequestFactory;
 use BlitzPHP\Middlewares\Cors;
 use Spec\BlitzPHP\Middlewares\TestRequestHandler;
 
-describe('Middleware / Cors', function () {
-    describe('CorsBuilder', function() {
-		beforeAll(function () {
+describe('Middleware / Cors', function (): void {
+    describe('CorsBuilder', function(): void {
+		beforeAll(function (): void {
 			$this->request  = fn() => new Request();
 			$this->response = fn() => new Response();
 			$this->config   = [
@@ -32,7 +32,7 @@ describe('Middleware / Cors', function () {
 			];
 		});
 
-		it("Teste si la requete est Cors", function () {
+		it("Teste si la requete est Cors", function (): void {
 			/** @var Request $request */
 			$request = $this->request()->withHeader('Origin', 'http://foo-bar.test');
 
@@ -46,7 +46,7 @@ describe('Middleware / Cors', function () {
 			expect($cors->isCorsRequest($request))->toBeFalsy();
 		});
 
-		it("Teste si c'est une requete Preflight", function () {
+		it("Teste si c'est une requete Preflight", function (): void {
 			/** @var Request $request */
 			$request = $this->request()->withMethod('OPTIONS')
 				->withHeader('Access-Control-Request-Method', 'GET');
@@ -62,7 +62,7 @@ describe('Middleware / Cors', function () {
 			expect($cors->isPreflightRequest($request))->toBeFalsy();
 		});
 
-		it("Vary Header", function () {
+		it("Vary Header", function (): void {
 			/** @var Response $response */
 			$response = $this->response()
 				->withHeader('Vary', 'Access-Control-Request-Method');
@@ -73,7 +73,7 @@ describe('Middleware / Cors', function () {
 			expect($response->getHeaderLine('Vary'))->toBe($vary->getHeaderLine('Vary'));
 		});
 
-		it("Gere une requete Preflight", function () {
+		it("Gere une requete Preflight", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('OPTIONS')
@@ -94,7 +94,7 @@ describe('Middleware / Cors', function () {
 			expect($expected->getStatusCode())->toBe(204);
 		});
 
-		it("Gere une requete", function () {
+		it("Gere une requete", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('GET')
@@ -111,7 +111,7 @@ describe('Middleware / Cors', function () {
 			expect($expected->getHeaderLine('Access-Control-Allow-Origin'))->toBe('*');
 		});
 
-		it("Gere une requete Preflight avec des restrictions AllowesHeaders", function () {
+		it("Gere une requete Preflight avec des restrictions AllowesHeaders", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('OPTIONS')
@@ -128,7 +128,7 @@ describe('Middleware / Cors', function () {
 				->not->toBe($expected->getHeaderLine('Access-Control-Allow-Headers'));
 		});
 
-		it("Gere une requete Preflight avec des memes restrictions AllowedHeaders", function () {
+		it("Gere une requete Preflight avec des memes restrictions AllowedHeaders", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('OPTIONS')
@@ -145,7 +145,7 @@ describe('Middleware / Cors', function () {
 				->toBe($expected->getHeaderLine('Access-Control-Allow-Headers'));
 		});
 
-		it("Gere une requete Preflight avec des restrictions AllowedOrigins", function () {
+		it("Gere une requete Preflight avec des restrictions AllowedOrigins", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('OPTIONS')
@@ -162,7 +162,7 @@ describe('Middleware / Cors', function () {
 				->not->toBe($expected->getHeaderLine('Access-Control-Allow-Origin'));
 		});
 
-		it("Gere une requete Preflight avec des memes restrictions AllowedOrigins", function () {
+		it("Gere une requete Preflight avec des memes restrictions AllowedOrigins", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('OPTIONS')
@@ -179,7 +179,7 @@ describe('Middleware / Cors', function () {
 				->toBe($expected->getHeaderLine('Access-Control-Allow-Origin'));
 		});
 
-		it("Gere une requete Preflight avec ExposeHeaders", function () {
+		it("Gere une requete Preflight avec ExposeHeaders", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('GET')
@@ -195,7 +195,7 @@ describe('Middleware / Cors', function () {
 				->toBe("X-My-Custom-Header, X-Another-Custom-Header");
 		});
 
-		it("Gere une requete Preflight avec ExposeHeaders non definis", function () {
+		it("Gere une requete Preflight avec ExposeHeaders non definis", function (): void {
 			/** @var Request $request */
 			$request = $this->request()
 				->withMethod('GET')
@@ -209,10 +209,10 @@ describe('Middleware / Cors', function () {
 		});
 	});
 
-	describe('CorsMiddleware', function() {
+	describe('CorsMiddleware', function(): void {
 		require_once TEST_PATH . '/support/Middlewares/TestRequestHandler.php';
 
-		beforeAll(function () {
+		beforeAll(function (): void {
 			config()->ghost('cors')->set('cors', [
 				'allowedOrigins'      => ['http://localhost'],
 				'supportsCredentials' => true,
@@ -224,7 +224,7 @@ describe('Middleware / Cors', function () {
 
 			$this->origin   = 'http://localhost';
 
-			$this->setServer = function(array $server) {
+			$this->setServer = function(array $server): void {
 				$this->server = array_merge($this->server, $server);
 			};
 
@@ -243,14 +243,14 @@ describe('Middleware / Cors', function () {
     		};
 		});
 
-		beforeEach(function () {
+		beforeEach(function (): void {
 			$this->server   = [
 				'REQUEST_URI' => '/test',
 				'HTTP_ORIGIN' => $this->origin,
 			];
 		});
 
-		it("modifie une requete sans origine", function () {
+		it("modifie une requete sans origine", function (): void {
 			unset($this->server['HTTP_ORIGIN']);
 
 			/** @var Response $response */
@@ -261,7 +261,7 @@ describe('Middleware / Cors', function () {
 			$this->server['HTTP_ORIGIN'] = $this->origin;
 		});
 
-		it("modifie une requete ayant la même origine", function () {
+		it("modifie une requete ayant la même origine", function (): void {
 			$this->setServer([
 				'HTTP_HOST'   => 'foo.com',
 				'HTTP_ORIGIN' => 'http://foo.com',
@@ -275,7 +275,7 @@ describe('Middleware / Cors', function () {
 			expect($response->getHeaderLine('Access-Control-Allow-Origin'))->toBe('http://foo.com');
 		});
 
-		it("renvoie l'en-tête `Allow Origin` en cas de requete réelle valide.", function () {
+		it("renvoie l'en-tête `Allow Origin` en cas de requete réelle valide.", function (): void {
 			/** @var Response $response */
 			$response = $this->sendRequest();
 
@@ -283,7 +283,7 @@ describe('Middleware / Cors', function () {
 			expect($response->getHeaderLine('Access-Control-Allow-Origin'))->toBe('http://localhost');
 		});
 
-		it("renvoie l'en-tête `Allow Origin` à la requete `Autoriser toutes les origines`.", function () {
+		it("renvoie l'en-tête `Allow Origin` à la requete `Autoriser toutes les origines`.", function (): void {
 			/** @var Response $response */
 			$response = $this->sendRequest([
 				'allowedOrigins' => ['*']
@@ -294,7 +294,7 @@ describe('Middleware / Cors', function () {
 			expect($response->getHeaderLine('Access-Control-Allow-Origin'))->toBe('http://localhost');
 		});
 
-		it("renvoie l'en-tête Allow Headers sur la demande Allow All Headers.", function () {
+		it("renvoie l'en-tête Allow Headers sur la demande Allow All Headers.", function (): void {
 			$this->setServer([
 				'HTTP_ORIGIN'                    => 'http://localhost',
 				'Access-Control-Request-Method'  => 'GET',
@@ -312,7 +312,7 @@ describe('Middleware / Cors', function () {
 			expect($response->getHeaderLine('Vary'))->toBe('Access-Control-Request-Headers, Access-Control-Request-Method');
 		});
 
-		it("définit l'en-tête AllowCredentials lorsque l'indicateur est défini dans une demande réelle valide.", function () {
+		it("définit l'en-tête AllowCredentials lorsque l'indicateur est défini dans une demande réelle valide.", function (): void {
 			/** @var Response $response */
 			$response = $this->sendRequest([
 				'supportsCredentials' => true

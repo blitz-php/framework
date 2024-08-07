@@ -13,8 +13,8 @@ use BlitzPHP\Container\Services;
 use BlitzPHP\Router\DefinedRouteCollector;
 use BlitzPHP\Router\RouteCollection;
 
-describe('DefinedRouteCollector', function () {
-    beforeAll(function () {
+describe('DefinedRouteCollector', function (): void {
+    beforeAll(function (): void {
         $this->getCollector = static function (array $config = [], array $files = []): RouteCollection {
             $defaults = ['App' => APP_PATH];
             $config   = array_merge($config, $defaults);
@@ -29,7 +29,7 @@ describe('DefinedRouteCollector', function () {
         };
     });
 
-    it('Test de collection', function () {
+    it('Test de collection', function (): void {
         $routes = $this->getCollector();
         $routes->get('journals', 'Blogs');
         $routes->get('product/(:num)', 'Catalog::productLookupByID/$1');
@@ -74,7 +74,7 @@ describe('DefinedRouteCollector', function () {
         expect($definedRoutes)->toBe($expected);
     });
 
-    it('Test de collection avec les verbes differents', function () {
+    it('Test de collection avec les verbes differents', function (): void {
         $routes = $this->getCollector();
         $routes->get('login', 'AuthController::showLogin', ['as' => 'loginShow']);
         $routes->post('login', 'AuthController::login', ['as' => 'login']);
@@ -112,7 +112,7 @@ describe('DefinedRouteCollector', function () {
         expect($expected)->toBe($definedRoutes);
     });
 
-    it('Test de collection avec l\'option $reset = false', function () {
+    it('Test de collection avec l\'option $reset = false', function (): void {
         $routes = $this->getCollector();
         $routes->get('journals', 'Blogs');
         $routes->get('product/(:num)', 'Catalog::productLookupByID/$1');

@@ -15,12 +15,12 @@ use BlitzPHP\View\View;
 use Spec\BlitzPHP\App\Views\BadDecorator;
 use Spec\BlitzPHP\App\Views\WorldDecorator;
 
-describe('Views / Decorator', function () {
-    afterAll(function () {
+describe('Views / Decorator', function (): void {
+    afterAll(function (): void {
 		config()->set('view.decorators', []);
     });
 
-	it('L\'abscence d\'un decorateur n\'impacte rien', function () {
+	it('L\'abscence d\'un decorateur n\'impacte rien', function (): void {
 		config(['view.decorators' => []]);
 
 		$view = new View();
@@ -33,7 +33,7 @@ describe('Views / Decorator', function () {
 			expect(fn() => $view->render())->toEcho($expected);
 	});
 
-	it('Un mauvais decorateur leve une exception', function () {
+	it('Un mauvais decorateur leve une exception', function (): void {
 		config()->set('view.decorators', [BadDecorator::class]);
 
 		$view = new View();
@@ -45,7 +45,7 @@ describe('Views / Decorator', function () {
 			->toThrow(ViewException::invalidDecorator(BadDecorator::class));
 	});
 
-	it('Le decorateur modifie la sortie', function () {
+	it('Le decorateur modifie la sortie', function (): void {
 		config()->set('view.decorators', [WorldDecorator::class]);
 
 		$view = new View();
@@ -57,7 +57,7 @@ describe('Views / Decorator', function () {
 			->toEcho('<h1>Hello Galaxy</h1>');
 	});
 
-	it('L\'abscence d\'un decorateur n\'impacte pas la sortie du parser', function () {
+	it('L\'abscence d\'un decorateur n\'impacte pas la sortie du parser', function (): void {
 		config(['view.decorators' => []]);
 
 		$view = new Parser(config('view.adapters.native'));
@@ -67,7 +67,7 @@ describe('Views / Decorator', function () {
 		expect(trim($view->render('parser1')))->toBe('<h1>Hello World</h1>');
 	});
 
-	it('Le decorateur modifie la sortie du parser', function () {
+	it('Le decorateur modifie la sortie du parser', function (): void {
 		config()->set('view.decorators', [WorldDecorator::class]);
 
 		$view = new Parser(config('view.adapters.native'));

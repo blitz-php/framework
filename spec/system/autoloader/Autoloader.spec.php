@@ -14,8 +14,8 @@ use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Spec\ReflectionHelper;
 
-describe('Autoloader', function () {
-    beforeEach(function () {
+describe('Autoloader', function (): void {
+    beforeEach(function (): void {
         $config = config('autoload');
 
         $config['classmap'] = [
@@ -35,16 +35,16 @@ describe('Autoloader', function () {
         $this->classLoader = ReflectionHelper::getPrivateMethodInvoker($this->loader, 'loadInNamespace');
     });
 
-    afterEach(function () {
+    afterEach(function (): void {
         $this->loader->unregister();
     });
 
-    describe('Autoloader', function () {
-        it(': Charge les classes stockees', function () {
+    describe('Autoloader', function (): void {
+        it(': Charge les classes stockees', function (): void {
             expect(new UnnamespacedClass())->toBeAnInstanceOf('UnnamespacedClass');
         });
 
-        it(": L'initialisation de l'autoloader avec des arguments invalides genere une exception", function () {
+        it(": L'initialisation de l'autoloader avec des arguments invalides genere une exception", function (): void {
             $config             = config('autoload');
             $config['psr4']     = [];
             $config['classmap'] = [];
@@ -54,7 +54,7 @@ describe('Autoloader', function () {
                 ->toThrow(new InvalidArgumentException('Le tableau de configuration doit contenir soit la clé \'psr4\' soit la clé \'classmap\'.'));
         });
 
-        it(": L'initialisation de l'autoloader fonctionne", function () {
+        it(": L'initialisation de l'autoloader fonctionne", function (): void {
             $loader = new Autoloader(config('autoload'));
             $loader->initialize();
 
@@ -63,7 +63,7 @@ describe('Autoloader', function () {
             expect(clean_path($ns['App'][0]))->toBe('ROOTPATH' . DS . 'app');
         });
 
-        it(": Recuperation de l'autoloader a partir d'une instance partagée du Service", function () {
+        it(": Recuperation de l'autoloader a partir d'une instance partagée du Service", function (): void {
             $classLoader = ReflectionHelper::getPrivateMethodInvoker(Services::autoloader(), 'loadInNamespace');
 
             // recherchez HomeController, comme cela devrait être dans le dépôt de base
@@ -72,7 +72,7 @@ describe('Autoloader', function () {
             expect(realpath($actual) ?: $actual)->toBe($expected);
         });
 
-        it(': Service autoloader', function () {
+        it(': Service autoloader', function (): void {
             $autoloader = Services::autoloader(false);
             $autoloader->initialize();
             $autoloader->register();
@@ -87,7 +87,7 @@ describe('Autoloader', function () {
             $autoloader->unregister();
         });
 
-        it(': Existence de fichier', function () {
+        it(': Existence de fichier', function (): void {
             $actual   = $this->classLoader(HomeController::class);
             $expected = APP_PATH . 'Controllers' . DS . 'HomeController.php';
             expect($actual)->toBe($expected);
@@ -97,13 +97,13 @@ describe('Autoloader', function () {
             expect($actual)->toBe($expected);
         });
 
-        it(': Fichier non existant', function () {
+        it(': Fichier non existant', function (): void {
             expect($this->classLoader('\App\Missing\Classname'))->toBeFalsy();
         });
     });
 
-    describe('Namespace', function () {
-        it(': Ajout de namespace', function () {
+    describe('Namespace', function (): void {
+        it(': Ajout de namespace', function (): void {
             expect(($this->classLoader)('My\App\Class'))->toBeFalsy();
 
             $this->loader->addNamespace('My\App', SUPPORT_PATH . 'Autoloader');
@@ -114,7 +114,7 @@ describe('Autoloader', function () {
             expect($actual)->toBe($expected);
         });
 
-        it(': Ajout de namespace pointant vers plusieurs dossiers', function () {
+        it(': Ajout de namespace pointant vers plusieurs dossiers', function (): void {
             $this->loader->addNamespace([
                 'My\App' => [SUPPORT_PATH . 'Autoloader', MIDDLEWARE_PATH],
             ]);
@@ -128,7 +128,7 @@ describe('Autoloader', function () {
             expect($actual)->toBe($expected);
         });
 
-        it(": Ajout d'une chaine namespace a un namespace du tableau defini", function () {
+        it(": Ajout d'une chaine namespace a un namespace du tableau defini", function (): void {
             $this->loader->addNamespace('App\Controllers', SUPPORT_PATH . 'Autoloader');
 
             $actual   = $this->classLoader('App\Controllers\FatalLocator');
@@ -136,7 +136,7 @@ describe('Autoloader', function () {
             expect($actual)->toBe($expected);
         });
 
-        it(': La methode `getNamespace` retourne un tableau avec les namespaces definis', function () {
+        it(': La methode `getNamespace` retourne un tableau avec les namespaces definis', function (): void {
             expect($this->loader->getNamespace())->toBe([
                 'App'      => [APP_PATH],
                 'BlitzPHP' => [SYST_PATH],
@@ -145,7 +145,7 @@ describe('Autoloader', function () {
             expect($this->loader->getNamespace('Foo'))->toBe([]);
         });
 
-        it(': Retrait de namespace', function () {
+        it(': Retrait de namespace', function (): void {
             $this->loader->addNamespace('My\App', SUPPORT_PATH . 'Autoloader');
             expect($this->classLoader('My\App\FatalLocator'))->toBe(SUPPORT_PATH . 'Autoloader' . DS . 'FatalLocator.php');
 
@@ -153,7 +153,7 @@ describe('Autoloader', function () {
             expect($this->classLoader('My\App\FatalLocator'))->toBeFalsy();
         });
 
-        it(': Retrait de namespace', function () {
+        it(': Retrait de namespace', function (): void {
             $this->loader->addNamespace('My\App', SUPPORT_PATH . 'Autoloader');
             expect($this->classLoader('My\App\FatalLocator'))->toBe(SUPPORT_PATH . 'Autoloader' . DS . 'FatalLocator.php');
 
@@ -162,8 +162,8 @@ describe('Autoloader', function () {
         });
     });
 
-    describe('Composer', function () {
-        it(': Capable de trouver les packages Composer', function () {
+    describe('Composer', function (): void {
+        it(': Capable de trouver les packages Composer', function (): void {
             $config = config('autoload');
             $loader = new Autoloader($config);
             $loader->initialize();
@@ -172,7 +172,7 @@ describe('Autoloader', function () {
             expect($namespaces)->toContainKey('Ahc\\Cli');
         });
 
-        it(": Les namespace Composer ne doivent pas remplacer les namespaces definis par l'autoloder", function () {
+        it(": Les namespace Composer ne doivent pas remplacer les namespaces definis par l'autoloder", function (): void {
             $config         = config('autoload');
             $config['psr4'] = [
                 'Psr\Log' => '/Config/Autoload/Psr/Log/',
@@ -185,7 +185,7 @@ describe('Autoloader', function () {
             expect($namespaces['Psr\Log'][1])->toMatch(static fn ($actual) => str_contains($actual, VENDOR_PATH));
         });
 
-        it(': Restriction des packages decouverts par Composer', function () {
+        it(': Restriction des packages decouverts par Composer', function (): void {
             $config                         = [];
             $config['psr4']                 = [];
             $config['classmap']             = [Autoloader::class => VENDOR_PATH . 'blitz-php/autoloader/Autoload.php'];
@@ -198,7 +198,7 @@ describe('Autoloader', function () {
             expect($namespaces['Psr\Log'][0])->toMatch(static fn ($actual) => str_contains($actual, VENDOR_PATH));
         });
 
-        it(': Exclusion des packages decouvers par Composer', function () {
+        it(': Exclusion des packages decouvers par Composer', function (): void {
             $config                         = [];
             $config['psr4']                 = [];
             $config['classmap']             = [Autoloader::class => VENDOR_PATH . 'blitz-php/autoloader/Autoload.php'];
@@ -210,7 +210,7 @@ describe('Autoloader', function () {
             expect($namespaces)->not->toContainKey(['Psr\Log', 'Kahlan']);
         });
 
-        it(": L'utilisation simultanné de only et exclude genere une exception", function () {
+        it(": L'utilisation simultanné de only et exclude genere une exception", function (): void {
             $config                         = [];
             $config['psr4']                 = [];
             $config['classmap']             = [Autoloader::class => VENDOR_PATH . 'blitz-php/autoloader/Autoload.php'];
@@ -221,7 +221,7 @@ describe('Autoloader', function () {
                 ->toThrow(new LogicException('Impossible d\'utiliser "only" et "exclude" en même temps dans "Config\autoload::composer>packages".'));
         });
 
-        it(": Trouve les routes Composer meme si le fichier autoload.php n'existe pas", function () {
+        it(": Trouve les routes Composer meme si le fichier autoload.php n'existe pas", function (): void {
             $composerPath = COMPOSER_PATH;
             $config       = config('autoload');
             $loader       = new Autoloader($config);
@@ -235,8 +235,8 @@ describe('Autoloader', function () {
         });
     });
 
-    describe('Chargement de fichier non-classe', function () {
-        it(': Chargement de fichier non-classe', function () {
+    describe('Chargement de fichier non-classe', function (): void {
+        it(': Chargement de fichier non-classe', function (): void {
             $config            = config('autoload');
             $config['files'][] = SUPPORT_PATH . 'Autoloader/functions.php';
             $loader            = new Autoloader($config);
@@ -250,7 +250,7 @@ describe('Autoloader', function () {
             $loader->unregister();
         });
 
-        it(': Chargement de helpers', function () {
+        it(': Chargement de helpers', function (): void {
             $config              = config('autoload');
             $config['helpers'][] = 'scl';
             $loader              = new Autoloader($config);

@@ -12,13 +12,11 @@
 use BlitzPHP\Filesystem\Files\UploadedFile;
 use BlitzPHP\Http\ServerRequest;
 
-describe('Http / ServerRequest', function () {
-    describe('Detector', function () {
-		it('Custom detector avec des arguments personnalises', function () {
+describe('Http / ServerRequest', function (): void {
+    describe('Detector', function (): void {
+		it('Custom detector avec des arguments personnalises', function (): void {
 			$request = new ServerRequest();
-			$request->addDetector('controller', function ($request, $name) {
-				return $request->getParam('controller') === $name;
-			});
+			$request->addDetector('controller', fn($request, $name) => $request->getParam('controller') === $name);
 
 			$request = $request->withParam('controller', 'blitz');
 
@@ -28,7 +26,7 @@ describe('Http / ServerRequest', function () {
 			expect($request->isController('nonExistingController'))->toBeFalsy();
 		});
 
-		it("Header detector", function () {
+		it("Header detector", function (): void {
 			$request = new ServerRequest();
 			$request->addDetector('host', ['header' => ['host' => 'blitzphp.com']]);
 
@@ -39,7 +37,7 @@ describe('Http / ServerRequest', function () {
 			expect($request->is('host'))->toBeFalsy();
 		});
 
-		it("Extension detector", function () {
+		it("Extension detector", function (): void {
 			$request = new ServerRequest();
 			$request = $request->withParam('_ext', 'json');
 
@@ -52,7 +50,7 @@ describe('Http / ServerRequest', function () {
 			expect($request->is('json'))->toBeFalsy();
 		});
 
-		it("Accept Header detector", function () {
+		it("Accept Header detector", function (): void {
 			$request = new ServerRequest();
 			$request = $request->withEnv('HTTP_ACCEPT', 'application/json, text/plain, */*');
 			expect($request->is('json'))->toBeTruthy();
@@ -68,8 +66,8 @@ describe('Http / ServerRequest', function () {
 		});
 	});
 
-	describe('Constructeur', function () {
-		it('construction avec les données de la requête', function () {
+	describe('Constructeur', function (): void {
+		it('construction avec les données de la requête', function (): void {
 			$data = [
 				'query' => [
 					'one' => 'param',
@@ -84,7 +82,7 @@ describe('Http / ServerRequest', function () {
 			expect($request->getRequestTarget())->toEqual('/some/path');
 		});
 
-		it('construction avec une chaine URL', function () {
+		it('construction avec une chaine URL', function (): void {
 			$request = new ServerRequest([
 				'url' => '/articles/view/1',
 				'environment' => ['REQUEST_URI' => '/some/other/path'],
@@ -95,7 +93,7 @@ describe('Http / ServerRequest', function () {
 			expect($request->getUri()->getPath())->toBe('/');
 		});
 
-		it('Teste que les arguments de la chaîne de requête fournis dans la chaîne de l\'URL sont analysés.', function () {
+		it('Teste que les arguments de la chaîne de requête fournis dans la chaîne de l\'URL sont analysés.', function (): void {
 			$request = new ServerRequest(['url' => 'some/path?one=something&two=else']);
 			$expected = ['one' => 'something', 'two' => 'else'];
 
@@ -104,7 +102,7 @@ describe('Http / ServerRequest', function () {
 			expect($request->getUri()->getQuery())->toBe('one=something&two=else');
 		});
 
-		xit('Tester que les chaînes de requête sont gérées correctement.', function () {
+		xit('Tester que les chaînes de requête sont gérées correctement.', function (): void {
 			$config = ['environment' => ['REQUEST_URI' => '/tasks/index?ts=123456']];
         	$request = new ServerRequest($config);
         	expect($request->getRequestTarget())->toBe('/tasks/index');
@@ -120,7 +118,7 @@ describe('Http / ServerRequest', function () {
 			expect($request->getRequestTarget())->toBe('/other/path');
 		});
 
-		xit("Tester que l'URL dans le chemin d'accès est traité correctement.", function () {
+		xit("Tester que l'URL dans le chemin d'accès est traité correctement.", function (): void {
 			$config = ['environment' => ['REQUEST_URI' => '/jump/http://blitzphp.com']];
 			$request = new ServerRequest($config);
 			expect($request->getRequestTarget())->toBe('/jump/http://blitzphp.com');
@@ -133,7 +131,7 @@ describe('Http / ServerRequest', function () {
 
 		});
 
-		it('getPath', function () {
+		it('getPath', function (): void {
 			$request = new ServerRequest(['url' => '/']);
 			expect($request->getPath())->toBe('/');
 
@@ -145,8 +143,8 @@ describe('Http / ServerRequest', function () {
 		});
 	});
 
-	describe('Parsing', function () {
-		it("Test d'analyse des données POST dans l'objet.", function () {
+	describe('Parsing', function (): void {
+		it("Test d'analyse des données POST dans l'objet.", function (): void {
 			$post = [
 				'Article' => ['title'],
 			];
@@ -166,8 +164,8 @@ describe('Http / ServerRequest', function () {
 		});
 	});
 
-	describe('Uploaded files', function () {
-		it("Tester que le constructeur utilise les objets fichiers téléchargés s'ils sont présents.", function () {
+	describe('Uploaded files', function (): void {
+		it("Tester que le constructeur utilise les objets fichiers téléchargés s'ils sont présents.", function (): void {
 			$file = new UploadedFile(
 				__FILE__,
 				123,
@@ -179,13 +177,13 @@ describe('Http / ServerRequest', function () {
         	expect($request->getUploadedFiles())->toBe(['avatar' => $file]);
 		});
 
-		it("Liste de fichiers vide.", function () {
+		it("Liste de fichiers vide.", function (): void {
 			$request = new ServerRequest(['files' => []]);
         	expect($request->getUploadedFiles())->toBeEmpty();
         	expect($request->getData())->toBeEmpty();
 		});
 
-		it("Remplacement de fichiers.", function () {
+		it("Remplacement de fichiers.", function (): void {
 			$file = new UploadedFile(
 				__FILE__,
 				123,
@@ -201,7 +199,7 @@ describe('Http / ServerRequest', function () {
 			expect($new->getUploadedFiles())->toBe(['picture' => $file]);
 		});
 
-		it("Recuperation d'un fichier.", function () {
+		it("Recuperation d'un fichier.", function (): void {
 			$file = new UploadedFile(
 				__FILE__,
 				123,
@@ -229,14 +227,14 @@ describe('Http / ServerRequest', function () {
 			expect($new->getUploadedFile('pictures.0.image'))->toEqual($file);
 		});
 
-		it("Remplacement de fichiers avec un fichier invalide.", function () {
+		it("Remplacement de fichiers avec un fichier invalide.", function (): void {
 			$request = new ServerRequest();
 
 			expect(fn() => $request->withUploadedFiles(['avatar' => 'picture']))
 				->toThrow(new InvalidArgumentException('Fichier invalide à `avatar`'));
 		});
 
-		it("Remplacement de fichiers avec un fichier invalide imbriquer.", function () {
+		it("Remplacement de fichiers avec un fichier invalide imbriquer.", function (): void {
 			$request = new ServerRequest();
 
 			expect(fn() => $request->withUploadedFiles(['user' => ['avatar' => 'not a file']]))

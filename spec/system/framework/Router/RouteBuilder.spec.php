@@ -14,14 +14,14 @@ use BlitzPHP\Router\RouteBuilder;
 use BlitzPHP\Spec\ReflectionHelper;
 use Spec\BlitzPHP\App\Controllers\HomeController;
 
-describe('RouteBuilder', function () {
-    beforeEach(function () {
+describe('RouteBuilder', function (): void {
+    beforeEach(function (): void {
         $this->builder = new RouteBuilder(getCollector());
         $this->routes  = ReflectionHelper::getPrivateProperty($this->builder, 'collection');
     });
 
-    describe('Ajout de route', function () {
-        it('Test de base', function () {
+    describe('Ajout de route', function (): void {
+        it('Test de base', function (): void {
             $this->builder->add('home', '\my\controller');
 
             expect($this->routes->getRoutes())->toBe([
@@ -29,7 +29,7 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('map', function () {
+        it('map', function (): void {
             $this->builder->map([
 				'product/(:num)'      => 'CatalogController::productLookupById',
 				'product/(:alphanum)' => 'CatalogController::productLookupByName',
@@ -42,8 +42,8 @@ describe('RouteBuilder', function () {
         });
     });
 
-    describe('Correspondance des verbes HTTP', function () {
-        it('Match fonctionne avec la methode HTTP actuel', function () {
+    describe('Correspondance des verbes HTTP', function (): void {
+        it('Match fonctionne avec la methode HTTP actuel', function (): void {
             setRequestMethod('GET');
 
             $this->builder->match(['get'], 'home', 'controller');
@@ -53,7 +53,7 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Match ignore les methodes HTTP invalide', function () {
+        it('Match ignore les methodes HTTP invalide', function (): void {
             setRequestMethod('GET');
 
             $this->builder->match(['put'], 'home', 'controller');
@@ -61,7 +61,7 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRoutes())->toBe([]);
         });
 
-        it('Add remplace les placeholders personnalisés avec les bons regex', function () {
+        it('Add remplace les placeholders personnalisés avec les bons regex', function (): void {
             $this->builder->placeholder('smiley', ':-)')
                 ->add('home/(:smiley)', 'controller');
 
@@ -71,22 +71,22 @@ describe('RouteBuilder', function () {
         });
     });
 
-    describe('Setters', function () {
-        it('Modification du controleur par defaut', function () {
+    describe('Setters', function (): void {
+        it('Modification du controleur par defaut', function (): void {
             $this->builder->setDefaultController('kishimoto');
 
             expect($this->routes->getDefaultController())->toBe('kishimotoController');
         });
 
-        it('Modification de la methode par defaut', function () {
+        it('Modification de la methode par defaut', function (): void {
             $this->builder->setDefaultMethod('minatoNavigation');
 
             expect($this->routes->getDefaultMethod())->toBe('minatoNavigation');
         });
     });
 
-    describe('Groupement', function () {
-        it('Les regroupements de routes fonctionne', function () {
+    describe('Groupement', function (): void {
+        it('Les regroupements de routes fonctionne', function (): void {
             $this->builder->prefix('admin')->group(function (): void {
                 $this->builder->add('users/list', '\UsersController::list');
             });
@@ -96,12 +96,12 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Groupes imbriqués avec options externes et sans options internes', function () {
-            $this->builder->prefix('admin')->namespace('Admin')->middlewares(['csrf'])->group(function ($routes) {
-                $this->builder->get('dashboard', static function () {});
+        it('Groupes imbriqués avec options externes et sans options internes', function (): void {
+            $this->builder->prefix('admin')->namespace('Admin')->middlewares(['csrf'])->group(function ($routes): void {
+                $this->builder->get('dashboard', static function (): void {});
 
-                $this->builder->prefix('profile')->group(function () {
-                    $this->builder->get('/', static function () {});
+                $this->builder->prefix('profile')->group(function (): void {
+                    $this->builder->get('/', static function (): void {});
                 });
             });
 
@@ -117,19 +117,19 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Groupes imbriqués avec option externe et interne', function () {
-            $this->builder->prefix('admin')->middlewares('csrf')->group(function () {
-                $this->builder->get('dashboard', static function () {});
+        it('Groupes imbriqués avec option externe et interne', function (): void {
+            $this->builder->prefix('admin')->middlewares('csrf')->group(function (): void {
+                $this->builder->get('dashboard', static function (): void {});
 
-                $this->builder->prefix('profile')->middlewares('honeypot')->group(static function ($routes) {
-                    $routes->get('/', static function () {});
+                $this->builder->prefix('profile')->middlewares('honeypot')->group(static function ($routes): void {
+                    $routes->get('/', static function (): void {});
                 });
             });
-			$this->builder->prefix('users')->middlewares('group:admin')->group(function () {
-				$this->builder->get('dashboard', static function () {});
+			$this->builder->prefix('users')->middlewares('group:admin')->group(function (): void {
+				$this->builder->get('dashboard', static function (): void {});
 
-				$this->builder->prefix('profile')->middlewares('can:view-profile')->group(static function ($routes) {
-                    $routes->get('/', static function () {});
+				$this->builder->prefix('profile')->middlewares('can:view-profile')->group(static function ($routes): void {
+                    $routes->get('/', static function (): void {});
                 });
 			});
 
@@ -149,12 +149,12 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Groupes imbriqués sans option externe avec option interne', function () {
-            $this->builder->prefix('admin')->middlewares('csrf')->group(function () {
-                $this->builder->get('dashboard', static function () {});
+        it('Groupes imbriqués sans option externe avec option interne', function (): void {
+            $this->builder->prefix('admin')->middlewares('csrf')->group(function (): void {
+                $this->builder->get('dashboard', static function (): void {});
 
-                $this->builder->prefix('profile')->namespace('Admin')->group(static function ($routes) {
-                    $routes->get('/', static function () {});
+                $this->builder->prefix('profile')->namespace('Admin')->group(static function ($routes): void {
+                    $routes->get('/', static function (): void {});
                 });
             });
 
@@ -169,8 +169,8 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Le regroupement fonctionne avec une chaîne de préfixe vide', function () {
-            $this->builder->group(function () {
+        it('Le regroupement fonctionne avec une chaîne de préfixe vide', function (): void {
+            $this->builder->group(function (): void {
                 $this->builder->add('users/list', '\UsersController::list');
             });
 
@@ -180,8 +180,8 @@ describe('RouteBuilder', function () {
         });
     });
 
-    describe('Resource & presenter', function () {
-        it('Échafaudages de ressources correctement', function () {
+    describe('Resource & presenter', function (): void {
+        it('Échafaudages de ressources correctement', function (): void {
             $this->builder->resource('photos');
 
             expect($this->routes->getRoutes())->toBe([
@@ -192,7 +192,7 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Échafaudages de ressources d\'API correctement', function () {
+        it('Échafaudages de ressources d\'API correctement', function (): void {
             $this->builder->resource('api/photos', ['controller' => 'Photos']);
 
             expect($this->routes->getRoutes())->toBe([
@@ -203,7 +203,7 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Échafaudages correct de presenter', function () {
+        it('Échafaudages correct de presenter', function (): void {
             $this->builder->presenter('photos');
 
             expect($this->routes->getRoutes())->toBe([
@@ -217,14 +217,14 @@ describe('RouteBuilder', function () {
         });
     });
 
-    describe('Creation a partir des verbes http appropries', function () {
-        it('GET', function () {
+    describe('Creation a partir des verbes http appropries', function (): void {
+        it('GET', function (): void {
             $this->builder->get('here', 'there');
 
             expect($this->routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('POST', function () {
+        it('POST', function (): void {
             ReflectionHelper::setPrivateProperty($this->builder, 'collection', $this->routes->setHTTPVerb('POST'));
 
             $this->builder->post('here', 'there');
@@ -232,14 +232,14 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('GET n\'autorise pas d\'autres methodes', function () {
+        it('GET n\'autorise pas d\'autres methodes', function (): void {
             $this->builder->get('here', 'there');
             $this->builder->post('from', 'to');
 
             expect($this->routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('form', function () {
+        it('form', function (): void {
             $this->builder->form('here', 'there');
             expect($this->routes->getRoutes())->toBe(['here' => '\formThere']);
 
@@ -248,7 +248,7 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRoutes())->toBe(['here' => '\processThere']);
         });
 
-        it('form avec options', function () {
+        it('form avec options', function (): void {
             $options = [
                 'unique' => true,
             ];
@@ -261,7 +261,7 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRoutes())->toBe(['here' => '\there']);
         });
 
-        it('form en definissant le controleur et la methode', function () {
+        it('form en definissant le controleur et la methode', function (): void {
             $this->builder->form('here', 'there::index');
             expect($this->routes->getRoutes())->toBe(['here' => '\there::formIndex']);
 
@@ -270,8 +270,8 @@ describe('RouteBuilder', function () {
 			expect($this->routes->getRoutes())->toBe(['here' => '\there::processIndex']);
         });
 
-		it('form en definissant uniquement la methode', function () {
-			$this->builder->controller('there')->group(function() {
+		it('form en definissant uniquement la methode', function (): void {
+			$this->builder->controller('there')->group(function(): void {
 				$this->builder->form('here', 'index');
 			});
 
@@ -282,7 +282,7 @@ describe('RouteBuilder', function () {
 			expect($this->routes->getRoutes())->toBe(['here' => '\there::processIndex']);
         });
 
-        it('form en utilisant un tableau', function () {
+        it('form en utilisant un tableau', function (): void {
             $this->builder->form('here', [HomeController::class, 'index']);
             expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::formIndex']);
 
@@ -291,7 +291,7 @@ describe('RouteBuilder', function () {
 			expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::processIndex']);
         });
 
-        it('form en utilisant un tableau à un element', function () {
+        it('form en utilisant un tableau à un element', function (): void {
             $this->builder->form('here', [HomeController::class]);
             expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::formIndex']);
 
@@ -300,7 +300,7 @@ describe('RouteBuilder', function () {
 			expect($this->routes->getRoutes())->toBe(['here' => '\Spec\BlitzPHP\App\Controllers\HomeController::processIndex']);
         });
 
-        it('form en utilisant une closure', function () {
+        it('form en utilisant une closure', function (): void {
             $this->builder->form('here', static fn() => 'Hello World');
 
 			$match = $this->routes->getRoutes();
@@ -316,7 +316,7 @@ describe('RouteBuilder', function () {
 			expect($match['here'])->toBeAnInstanceOf('Closure');
 		});
 
-        it('form en utilisant une closure et l\'option unique', function () {
+        it('form en utilisant une closure et l\'option unique', function (): void {
             $this->builder->form('here', static fn() => 'Hello World', ['unique' => true]);
 
 			$match = $this->routes->getRoutes();
@@ -332,7 +332,7 @@ describe('RouteBuilder', function () {
 			expect($match['here'])->toBeAnInstanceOf('Closure');
 		});
 
-        it('Route de vue', function () {
+        it('Route de vue', function (): void {
             $this->builder->view('here', 'hello');
 
             $route = $this->routes->getRoutes(Method::GET)['here'];
@@ -350,7 +350,7 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRoutes('cli'))->not->toContainKey('here');
         });
 
-        it('Restriction d\'environnement', function () {
+        it('Restriction d\'environnement', function (): void {
             $this->builder->environment('testing', function (): void {
                 $this->builder->get('here', 'there');
             });
@@ -362,8 +362,8 @@ describe('RouteBuilder', function () {
         });
     });
 
-    describe('Routes nommées', function () {
-        it('Route nommée', function () {
+    describe('Routes nommées', function (): void {
+        it('Route nommée', function (): void {
             $this->builder->as('namedRoute')->add('users', 'Users::index');
             $this->builder->name('namedRoute2')->add('profil', 'Users::index');
 
@@ -371,15 +371,15 @@ describe('RouteBuilder', function () {
             expect($this->routes->reverseRoute('namedRoute2'))->toBe('/profil');
         });
 
-        it('Route nommée avec la locale', function () {
+        it('Route nommée avec la locale', function (): void {
             $this->builder->as('namedRoute')->add('{locale}/users', 'Users::index');
 
             expect($this->routes->reverseRoute('namedRoute'))->toBe('/en/users');
         });
     });
 
-    describe('Redirection', function () {
-        it('Ajout de redirection', function () {
+    describe('Redirection', function (): void {
+        it('Ajout de redirection', function (): void {
             // Le deuxième paramètre est soit le nouvel URI vers lequel rediriger, soit le nom d'une route nommée.
             $this->builder->redirect('users', 'users/index', 307);
 
@@ -393,7 +393,7 @@ describe('RouteBuilder', function () {
             expect($this->routes->getRedirectCode('bosses'))->toBe(0);
         });
 
-        it('Ajout de redirection avec une route nommee', function () {
+        it('Ajout de redirection avec une route nommee', function (): void {
             $this->builder->name('namedRoute')->add('zombies', 'Zombies::index');
             $this->builder->redirect('users', 'namedRoute', 307);
 
@@ -408,8 +408,8 @@ describe('RouteBuilder', function () {
         });
     });
 
-    describe('Sous domaines', function () {
-        it('Hostname', function () {
+    describe('Sous domaines', function (): void {
+        it('Hostname', function (): void {
             ReflectionHelper::setPrivateProperty($this->routes, 'httpHost', 'example.com');
 
             $this->builder->hostname('example.com')->add('from', 'to');
@@ -420,7 +420,7 @@ describe('RouteBuilder', function () {
             ]);
         });
 
-        it('Sous domaine', function () {
+        it('Sous domaine', function (): void {
             ReflectionHelper::setPrivateProperty($this->routes, 'httpHost', 'adm.example.com');
 
             $this->builder->subdomain('adm')->add('/objects/(:alphanum)', 'Admin::objectsList/$1');
@@ -432,17 +432,17 @@ describe('RouteBuilder', function () {
         });
     });
 
-    describe('Fallback', function () {
-        it('Fallback', function () {
+    describe('Fallback', function (): void {
+        it('Fallback', function (): void {
             expect($this->routes->get404Override())->toBeNull();
         });
 
-        it('Fallback sous forme de chaine', function () {
+        it('Fallback sous forme de chaine', function (): void {
             $this->builder->fallback('Explode');
             expect($this->routes->get404Override())->toBe('Explode');
         });
 
-        it('Fallback sous forme de callback', function () {
+        it('Fallback sous forme de callback', function (): void {
             $this->builder->fallback(static function (): void {
                 echo 'Explode now';
             });
@@ -450,8 +450,8 @@ describe('RouteBuilder', function () {
         });
     });
 
-    it('Exception levee en cas de methode non autorisee', function () {
-        expect(function () {
+    it('Exception levee en cas de methode non autorisee', function (): void {
+        expect(function (): void {
             $this->builder->get404Override();
         })->toThrow(new BadMethodCallException());
     });
