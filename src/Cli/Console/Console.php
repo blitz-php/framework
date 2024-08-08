@@ -11,9 +11,9 @@
 
 namespace BlitzPHP\Cli\Console;
 
-use Ahc\Cli\IO\Interactor;
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
+use Ahc\Cli\IO\Interactor;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Debug\Logger;

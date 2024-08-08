@@ -107,10 +107,10 @@ class PHPMailer extends AbstractAdapter
     public function setProtocol(string $protocol): static
     {
         match (strtolower($protocol)) {
-            static::PROTOCOL_MAIL => $this->mailer->isMail(),
-            static::PROTOCOL_QMAIL => $this->mailer->isQmail(),
+            static::PROTOCOL_MAIL     => $this->mailer->isMail(),
+            static::PROTOCOL_QMAIL    => $this->mailer->isQmail(),
             static::PROTOCOL_SENDMAIL => $this->mailer->isSendmail(),
-            default => $this->mailer->isSMTP(),
+            default                   => $this->mailer->isSMTP(),
         };
 
         return $this;

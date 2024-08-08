@@ -146,7 +146,7 @@ class NativeAdapter extends AbstractAdapter
             // Nettoyer nos noms de chemins pour les rendre un peu plus propres
             $this->renderVars['file'] = clean_path($this->renderVars['file']);
             $this->renderVars['file'] = ++$this->viewsCount . ' ' . $this->renderVars['file'];
-            $output = '<!-- DEBUG-VIEW START ' . $this->renderVars['file'] . ' -->' . PHP_EOL
+            $output                   = '<!-- DEBUG-VIEW START ' . $this->renderVars['file'] . ' -->' . PHP_EOL
                 . $output . PHP_EOL
                 . '<!-- DEBUG-VIEW ENDED ' . $this->renderVars['file'] . ' -->' . PHP_EOL;
         }

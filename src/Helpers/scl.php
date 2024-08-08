@@ -175,7 +175,7 @@ function scl_minimizeImg($src, $size = [], $relative = false)
     // Si on envoie un tableau comme $size
     if (is_array($size)) {
         // Si le tableau n'a pas 1 ou deux element
-        if (! in_array(count($size), [1, 2])) {
+        if (! in_array(count($size), [1, 2], true)) {
             return [2, 'Violation du nombre de dimension'];
         }
         // Si l'un des element du tableau n'est pas un nombre
@@ -259,12 +259,12 @@ function scl_generateKeys($nbr = 8, $type = 0)
     $nbr = ($nbr < 3 || $nbr > 64) ? 8 : $nbr;
 
     $chars = match ($type) {
-        1 => range('a', 'z'),
-        2 => range('A', 'Z'),
-        3 => range(0, 9),
-        4 => array_merge(range('a', 'z'), range('A', 'Z')),
-        5 => array_merge(range(0, 9), range('a', 'z')),
-        6 => array_merge(range(0, 9), range('A', 'Z')),
+        1       => range('a', 'z'),
+        2       => range('A', 'Z'),
+        3       => range(0, 9),
+        4       => array_merge(range('a', 'z'), range('A', 'Z')),
+        5       => array_merge(range(0, 9), range('a', 'z')),
+        6       => array_merge(range(0, 9), range('A', 'Z')),
         default => array_merge(range(0, 9), range('a', 'z'), range('A', 'Z')),
     };
     $return  = ''; // Valeur de retour

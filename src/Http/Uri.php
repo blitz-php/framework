@@ -351,7 +351,7 @@ class Uri implements UriInterface
         }
 
         if (isset($path) && $path !== '') {
-            $uri .= !str_ends_with($uri, '/')
+            $uri .= ! str_ends_with($uri, '/')
                 ? '/' . ltrim($path, '/')
                 : ltrim($path, '/');
         }

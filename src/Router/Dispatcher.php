@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Router;
 
-use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Container\Container;
 use BlitzPHP\Container\Services;
@@ -19,6 +18,7 @@ use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Http\ResponsableInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Support\Arrayable;
+use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\PageNotFoundException;

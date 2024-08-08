@@ -138,7 +138,7 @@ class About extends Command
      */
     protected function displayJson(Collection $data): void
     {
-        $output = $data->flatMap(fn($data, $section) => [
+        $output = $data->flatMap(fn ($data, $section) => [
             (string) Text::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [
                 $this->toSearchKeyword($item[0]) => value($item[1], true),
             ]),

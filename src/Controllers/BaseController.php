@@ -11,12 +11,12 @@
 
 namespace BlitzPHP\Controllers;
 
-use BlitzPHP\Validation\DataValidation;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
+use BlitzPHP\Validation\DataValidation;
 use BlitzPHP\Validation\Validation;
 use BlitzPHP\Validation\Validator;
 use Dimtrovich\Validation\Exceptions\ValidationException as DimtrovichValidationException;
@@ -112,9 +112,9 @@ abstract class BaseController
      * Validation des donnees de la requete actuelle
      *
      * @param array|class-string<DataValidation> $rules
-     * @param array                                                   $messages Si $rules est une chaine (representant) la classe de validation,
-     *                                                                          alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
-     *                                                                          Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
+     * @param array                              $messages Si $rules est une chaine (representant) la classe de validation,
+     *                                                     alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
+     *                                                     Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
      */
     protected function validate(array|string $rules, array $messages = []): ValidatedInput
     {
@@ -140,9 +140,9 @@ abstract class BaseController
      * Cree un validateur avec les donnees de la requete actuelle
      *
      * @param array|class-string<DataValidation> $rules
-     * @param array                                                   $messages Si $rules est une chaine (representant) la classe de validation,
-     *                                                                          alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
-     *                                                                          Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
+     * @param array                              $messages Si $rules est une chaine (representant) la classe de validation,
+     *                                                     alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
+     *                                                     Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
      */
     protected function validation(array|string $rules, array $messages = []): Validation
     {

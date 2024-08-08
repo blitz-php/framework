@@ -11,13 +11,13 @@
 
 namespace BlitzPHP\Http;
 
-use BlitzPHP\Http\Concerns\InteractsWithContentTypes;
-use BlitzPHP\Http\Concerns\InteractsWithInput;
-use BlitzPHP\Http\Concerns\InteractsWithFlashData;
 use ArrayAccess;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Exceptions\ValidationException;
+use BlitzPHP\Http\Concerns\InteractsWithContentTypes;
+use BlitzPHP\Http\Concerns\InteractsWithFlashData;
+use BlitzPHP\Http\Concerns\InteractsWithInput;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\String\Text;

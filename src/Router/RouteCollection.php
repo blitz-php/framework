@@ -251,7 +251,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Normaliser la chaîne de chemin dans routesFile
-		$routesFile = realpath($routesFile) ?: $routesFile;
+        $routesFile = realpath($routesFile) ?: $routesFile;
 
         // Incluez le fichier routesFile s'il n'existe pas.
         // Ne conserver que pour les fins BC pour l'instant.
@@ -1210,8 +1210,8 @@ class RouteCollection implements RouteCollectionInterface
         // Ajoutez l'espace de noms par défaut si nécessaire.
         $namespace = trim($this->defaultNamespace, '\\') . '\\';
         if (
-            !str_starts_with($search, '\\')
-            && !str_starts_with($search, $namespace)
+            ! str_starts_with($search, '\\')
+            && ! str_starts_with($search, $namespace)
         ) {
             $search = $namespace . $search;
         }
@@ -1410,9 +1410,9 @@ class RouteCollection implements RouteCollectionInterface
             unset($options['middleware']);
         }
 
-		if (isset($options['middlewares'])) {
-			$options['middlewares'] = array_unique($options['middlewares']);
-		}
+        if (isset($options['middlewares'])) {
+            $options['middlewares'] = array_unique($options['middlewares']);
+        }
 
         if (is_string($to) && isset($options['controller'])) {
             $to = str_replace($options['controller'] . '::', '', $to);

@@ -131,8 +131,8 @@ class Router implements RouterInterface
      */
     public function __construct(RouteCollectionInterface $routes, ServerRequestInterface $request)
     {
-		$this->permittedURIChars = config('app.permitted_uri_chars', '');
-        $this->collection = $routes;
+        $this->permittedURIChars = config('app.permitted_uri_chars', '');
+        $this->collection        = $routes;
 
         $this->setController($this->collection->getDefaultController());
         $this->setMethod($this->collection->getDefaultMethod());
@@ -166,10 +166,10 @@ class Router implements RouterInterface
             $uri = '/';
         }
 
-		// Décoder la chaîne de caractères codée par l'URL
-        $uri                   = urldecode($uri);
+        // Décoder la chaîne de caractères codée par l'URL
+        $uri = urldecode($uri);
 
-		$this->checkDisallowedChars($uri);
+        $this->checkDisallowedChars($uri);
 
         $this->middlewaresInfo = [];
 
@@ -374,7 +374,7 @@ class Router implements RouterInterface
             $routeKey = $routeKey === '/'
                 ? $routeKey
                 // $routeKey peut être int, car il s'agit d'une clé de tableau, et l'URI `/1` est valide.
-				// Le `/` de tête est supprimé.
+                // Le `/` de tête est supprimé.
                 : ltrim((string) $routeKey, '/ ');
 
             $matchedKey = $routeKey;

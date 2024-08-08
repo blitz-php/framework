@@ -8,9 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-use Psr\Http\Message\StreamInterface;
-use GuzzleHttp\Psr7\Utils;
-use BlitzPHP\Debug\Logger;
+
 use BlitzPHP\Cli\Console\Console;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Container\Services;
@@ -18,6 +16,7 @@ use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
+use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Http\Redirection;
@@ -27,6 +26,8 @@ use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
 use BlitzPHP\Utilities\Support\Invader;
+use GuzzleHttp\Psr7\Utils;
+use Psr\Http\Message\StreamInterface;
 
 // ================================= FONCTIONS UTIILITAIRES ESSENTIELLES ================================= //
 
@@ -714,12 +715,12 @@ if (! function_exists('clean_path')) {
         $path = realpath($path) ?: $path;
 
         return match (true) {
-            str_starts_with($path, APP_PATH) => 'APP_PATH' . DS . substr($path, strlen(APP_PATH)),
-            str_starts_with($path, SYST_PATH) => 'SYST_PATH' . DS . substr($path, strlen(SYST_PATH)),
+            str_starts_with($path, APP_PATH)                                                 => 'APP_PATH' . DS . substr($path, strlen(APP_PATH)),
+            str_starts_with($path, SYST_PATH)                                                => 'SYST_PATH' . DS . substr($path, strlen(SYST_PATH)),
             defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH . 'blitz-php' . DS) => 'BLITZ_PATH' . DS . substr($path, strlen(VENDOR_PATH . 'blitz-php' . DS)),
-            defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH) => 'VENDOR_PATH' . DS . substr($path, strlen(VENDOR_PATH)),
-            str_starts_with($path, ROOTPATH) => 'ROOTPATH' . DS . substr($path, strlen(ROOTPATH)),
-            default => $path,
+            defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH)                    => 'VENDOR_PATH' . DS . substr($path, strlen(VENDOR_PATH)),
+            str_starts_with($path, ROOTPATH)                                                 => 'ROOTPATH' . DS . substr($path, strlen(ROOTPATH)),
+            default                                                                          => $path,
         };
     }
 }
@@ -1034,8 +1035,8 @@ if (! function_exists('to_stream')) {
      * - metadata : Tableau de métadonnées personnalisées.
      * - size : Taille du flux.
      *
-     * @param bool|callable|float|int|Iterator|StreamInterface|resource|string|null $resource Données du corps de l'entité
-     * @param array                                                                                  $options  Additional options
+     * @param bool|callable|float|int|Iterator|resource|StreamInterface|string|null $resource Données du corps de l'entité
+     * @param array                                                                 $options  Additional options
      *
      * @uses GuzzleHttp\Psr7\stream_for
      *

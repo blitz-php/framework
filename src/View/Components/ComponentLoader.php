@@ -99,8 +99,8 @@ class ComponentLoader
      * Analyse l'attribut params. S'il s'agit d'un tableau, il est renvoyé tel quel.
      * S'il s'agit d'une chaîne, elle doit être au format "clé1=valeur clé2=valeur".
      * Elle sera divisée et renvoyée sous forme de tableau.
-	 *
-	 * @param array<string, string>|string|null       $params
+     *
+     * @param array<string, string>|string|null $params
      */
     public function prepareParams($params): array
     {

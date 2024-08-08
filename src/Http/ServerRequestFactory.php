@@ -11,11 +11,11 @@
 
 namespace BlitzPHP\Http;
 
-use Psr\Http\Message\UriInterface;
 use BlitzPHP\Utilities\Iterable\Arr;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Usine permettant de créer des instances de ServerRequest.
@@ -131,10 +131,10 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
      * des valeurs données n'est effectué, et, en particulier, aucune tentative n'est faite pour
      * déterminer la méthode HTTP ou l'URI, qui doivent être fournis explicitement.
      *
-     * @param string                                $method       La méthode HTTP associée à la requete.
-     * @param UriInterface|string $uri L'URI associé à la requete.
-     *                                                            Si la valeur est une chaîne, la fabrique DOIT créer une instance d'UriInterface basée sur celle-ci.
-     * @param array                                 $serverParams Tableau de paramètres SAPI permettant d'alimenter l'instance de requete générée.
+     * @param string              $method       La méthode HTTP associée à la requete.
+     * @param string|UriInterface $uri          L'URI associé à la requete.
+     *                                          Si la valeur est une chaîne, la fabrique DOIT créer une instance d'UriInterface basée sur celle-ci.
+     * @param array               $serverParams Tableau de paramètres SAPI permettant d'alimenter l'instance de requete générée.
      */
     public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
     {

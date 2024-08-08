@@ -86,7 +86,7 @@ abstract class AbstractAdapter implements RendererInterface
             }
         }
 
-        if (!$this->locator instanceof LocatorInterface && ! is_dir($this->viewPath)) {
+        if (! $this->locator instanceof LocatorInterface && ! is_dir($this->viewPath)) {
             $this->viewPath = '';
             $this->locator  = Services::locator();
         }
@@ -261,7 +261,7 @@ abstract class AbstractAdapter implements RendererInterface
         $ext ??= $this->ext;
 
         $viewPath = $options['viewPath'] ?? $this->viewPath;
-        $file = ! empty($viewPath) ? str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($view, '/\\')) : $view;
+        $file     = ! empty($viewPath) ? str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($view, '/\\')) : $view;
 
         $file = Helpers::ensureExt($file, $ext);
 

@@ -12,6 +12,7 @@
 namespace BlitzPHP\Controllers;
 
 use Psr\Http\Message\ResponseInterface;
+
 /**
  * Un contrôleur extensible pour fournir une API RESTful pour une ressource.
  */

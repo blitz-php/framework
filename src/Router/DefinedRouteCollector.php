@@ -25,7 +25,7 @@ final class DefinedRouteCollector
 
     public function __construct(private readonly RouteCollection $routeCollection)
     {
-	}
+    }
 
     /**
      * Collecte les routes enregistrees
@@ -47,7 +47,7 @@ final class DefinedRouteCollector
                 // La clé de la route devrait être une chaîne de caractères, mais elle est stockée sous la forme d'une clé de tableau, qui peut être un entier.
                 $route = (string) $route;
 
-				if (is_string($handler) || $handler instanceof Closure) {
+                if (is_string($handler) || $handler instanceof Closure) {
                     if ($handler instanceof Closure) {
                         $view = $this->routeCollection->getRoutesOptions($route, $method)['view'] ?? false;
 

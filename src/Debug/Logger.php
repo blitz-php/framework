@@ -171,13 +171,13 @@ class Logger implements LoggerInterface
     private function pushHandler(string $handler, stdClass $options)
     {
         match ($handler) {
-            'error' => $this->pushErrorHandler($options),
-            'email' => $this->pushEmailHandler($options),
+            'error'    => $this->pushErrorHandler($options),
+            'email'    => $this->pushEmailHandler($options),
             'telegram' => $this->pushTelegramHandler($options),
-            'chrome' => $this->pushChromeHandler($options),
-            'firebug' => $this->pushFirebugHandler($options),
-            'browser' => $this->pushBrowserHandler($options),
-            default => $this->pushFileHandler($options),
+            'chrome'   => $this->pushChromeHandler($options),
+            'firebug'  => $this->pushFirebugHandler($options),
+            'browser'  => $this->pushBrowserHandler($options),
+            default    => $this->pushFileHandler($options),
         };
     }
 
@@ -290,14 +290,14 @@ class Logger implements LoggerInterface
     private function pushProcessor(string $processor)
     {
         match ($processor) {
-            'web' => $this->monolog->pushProcessor(new WebProcessor()),
+            'web'           => $this->monolog->pushProcessor(new WebProcessor()),
             'introspection' => $this->monolog->pushProcessor(new IntrospectionProcessor()),
-            'hostname' => $this->monolog->pushProcessor(new HostnameProcessor()),
-            'process_id' => $this->monolog->pushProcessor(new ProcessIdProcessor()),
-            'uid' => $this->monolog->pushProcessor(new UidProcessor()),
-            'memory_usage' => $this->monolog->pushProcessor(new MemoryUsageProcessor()),
-            'psr' => $this->monolog->pushProcessor(new PsrLogMessageProcessor()),
-            default => throw new InvalidArgumentException('Invalid formatter for log processor. Accepts values: web/introspection/hostname/process_id/uid/memory_usage/psr'),
+            'hostname'      => $this->monolog->pushProcessor(new HostnameProcessor()),
+            'process_id'    => $this->monolog->pushProcessor(new ProcessIdProcessor()),
+            'uid'           => $this->monolog->pushProcessor(new UidProcessor()),
+            'memory_usage'  => $this->monolog->pushProcessor(new MemoryUsageProcessor()),
+            'psr'           => $this->monolog->pushProcessor(new PsrLogMessageProcessor()),
+            default         => throw new InvalidArgumentException('Invalid formatter for log processor. Accepts values: web/introspection/hostname/process_id/uid/memory_usage/psr'),
         };
     }
 

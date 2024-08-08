@@ -469,12 +469,12 @@ final class AutoRouter implements AutoRouterInterface
         }
 
         if (
-			// Par exemple, si `getSomeMethod()` existe dans le contrôleur, seul l'URI `controller/some-method` devrait être accessible.
-			// Mais si un visiteur navigue vers l'URI `controller/somemethod`, `getSomemethod()` sera vérifié, et `method_exists()` retournera true parce que les noms de méthodes en PHP sont insensibles à la casse.
+            // Par exemple, si `getSomeMethod()` existe dans le contrôleur, seul l'URI `controller/some-method` devrait être accessible.
+            // Mais si un visiteur navigue vers l'URI `controller/somemethod`, `getSomemethod()` sera vérifié, et `method_exists()` retournera true parce que les noms de méthodes en PHP sont insensibles à la casse.
             method_exists($this->controller, $method)
             // Mais nous n'autorisons pas `controller/somemethod`, donc vérifiez le nom exact de la méthode.
-			&& ! in_array($method, get_class_methods($this->controller), true)
-		) {
+            && ! in_array($method, get_class_methods($this->controller), true)
+        ) {
             throw new PageNotFoundException(
                 '"' . $this->controller . '::' . $method . '()" n\'a pas été trouvé.'
             );

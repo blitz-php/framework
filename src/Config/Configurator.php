@@ -50,7 +50,7 @@ final class Configurator
      */
     public function __construct(private array $configSchemas = [])
     {
-        $this->userConfig    = new Data();
+        $this->userConfig = new Data();
     }
 
     /**

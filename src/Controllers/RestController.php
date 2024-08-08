@@ -510,7 +510,7 @@ class RestController extends BaseController
 
         // Verifie que l'ip qui emet la requete est dans la whitelist
         if (! empty($this->config->ip_whitelist)) {
-            $whitelist = $this->config->ip_whitelist;
+            $whitelist   = $this->config->ip_whitelist;
             $whitelist[] = '127.0.0.1';
             $whitelist[] = '0.0.0.0';
 

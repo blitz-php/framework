@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Http;
 
-use GuzzleHttp\Psr7\Utils;
 use BadMethodCallException;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\FrameworkException;
@@ -23,6 +22,7 @@ use BlitzPHP\Utilities\Iterable\Arr;
 use Closure;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
 use GuzzleHttp\Psr7\Stream;
+use GuzzleHttp\Psr7\Utils;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
@@ -1716,7 +1716,7 @@ class ServerRequest implements ServerRequestInterface
         if (empty($host = $uri->getHost())) {
             return $new;
         }
-        if (!empty($port = $uri->getPort())) {
+        if (! empty($port = $uri->getPort())) {
             $host .= ':' . $port;
         }
         $new->_environment['HTTP_HOST'] = $host;
@@ -1794,12 +1794,13 @@ class ServerRequest implements ServerRequestInterface
         if (null === $this->negotiator) {
             $this->negotiator = Services::negotiator($this, true);
         }
+
         return match (strtolower($type)) {
-            'media' => $this->negotiator->media($supported, $strictMatch),
-            'charset' => $this->negotiator->charset($supported),
+            'media'    => $this->negotiator->media($supported, $strictMatch),
+            'charset'  => $this->negotiator->charset($supported),
             'encoding' => $this->negotiator->encoding($supported),
             'language' => $this->negotiator->language($supported),
-            default => throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.'),
+            default    => throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.'),
         };
     }
 
