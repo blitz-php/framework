@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use Symfony\Component\Finder\SplFileInfo;
 use BlitzPHP\Cache\Cache as CacheCache;
 use BlitzPHP\Config\Config as ConfigConfig;
 use BlitzPHP\Container\Container as ContainerContainer;
@@ -29,9 +29,9 @@ use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\View\View as ViewView;
 use DI\NotFoundException;
 
-describe('Facades', function () {
-	describe('Facade', function () {
-		it('Accessor retourne un objet', function () {
+describe('Facades', function (): void {
+	describe('Facade', function (): void {
+		it('Accessor retourne un objet', function (): void {
 			$class = new class() extends Facade {
 				protected static function accessor(): object
 				{
@@ -42,7 +42,7 @@ describe('Facades', function () {
 			expect(ReflectionHelper::getPrivateMethodInvoker($class, 'accessor')())->toBeAnInstanceOf(stdClass::class);
 		});
 
-		it('Accessor retourne un string', function () {
+		it('Accessor retourne un string', function (): void {
 			$class = new class() extends Facade {
 				protected static function accessor(): string
 				{
@@ -53,7 +53,7 @@ describe('Facades', function () {
 			expect(ReflectionHelper::getPrivateMethodInvoker($class, 'accessor')())->toBe('fs');
 		});
 
-		it('__call et __callStatic fonctionnent', function () {
+		it('__call et __callStatic fonctionnent', function (): void {
 			$class = new class() extends Facade {
 				protected static function accessor(): string
 				{
@@ -66,7 +66,7 @@ describe('Facades', function () {
 			expect($class::exists(__FILE__))->toBeTruthy();
 		});
 
-		it('__callStatic genere une erreur si accessor renvoie une chaine qui ne peut pas etre resourdre par le fournisseur de service', function () {
+		it('__callStatic genere une erreur si accessor renvoie une chaine qui ne peut pas etre resourdre par le fournisseur de service', function (): void {
 			$class = new class() extends Facade {
 				protected static function accessor(): string
 				{
@@ -78,7 +78,7 @@ describe('Facades', function () {
 			expect(fn() => $class::exists(__FILE__))->toThrow(new NotFoundException("No entry or class found for 'fss'"));
 		});
 
-		it('__callStatic genere une erreur si accessor renvoie une chaine qui peut etre resourdre par le fournisseur de service mais n\'est pas un objet', function () {
+		it('__callStatic genere une erreur si accessor renvoie une chaine qui peut etre resourdre par le fournisseur de service mais n\'est pas un objet', function (): void {
 			Container::set('fss', __FILE__);
 			$class = new class() extends Facade {
 				protected static function accessor(): string
@@ -91,7 +91,7 @@ describe('Facades', function () {
 			expect(fn() => $class::test())->toThrow(new InvalidArgumentException());
 		});
 
-		it('__callStatic fonctionne normalement si accessor renvoie une chaine qui peut etre resourdre par le fournisseur de service', function () {
+		it('__callStatic fonctionne normalement si accessor renvoie une chaine qui peut etre resourdre par le fournisseur de service', function (): void {
 			Container::set('fss', new class() {
 				public function test() {
 					return true;
@@ -109,7 +109,7 @@ describe('Facades', function () {
 			expect(fn() => $class::test())->not->toThrow(new InvalidArgumentException());
 		});
 
-		it('__callStatic genere une erreur normale si la methode n\'existe pas ou qu\'il y\'a une incompatibilite de parametre', function () {
+		it('__callStatic genere une erreur normale si la methode n\'existe pas ou qu\'il y\'a une incompatibilite de parametre', function (): void {
 			Container::set('fss', new class() {
 				public function test() {
 					return true;
@@ -134,14 +134,14 @@ describe('Facades', function () {
 		});
 	});
 
-    describe('Cache', function () {
-        it('Cache', function () {
+    describe('Cache', function (): void {
+        it('Cache', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Cache::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(CacheCache::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
 			expect(Cache::set('foo', 'bar'))->toBeTruthy();
 			expect(Cache::get('foo'))->toBe('bar');
 			expect(Cache::delete('foo'))->toBeTruthy();
@@ -149,14 +149,14 @@ describe('Facades', function () {
         });
     });
 
-	describe('Config', function () {
-        it('Container', function () {
+	describe('Config', function (): void {
+        it('Container', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Config::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(ConfigConfig::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
 			$lang = config('app.language');
 
 			expect(Config::has('app.language'))->toBeTruthy();
@@ -170,55 +170,55 @@ describe('Facades', function () {
 		});
     });
 
-	describe('Container', function () {
-        it('Container', function () {
+	describe('Container', function (): void {
+        it('Container', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Container::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(ContainerContainer::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
             expect(Container::has(ContainerContainer::class))->toBeTruthy();
         });
     });
 
-    describe('Fs', function () {
-        it('FS', function () {
+    describe('Fs', function (): void {
+        it('FS', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Fs::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(Filesystem::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
             expect(Fs::exists(__FILE__))->toBeTruthy();
         });
     });
 
-    describe('Log', function () {
-        it('Log', function () {
+    describe('Log', function (): void {
+        it('Log', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Log::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(Logger::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
 			skipIf(true); // skip execution because we don't have permission on github and scrutinizer
 			Log::debug('test file ' . __FILE__);
 
-			/** @var \Symfony\Component\Finder\SplFileInfo $file */
-			$file = last(Fs::files(storage_path('logs')));
+			/** @var SplFileInfo $file */
+   $file = last(Fs::files(storage_path('logs')));
 			expect($file->getContents())->toMatch(fn($actual) => str_contains($actual, 'test file ' . __FILE__));
         });
     });
 
-    describe('Route', function () {
-        it('Route', function () {
+    describe('Route', function (): void {
+        it('Route', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Route::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(RouteBuilder::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
             $routeBuilder = Route::setDefaultController('TestController');
 
             expect(ReflectionHelper::getPrivateProperty($routeBuilder, 'collection')->getDefaultController())
@@ -226,26 +226,26 @@ describe('Facades', function () {
         });
     });
 
-    describe('Storage', function () {
-        it('Storage', function () {
+    describe('Storage', function (): void {
+        it('Storage', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(Storage::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(FilesystemManager::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
             expect(Storage::exists(__FILE__))->toBeFalsy();
         });
     });
 
-    describe('View', function () {
-        it('View', function () {
+    describe('View', function (): void {
+        it('View', function (): void {
             $accessor = ReflectionHelper::getPrivateMethodInvoker(View::class, 'accessor');
 
             expect($accessor())->toBeAnInstanceOf(ViewView::class);
         });
 
-        it('Execution d\'une methode', function () {
+        it('Execution d\'une methode', function (): void {
             expect(View::exists(__FILE__))->toBeFalsy();
             expect(View::exists('simple'))->toBeTruthy();
         });

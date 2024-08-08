@@ -13,6 +13,7 @@ namespace BlitzPHP\Facades;
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Router\RouteBuilder;
+use Closure;
 
 /**
  * @method static void         configure(callable $callback(RouteBuilder $route))                         Configure les parametres de routing.
@@ -24,7 +25,7 @@ use BlitzPHP\Router\RouteBuilder;
  * @method static RouteBuilder controller(string $controller)                                             Defini le contrôleur a utiliser dans le routage
  * @method static void         delete(string $from, array|callable|string $to, array $options = [])       Enregistre une route qui ne sera disponible que pour les requêtes DELETE.
  * @method static RouteBuilder domain(string $domain)                                                     Defini une restriction de domaine pour la route
- * @method static void         environment(string $env, \Closure $callback)                               Limite les routes à un ENVIRONNEMENT spécifié ou ils ne fonctionneront pas.
+ * @method static void         environment(string $env, Closure $callback)                                Limite les routes à un ENVIRONNEMENT spécifié ou ils ne fonctionneront pas.
  * @method static RouteBuilder fallback($callable = null)                                                 Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
  * @method static void         form(string $from, array|callable|string $to, array $options = [])         Enregistre une route qui ne sera disponible que pour les requêtes GET et POST.
  * @method static void         get(string $from, array|callable|string $to, array $options = [])          Enregistre une route qui ne sera disponible que pour les requêtes GET.

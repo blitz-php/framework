@@ -63,7 +63,6 @@ class App
         $base = str_replace('/', '\\', rtrim($base, '\\'));
 
         if (static::_classExistsInBase($fullname, $base)) {
-            /** @var class-string */
             return $base . $fullname;
         }
 
@@ -71,7 +70,6 @@ class App
             return null;
         }
 
-        /** @var class-string */
         return 'BlitzPHP' . $fullname;
     }
 
@@ -124,11 +122,11 @@ class App
             return $class;
         }
 
-        $pluginName = (string) substr($class, 0, $pos);
-        $name       = (string) substr($class, $pos + strlen($type));
+        $pluginName = substr($class, 0, $pos);
+        $name       = substr($class, $pos + strlen($type));
 
-        if ($suffix) {
-            $name = (string) substr($name, 0, -strlen($suffix));
+        if ($suffix !== '' && $suffix !== '0') {
+            $name = substr($name, 0, -strlen($suffix));
         }
 
         $nonPluginNamespaces = [

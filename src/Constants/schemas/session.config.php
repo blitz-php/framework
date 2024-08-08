@@ -9,10 +9,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Session\Handlers\File;
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'handler'            => Expect::string()->default(BlitzPHP\Session\Handlers\File::class),
+    'handler'            => Expect::string()->default(File::class),
     'cookie_name'        => Expect::string()->default('blitz_session'),
     'expiration'         => Expect::int()->default(7200),
     'savePath'           => Expect::string()->default(FRAMEWORK_STORAGE_PATH . 'session'),

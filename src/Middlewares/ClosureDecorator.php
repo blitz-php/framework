@@ -62,7 +62,7 @@ class ClosureDecorator implements MiddlewareInterface
         $parameters = collect($reflector->getParameters())->map(static fn (ReflectionParameter $p) => $p->getName())->all();
 
         if (Arr::contains($parameters, ['request', 'response', 'next'])) {
-            return ($this->callable)($request, $this->response, [$handler, 'handle']);
+            return ($this->callable)($request, $this->response, $handler->handle(...));
         }
         if (Arr::contains($parameters, ['request', 'handler'])) {
             return ($this->callable)($request, $handler);

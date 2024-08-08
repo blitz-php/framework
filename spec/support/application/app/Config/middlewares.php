@@ -1,5 +1,6 @@
 <?php
 
+use BlitzPHP\Http\MiddlewareQueue;
 /**
  * This file is part of Blitz PHP framework.
  *
@@ -8,9 +9,8 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
 return [
     'aliases' => [],
     'globals' => [],
-    'build'   => static fn (\BlitzPHP\Http\MiddlewareQueue $queue) => null,
+    'build'   => static fn (MiddlewareQueue $queue) => null,
 ];

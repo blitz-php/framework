@@ -21,7 +21,7 @@ use BlitzPHP\Router\Router;
  */
 final class MiddlewareFinder
 {
-    private Router $router;
+    private readonly Router $router;
 
     public function __construct(?Router $router = null)
     {
@@ -39,9 +39,9 @@ final class MiddlewareFinder
             $this->router->handle($uri);
 
             return $this->router->getMiddlewares();
-        } catch (RedirectException $e) {
+        } catch (RedirectException) {
             return [];
-        } catch (PageNotFoundException $e) {
+        } catch (PageNotFoundException) {
             return ['<unknown>'];
         }
     }

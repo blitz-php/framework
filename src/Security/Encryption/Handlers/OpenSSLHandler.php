@@ -69,7 +69,7 @@ class OpenSSLHandler extends BaseHandler
             $this->key = is_array($params) && isset($params['key']) ? $params['key'] : $params;
         }
 
-        if (empty($this->key)) {
+        if ($this->key === '' || $this->key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 
@@ -105,7 +105,7 @@ class OpenSSLHandler extends BaseHandler
             $this->key = is_array($params) && isset($params['key']) ? $params['key'] : $params;
         }
 
-        if (empty($this->key)) {
+        if ($this->key === '' || $this->key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 

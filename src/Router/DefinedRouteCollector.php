@@ -18,16 +18,13 @@ use Closure;
  */
 final class DefinedRouteCollector
 {
-    private RouteCollection $routeCollection;
-
     /**
      * Routes deja collectees (pour eviter de faire la meme chose plusieurs fois)
      */
     private array $cachedRoutes = [];
 
-    public function __construct(RouteCollection $routes)
+    public function __construct(private readonly RouteCollection $routeCollection)
     {
-        $this->routeCollection = $routes;
     }
 
     /**
@@ -47,6 +44,9 @@ final class DefinedRouteCollector
             $routes = $this->routeCollection->getRoutes($method);
 
             foreach ($routes as $route => $handler) {
+                // La clé de la route devrait être une chaîne de caractères, mais elle est stockée sous la forme d'une clé de tableau, qui peut être un entier.
+                $route = (string) $route;
+
                 if (is_string($handler) || $handler instanceof Closure) {
                     if ($handler instanceof Closure) {
                         $view = $this->routeCollection->getRoutesOptions($route, $method)['view'] ?? false;

@@ -13,13 +13,13 @@ use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\View\Adapters\NativeAdapter;
 
-describe('Views / NativeAdapter', function () {
-    beforeAll(function () {
+describe('Views / NativeAdapter', function (): void {
+    beforeAll(function (): void {
 		$this->config = config('view.adapters.native');
     });
 
-    describe('Extends', function () {
-        it('Extend fonctionne normalement', function () {
+    describe('Extends', function (): void {
+        it('Extend fonctionne normalement', function (): void {
             $view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -28,7 +28,7 @@ describe('Views / NativeAdapter', function () {
             expect($view->render('extend'))->toMatch(fn($actual) => str_contains($actual, $expected));
         });
 
-        it("Le layout n'est pas rendu plusieurs fois même si on l'appelle à plusieurs reprise", function () {
+        it("Le layout n'est pas rendu plusieurs fois même si on l'appelle à plusieurs reprise", function (): void {
             $view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -39,7 +39,7 @@ describe('Views / NativeAdapter', function () {
         	expect($view->render('extend'))->toMatch(fn($actual) => str_contains($actual, $expected));
         });
 
-        it("Les variables sont disponibles partout", function () {
+        it("Les variables sont disponibles partout", function (): void {
             $view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -48,7 +48,7 @@ describe('Views / NativeAdapter', function () {
         	expect($view->render('extend'))->toMatch(fn($actual) => str_contains($actual, $expected));
         });
 
-        it("Deux sections peuvent avoir le meme nom", function () {
+        it("Deux sections peuvent avoir le meme nom", function (): void {
             $view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -57,7 +57,7 @@ describe('Views / NativeAdapter', function () {
         	expect($view->render('extend_two'))->toMatch(fn($actual) => str_contains($actual, $expected));
         });
 
-        it("Une erreur syntaxique dans la closure d'une section leve une exception", function () {
+        it("Une erreur syntaxique dans la closure d'une section leve une exception", function (): void {
             $view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -65,7 +65,7 @@ describe('Views / NativeAdapter', function () {
 			expect(fn() => $view->render('broken'))->toThrow(new RuntimeException());
         });
 
-        it("L'abscence d'un renderSection n'affichera pas le contenu de la vue", function () {
+        it("L'abscence d'un renderSection n'affichera pas le contenu de la vue", function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('testString', 'Hello World');
@@ -74,7 +74,7 @@ describe('Views / NativeAdapter', function () {
             expect($view->render('apples'))->toMatch(fn($actual) => str_contains($actual, $expected));
         });
 
-        it("Le rendu de section conserve les donnees", function () {
+        it("Le rendu de section conserve les donnees", function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('pageTitle', 'Bienvenue sur BlitzPHP!');
@@ -85,8 +85,8 @@ describe('Views / NativeAdapter', function () {
         });
     });
 
-    describe('Inclusion', function () {
-        it('include fonctionne normalement', function () {
+    describe('Inclusion', function (): void {
+        it('include fonctionne normalement', function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('testString', 'Hello World');
@@ -98,7 +98,7 @@ describe('Views / NativeAdapter', function () {
 			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
         });
 
-		it('includeWhen', function () {
+		it('includeWhen', function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('testString', 'Hello World');
@@ -111,7 +111,7 @@ describe('Views / NativeAdapter', function () {
 			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>{teststring}</h1>'));
         });
 
-		it('includeUnless', function () {
+		it('includeUnless', function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('testString', 'Hello World');
@@ -123,7 +123,7 @@ describe('Views / NativeAdapter', function () {
 			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
         });
 
-		it('includeIf', function () {
+		it('includeIf', function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('testString', 'Hello World');
@@ -135,7 +135,7 @@ describe('Views / NativeAdapter', function () {
 			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
         });
 
-		it('includeFirst', function () {
+		it('includeFirst', function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('testString', 'Hello World');
@@ -148,7 +148,7 @@ describe('Views / NativeAdapter', function () {
 			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>{teststring}</h1>'));
         });
 
-		it('includeFirst leve  une exception si on ne trouve aucune vue', function () {
+		it('includeFirst leve  une exception si on ne trouve aucune vue', function (): void {
             $view = new NativeAdapter($this->config);
 
         	$view->setVar('testString', 'Hello World');
@@ -157,8 +157,8 @@ describe('Views / NativeAdapter', function () {
         });
     });
 
-	describe('Donnees', function() {
-		it('render ne modifie pas la propriete saveData', function () {
+	describe('Donnees', function(): void {
+		it('render ne modifie pas la propriete saveData', function (): void {
             $view = new NativeAdapter($this->config);
 
 			ReflectionHelper::setPrivateProperty($view, 'saveData', true);
@@ -168,7 +168,7 @@ describe('Views / NativeAdapter', function () {
 			expect(ReflectionHelper::getPrivateProperty($view, 'saveData'))->toBeTruthy();
         });
 
-		it("Render ne sauvegarde les donnees que lorsque c'est necessaire", function() {
+		it("Render ne sauvegarde les donnees que lorsque c'est necessaire", function(): void {
 			$view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'test');
@@ -179,8 +179,8 @@ describe('Views / NativeAdapter', function () {
         });
 	});
 
-	describe('Vues imbriquees', function () {
-		it('Sections imbriquees', function () {
+	describe('Vues imbriquees', function (): void {
+		it('Sections imbriquees', function (): void {
 			$view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -191,7 +191,7 @@ describe('Views / NativeAdapter', function () {
 			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Third</p>'));
         });
 
-		it('La mise en cache fonctionne', function() {
+		it('La mise en cache fonctionne', function(): void {
 			$view = new NativeAdapter($this->config);
 
 			$view->setVar('testString', 'Hello World');
@@ -203,8 +203,8 @@ describe('Views / NativeAdapter', function () {
 		});
 	});
 
-	describe('assets bundle', function () {
-		it('addCss, addJs', function () {
+	describe('assets bundle', function (): void {
+		it('addCss, addJs', function (): void {
 			$view = new NativeAdapter($this->config);
 
 			$view->addCss('style.css');
@@ -225,7 +225,7 @@ describe('Views / NativeAdapter', function () {
 			expect($lib_scripts)->toBe([]);
 		});
 
-		it('addLibCss, addLibJs', function () {
+		it('addLibCss, addLibJs', function (): void {
 			$view = new NativeAdapter($this->config);
 
 			$view->addLibCss('bootstrap.css');
@@ -246,7 +246,7 @@ describe('Views / NativeAdapter', function () {
 			expect($lib_scripts)->toBe(['bootstrap.js', 'jquery', 'select2.min']);
 		});
 
-		it('Style bundle', function () {
+		it('Style bundle', function (): void {
 			$view = new NativeAdapter($this->config);
 
 			$view->addLibCss('bootstrap.css');
@@ -269,7 +269,7 @@ describe('Views / NativeAdapter', function () {
 			}
 		});
 
-		it('script bundle', function () {
+		it('script bundle', function (): void {
 			$view = new NativeAdapter($this->config);
 
 			$view->addJs('style.js')->addJs('color', 'content.min');
@@ -293,19 +293,19 @@ describe('Views / NativeAdapter', function () {
 		});
 	});
 
-	describe('Methodes speciales', function () {
-		beforeAll(function () {
+	describe('Methodes speciales', function (): void {
+		beforeAll(function (): void {
 			$this->view = new NativeAdapter($this->config);
 		});
 
-		it('title', function() {
+		it('title', function(): void {
 			expect($this->view->getData())->not->toContainKey('title');
 			expect($this->view->title('My Title'))->toBeAnInstanceOf(NativeAdapter::class);
 			expect($this->view->getData())->toContainKey('title');
 			expect($this->view->getData()['title'])->toBe('My Title');
 		});
 
-		it('meta', function() {
+		it('meta', function(): void {
 			expect($this->view->meta('description'))->toBeEmpty();
 			expect($this->view->meta('description', 'BlitzPHP'))->toBeAnInstanceOf(NativeAdapter::class);
 			expect($this->view->meta('charset', 'utf-8'))->toBeAnInstanceOf(NativeAdapter::class);
@@ -313,18 +313,18 @@ describe('Views / NativeAdapter', function () {
 			expect($this->view->meta('charset'))->toBe('utf-8');
 		});
 
-		it('except', function () {
+		it('except', function (): void {
 			expect($this->view->excerpt('methodes speciales'))->toBe('methodes speciales');
 			expect($this->view->excerpt('methodes speciales', 8))->toBe('metho...');
 		});
 	});
 
-	describe('Directives', function () {
-		beforeAll(function () {
+	describe('Directives', function (): void {
+		beforeAll(function (): void {
 			$this->view = new NativeAdapter($this->config);
 		});
 
-		it('class', function () {
+		it('class', function (): void {
 			expect($this->view->class([]))->toBe('');
 
 			$isActive = false;
@@ -338,7 +338,7 @@ describe('Views / NativeAdapter', function () {
 			]))->toBe('class="p-4 text-gray-500 bg-red"');
 		});
 
-		it('style', function () {
+		it('style', function (): void {
 			expect($this->view->style([]))->toBe('');
 
 			$isActive = true;
@@ -349,7 +349,7 @@ describe('Views / NativeAdapter', function () {
 			]))->toBe('style="background-color: red; font-weight: bold;"');
 		});
 
-		it('checked', function () {
+		it('checked', function (): void {
 			expect($this->view->checked('a'))->toBe('');
 			expect($this->view->checked('true'))->toBe('checked="checked"');
 			expect($this->view->checked('1'))->toBe('checked="checked"');
@@ -361,7 +361,7 @@ describe('Views / NativeAdapter', function () {
 			expect($this->view->checked(false))->toBe('');
 		});
 
-		it('selected', function () {
+		it('selected', function (): void {
 			expect($this->view->selected('a'))->toBe('');
 			expect($this->view->selected('true'))->toBe('selected="selected"');
 			expect($this->view->selected('1'))->toBe('selected="selected"');
@@ -373,7 +373,7 @@ describe('Views / NativeAdapter', function () {
 			expect($this->view->selected(false))->toBe('');
 		});
 
-		it('disabled', function () {
+		it('disabled', function (): void {
 			expect($this->view->disabled('a'))->toBe('');
 			expect($this->view->disabled('true'))->toBe('disabled');
 			expect($this->view->disabled('1'))->toBe('disabled');
@@ -385,7 +385,7 @@ describe('Views / NativeAdapter', function () {
 			expect($this->view->disabled(false))->toBe('');
 		});
 
-		it('required', function () {
+		it('required', function (): void {
 			expect($this->view->required('a'))->toBe('');
 			expect($this->view->required('true'))->toBe('required');
 			expect($this->view->required('1'))->toBe('required');
@@ -397,7 +397,7 @@ describe('Views / NativeAdapter', function () {
 			expect($this->view->required(false))->toBe('');
 		});
 
-		it('readonly', function () {
+		it('readonly', function (): void {
 			expect($this->view->readonly('a'))->toBe('');
 			expect($this->view->readonly('true'))->toBe('readonly');
 			expect($this->view->readonly('1'))->toBe('readonly');
@@ -409,7 +409,7 @@ describe('Views / NativeAdapter', function () {
 			expect($this->view->readonly(false))->toBe('');
 		});
 
-		it('method', function () {
+		it('method', function (): void {
 			expect($this->view->method('post'))->toBe('<input type="hidden" name="_method" value="POST">');
 			expect(fn() => $this->view->method('test'))->toThrow(new InvalidArgumentException());
 		});

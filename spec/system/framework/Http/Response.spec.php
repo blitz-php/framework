@@ -17,9 +17,9 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Spec\ReflectionHelper;
 
-describe('Http / Response', function () {
-	describe('Constructeur', function () {
-		it('Le constructeur fonctionne', function () {
+describe('Http / Response', function (): void {
+	describe('Constructeur', function (): void {
+		it('Le constructeur fonctionne', function (): void {
 			$response = new Response();
 			expect((string) $response->getBody())->toBe('');
 			expect($response->getCharset())->toBe('UTF-8');
@@ -42,8 +42,8 @@ describe('Http / Response', function () {
 		});
 	});
 
-	describe('Types', function() {
-		it('GetType', function() {
+	describe('Types', function(): void {
+		it('GetType', function(): void {
 			$response = new Response();
 
 			expect($response->getType())->toBe('text/html');
@@ -52,7 +52,7 @@ describe('Http / Response', function () {
 			expect($response->withType('json')->getType())->toBe('application/json');
 		});
 
-		it('SetTypeMap', function() {
+		it('SetTypeMap', function(): void {
 			$response = new Response();
 			$response->setTypeMap('ical', 'text/calendar');
 			expect($response->withType('ical')->getType())->toBe('text/calendar');
@@ -62,7 +62,7 @@ describe('Http / Response', function () {
 			expect($response->withType('ical')->getType())->toBe('text/calendar');
 		});
 
-		it('WithTypeAlias', function() {
+		it('WithTypeAlias', function(): void {
 			$response = new Response();
 
 			// Le type de contenu par défaut doit correspondre
@@ -82,7 +82,7 @@ describe('Http / Response', function () {
         	expect($json->getType())->toBe('application/json');
 		});
 
-		it('WithTypeFull', function() {
+		it('WithTypeFull', function(): void {
 			$response = new Response();
 
 			// Ne doit pas ajouter de jeu de caractères à un type explicite
@@ -98,14 +98,14 @@ describe('Http / Response', function () {
 				->toBe('text/html; charset=UTF-8');
 		});
 
-		it('Un type invalide leve une exception', function() {
+		it('Un type invalide leve une exception', function(): void {
 			$response = new Response();
 
 			expect(fn() => $response->withType('beans'))
 				->toThrow(new InvalidArgumentException('`beans` est un content type invalide.'));
 		});
 
-		it('MapType', function() {
+		it('MapType', function(): void {
 			$response = new Response();
 
 			expect($response->mapType('audio/x-wav'))->toBe('wav');
@@ -120,67 +120,67 @@ describe('Http / Response', function () {
 		});
 	});
 
-    describe('Status code', function () {
-        it('Modification du statut code', function () {
+    describe('Status code', function (): void {
+        it('Modification du statut code', function (): void {
             $response = new Response();
             $response = $response->withStatus(200);
 
             expect($response->getStatusCode())->toBe(200);
         });
 
-        it('Status code leve une erreur lorsque le code est invalide', function () {
+        it('Status code leve une erreur lorsque le code est invalide', function (): void {
             $response = new Response();
 
             expect(static fn () => $response->withStatus(54322))->toThrow(new HttpException());
         });
 
-        it('Status code modifie la raison', function () {
+        it('Status code modifie la raison', function (): void {
             $response = new Response();
             $response = $response->withStatus(200);
 
             expect($response->getReasonPhrase())->toBe('OK');
         });
 
-        it('Status code modifie une raison personnalisee', function () {
+        it('Status code modifie une raison personnalisee', function (): void {
             $response = new Response();
             $response = $response->withStatus(200, 'Not the right person');
 
             expect($response->getReasonPhrase())->toBe('Not the right person');
         });
 
-        it('Erreur lorsque le statut code est inconnue', function () {
+        it('Erreur lorsque le statut code est inconnue', function (): void {
             $response = new Response();
 
             expect(static fn () => $response->withStatus(115))->toThrow(new HttpException(lang('HTTP.unknownStatusCode', [115])));
         });
 
-        it('Erreur lorsque le statut code est petit', function () {
+        it('Erreur lorsque le statut code est petit', function (): void {
             $response = new Response();
 
             expect(static fn () => $response->withStatus(95))->toThrow(new HttpException(lang('HTTP.invalidStatusCode', [95])));
         });
 
-        it('Erreur lorsque le statut code est grand', function () {
+        it('Erreur lorsque le statut code est grand', function (): void {
             $response = new Response();
 
             expect(static fn () => $response->withStatus(695))->toThrow(new HttpException(lang('HTTP.invalidStatusCode', [695])));
         });
 
-        it('Raison avec le statut different de 200', function () {
+        it('Raison avec le statut different de 200', function (): void {
             $response = new Response();
             $response = $response->withStatus(300, 'Multiple Choices');
 
             expect($response->getReasonPhrase())->toBe('Multiple Choices');
         });
 
-        it('Raison personnalisee avec un statut different de 200', function () {
+        it('Raison personnalisee avec un statut different de 200', function (): void {
             $response = new Response();
             $response = $response->withStatus(300, 'My Little Pony');
 
             expect($response->getReasonPhrase())->toBe('My Little Pony');
         });
 
-		it('WithStatus efface le content type', function () {
+		it('WithStatus efface le content type', function (): void {
 			$response = new Response();
         	$new = $response->withType('pdf')->withStatus(204);
 
@@ -201,7 +201,7 @@ describe('Http / Response', function () {
         	expect($new->getType())->toBe('');
 		});
 
-		it("WithStatus n'efface pas le content type lorsqu'il passe par withHeader", function () {
+		it("WithStatus n'efface pas le content type lorsqu'il passe par withHeader", function (): void {
 			$response = new Response();
         	$new = $response->withHeader('Content-Type', 'application/json')->withStatus(403);
 
@@ -217,8 +217,8 @@ describe('Http / Response', function () {
 		});
     });
 
-    describe('Redirection', function () {
-        it('Redirection simple', function () {
+    describe('Redirection', function (): void {
+        it('Redirection simple', function (): void {
             $response = new Response();
 
             $response = $response->redirect('example.com');
@@ -228,7 +228,7 @@ describe('Http / Response', function () {
             expect($response->getStatusCode())->toBe(302);
         });
 
-        it('Redirection temporaire', function () {
+        it('Redirection temporaire', function (): void {
             $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
             $_SERVER['REQUEST_METHOD']  = 'POST';
             $response                   = new Response();
@@ -240,7 +240,7 @@ describe('Http / Response', function () {
             expect($response->getStatusCode())->toBe(303);
         });
 
-        xit('Redirection temporaire avec la methode GET', function () {
+        xit('Redirection temporaire avec la methode GET', function (): void {
             $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
             $_SERVER['REQUEST_METHOD']  = 'GET';
             $response                   = new Response();
@@ -253,14 +253,14 @@ describe('Http / Response', function () {
         });
     });
 
-    describe('Cookie', function () {
-        it('hasCookie', function () {
+    describe('Cookie', function (): void {
+        it('hasCookie', function (): void {
             $response = new Response();
 
             expect($response->hasCookie('foo'))->toBeFalsy();
         });
 
-        it('setCookie', function () {
+        it('setCookie', function (): void {
             $response = new Response();
             $response = $response->withCookie(new Cookie('foo', 'bar'));
 
@@ -268,7 +268,7 @@ describe('Http / Response', function () {
             expect($response->hasCookie('foo', 'bar'))->toBeTruthy();
         });
 
-        it('Redirection avec cookie', function () {
+        it('Redirection avec cookie', function (): void {
             $loginTime = (string) time();
 
             $response = new Response();
@@ -281,8 +281,8 @@ describe('Http / Response', function () {
         });
     });
 
-    describe('JSON et XML', function () {
-        it('JSON avec un tableau', function () {
+    describe('JSON et XML', function (): void {
+        it('JSON avec un tableau', function (): void {
             $body = [
                 'foo' => 'bar',
                 'bar' => [
@@ -300,7 +300,7 @@ describe('Http / Response', function () {
             expect($response->getHeaderLine('content-type'))->toMatch(static fn ($content) => str_contains($content, 'application/json'));
         });
 
-        it('XML avec un tableau', function () {
+        it('XML avec un tableau', function (): void {
             $body = [
                 'foo' => 'bar',
                 'bar' => [
@@ -319,8 +319,8 @@ describe('Http / Response', function () {
         });
     });
 
-    describe('Telechargement', function () {
-        it('StreamDownload', function () {
+    describe('Telechargement', function (): void {
+        it('StreamDownload', function (): void {
             $response = new Response();
             $actual   = $response->streamDownload('data', 'unit-test.txt');
 
@@ -332,7 +332,7 @@ describe('Http / Response', function () {
             expect(static fn () => $emitter($actual, 8192))->toEcho('data');
         });
 
-        it('Download', function () {
+        it('Download', function (): void {
 			$response = new Response();
 			$new = $response->withDownload('myfile.mp3');
 			expect($response->hasHeader('Content-Disposition'))->toBeFalsy(); // Pas de mutation
@@ -352,15 +352,15 @@ describe('Http / Response', function () {
             expect(static fn () => $emitter($actual, 8192))->toEcho(file_get_contents(__FILE__));
         });
 
-        it('Download avec un fichier innexistant', function () {
+        it('Download avec un fichier innexistant', function (): void {
             $response = new Response();
 
             expect(static fn () => $response->download('__FILE__'))->toThrow(new LoadException());
         });
     });
 
-    describe('With', function () {
-        it('withDate', function () {
+    describe('With', function (): void {
+        it('withDate', function (): void {
             $datetime = DateTime::createFromFormat('!Y-m-d', '2000-03-10');
 
             $response = new Response();
@@ -373,7 +373,7 @@ describe('Http / Response', function () {
                 ->toBe($date->format('D, d M Y H:i:s') . ' GMT');
         });
 
-        it('withLink', function () {
+        it('withLink', function (): void {
             $response = new Response();
 
 			expect($response->hasHeader('Link'))->toBeFalsy();
@@ -388,14 +388,14 @@ describe('Http / Response', function () {
             ]);
         });
 
-        it('withContentType', function () {
+        it('withContentType', function (): void {
             $response = new Response();
             $response = $response->withType('text/json');
 
             expect($response->getHeaderLine('Content-Type'))->toBe('text/json; charset=UTF-8');
         });
 
-        it('withCache', function () {
+        it('withCache', function (): void {
             $date   = date('r');
             $result = (new DateTime($date))->setTimezone(new DateTimeZone('UTC'))->format(DATE_RFC7231);
 
@@ -419,7 +419,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Cache-Control'))->toBe('public, max-age=0');
         });
 
-        it('withDisabledCache', function () {
+        it('withDisabledCache', function (): void {
             $response = new Response();
 			$expected = [
 				'Content-Type'  => ['text/html; charset=UTF-8'],
@@ -434,7 +434,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaders())->toBe($expected);
         });
 
-        it('withCharset', function () {
+        it('withCharset', function (): void {
             $response = new Response();
             expect($response->getHeaderLine('Content-Type'))->toBe('text/html; charset=UTF-8');
 
@@ -445,7 +445,7 @@ describe('Http / Response', function () {
             expect($new->getHeaderLine('Content-Type'))->toBe('text/html; charset=iso-8859-1');
         });
 
-        it('withLength', function () {
+        it('withLength', function (): void {
             $response = new Response();
             expect($response->hasHeader('Content-Length'))->toBeFalsy();
 
@@ -455,7 +455,7 @@ describe('Http / Response', function () {
             expect($new->getHeaderLine('Content-Length'))->toBe('100');
         });
 
-        it('withExpires', function () {
+        it('withExpires', function (): void {
             $response = new Response();
 			$now = new DateTime('now', new DateTimeZone('Africa/Douala'));
 
@@ -474,7 +474,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Expires'))->toBe($time->format(DATE_RFC7231));
         });
 
-        it('withModified', function () {
+        it('withModified', function (): void {
             $response = new Response();
 			$now = new DateTime('now', new DateTimeZone('Africa/Douala'));
 
@@ -497,7 +497,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Last-Modified'))->toBe($time->format(DATE_RFC7231));
         });
 
-		it('withSharable', function () {
+		it('withSharable', function (): void {
 			$response = new Response();
 			$new = $response->withSharable(true);
 
@@ -514,7 +514,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Cache-Control'))->toBe('private, max-age=3600');
 		});
 
-		it('withMaxAge', function () {
+		it('withMaxAge', function (): void {
 			$response = new Response();
 
 			expect($response->hasHeader('Cache-Control'))->toBeFalsy();
@@ -526,7 +526,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Cache-Control'))->toBe('max-age=3600, private');
 		});
 
-		it('withSharedMaxAge', function () {
+		it('withSharedMaxAge', function (): void {
 			$response = new Response();
 			$new = $response->withSharedMaxAge(3600);
 
@@ -537,7 +537,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Cache-Control'))->toBe('s-maxage=3600, public');
 		});
 
-		it('withMustRevalidate', function () {
+		it('withMustRevalidate', function (): void {
 			$response = new Response();
 
 			expect($response->hasHeader('Cache-Control'))->toBeFalsy();
@@ -550,7 +550,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Cache-Control'))->toBeEmpty();
 		});
 
-		it('withVary', function () {
+		it('withVary', function (): void {
 			$response = new Response();
 			$new = $response->withVary('Accept-encoding');
 
@@ -562,7 +562,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Vary'))->toBe('Accept-encoding, Accept-language');
 		});
 
-		it('withEtag', function () {
+		it('withEtag', function (): void {
 			$response = new Response();
 			$new = $response->withEtag('something');
 
@@ -573,7 +573,7 @@ describe('Http / Response', function () {
 			expect($new->getHeaderLine('Etag'))->toBe('W/"something"');
 		});
 
-		it('withNotModified', function () {
+		it('withNotModified', function (): void {
 			$response = new Response(['body' => 'something']);
 			$response = $response->withLength(100)
 				->withStatus(200)
@@ -598,8 +598,8 @@ describe('Http / Response', function () {
 		});
     });
 
-	describe('Autres', function () {
-		it('Compression', function () {
+	describe('Autres', function (): void {
+		it('Compression', function (): void {
 			$response = new Response();
 
 			if (ini_get('zlib.output_compression') === '1' || !extension_loaded('zlib')) {
@@ -619,7 +619,7 @@ describe('Http / Response', function () {
 	        ob_get_clean();
 		});
 
-		it('Sortie compressee', function () {
+		it('Sortie compressee', function (): void {
 			$response = new Response();
 
 			$_SERVER['HTTP_ACCEPT_ENCODING'] = 'gzip';

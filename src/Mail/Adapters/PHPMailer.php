@@ -32,7 +32,7 @@ class PHPMailer extends AbstractAdapter
     public function __construct(bool $debug = false)
     {
         $this->mailer              = new Mailer();
-        $this->mailer->Debugoutput = static function ($str, $level) {
+        $this->mailer->Debugoutput = static function ($str, $level): void {
             Services::logger()->info('[Mail][' . $level . ']: ' . $str);
         };
 
@@ -106,23 +106,12 @@ class PHPMailer extends AbstractAdapter
      */
     public function setProtocol(string $protocol): static
     {
-        switch (strtolower($protocol)) {
-            case static::PROTOCOL_MAIL:
-                $this->mailer->isMail();
-                break;
-
-            case static::PROTOCOL_QMAIL:
-                $this->mailer->isQmail();
-                break;
-
-            case static::PROTOCOL_SENDMAIL:
-                $this->mailer->isSendmail();
-                break;
-
-            default:
-                $this->mailer->isSMTP();
-                break;
-        }
+        match (strtolower($protocol)) {
+            static::PROTOCOL_MAIL     => $this->mailer->isMail(),
+            static::PROTOCOL_QMAIL    => $this->mailer->isQmail(),
+            static::PROTOCOL_SENDMAIL => $this->mailer->isSendmail(),
+            default                   => $this->mailer->isSMTP(),
+        };
 
         return $this;
     }

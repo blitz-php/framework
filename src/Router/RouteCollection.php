@@ -251,9 +251,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Normaliser la chaîne de chemin dans routesFile
-        if (false !== $realpath = realpath($routesFile)) {
-            $routesFile = $realpath;
-        }
+        $routesFile = realpath($routesFile) ?: $routesFile;
 
         // Incluez le fichier routesFile s'il n'existe pas.
         // Ne conserver que pour les fins BC pour l'instant.
@@ -562,7 +560,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function getRoutes(?string $verb = null, bool $includeWildcard = true): array
     {
-        if (empty($verb)) {
+        if ($verb === null || $verb === '') {
             $verb = $this->getHTTPVerb();
         }
 
@@ -714,11 +712,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function getRedirectCode(string $routeKey): int
     {
-        if (isset($this->routes['*'][$routeKey]['redirect'])) {
-            return $this->routes['*'][$routeKey]['redirect'];
-        }
-
-        return 0;
+        return $this->routes['*'][$routeKey]['redirect'] ?? 0;
     }
 
     /**
@@ -1033,7 +1027,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function match(array $verbs = [], string $from = '', $to = '', ?array $options = null): self
     {
-        if (empty($from) || empty($to)) {
+        if ($from === '' || empty($to)) {
             throw new InvalidArgumentException('Vous devez fournir les paramètres : $from, $to.');
         }
 
@@ -1159,9 +1153,9 @@ class RouteCollection implements RouteCollectionInterface
     public function view(string $from, string $view, array $options = []): self
     {
         $to = static fn (...$data) => Services::viewer()
-            ->setData(['segments' => $data] + $options, 'raw')
+            ->setData(['segments' => $data], 'raw')
             ->display($view)
-            ->setOptions($options)
+            ->options($options)
             ->render();
 
         $routeOptions = array_merge($options, ['view' => $view]);
@@ -1216,8 +1210,8 @@ class RouteCollection implements RouteCollectionInterface
         // Ajoutez l'espace de noms par défaut si nécessaire.
         $namespace = trim($this->defaultNamespace, '\\') . '\\';
         if (
-            substr($search, 0, 1) !== '\\'
-            && substr($search, 0, strlen($namespace)) !== $namespace
+            ! str_starts_with($search, '\\')
+            && ! str_starts_with($search, $namespace)
         ) {
             $search = $namespace . $search;
         }
@@ -1405,10 +1399,19 @@ class RouteCollection implements RouteCollectionInterface
         $options = array_merge($this->currentOptions ?? [], $options ?? []);
 
         if (isset($options['middleware'])) {
+            $options['middleware'] = (array) $options['middleware'];
+
             if (! isset($options['middlewares'])) {
-                $options['middlewares'] = (array) $options['middleware'];
+                $options['middlewares'] = $options['middleware'];
+            } else {
+                $options['middlewares'] = array_merge($options['middlewares'], $options['middleware']);
             }
+
             unset($options['middleware']);
+        }
+
+        if (isset($options['middlewares'])) {
+            $options['middlewares'] = array_unique($options['middlewares']);
         }
 
         if (is_string($to) && isset($options['controller'])) {
@@ -1677,10 +1680,8 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Vérifier les paramètres régionaux non valides
-        if ($locale !== null) {
-            if (! in_array($locale, config('app.supported_locales'), true)) {
-                $locale = null;
-            }
+        if ($locale !== null && ! in_array($locale, config('app.supported_locales'), true)) {
+            $locale = null;
         }
 
         if ($locale === null) {

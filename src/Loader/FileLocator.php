@@ -14,7 +14,6 @@ namespace BlitzPHP\Loader;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
-use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
@@ -156,11 +155,7 @@ class FileLocator
             }
         }
 
-        if (! empty($file)) {
-            $schema = require $file;
-        } else {
-            $schema = null;
-        }
+        $schema = ! empty($file) ? require $file : null;
 
         if (empty($schema) || ! ($schema instanceof Schema)) {
             $schema = Expect::mixed();

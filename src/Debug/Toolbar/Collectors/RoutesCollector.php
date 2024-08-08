@@ -40,8 +40,8 @@ class RoutesCollector extends BaseCollector
      */
     protected string $title = 'Routes';
 
-    private DefinedRouteCollector $definedRouteCollector;
-    private Router $router;
+    private readonly DefinedRouteCollector $definedRouteCollector;
+    private readonly Router $router;
     private bool $isAutoRoute = false;
 
     public function __construct()
@@ -66,7 +66,7 @@ class RoutesCollector extends BaseCollector
         } else {
             try {
                 $method = new ReflectionMethod($this->router->controllerName(), $this->router->methodName());
-            } catch (ReflectionException $e) {
+            } catch (ReflectionException) {
                 // Si nous sommes ici, la méthode n'existe pas
                 // et est probablement calculé dans _remap.
                 $method = new ReflectionMethod($this->router->controllerName(), '_remap');

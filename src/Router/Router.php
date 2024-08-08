@@ -16,6 +16,7 @@ use BlitzPHP\Contracts\Router\AutoRouterInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Router\RouterInterface;
 use BlitzPHP\Enums\Method;
+use BlitzPHP\Exceptions\BadRequestException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Exceptions\RouterException;
@@ -33,7 +34,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class Router implements RouterInterface
 {
     /**
-     * List of allowed HTTP methods (and CLI for command line use).
+     * Liste des méthodes HTTP autorisées (et CLI pour l'utilisation de la ligne de commande).
      */
     public const HTTP_METHODS = [
         Method::GET,
@@ -118,12 +119,20 @@ class Router implements RouterInterface
     protected ?AutoRouterInterface $autoRouter = null;
 
     /**
+     * Caractères URI autorisés
+     *
+     * La valeur par défaut est `''` (ne pas vérifier) pour des raisons de compatibilité ascendante.
+     */
+    protected string $permittedURIChars = '';
+
+    /**
      * @param RouteCollection $routes
      * @param Request         $request
      */
     public function __construct(RouteCollectionInterface $routes, ServerRequestInterface $request)
     {
-        $this->collection = $routes;
+        $this->permittedURIChars = config('app.permitted_uri_chars', '');
+        $this->collection        = $routes;
 
         $this->setController($this->collection->getDefaultController());
         $this->setMethod($this->collection->getDefaultMethod());
@@ -157,7 +166,11 @@ class Router implements RouterInterface
             $uri = '/';
         }
 
-        $uri                   = urldecode($uri);
+        // Décoder la chaîne de caractères codée par l'URL
+        $uri = urldecode($uri);
+
+        $this->checkDisallowedChars($uri);
+
         $this->middlewaresInfo = [];
 
         if ($this->checkRoutes($uri)) {
@@ -249,8 +262,8 @@ class Router implements RouterInterface
             $routeArray = explode('::', $route);
 
             return [
-                $routeArray[0], // Controller
-                $routeArray[1] ?? 'index',   // Method
+                $routeArray[0], // Controleur
+                $routeArray[1] ?? 'index',   // Methode
             ];
         }
 
@@ -348,7 +361,7 @@ class Router implements RouterInterface
         $routes = $this->collection->getRoutes($this->collection->getHTTPVerb());
 
         // S'il n'y a pas de routes definies pour la methode HTTP, c'est pas la peine d'aller plus loin
-        if (empty($routes)) {
+        if ($routes === []) {
             return false;
         }
 
@@ -360,6 +373,8 @@ class Router implements RouterInterface
         foreach ($routes as $routeKey => $handler) {
             $routeKey = $routeKey === '/'
                 ? $routeKey
+                // $routeKey peut être int, car il s'agit d'une clé de tableau, et l'URI `/1` est valide.
+                // Le `/` de tête est supprimé.
                 : ltrim((string) $routeKey, '/ ');
 
             $matchedKey = $routeKey;
@@ -381,7 +396,7 @@ class Router implements RouterInterface
                     }, is_array($handler) ? key($handler) : $handler);
 
                     throw new RedirectException(
-                        preg_replace('#^' . $routeKey . '$#u', $redirectTo, $uri),
+                        preg_replace('#\A' . $routeKey . '\z#u', $redirectTo, $uri),
                         $this->collection->getRedirectCode($routeKey)
                     );
                 }
@@ -513,7 +528,7 @@ class Router implements RouterInterface
     protected function setRequest(array $segments = [])
     {
         // Si nous n'avons aucun segment - essayez le contrôleur par défaut ;
-        if (empty($segments)) {
+        if ($segments === []) {
             return;
         }
 
@@ -530,6 +545,16 @@ class Router implements RouterInterface
         array_shift($segments);
 
         $this->params = $segments;
+    }
+
+    /**
+     * @param callable|string $handler
+     */
+    protected function setMatchedRoute(string $route, $handler): void
+    {
+        $this->matchedRoute = [$route, $handler];
+
+        $this->matchedRouteOptions = $this->collection->getRoutesOptions($route);
     }
 
     /**
@@ -561,12 +586,18 @@ class Router implements RouterInterface
     }
 
     /**
-     * @param callable|string $handler
+     * Vérifie les caractères non autorisés
      */
-    protected function setMatchedRoute(string $route, $handler): void
+    private function checkDisallowedChars(string $uri): void
     {
-        $this->matchedRoute = [$route, $handler];
-
-        $this->matchedRouteOptions = $this->collection->getRoutesOptions($route);
+        foreach (explode('/', $uri) as $segment) {
+            if ($segment !== '' && $this->permittedURIChars !== ''
+                && preg_match('/\A[' . $this->permittedURIChars . ']+\z/iu', $segment) !== 1
+            ) {
+                throw new BadRequestException(
+                    'L\'URI que vous avez soumis contient des caractères non autorisés : "' . $segment . '"'
+                );
+            }
+        }
     }
 }

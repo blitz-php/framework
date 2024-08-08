@@ -31,14 +31,7 @@ final class Configurator
     /**
      * @psalm-readonly
      */
-    private Data $userConfig;
-
-    /**
-     * @var array<string, Schema>
-     *
-     * @psalm-allow-private-mutation
-     */
-    private array $configSchemas = [];
+    private readonly Data $userConfig;
 
     /**
      * @psalm-allow-private-mutation
@@ -53,12 +46,11 @@ final class Configurator
     private array $cache = [];
 
     /**
-     * @param array<string, Schema> $baseSchemas
+     * @param array<string, Schema> $configSchemas
      */
-    public function __construct(array $baseSchemas = [])
+    public function __construct(private array $configSchemas = [])
     {
-        $this->configSchemas = $baseSchemas;
-        $this->userConfig    = new Data();
+        $this->userConfig = new Data();
     }
 
     /**
@@ -132,7 +124,7 @@ final class Configurator
 
         try {
             return $this->finalConfig->has($key);
-        } catch (InvalidPathException $ex) {
+        } catch (InvalidPathException) {
             return false;
         }
     }

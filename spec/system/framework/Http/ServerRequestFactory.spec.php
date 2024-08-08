@@ -14,9 +14,9 @@ use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\ServerRequestFactory;
 use Psr\Http\Message\UploadedFileInterface;
 
-describe('Http / ServerRequestFactory', function () {
-	describe('ServerRequestFactoryInterface', function () {
-		it('Test createServerRequest', function () {
+describe('Http / ServerRequestFactory', function (): void {
+	describe('ServerRequestFactoryInterface', function (): void {
+		it('Test createServerRequest', function (): void {
 			$factory = new ServerRequestFactory();
         	$request = $factory->createServerRequest('GET', 'https://blitzphp.com/team', ['foo' => 'bar']);
 
@@ -29,8 +29,8 @@ describe('Http / ServerRequestFactory', function () {
 		});
 	});
 
-    describe('Superglobales', function () {
-		it('Teste que fromGlobals lit les superglobales', function () {
+    describe('Superglobales', function (): void {
+		it('Teste que fromGlobals lit les superglobales', function (): void {
 			$post = [
 				'title' => 'custom',
 			];
@@ -61,7 +61,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($expected->getClientMediaType())->toBe($files['image']['type']);
 		});
 
-		it("Schema", function () {
+		it("Schema", function (): void {
 			$server = [
 				'DOCUMENT_ROOT'          => '/blitz/repo/webroot',
 				'PHP_SELF'               => '/index.php',
@@ -80,8 +80,8 @@ describe('Http / ServerRequestFactory', function () {
 		});
 	});
 
-	describe('Parsing', function () {
-		it('test Form Url Encoded Body Parsing', function () {
+	describe('Parsing', function (): void {
+		it('test Form Url Encoded Body Parsing', function (): void {
 			$data = [
 				'Article' => ['title'],
 			];
@@ -123,7 +123,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($request->getData())->toEqual($data);
 		});
 
-		it('methode reecrite', function () {
+		it('methode reecrite', function (): void {
 			$post = ['_method' => 'POST'];
 			$request = ServerRequestFactory::fromGlobals([], [], $post);
 			expect($request->getEnv('REQUEST_METHOD'))->toBe('POST');
@@ -144,7 +144,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($request->getEnv('ORIGINAL_REQUEST_METHOD'))->toBe('POST');
 		});
 
-		it('Recuperation des parametres serveur', function () {
+		it('Recuperation des parametres serveur', function (): void {
 			$vars = [
 				'REQUEST_METHOD' => 'PUT',
 				'HTTPS'          => 'on',
@@ -162,7 +162,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($request->getServerParams())->toBe($expected);
 		});
 
-		it('Surcharge de la méthode Corps vide analysé.', function () {
+		it('Surcharge de la méthode Corps vide analysé.', function (): void {
 			$body = ['_method' => 'GET', 'foo' => 'bar'];
 			$request = ServerRequestFactory::fromGlobals(
 				['REQUEST_METHOD' => 'POST'],
@@ -183,8 +183,8 @@ describe('Http / ServerRequestFactory', function () {
 		});
 	});
 
-	describe('Fichiers', function () {
-		it("Teste le comportement par défaut de la fusion des fichiers téléchargés.", function () {
+	describe('Fichiers', function (): void {
+		it("Teste le comportement par défaut de la fusion des fichiers téléchargés.", function (): void {
 			$files = [
 				'file' => [
 					'name'     => 'file.txt',
@@ -205,7 +205,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($expected->getClientMediaType())->toBe($files['file']['type']);
 		});
 
-		it("Test de traitement des fichiers avec des noms de champs `file`.", function () {
+		it("Test de traitement des fichiers avec des noms de champs `file`.", function (): void {
 			$files = [
 				'image_main' => [
 					'name'     => ['file' => 'born on.txt'],
@@ -315,7 +315,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($uploads['image_main']['file']->getClientFilename())->toBe('born on.txt');
 		});
 
-		it("Test de traitement d'un fichier d'entrée ne contenant pas de 's.", function () {
+		it("Test de traitement d'un fichier d'entrée ne contenant pas de 's.", function (): void {
 			$files = [
 				'birth_cert' => [
 					'name'     => 'born on.txt',
@@ -338,7 +338,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($uploads['birth_cert']->getSize())->toBe(123);
 		});
 
-		it("Tester que les fichiers du 0e index fonctionnent.", function () {
+		it("Tester que les fichiers du 0e index fonctionnent.", function (): void {
 			$files = [
 				0 => [
 					'name'     => 'blitz_sqlserver_patch.patch',
@@ -357,7 +357,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($uploads[0]->getClientFilename())->toBe($files[0]['name']);
 		});
 
-		it("Teste que les téléchargements de fichiers sont fusionnés avec les données du message sous forme d'objets et non de tableaux.", function () {
+		it("Teste que les téléchargements de fichiers sont fusionnés avec les données du message sous forme d'objets et non de tableaux.", function (): void {
 			$files = [
 				'flat' => [
 					'name' => 'flat.txt',
@@ -495,7 +495,7 @@ describe('Http / ServerRequestFactory', function () {
 			expect($request->getData())->toEqual($expected);
 		});
 
-		it("Test de passage d'une structure de liste de fichiers invalide.", function () {
+		it("Test de passage d'une structure de liste de fichiers invalide.", function (): void {
 			expect(fn() => ServerRequestFactory::fromGlobals([], [], [], [], [
 				[
 					'invalid' => [

@@ -118,7 +118,7 @@ class Services
      */
     public static function cache(?array $config = null, bool $shared = true): Cache
     {
-        if (empty($config)) {
+        if ($config === null || $config === []) {
             $config = static::config()->get('cache');
         }
 
@@ -286,7 +286,7 @@ class Services
      */
     public static function mail(?array $config = null, bool $shared = true): Mail
     {
-        if (empty($config)) {
+        if ($config === null || $config === []) {
             $config = static::config()->get('mail');
         }
 
@@ -308,7 +308,7 @@ class Services
      */
     public static function negotiator(?ServerRequest $request = null, bool $shared = true): Negotiator
     {
-        if (empty($request)) {
+        if ($request === null) {
             $request = static::request(true);
         }
 
@@ -395,10 +395,10 @@ class Services
             return static::$instances[Router::class];
         }
 
-        if (empty($routes)) {
+        if ($routes === null) {
             $routes = static::routes(true);
         }
-        if (empty($request)) {
+        if ($request === null) {
             $request = static::request(true);
         }
 
@@ -485,16 +485,12 @@ class Services
      */
     public static function translator(?string $locale = null, bool $shared = true): Translate
     {
-        if (empty($locale)) {
-            if (empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
-                $config = static::config()->get('app');
-
-                if (empty($locale = static::negotiator()->language($config['supported_locales']))) {
-                    $locale = $config['language'];
-                }
-
-                static::$instances[Translate::class . 'locale'] = $locale;
+        if (empty($locale) && empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
+            $config = static::config()->get('app');
+            if (($locale = static::negotiator()->language($config['supported_locales'])) === '' || ($locale = static::negotiator()->language($config['supported_locales'])) === '0') {
+                $locale = $config['language'];
             }
+            static::$instances[Translate::class . 'locale'] = $locale;
         }
 
         if (true === $shared && isset(static::$instances[Translate::class])) {
@@ -617,11 +613,7 @@ class Services
         $name      = array_shift($arguments);
 
         if (empty(static::$instances[$name])) {
-            if (! empty($arguments)) {
-                static::$instances[$name] = static::factory($name, $arguments);
-            } else {
-                static::$instances[$name] = static::container()->get($name);
-            }
+            static::$instances[$name] = $arguments !== [] ? static::factory($name, $arguments) : static::container()->get($name);
         }
 
         return static::$instances[$name];

@@ -37,7 +37,7 @@ class Load
      */
     public static function helper(array|string $helpers)
     {
-        if (empty($helpers)) {
+        if ($helpers === '' || $helpers === '0' || $helpers === []) {
             throw new LoadException('Veuillez specifier le helper à charger');
         }
 
@@ -57,7 +57,7 @@ class Load
      */
     public static function model(array|string $model, ?ConnectionInterface $connection = null)
     {
-        if (empty($model)) {
+        if ($model === '' || $model === '0' || $model === []) {
             throw new LoadException('Veuillez specifier le modele à charger');
         }
 

@@ -60,13 +60,13 @@ class Publish extends Command
         foreach ($publishers as $publisher) {
             if ($publisher->publish()) {
                 $this->ok(lang('Publisher.publishSuccess', [
-                    get_class($publisher),
+                    $publisher::class,
                     count($publisher->getPublished()),
                     $publisher->getDestination(),
                 ]));
             } else {
                 $this->fail(lang('Publisher.publishFailure', [
-                    get_class($publisher),
+                    $publisher::class,
                     $publisher->getDestination(),
                 ]));
 

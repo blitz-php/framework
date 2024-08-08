@@ -177,7 +177,7 @@ class ResponseEmitter
             'HTTP/%s %d%s',
             $response->getProtocolVersion(),
             $response->getStatusCode(),
-            ($reasonPhrase ? ' ' . $reasonPhrase : '')
+            ($reasonPhrase !== '' && $reasonPhrase !== '0' ? ' ' . $reasonPhrase : '')
         ));
     }
 
@@ -195,11 +195,7 @@ class ResponseEmitter
                 setcookie(
                     $cookie['name'],
                     $cookie['value'],
-                    $cookie['expires'],
-                    $cookie['path'],
-                    $cookie['domain'],
-                    $cookie['secure'],
-                    $cookie['httponly']
+                    ['expires' => $cookie['expires'], 'path' => $cookie['path'], 'domain' => $cookie['domain'], 'secure' => $cookie['secure'], 'httponly' => $cookie['httponly']]
                 );
 
                 continue;
@@ -240,11 +236,7 @@ class ResponseEmitter
             setcookie(
                 $data['name'],
                 $data['value'],
-                $data['expires'],
-                $data['path'],
-                $data['domain'],
-                $data['secure'],
-                $data['httponly']
+                ['expires' => $data['expires'], 'path' => $data['path'], 'domain' => $data['domain'], 'secure' => $data['secure'], 'httponly' => $data['httponly']]
             );
         }
     }

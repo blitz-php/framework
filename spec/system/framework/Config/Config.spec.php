@@ -15,13 +15,13 @@ use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Spec\ReflectionHelper;
 use Nette\Schema\Schema;
 
-describe('Config / Config', function () {
-	beforeEach(function() {
+describe('Config / Config', function (): void {
+	beforeEach(function(): void {
 		$this->config = Services::config();
 	});
 
-    describe('Initialisation', function () {
-        it('La config est toujours initialisee', function () {
+    describe('Initialisation', function (): void {
+        it('La config est toujours initialisee', function (): void {
             $initialized  = ReflectionHelper::getPrivateProperty(Config::class, 'initialized');
             $configurator = ReflectionHelper::getPrivateProperty($this->config, 'configurator');
             $finalConfig  = ReflectionHelper::getPrivateProperty($configurator, 'finalConfig');
@@ -30,7 +30,7 @@ describe('Config / Config', function () {
             expect($finalConfig)->not->toBeNull();
         });
 
-        it('La config charge bien les fichiers', function () {
+        it('La config charge bien les fichiers', function (): void {
 			$loaded  = ReflectionHelper::getPrivateProperty(Config::class, 'loaded');
 
 			expect($loaded)->toBeA('array');
@@ -38,7 +38,7 @@ describe('Config / Config', function () {
 			expect($loaded['app'])->toBe(config_path('app'));
         });
 
-        it('La methode load charge belle et bien le fichier de config', function () {
+        it('La methode load charge belle et bien le fichier de config', function (): void {
 			$loaded  = ReflectionHelper::getPrivateProperty(Config::class, 'loaded');
 
 			// Soyons sur que seul les fichiers necessaires sont charges
@@ -54,8 +54,8 @@ describe('Config / Config', function () {
 		});
     });
 
-    describe('Getters et setters', function () {
-        it('has, exists, missing', function () {
+    describe('Getters et setters', function (): void {
+        it('has, exists, missing', function (): void {
 			expect($this->config->has('appl'))->toBeFalsy();
 			expect($this->config->has('app'))->toBeTruthy();
 
@@ -63,13 +63,13 @@ describe('Config / Config', function () {
 			expect($this->config->missing('app'))->toBeFalsy();
         });
 
-        it('get', function () {
+        it('get', function (): void {
             expect($this->config->get('app.environment'))->toBe('testing');
             expect(fn() => $this->config->get('app.environement'))->toThrow(new ConfigException());
             expect($this->config->get('app.environement', 'default'))->toBe('default');
         });
 
-        it('set', function () {
+        it('set', function (): void {
 			$env = $this->config->get('app.environment');
 
 			$this->config->set('app.environement', 'dev');
@@ -79,7 +79,7 @@ describe('Config / Config', function () {
             expect($this->config->get('app.environement'))->toBe('testing');
         });
 
-        it('set d\'une config abscente', function () {
+        it('set d\'une config abscente', function (): void {
 			$this->config->set('appl.environement', 'dev');
 			expect(fn() => $this->config->get('appl.environement'))->toThrow(new ConfigException());
 
@@ -89,18 +89,18 @@ describe('Config / Config', function () {
         });
     });
 
-	describe('Autres', function () {
-		it('path', function () {
+	describe('Autres', function (): void {
+		it('path', function (): void {
 			expect(Config::path('app'))->toBe(config_path('app'));
 			expect(Config::path('appl'))->toBeEmpty();
 		});
 
-		it('schema', function () {
+		it('schema', function (): void {
 			expect(Config::schema('app'))->toBeAnInstanceOf(Schema::class);
 			expect(Config::schema('appl'))->toBeNull();
 		});
 
-		it('reset', function () {
+		it('reset', function (): void {
 			expect($this->config->get('app.environment'))->toBe('testing');
 			expect($this->config->get('app.negotiate_locale'))->toBeTruthy();
 
@@ -114,7 +114,7 @@ describe('Config / Config', function () {
 			expect($this->config->get('app.negotiate_locale'))->toBeTruthy();
 		});
 
-		it('reset multple', function () {
+		it('reset multple', function (): void {
 			expect($this->config->get('app.environment'))->toBe('testing');
 			expect($this->config->get('publisher.restrictions'))->toContainKeys([ROOTPATH, WEBROOT]);
 			expect($this->config->get('app.negotiate_locale'))->toBeTruthy();

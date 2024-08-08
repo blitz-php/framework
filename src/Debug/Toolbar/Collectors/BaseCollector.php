@@ -71,7 +71,7 @@ abstract class BaseCollector
      */
     public function getKey(): string
     {
-        if (empty($this->key)) {
+        if ($this->key === '') {
             $this->key = str_replace('Collector', '', basename(static::class));
         }
 

@@ -112,7 +112,7 @@ class Mail implements MailerInterface
      */
     protected function factory(): AbstractAdapter
     {
-        if (! empty($this->adapter)) {
+        if (null !== $this->adapter) {
             return $this->adapter;
         }
 

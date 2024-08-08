@@ -66,13 +66,13 @@ class ApplicationController extends BaseController
 
         $viewer = Services::viewer();
 
-        $viewer->setData($data)->setOptions($options);
+        $viewer->setData($data)->options($options);
 
         if ($this->layout !== '') {
             $viewer->layout($this->layout);
         }
 
-        if (! empty($this->viewDatas) && is_array($this->viewDatas)) {
+        if ($this->viewDatas !== [] && is_array($this->viewDatas)) {
             $viewer->addData($this->viewDatas);
         }
 
@@ -104,12 +104,12 @@ class ApplicationController extends BaseController
             $view = $dbt[1]['function'] ?? '';
         }
 
-        if (empty($view) && empty($data)) {
+        if (($view === '' || $view === '0') && ($data === null || $data === [])) {
             $dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $view = $dbt[1]['function'] ?? '';
         }
 
-        if (empty($view)) {
+        if ($view === '' || $view === '0') {
             $view = Dispatcher::getMethod();
         }
 

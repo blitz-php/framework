@@ -57,7 +57,6 @@ class Debugger
     private static function initIgnition(array $config): void
     {
         $debugger = Ignition::make();
-
         $debugger->applicationPath(ROOTPATH)
             ->shouldDisplayException(! on_prod())
             ->register();

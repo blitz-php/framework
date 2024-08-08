@@ -19,7 +19,7 @@ use BlitzPHP\Router\RouteCollection;
  */
 final class SampleURIGenerator
 {
-    private RouteCollection $routes;
+    private readonly RouteCollection $routes;
 
     /**
      * Exemple de chemin URI pour l'espace réservé.

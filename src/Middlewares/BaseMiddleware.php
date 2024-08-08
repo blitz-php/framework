@@ -66,7 +66,7 @@ abstract class BaseMiddleware
     final public function fill(array $params): static
     {
         foreach ($this->fillable as $key) {
-            if (empty($params)) {
+            if ($params === []) {
                 break;
             }
             $this->arguments[$key] = array_shift($params);

@@ -15,16 +15,16 @@ use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\Validation\ErrorBag;
 use BlitzPHP\View\View;
 
-describe('Views / View', function () {
-    describe('Donnees', function () {
-        it('Peut-on stocker des variable', function () {
+describe('Views / View', function (): void {
+    describe('Donnees', function (): void {
+        it('Peut-on stocker des variable', function (): void {
             $view = new View();
 
         	$view->setVar('foo', 'bar');
             expect($view->getData())->toBe(['foo' => 'bar']);
         });
 
-        it("Peut-on ecraser une variable existante", function () {
+        it("Peut-on ecraser une variable existante", function (): void {
             $view = new View();
 
         	$view->setVar('foo', 'bar');
@@ -32,7 +32,7 @@ describe('Views / View', function () {
             expect($view->getData())->toBe(['foo' => 'baz']);
         });
 
-        it("Peut-on stocker un tableau de donnees", function () {
+        it("Peut-on stocker un tableau de donnees", function (): void {
             $view = new View();
 
         	$expected = [
@@ -44,7 +44,7 @@ describe('Views / View', function () {
             expect($view->getData())->toBe($expected);
         });
 
-        it("Fusion de donnees", function () {
+        it("Fusion de donnees", function (): void {
 			$view = new View();
 
         	$expected = [
@@ -62,7 +62,7 @@ describe('Views / View', function () {
             expect($view->getData())->toBe($expected);
         });
 
-        it("with", function () {
+        it("with", function (): void {
 			$view = new View();
 
         	$expected = [
@@ -79,7 +79,7 @@ describe('Views / View', function () {
             expect($view->getData())->toBe($expected);
         });
 
-        it("setData ecrase les donnees", function () {
+        it("setData ecrase les donnees", function (): void {
 			$view = new View();
 
         	$view->setVar('fee', 'fi');
@@ -92,7 +92,7 @@ describe('Views / View', function () {
             expect($view->getData())->toBe(['bar' => 'foo']);
         });
 
-        it("Peut-on ecraser une donnee existante", function () {
+        it("Peut-on ecraser une donnee existante", function (): void {
             $view = new View();
 
         	$expected = [
@@ -109,14 +109,14 @@ describe('Views / View', function () {
             expect($view->getData())->toBe($expected);
         });
 
-		it('Peut-on stocker des variable avec un echappement', function () {
+		it('Peut-on stocker des variable avec un echappement', function (): void {
             $view = new View();
 
         	$view->setVar('foo', 'bar&', 'html');
             expect($view->getData())->toBe(['foo' => 'bar&amp;']);
         });
 
-        it("Peut-on stocker un tableau de donnees avec un echappement", function () {
+        it("Peut-on stocker un tableau de donnees avec un echappement", function (): void {
             $view = new View();
 
         	$expected = [
@@ -131,7 +131,7 @@ describe('Views / View', function () {
             expect($view->getData())->toBe($expected);
         });
 
-        it("Reset data", function () {
+        it("Reset data", function (): void {
             $view = new View();
 
         	$view->setData([
@@ -144,8 +144,8 @@ describe('Views / View', function () {
         });
     });
 
-	describe('Render', function() {
-		it('La methode render affiche le bon contenu', function() {
+	describe('Render', function(): void {
+		it('La methode render affiche le bon contenu', function(): void {
 			$view = new View();
 
 			$view->setVar('testString', 'Hello World');
@@ -156,7 +156,7 @@ describe('Views / View', function () {
 			expect(fn() => $view->render())->toEcho($expected);
 		});
 
-		it('Leve une exception si la vue n\'existe pas', function() {
+		it('Leve une exception si la vue n\'existe pas', function(): void {
 			$view = new View();
 
 			$view->setVar('testString', 'Hello World')->display('missing');
@@ -164,7 +164,7 @@ describe('Views / View', function () {
 			expect(fn() => $view->render())->toThrow(new ViewException);
 		});
 
-		it('Render peut vider les donnees', function() {
+		it('Render peut vider les donnees', function(): void {
 			$view = new View();
 
 			$view->make('simple', ['testString' =>'Hello World'])->get(false, false);
@@ -172,7 +172,7 @@ describe('Views / View', function () {
 			expect($view->getData())->toBe([]);
 		});
 
-		it('Render conserve les donnees', function() {
+		it('Render conserve les donnees', function(): void {
 			$view = new View();
 
 			$expected = ['testString' => 'Hello World'];
@@ -181,7 +181,7 @@ describe('Views / View', function () {
 			expect($view->getData())->toBe($expected);
 		});
 
-		it('Mise en cache', function() {
+		it('Mise en cache', function(): void {
 			$view = new View();
 
 			$view->setVar('testString', 'Hello World');
@@ -194,7 +194,7 @@ describe('Views / View', function () {
 				->toEcho($expected);
 		});
 
-		it('RenderString sauvegarde les donnees', function() {
+		it('RenderString sauvegarde les donnees', function(): void {
 			$view = new View();
 			$expected = '<h1>Hello World</h1>';
 
@@ -209,8 +209,8 @@ describe('Views / View', function () {
 		});
 	});
 
-	describe('Performance logging', function () {
-		it('Sauvegarde les performances', function () {
+	describe('Performance logging', function (): void {
+		it('Sauvegarde les performances', function (): void {
 			config(['view.debug' => true]);
 
 			$view = new View();
@@ -223,7 +223,7 @@ describe('Views / View', function () {
 			expect($view->getPerformanceData())->toHaveLength(1);
 		});
 
-		it('Ne sauvegarde pas les performances', function () {
+		it('Ne sauvegarde pas les performances', function (): void {
 			config(['view.debug' => false]);
 
 			$view = new View();
@@ -237,15 +237,15 @@ describe('Views / View', function () {
 		});
 	});
 
-	describe('Autres', function() {
-		it('Vue stringable', function() {
+	describe('Autres', function(): void {
+		it('Vue stringable', function(): void {
 			$view = new View();
 
 			expect((string) $view->make('simple', ['testString' => 'Hello']))
 				->toBe('<h1>Hello</h1>');
 		});
 
-		it('Share', function() {
+		it('Share', function(): void {
 			View::share('testString', 'String');
 			View::share('testClosure', fn() => 'String');
 
@@ -256,7 +256,7 @@ describe('Views / View', function () {
 			expect($view->renderString('<h1><?= $testClosure ?></h1>'))->toBe($expected);
 		});
 
-		it('WithErrors', function () {
+		it('WithErrors', function (): void {
 			$view     = new View();
 
 			$view->withErrors('invalid error');
@@ -293,7 +293,7 @@ describe('Views / View', function () {
 			expect($tempData['errors']->toArray())->toBe($errors);
 		});
 
-		it('first', function () {
+		it('first', function (): void {
 			$view     = new View();
 
 			$view->first(['missing', 'simple'], ['testString' => 'String']);
@@ -303,7 +303,7 @@ describe('Views / View', function () {
 				->toThrow(new ViewException());
 		});
 
-		it('setAdapter leve une exception', function () {
+		it('setAdapter leve une exception', function (): void {
 			$config = config()->get('view.adapters.native');
 			config()->set('view.adapters.native', []);
 
@@ -313,8 +313,8 @@ describe('Views / View', function () {
 		});
 	});
 
-	describe('Options', function () {
-		it('Save data', function () {
+	describe('Options', function (): void {
+		it('Save data', function (): void {
 			$view = new View();
 
 			$view->setVar('testString', 'Hello World');
@@ -328,28 +328,24 @@ describe('Views / View', function () {
 			expect($view->getData())->toBe([]);
 		});
 
-		it('Layout', function () {
+		it('Layout', function (): void {
 			$view = new View();
 
 			$view->setVar('testString', 'Hello World');
 			$view->display('simple_layout')
 				->setLayout('layout');
 
-			expect(fn() => $view->render())->toMatchEcho(function($actual) {
-				return str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>');
-			});
+			expect(fn() => $view->render())->toMatchEcho(fn($actual) => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
 		});
 
-		it('Layout a travers options', function () {
+		it('Layout a travers options', function (): void {
 			$view = new View();
 
 			$view->setVar('testString', 'Hello World');
 			$view->display('simple_layout')
 				->options(['layout' => 'layout']);
 
-			expect(fn() => $view->render())->toMatchEcho(function($actual) {
-				return str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>');
-			});
+			expect(fn() => $view->render())->toMatchEcho(fn($actual) => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
 		});
 	});
 });

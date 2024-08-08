@@ -64,9 +64,7 @@ class ComponentLoader
     {
         [$instance, $method] = $this->determineClass($library);
 
-        $class = is_object($instance)
-            ? get_class($instance)
-            : null;
+        $class = is_object($instance) ? $instance::class : null;
 
         $params = $this->prepareParams($params);
 
@@ -101,10 +99,12 @@ class ComponentLoader
      * Analyse l'attribut params. S'il s'agit d'un tableau, il est renvoyé tel quel.
      * S'il s'agit d'une chaîne, elle doit être au format "clé1=valeur clé2=valeur".
      * Elle sera divisée et renvoyée sous forme de tableau.
+     *
+     * @param array<string, string>|string|null $params
      */
-    public function prepareParams(null|array|string $params): array
+    public function prepareParams($params): array
     {
-        if ($params === null || $params === '' || $params === []) {
+        if ($params === null || $params === '' || $params === [] || (! is_string($params) && ! is_array($params))) {
             return [];
         }
 
@@ -243,7 +243,7 @@ class ComponentLoader
                     $mountParams[] = $params[$paramName];
                 }
             }
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             // ne rien faire
         }
 

@@ -369,7 +369,7 @@ if (! function_exists('img_url')) {
      */
     function img_url(?string $name, bool $add_version = true): string
     {
-        if (empty($name)) {
+        if ($name === null || $name === '' || $name === '0') {
             return '';
         }
 
@@ -427,7 +427,7 @@ if (! function_exists('docs_url')) {
      */
     function docs_url(?string $name, bool $add_version = true): string
     {
-        if (empty($name)) {
+        if ($name === null || $name === '' || $name === '0') {
             return '';
         }
 
@@ -454,7 +454,7 @@ if (! function_exists('videos_url')) {
      */
     function videos_url(?string $name, bool $add_version = true): string
     {
-        if (empty($name)) {
+        if ($name === null || $name === '' || $name === '0') {
             return '';
         }
 

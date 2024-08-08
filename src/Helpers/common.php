@@ -16,6 +16,7 @@ use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
+use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Http\Redirection;
@@ -25,6 +26,8 @@ use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
 use BlitzPHP\Utilities\Support\Invader;
+use GuzzleHttp\Psr7\Utils;
+use Psr\Http\Message\StreamInterface;
 
 // ================================= FONCTIONS UTIILITAIRES ESSENTIELLES ================================= //
 
@@ -54,7 +57,7 @@ if (! function_exists('helper')) {
      *   2. {namespace}/Helpers
      *   3. system/Helpers
      */
-    function helper(array|string $filenames)
+    function helper(array|string $filenames): void
     {
         Load::helper($filenames);
     }
@@ -121,7 +124,7 @@ if (! function_exists('show404')) {
     /**
      * Afficher une page 404 introuvable dans le navigateur
      */
-    function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = [])
+    function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = []): never
     {
         throw PageNotFoundException::pageNotFound($message);
     }
@@ -236,13 +239,13 @@ if (! function_exists('logger')) {
      *
      * @param int|string $level
      *
-     * @return BlitzPHP\Debug\Logger|void
+     * @return Logger|void
      */
     function logger($level = null, ?string $message = null, array $context = [])
     {
         $logger = Services::logger();
 
-        if (empty($level) || empty($message)) {
+        if (empty($level) || $message === null) {
             return $logger;
         }
 
@@ -268,7 +271,7 @@ if (! function_exists('cache')) {
     {
         $cache = Services::cache();
 
-        if (empty($key)) {
+        if ($key === null) {
             return $cache;
         }
 
@@ -441,7 +444,7 @@ if (! function_exists('csrf_field')) {
     {
         $name = config('security.csrf_token_name', '_token');
 
-        return '<input type="hidden"' . (! empty($id) ? ' id="' . esc($id, 'attr') . '"' : '') . ' name="' . $name . '" value="' . csrf_token() . '">';
+        return '<input type="hidden"' . ($id !== null && $id !== '' ? ' id="' . esc($id, 'attr') . '"' : '') . ' name="' . $name . '" value="' . csrf_token() . '">';
     }
 }
 
@@ -453,7 +456,7 @@ if (! function_exists('csrf_meta')) {
     {
         $name = config('security.csrf_header_name', 'X-CSRF-TOKEN');
 
-        return '<meta' . (! empty($id) ? ' id="' . esc($id, 'attr') . '"' : '') . ' name="' . $name . '" content="' . csrf_token() . '">';
+        return '<meta' . ($id !== null && $id !== '' ? ' id="' . esc($id, 'attr') . '"' : '') . ' name="' . $name . '" content="' . csrf_token() . '">';
     }
 }
 
@@ -486,7 +489,7 @@ if (! function_exists('environment')) {
             $current = config('app.environment');
         }
 
-        if (empty($env)) {
+        if ($env === '' || $env === '0' || $env === [] || $env === null) {
             return $current;
         }
 
@@ -637,7 +640,7 @@ if (! function_exists('redirection')) {
     /**
      * Redirige l'utilisateur
      */
-    function redirection(string $uri = '', string $method = 'location', ?int $code = 302)
+    function redirection(string $uri = '', string $method = 'location', ?int $code = 302): never
     {
         $response = redirect()->to($uri, $code, [], null, $method);
 
@@ -661,7 +664,7 @@ if (! function_exists('redirect')) {
     {
         $redirection = Services::redirection();
 
-        if (! empty($uri)) {
+        if ($uri !== null && $uri !== '') {
             return $redirection->route($uri);
         }
 
@@ -711,25 +714,14 @@ if (! function_exists('clean_path')) {
     {
         $path = realpath($path) ?: $path;
 
-        switch (true) {
-            case str_starts_with($path, APP_PATH)  :
-                return 'APP_PATH' . DS . substr($path, strlen(APP_PATH));
-
-            case str_starts_with($path, SYST_PATH)  :
-                return 'SYST_PATH' . DS . substr($path, strlen(SYST_PATH));
-
-            case defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH . 'blitz-php' . DS)  :
-                return 'BLITZ_PATH' . DS . substr($path, strlen(VENDOR_PATH . 'blitz-php' . DS));
-
-            case defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH)  :
-                return 'VENDOR_PATH' . DS . substr($path, strlen(VENDOR_PATH));
-
-            case str_starts_with($path, ROOTPATH)  :
-                return 'ROOTPATH' . DS . substr($path, strlen(ROOTPATH));
-
-            default:
-                return $path;
-        }
+        return match (true) {
+            str_starts_with($path, APP_PATH)                                                 => 'APP_PATH' . DS . substr($path, strlen(APP_PATH)),
+            str_starts_with($path, SYST_PATH)                                                => 'SYST_PATH' . DS . substr($path, strlen(SYST_PATH)),
+            defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH . 'blitz-php' . DS) => 'BLITZ_PATH' . DS . substr($path, strlen(VENDOR_PATH . 'blitz-php' . DS)),
+            defined('VENDOR_PATH') && str_starts_with($path, VENDOR_PATH)                    => 'VENDOR_PATH' . DS . substr($path, strlen(VENDOR_PATH)),
+            str_starts_with($path, ROOTPATH)                                                 => 'ROOTPATH' . DS . substr($path, strlen(ROOTPATH)),
+            default                                                                          => $path,
+        };
     }
 }
 
@@ -768,10 +760,8 @@ if (! function_exists('deprecationWarning')) {
      * @param string $message    Le message à afficher comme avertissement d'obsolescence.
      * @param int    $stackFrame Le cadre de pile à inclure dans l'erreur. Par défaut à 1
      *                           car cela devrait pointer vers le code de l'application/du plugin.
-     *
-     * @return void
      */
-    function deprecation_warning(string $message, int $stackFrame = 1)
+    function deprecation_warning(string $message, int $stackFrame = 1): void
     {
         Helpers::deprecationWarning($message, $stackFrame);
     }
@@ -824,7 +814,7 @@ if (! function_exists('trigger_warning')) {
     /**
      * Déclenche un E_USER_WARNING.
      */
-    function trigger_warning(string $message)
+    function trigger_warning(string $message): void
     {
         Helpers::triggerWarning($message);
     }
@@ -848,7 +838,7 @@ if (! function_exists('force_https')) {
      *
      * @throws RedirectException
      */
-    function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?Redirection $response = null)
+    function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?Redirection $response = null): void
     {
         $request ??= Services::request();
         $response ??= Services::redirection();
@@ -895,7 +885,7 @@ if (! function_exists('ip_address')) {
      */
     function ip_address(): string
     {
-        return (string) Services::request()->clientIp();
+        return Services::request()->clientIp();
     }
 }
 
@@ -1045,16 +1035,16 @@ if (! function_exists('to_stream')) {
      * - metadata : Tableau de métadonnées personnalisées.
      * - size : Taille du flux.
      *
-     * @param bool|callable|float|int|Iterator|Psr\Http\Message\StreamInterface|resource|string|null $resource Données du corps de l'entité
-     * @param array                                                                                  $options  Additional options
+     * @param bool|callable|float|int|Iterator|resource|StreamInterface|string|null $resource Données du corps de l'entité
+     * @param array                                                                 $options  Additional options
      *
      * @uses GuzzleHttp\Psr7\stream_for
      *
      * @throws InvalidArgumentException si l'argument $resource n'est pas valide.
      */
-    function to_stream($resource = '', array $options = []): Psr\Http\Message\StreamInterface
+    function to_stream($resource = '', array $options = []): StreamInterface
     {
-        return GuzzleHttp\Psr7\Utils::streamFor($resource, $options);
+        return Utils::streamFor($resource, $options);
     }
 }
 

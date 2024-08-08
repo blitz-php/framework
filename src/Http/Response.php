@@ -16,6 +16,7 @@ use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Http\Concerns\ResponseTrait;
+use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Session\Cookie\CookieCollection;
 use DateTime;
 use DateTimeInterface;
@@ -27,6 +28,7 @@ use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use SplFileInfo;
+use Stringable;
 
 /**
  * Les réponses contiennent le texte de la réponse, l'état et les en-têtes d'une réponse HTTP.
@@ -39,7 +41,7 @@ use SplFileInfo;
  *
  * @credit CakePHP <a href="https://api.cakephp.org/4.3/class-Cake.Http.Response.html">Cake\Http\Response</a>
  */
-class Response implements ResponseInterface
+class Response implements ResponseInterface, Stringable
 {
     use MessageTrait;
     use ResponseTrait;
@@ -458,7 +460,7 @@ class Response implements ResponseInterface
     public function redirect(string $uri, string $method = 'auto', ?int $code = null): static
     {
         // Suppose une réponse de code d'état 302 ; remplacer si nécessaire
-        if (empty($code)) {
+        if ($code === null || $code === 0) {
             $code = StatusCode::FOUND;
         }
 
@@ -587,7 +589,7 @@ class Response implements ResponseInterface
             throw HttpException::invalidStatusCode($code);
         }
 
-        if (! array_key_exists($code, $this->_statusCodes) && empty($reasonPhrase)) {
+        if (! array_key_exists($code, $this->_statusCodes) && ($reasonPhrase === '' || $reasonPhrase === '0')) {
             throw HttpException::unkownStatusCode($code);
         }
 
@@ -713,7 +715,7 @@ class Response implements ResponseInterface
     public function mapType($ctype)
     {
         if (is_array($ctype)) {
-            return array_map([$this, 'mapType'], $ctype);
+            return array_map($this->mapType(...), $ctype);
         }
 
         foreach ($this->_mimeTypes as $alias => $types) {
@@ -1109,7 +1111,7 @@ class Response implements ResponseInterface
         }
 
         $param = '';
-        if ($params) {
+        if ($params !== []) {
             $param = '; ' . implode('; ', $params);
         }
 
@@ -1137,7 +1139,7 @@ class Response implements ResponseInterface
         $etags       = preg_split('/\s*,\s*/', $request->getHeaderLine('If-None-Match'), 0, PREG_SPLIT_NO_EMPTY);
         $responseTag = $this->getHeaderLine('Etag');
         $etagMatches = null;
-        if ($responseTag) {
+        if ($responseTag !== '' && $responseTag !== '0') {
             $etagMatches = in_array('*', $etags, true) || in_array($responseTag, $etags, true);
         }
 
@@ -1262,7 +1264,7 @@ class Response implements ResponseInterface
     public function getCookies(): array
     {
         $out = [];
-        /** @var array<\BlitzPHP\Session\Cookie\Cookie> $cookies */
+        /** @var array<Cookie> $cookies */
         $cookies = $this->_cookies;
 
         foreach ($cookies as $cookie) {
@@ -1349,7 +1351,7 @@ class Response implements ResponseInterface
 
         $new       = $new->withHeader('Accept-Ranges', 'bytes');
         $httpRange = (string) env('HTTP_RANGE');
-        if ($httpRange) {
+        if ($httpRange !== '' && $httpRange !== '0') {
             $new->_fileRange($file, $httpRange);
         } else {
             $new = $new->withHeader('Content-Length', (string) $fileSize);

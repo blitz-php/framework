@@ -21,7 +21,7 @@ if (! function_exists('dd')) {
      *
      * @codeCoverageIgnore Ne peut pas etre tester ... presence de "exit"
      */
-    function dd(...$vars)
+    function dd(...$vars): void
     {
         if (class_exists(Kint::class)) {
             Kint::$aliases[] = 'dd';
@@ -40,7 +40,7 @@ if (! function_exists('dump')) {
      *
      * @codeCoverageIgnore Ne peut pas etre tester
      */
-    function dump(...$vars)
+    function dump(...$vars): void
     {
         if (class_exists(Kint::class)) {
             Kint::$aliases[] = 'dump';

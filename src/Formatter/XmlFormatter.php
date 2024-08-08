@@ -97,6 +97,6 @@ class XmlFormatter implements FormatterInterface
      */
     public function parse(string $data): array
     {
-        return $data ? (array) simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA) : [];
+        return $data !== '' && $data !== '0' ? (array) simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA) : [];
     }
 }

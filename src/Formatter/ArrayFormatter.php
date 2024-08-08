@@ -32,11 +32,7 @@ class ArrayFormatter implements FormatterInterface
         $array = [];
 
         foreach ($data as $key => $value) {
-            if (is_object($value) || is_array($value)) {
-                $array[$key] = $this->format($value);
-            } else {
-                $array[$key] = $value;
-            }
+            $array[$key] = is_object($value) || is_array($value) ? $this->format($value) : $value;
         }
 
         return $array;

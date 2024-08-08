@@ -118,12 +118,12 @@ class About extends Command
      */
     protected function displayDetail(Collection $data): void
     {
-        $data->each(function ($data, $section) {
+        $data->each(function ($data, $section): void {
             $this->newLine();
 
             $this->justify($section, '', ['first' => ['fg' => Color::GREEN]]);
 
-            $data->pipe(static fn ($data) => $section !== 'Environnement' ? $data->sort() : $data)->each(function ($detail) {
+            $data->pipe(static fn ($data) => $section !== 'Environnement' ? $data->sort() : $data)->each(function ($detail): void {
                 [$label, $value] = $detail;
                 if (! in_array($label, static::$displayed, true)) {
                     $this->justify($label, value($value, false));
@@ -138,13 +138,11 @@ class About extends Command
      */
     protected function displayJson(Collection $data): void
     {
-        $output = $data->flatMap(function ($data, $section) {
-            return [
-                (string) Text::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [
-                    $this->toSearchKeyword($item[0]) => value($item[1], true),
-                ]),
-            ];
-        });
+        $output = $data->flatMap(fn ($data, $section) => [
+            (string) Text::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [
+                $this->toSearchKeyword($item[0]) => value($item[1], true),
+            ]),
+        ]);
 
         $this->eol()->json($output);
     }

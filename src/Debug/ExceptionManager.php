@@ -36,10 +36,8 @@ class ExceptionManager
     public static function registerHttpErrors(Run $debugger, array $config): Run
     {
         return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config) {
-            if (true === $config['log']) {
-                if (! in_array($exception->getCode(), $config['ignore_codes'], true)) {
-                    Services::logger()->error($exception);
-                }
+            if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
+                Services::logger()->error($exception);
             }
 
             if (is_dir($config['error_view_path'])) {
@@ -148,7 +146,7 @@ class ExceptionManager
                     default    => [],
                 };
 
-                foreach ($values as $key => $value) {
+                foreach (array_keys($values) as $key) {
                     $handler->blacklist($name, $key);
                 }
             }

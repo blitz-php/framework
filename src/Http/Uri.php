@@ -143,18 +143,16 @@ class Uri implements UriInterface
      */
     public function getAuthority(bool $ignorePort = false): string
     {
-        if (empty($this->host)) {
+        if (empty($authority = $this->host)) {
             return '';
         }
 
-        $authority = $this->host;
-
-        if (! empty($this->getUserInfo())) {
-            $authority = $this->getUserInfo() . '@' . $authority;
+        if (! empty($userInfo = $this->getUserInfo())) {
+            $authority = $userInfo . '@' . $authority;
         }
 
         // N'ajoute pas de port s'il s'agit d'un port standard pour ce schéma
-        if (! empty($this->port) && ! $ignorePort && $this->port !== $this->defaultPorts[$this->scheme]) {
+        if ($this->port !== null && $this->port !== 0 && ! $ignorePort && $this->port !== $this->defaultPorts[$this->scheme]) {
             $authority .= ':' . $this->port;
         }
 
@@ -243,7 +241,7 @@ class Uri implements UriInterface
             $vars = $temp;
         }
 
-        return empty($vars) ? '' : http_build_query($vars);
+        return $vars === [] ? '' : http_build_query($vars);
     }
 
     /**
@@ -353,7 +351,7 @@ class Uri implements UriInterface
         }
 
         if (isset($path) && $path !== '') {
-            $uri .= substr($uri, -1, 1) !== '/'
+            $uri .= ! str_ends_with($uri, '/')
                 ? '/' . ltrim($path, '/')
                 : ltrim($path, '/');
         }
@@ -549,7 +547,7 @@ class Uri implements UriInterface
         }
 
         // Ne peut pas avoir de début ?
-        if (! empty($query) && str_starts_with($query, '?')) {
+        if ($query !== '' && str_starts_with($query, '?')) {
             $query = substr($query, 1);
         }
 
@@ -800,7 +798,7 @@ class Uri implements UriInterface
      */
     protected function mergePaths(self $base, self $reference): string
     {
-        if (! empty($base->getAuthority()) && '' === $base->getPath()) {
+        if ($base->getAuthority() !== '' && '' === $base->getPath()) {
             return '/' . ltrim($reference->getPath(), '/ ');
         }
 
@@ -824,7 +822,7 @@ class Uri implements UriInterface
      */
     public static function removeDotSegments(string $path): string
     {
-        if (empty($path) || $path === '/') {
+        if ($path === '' || $path === '/') {
             return $path;
         }
 
@@ -859,7 +857,7 @@ class Uri implements UriInterface
             }
 
             // Ajouter une barre oblique à la fin si nécessaire
-            if (substr($path, -1, 1) === '/') {
+            if (str_ends_with($path, '/')) {
                 $output .= '/';
             }
         }
@@ -878,7 +876,7 @@ class Uri implements UriInterface
         $config  = (object) config('app');
         $baseUri = new self($config->base_url);
 
-        if (substr($this->getScheme(), 0, 4) === 'http' && $this->getHost() === $baseUri->getHost()) {
+        if (str_starts_with($this->getScheme(), 'http') && $this->getHost() === $baseUri->getHost()) {
             // Vérifier la présence de segments supplémentaires
             $basePath = trim($baseUri->getPath(), '/') . '/';
             $trimPath = ltrim($path, '/');

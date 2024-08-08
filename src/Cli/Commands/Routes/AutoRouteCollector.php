@@ -24,11 +24,11 @@ final class AutoRouteCollector
      * @param string              $prefix               Préfixe URI pour Module Routing
      */
     public function __construct(
-        private string $namespace,
-        private string $defaultController,
-        private string $defaultMethod,
-        private array $httpMethods,
-        private array $protectedControllers,
+        private readonly string $namespace,
+        private readonly string $defaultController,
+        private readonly string $defaultMethod,
+        private readonly array $httpMethods,
+        private readonly array $protectedControllers,
         private string $prefix = ''
     ) {
     }
@@ -110,7 +110,7 @@ final class AutoRouteCollector
             // Recuperer les elements commun
             $middlewares = array_intersect($filtersLongest, $filtersShortest);
 
-            $route['middlewares'] = implode(' ', array_map([Helpers::class, 'classBasename'], $middlewares));
+            $route['middlewares'] = implode(' ', array_map(Helpers::classBasename(...), $middlewares));
         }
 
         return $routes;

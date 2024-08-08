@@ -589,7 +589,7 @@ abstract class Command
             $second = $this->color->line($second, $options['second']);
         }
 
-        return $this->write($first . ' ' . str_repeat((string) $options['sep'], $dashWidth) . ' ' . $second)->eol();
+        return $this->write($first . ' ' . str_repeat($options['sep'], $dashWidth) . ' ' . $second)->eol();
     }
 
     /**

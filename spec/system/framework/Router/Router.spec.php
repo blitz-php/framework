@@ -11,13 +11,14 @@
 
 use BlitzPHP\Container\Services;
 use BlitzPHP\Enums\Method;
+use BlitzPHP\Exceptions\BadRequestException;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Router\RouteCollection;
 use Spec\BlitzPHP\App\Middlewares\CustomMiddleware;
 
-describe('Router', function () {
-	beforeAll(function () {
+describe('Router', function (): void {
+	beforeAll(function (): void {
 		$this->createCollection = function(array $config = []) {
 			$default = array_merge(config('routing'), $config);
 
@@ -26,7 +27,7 @@ describe('Router', function () {
 		};
 	});
 
-    beforeEach(function () {
+    beforeEach(function (): void {
         $this->collection = Services::routes(false)->setDefaultNamespace('\\');
 
         $routes = [
@@ -55,8 +56,8 @@ describe('Router', function () {
         $this->request = Services::request()->withMethod('GET');
     });
 
-    describe('URI', function () {
-        it("L'URI vide correspond aux valeurs par défaut", function () {
+    describe('URI', function (): void {
+        it("L'URI vide correspond aux valeurs par défaut", function (): void {
             $router = Services::router($this->collection, $this->request, false);
             $router->handle('');
 
@@ -64,15 +65,23 @@ describe('Router', function () {
             expect('index')->toBe($router->methodName());
         });
 
-        it('Zéro comme chemin URI', function () {
+        it('Zéro comme chemin URI', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(static function () use ($router) {
+            expect(static function () use ($router): void {
                 $router->handle('0');
             })->toThrow(new PageNotFoundException());
         });
 
-        it("Mappages d'URI vers le contrôleur", function () {
+		it('Caracteres non autorisés', function (): void {
+            $router = Services::router($this->collection, $this->request, false);
+
+            expect(static function () use ($router): void {
+                $router->handle('test/%3Ca%3E');
+            })->toThrow(new BadRequestException());
+        });
+
+        it("Mappages d'URI vers le contrôleur", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('users');
@@ -81,7 +90,7 @@ describe('Router', function () {
             expect('index')->toBe($router->methodName());
         });
 
-        it("Mappages d'URI avec une barre oblique finale vers le contrôleur", function () {
+        it("Mappages d'URI avec une barre oblique finale vers le contrôleur", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('users/');
@@ -90,7 +99,7 @@ describe('Router', function () {
             expect('index')->toBe($router->methodName());
         });
 
-        it("Mappages d'URI vers une méthode alternative du contrôleur", function () {
+        it("Mappages d'URI vers une méthode alternative du contrôleur", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('posts');
@@ -99,7 +108,7 @@ describe('Router', function () {
             expect('posts')->toBe($router->methodName());
         });
 
-        it("Mappage d'URI vers le contrôleur ayant un sous namespace", function () {
+        it("Mappage d'URI vers le contrôleur ayant un sous namespace", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('pages');
@@ -108,7 +117,7 @@ describe('Router', function () {
             expect('list_all')->toBe($router->methodName());
         });
 
-        it("Mappage d'URI vers les paramètres aux références arrière", function () {
+        it("Mappage d'URI vers les paramètres aux références arrière", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('posts/123');
@@ -117,7 +126,7 @@ describe('Router', function () {
             expect(['123'])->toBe($router->params());
         });
 
-        it("Mappage d'URI vers les paramètres aux références arrière réarrangées", function () {
+        it("Mappage d'URI vers les paramètres aux références arrière réarrangées", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('posts/123/edit');
@@ -126,7 +135,7 @@ describe('Router', function () {
             expect(['123'])->toBe($router->params());
         });
 
-        it("Mappage d'URI vers les paramètres aux références arrière avec les inutilisés", function () {
+        it("Mappage d'URI vers les paramètres aux références arrière avec les inutilisés", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('books/123/sometitle/456');
@@ -135,7 +144,7 @@ describe('Router', function () {
             expect(['456', '123'])->toBe($router->params());
         });
 
-        xit("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
+        xit("Mappage d'URI vers les paramètres sans utilisation de références arrière", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('shop/123');
@@ -145,7 +154,7 @@ describe('Router', function () {
             expect(['123'])->toBe($router->params());
         });
 
-        xit("Mappage d'URI vers les paramètres sans utilisation de références arrière", function () {
+        xit("Mappage d'URI vers les paramètres sans utilisation de références arrière", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('shop/123/edit');
@@ -154,7 +163,7 @@ describe('Router', function () {
             expect(['123'])->toBe($router->params());
         });
 
-        it("Mappages d'URI avec plusieurs paramètres", function () {
+        it("Mappages d'URI avec plusieurs paramètres", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('objects/123/sort/abc/FOO');
@@ -163,7 +172,7 @@ describe('Router', function () {
             expect(['123', 'abc', 'FOO'])->toBe($router->params());
         });
 
-        it("Mappages d'URI avec plusieurs paramètres et une barre oblique de fin", function () {
+        it("Mappages d'URI avec plusieurs paramètres et une barre oblique de fin", function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('objects/123/sort/abc/FOO/');
@@ -172,7 +181,7 @@ describe('Router', function () {
             expect(['123', 'abc', 'FOO'])->toBe($router->params());
         });
 
-        it('Closures', function () {
+        it('Closures', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('closure/123/alpha');
@@ -186,16 +195,16 @@ describe('Router', function () {
         });
     });
 
-    describe('Route', function () {
-        it(': Message d\'exception quand la route n\'existe pas', function () {
+    describe('Route', function (): void {
+        it(': Message d\'exception quand la route n\'existe pas', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(static function () use ($router) {
+            expect(static function () use ($router): void {
                 $router->handle('url/not-exists');
             })->toThrow(new PageNotFoundException("Impossible de trouver une route pour 'GET: url/not-exists'."));
         });
 
-        it(': Détection de la langue', function () {
+        it(': Détection de la langue', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('fr/pages');
@@ -209,7 +218,7 @@ describe('Router', function () {
             expect($router->getLocale())->toBe('bg');
         });
 
-        it(': Route resource', function () {
+        it(': Route resource', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('admin/admins');
@@ -218,15 +227,15 @@ describe('Router', function () {
             expect($router->methodName())->toBe('list_all');
         });
 
-        it(': Route avec barre oblique dans le nom du contrôleur', function () {
+        it(': Route avec barre oblique dans le nom du contrôleur', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(static function () use ($router) {
+            expect(static function () use ($router): void {
                 $router->handle('admin/admins/edit/1');
             })->toThrow(new RouterException('The namespace delimiter is a backslash (\), not a slash (/). Route handler: \App/Admin/Admins::edit_show/$1'));
         });
 
-        it(': Route avec barre oblique en tête', function () {
+        it(': Route avec barre oblique en tête', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('some/slash');
@@ -235,20 +244,20 @@ describe('Router', function () {
             expect($router->methodName())->toBe('index');
         });
 
-        it(': Routage avec contrôleur dynamique', function () {
+        it(': Routage avec contrôleur dynamique', function (): void {
             $router = Services::router($this->collection, $this->request, false);
 
-            expect(static function () use ($router) {
+            expect(static function () use ($router): void {
                 $router->handle('en/zoo/bar');
             })->toThrow(new RouterException('A dynamic controller is not allowed for security reasons. Route handler: \$2::$3/$1'));
         });
 
-        it(': Options de route', function () {
-            $this->collection->add('foo', static function () {}, [
+        it(': Options de route', function (): void {
+            $this->collection->add('foo', static function (): void {}, [
                 'as'  => 'login',
                 'foo' => 'baz',
             ]);
-            $this->collection->add('baz', static function () {}, [
+            $this->collection->add('baz', static function (): void {}, [
                 'as'  => 'admin',
                 'foo' => 'bar',
             ]);
@@ -260,7 +269,7 @@ describe('Router', function () {
             expect($router->getMatchedRouteOptions())->toBe(['as' => 'login', 'foo' => 'baz']);
         });
 
-        it(': Ordre de routage', function () {
+        it(': Ordre de routage', function (): void {
             $this->collection->post('auth', 'Main::auth_post');
             $this->collection->add('auth', 'Main::index');
 
@@ -273,7 +282,7 @@ describe('Router', function () {
             expect($router->methodName())->toBe('auth_post');
         });
 
-        it(': Ordre de priorité de routage', function () {
+        it(': Ordre de priorité de routage', function (): void {
             $this->collection->add('main', 'Main::index');
             $this->collection->add('(.*)', 'Main::wildcard', ['priority' => 1]);
             $this->collection->add('module', 'Module::index');
@@ -292,18 +301,24 @@ describe('Router', function () {
             expect($router->methodName())->toBe('index');
         });
 
-        it(': Expression régulière avec Unicode', function () {
-            $this->collection->get('news/([a-z0-9\x{0980}-\x{09ff}-]+)', 'News::view/$1');
+        it(': Expression régulière avec Unicode', function (): void {
+            config()->set('app.permitted_uri_chars', 'a-z 0-9~%.:_\-\x{0980}-\x{09ff}');
+
+			$this->collection->get('news/([a-z0-9\x{0980}-\x{09ff}-]+)', 'News::view/$1');
             $router = Services::router($this->collection, $this->request, false);
 
             $router->handle('news/a0%E0%A6%80%E0%A7%BF-');
             expect($router->controllerName())->toBe('NewsController');
             expect($router->methodName())->toBe('view');
             expect($router->params())->toBe(['a0ঀ৿-']);
+
+			config()->reset('app.permitted_uri_chars');
         });
 
-        it(': Espace réservé d\'expression régulière avec Unicode', function () {
-            $this->collection->addPlaceholder('custom', '[a-z0-9\x{0980}-\x{09ff}-]+');
+        it(': Espace réservé d\'expression régulière avec Unicode', function (): void {
+            config()->set('app.permitted_uri_chars', 'a-z 0-9~%.:_\-\x{0980}-\x{09ff}');
+
+			$this->collection->addPlaceholder('custom', '[a-z0-9\x{0980}-\x{09ff}-]+');
             $this->collection->get('news/(:custom)', 'News::view/$1');
             $router = Services::router($this->collection, $this->request, false);
 
@@ -311,12 +326,14 @@ describe('Router', function () {
             expect($router->controllerName())->toBe('NewsController');
             expect($router->methodName())->toBe('view');
             expect($router->params())->toBe(['a0ঀ৿-']);
+
+			config()->reset('app.permitted_uri_chars');
         });
     });
 
-    describe('Groupes et middlewares', function () {
-        it(': Le routeur fonctionne avec les middlewares', function () {
-            $this->collection->group('foo', ['middleware' => 'test'], static function (RouteCollection $routes) {
+    describe('Groupes et middlewares', function (): void {
+        it(': Le routeur fonctionne avec les middlewares', function (): void {
+            $this->collection->group('foo', ['middleware' => 'test'], static function (RouteCollection $routes): void {
                 $routes->add('bar', 'TestController::foobar');
             });
 
@@ -328,7 +345,7 @@ describe('Router', function () {
             expect($router->getMiddlewares())->toBe(['test']);
         });
 
-        it(': Ressources groupées avec des route ayant les middlewares', function () {
+        it(': Ressources groupées avec des route ayant les middlewares', function (): void {
             $group = [
                 'api',
                 [
@@ -353,7 +370,7 @@ describe('Router', function () {
             expect($router->getMiddlewares())->toBe(['api-auth']);
         });
 
-        it(': Le routeur fonctionne avec un nom de classe comme middleware', function () {
+        it(': Le routeur fonctionne avec un nom de classe comme middleware', function (): void {
             $this->collection->add('foo', 'TestController::foo', ['middleware' => CustomMiddleware::class]);
 
             $router = Services::router($this->collection, $this->request, false);
@@ -364,7 +381,7 @@ describe('Router', function () {
             expect($router->getMiddlewares())->toBe([CustomMiddleware::class]);
         });
 
-        it(': Le routeur fonctionne avec plusieurs middlewares', function () {
+        it(': Le routeur fonctionne avec plusieurs middlewares', function (): void {
             $this->collection->add('foo', 'TestController::foo', ['middleware' => ['filter1', 'filter2:param']]);
 
             $router = Services::router($this->collection, $this->request, false);
@@ -375,7 +392,7 @@ describe('Router', function () {
             expect($router->getMiddlewares())->toBe(['filter1', 'filter2:param']);
         });
 
-        it(': Correspond correctement aux verbes mixtes', function () {
+        it(': Correspond correctement aux verbes mixtes', function (): void {
             $this->collection->setHTTPVerb(Method::GET);
 
             $this->collection->add('/', 'Home::index');
@@ -403,8 +420,8 @@ describe('Router', function () {
         });
     });
 
-    describe('Traduction des tirets d\'URI', function () {
-        it(': Traduire les tirets URI en snake case (methode) et pascal case (controleur) lorsqu\'on desactive la traduction d\'URI', function () {
+    describe('Traduction des tirets d\'URI', function (): void {
+        it(': Traduire les tirets URI en snake case (methode) et pascal case (controleur) lorsqu\'on desactive la traduction d\'URI', function (): void {
             $this->collection->setTranslateURIDashes(false);
 
             $router = Services::router($this->collection, $this->request, false);
@@ -414,7 +431,7 @@ describe('Router', function () {
             expect($router->methodName())->toBe('show_list');
         });
 
-        it(': Traduire les tirets URI', function () {
+        it(': Traduire les tirets URI', function (): void {
             $this->collection->setTranslateURIDashes(true);
 
             $router = Services::router($this->collection, $this->request, false);
@@ -424,7 +441,7 @@ describe('Router', function () {
             expect($router->methodName())->toBe('show_list');
         });
 
-        it(': Traduire les tirets URI pour les paramètres', function () {
+        it(': Traduire les tirets URI pour les paramètres', function (): void {
             $this->collection->setTranslateURIDashes(true);
             $router = Services::router($this->collection, $this->request, false);
 
@@ -435,8 +452,8 @@ describe('Router', function () {
         });
     });
 
-	describe('Segments multiple', function () {
-		it('l\'option de segment multiple est desactivee', function () {
+	describe('Segments multiple', function (): void {
+		it('l\'option de segment multiple est desactivee', function (): void {
 			$this->collection->get('product/(:any)', 'Catalog::productLookup/$1');
 			$router = Services::router($this->collection, $this->request, false);
 
@@ -447,7 +464,7 @@ describe('Router', function () {
 			expect(['123', '456'])->toBe($router->params());
 		});
 
-		xit('l\'option de segment multiple est activee', function () {
+		xit('l\'option de segment multiple est activee', function (): void {
 			$collection = $this->createCollection([
 				'multiple_segments_one_param' => true,
 			]);

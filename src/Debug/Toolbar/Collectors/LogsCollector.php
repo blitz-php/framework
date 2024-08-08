@@ -57,7 +57,7 @@ class LogsCollector extends BaseCollector
     {
         $this->collectLogs();
 
-        return empty($this->data);
+        return $this->data === [];
     }
 
     /**
@@ -75,7 +75,7 @@ class LogsCollector extends BaseCollector
      */
     protected function collectLogs()
     {
-        if (! empty($this->data)) {
+        if ($this->data !== []) {
             return $this->data;
         }
 

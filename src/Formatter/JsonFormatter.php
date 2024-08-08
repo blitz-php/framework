@@ -53,6 +53,6 @@ class JsonFormatter implements FormatterInterface
      */
     public function parse(string $data): array
     {
-        return $data ? json_decode(trim($data), true) : [];
+        return $data !== '' ? json_decode(trim($data), true) : [];
     }
 }

@@ -21,8 +21,8 @@ use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Spec\Mock\MockRequest;
 use BlitzPHP\Spec\ReflectionHelper;
 
-describe('Redirection', function () {
-    beforeAll(function () {
+describe('Redirection', function (): void {
+    beforeAll(function (): void {
         $this->routes = new RouteCollection(Services::locator(), (object) config('routing'));
         Services::injectMock('routes', $this->routes);
 
@@ -30,11 +30,11 @@ describe('Redirection', function () {
         Services::injectMock('request', $this->request);
     });
 
-    beforeEach(function () {
+    beforeEach(function (): void {
     });
 
-    describe('Redirection simple', function () {
-        it('Redirection vers une URL complete', function () {
+    describe('Redirection simple', function (): void {
+        it('Redirection vers une URL complete', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->to('http://example.com/foo');
@@ -43,7 +43,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('http://example.com/foo');
         });
 
-        it('Redirection vers une URL relative convertie en URL complete', function () {
+        it('Redirection vers une URL relative convertie en URL complete', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->to('/foo');
@@ -52,7 +52,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('http://example.com/foo');
         });
 
-        it('Redirection avec une baseURL personalisee', function () {
+        it('Redirection avec une baseURL personalisee', function (): void {
             config(['app.base_url' => 'http://example.com/test/']);
 
             $request  = new MockRequest();
@@ -67,8 +67,8 @@ describe('Redirection', function () {
         });
     });
 
-    describe('Redirection vers une route', function () {
-        it('Redirection vers une route', function () {
+    describe('Redirection vers une route', function (): void {
+        it('Redirection vers une route', function (): void {
             $this->routes->add('exampleRoute', 'Home::index');
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -86,7 +86,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRoute2');
         });
 
-        it('Redirection vers un mauvais nom de route', function () {
+        it('Redirection vers un mauvais nom de route', function (): void {
             $this->routes->add('exampleRoute', 'Home::index');
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -95,7 +95,7 @@ describe('Redirection', function () {
                 ->toThrow(new HttpException());
         });
 
-        it('Redirection vers une mauvaise methode de controleur', function () {
+        it('Redirection vers une mauvaise methode de controleur', function (): void {
             $this->routes->add('exampleRoute', 'Home::index');
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -104,7 +104,7 @@ describe('Redirection', function () {
                 ->toThrow(new HttpException());
         });
 
-        it('Redirection vers une route nommee et avec une baseURL personalisee', function () {
+        it('Redirection vers une route nommee et avec une baseURL personalisee', function (): void {
             config(['app.base_url' => 'http://example.com/test/']);
 
             $request  = new MockRequest();
@@ -120,7 +120,7 @@ describe('Redirection', function () {
             config(['app.base_url' => BASE_URL]);
         });
 
-        it('Redirection vers une route avec parametres', function () {
+        it('Redirection vers une route avec parametres', function (): void {
             $this->routes->add('users/(:num)', 'Home::index', ['as' => 'users.profile']);
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -135,8 +135,8 @@ describe('Redirection', function () {
         });
     });
 
-    describe('With', function () {
-        it('WithInput', function () {
+    describe('With', function (): void {
+        it('WithInput', function (): void {
             $_SESSION = [];
             $_GET     = ['foo' => 'bar'];
             $_POST    = ['bar' => 'baz'];
@@ -151,7 +151,7 @@ describe('Redirection', function () {
             expect($_SESSION['_blitz_old_input']['post']['bar'])->toBe('baz');
         });
 
-        it('With', function () {
+        it('With', function (): void {
             $_SESSION = [];
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -162,7 +162,7 @@ describe('Redirection', function () {
             expect($_SESSION)->toContainKey('foo');
         });
 
-        it('WithCookies', function () {
+        it('WithCookies', function (): void {
             Services::set(
                 Response::class,
                 Services::response()->cookie('foo', 'bar')
@@ -183,7 +183,7 @@ describe('Redirection', function () {
             ReflectionHelper::setPrivateProperty($response, '_cookies', new CookieCollection());
             Services::set(Response::class, $response);
         });
-        it('WithCookies vides', function () {
+        it('WithCookies vides', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->withCookies();
@@ -191,7 +191,7 @@ describe('Redirection', function () {
             expect($response->getCookies())->toBe([]);
         });
 
-        it('WithHeaders', function () {
+        it('WithHeaders', function (): void {
             Services::set(
                 Response::class,
                 $baseResponse = Services::response()->header('foo', 'bar')
@@ -209,7 +209,7 @@ describe('Redirection', function () {
             }
         });
 
-        it('WithHeaders vide', function () {
+        it('WithHeaders vide', function (): void {
             $baseResponse = Services::response();
 
             foreach (array_keys($baseResponse->getHeaders()) as $key) {
@@ -224,7 +224,7 @@ describe('Redirection', function () {
             expect(count($response->getHeaders()))->toBe(1);
         });
 
-        it('WithErrors', function () {
+        it('WithErrors', function (): void {
             $_SESSION = [];
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -238,8 +238,8 @@ describe('Redirection', function () {
         });
     });
 
-    describe('Redirect back', function () {
-        it('back', function () {
+    describe('Redirect back', function (): void {
+        it('back', function (): void {
             $_SERVER['HTTP_REFERER'] = 'http://somewhere.com';
 
             $this->request = new MockRequest();
@@ -252,17 +252,17 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('http://somewhere.com');
         });
 
-        it('HTTP REFERER manquant', function () {
+        it('HTTP REFERER manquant', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $returned = $response->back();
 
-            expect($response)->toBeAnInstanceOf(get_class($returned));
+            expect($response)->toBeAnInstanceOf($returned::class);
         });
     });
 
-    describe('Methodes raccourcies', function () {
-        it('home', function () {
+    describe('Methodes raccourcies', function (): void {
+        it('home', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->home();
@@ -279,7 +279,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('http://example.com/exampleRouteHome');
         });
 
-        it('action', function () {
+        it('action', function (): void {
             $this->routes->add('action', 'Controller::index');
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
@@ -301,7 +301,7 @@ describe('Redirection', function () {
             expect(static fn () => $response->action('fackeAction::method'))->toThrow(new RouterException('Action fackeAction::method not defined.'));
         });
 
-        it('away', function () {
+        it('away', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->away('http://google.com');
@@ -310,7 +310,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('http://google.com');
         });
 
-        it('secure', function () {
+        it('secure', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->secure('foo');
@@ -319,7 +319,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('https://example.com/foo');
         });
 
-        it('refresh', function () {
+        it('refresh', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->refresh();
@@ -328,7 +328,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe(trim(BASE_URL, '/'));
         });
 
-        it('guest', function () {
+        it('guest', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->guest('home');
@@ -337,7 +337,7 @@ describe('Redirection', function () {
             expect($response->getHeaderLine('Location'))->toBe('http://example.com/home');
         });
 
-        it('intended', function () {
+        it('intended', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
             $response = $response->intended();

@@ -170,36 +170,15 @@ class Logger implements LoggerInterface
      */
     private function pushHandler(string $handler, stdClass $options)
     {
-        switch ($handler) {
-            case 'error':
-                $this->pushErrorHandler($options);
-                break;
-
-            case 'email':
-                $this->pushEmailHandler($options);
-                break;
-
-            case 'telegram':
-                $this->pushTelegramHandler($options);
-                break;
-
-            case 'chrome':
-                $this->pushChromeHandler($options);
-                break;
-
-            case 'firebug':
-                $this->pushFirebugHandler($options);
-                break;
-
-            case 'browser':
-                $this->pushBrowserHandler($options);
-                break;
-
-            default:
-                // File handler
-                $this->pushFileHandler($options);
-                break;
-        }
+        match ($handler) {
+            'error'    => $this->pushErrorHandler($options),
+            'email'    => $this->pushEmailHandler($options),
+            'telegram' => $this->pushTelegramHandler($options),
+            'chrome'   => $this->pushChromeHandler($options),
+            'firebug'  => $this->pushFirebugHandler($options),
+            'browser'  => $this->pushBrowserHandler($options),
+            default    => $this->pushFileHandler($options),
+        };
     }
 
     /**
@@ -310,38 +289,16 @@ class Logger implements LoggerInterface
      */
     private function pushProcessor(string $processor)
     {
-        switch ($processor) {
-            case 'web':
-                $this->monolog->pushProcessor(new WebProcessor());
-                break;
-
-            case 'introspection':
-                $this->monolog->pushProcessor(new IntrospectionProcessor());
-                break;
-
-            case 'hostname':
-                $this->monolog->pushProcessor(new HostnameProcessor());
-                break;
-
-            case 'process_id':
-                $this->monolog->pushProcessor(new ProcessIdProcessor());
-                break;
-
-            case 'uid':
-                $this->monolog->pushProcessor(new UidProcessor());
-                break;
-
-            case 'memory_usage':
-                $this->monolog->pushProcessor(new MemoryUsageProcessor());
-                break;
-
-            case 'psr':
-                $this->monolog->pushProcessor(new PsrLogMessageProcessor());
-                break;
-
-            default:
-                throw new InvalidArgumentException('Invalid formatter for log processor. Accepts values: web/introspection/hostname/process_id/uid/memory_usage/psr');
-        }
+        match ($processor) {
+            'web'           => $this->monolog->pushProcessor(new WebProcessor()),
+            'introspection' => $this->monolog->pushProcessor(new IntrospectionProcessor()),
+            'hostname'      => $this->monolog->pushProcessor(new HostnameProcessor()),
+            'process_id'    => $this->monolog->pushProcessor(new ProcessIdProcessor()),
+            'uid'           => $this->monolog->pushProcessor(new UidProcessor()),
+            'memory_usage'  => $this->monolog->pushProcessor(new MemoryUsageProcessor()),
+            'psr'           => $this->monolog->pushProcessor(new PsrLogMessageProcessor()),
+            default         => throw new InvalidArgumentException('Invalid formatter for log processor. Accepts values: web/introspection/hostname/process_id/uid/memory_usage/psr'),
+        };
     }
 
     /**
@@ -355,10 +312,10 @@ class Logger implements LoggerInterface
             return $handler;
         }
 
-        if (empty($format)) {
+        if ($format === null || $format === '') {
             $format = 'json';
         }
-        if (! empty($allowed) && ! in_array($format, $allowed, true)) {
+        if ($allowed !== [] && ! in_array($format, $allowed, true)) {
             throw new InvalidArgumentException('Invalid formatter for log file handler. Accepts values: ' . implode('/', $allowed));
         }
 

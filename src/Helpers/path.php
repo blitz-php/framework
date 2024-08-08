@@ -19,7 +19,7 @@ if (! function_exists('css_path')) {
      */
     function css_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
@@ -41,7 +41,7 @@ if (! function_exists('js_path')) {
      */
     function js_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
@@ -63,7 +63,7 @@ if (! function_exists('lib_path')) {
      */
     function lib_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -81,7 +81,7 @@ if (! function_exists('less_path')) {
      */
     function less_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
@@ -103,7 +103,7 @@ if (! function_exists('img_path')) {
      */
     function img_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -121,7 +121,7 @@ if (! function_exists('docs_path')) {
      */
     function docs_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -139,7 +139,7 @@ if (! function_exists('video_path')) {
      */
     function video_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -157,7 +157,7 @@ if (! function_exists('public_path')) {
      */
     function public_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -175,7 +175,7 @@ if (! function_exists('root_path')) {
      */
     function root_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -193,7 +193,7 @@ if (! function_exists('base_path')) {
      */
     function base_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -211,7 +211,7 @@ if (! function_exists('resource_path')) {
      */
     function resource_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -229,7 +229,7 @@ if (! function_exists('class_path')) {
      */
     function class_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -247,7 +247,7 @@ if (! function_exists('config_path')) {
      */
     function config_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
@@ -270,7 +270,7 @@ if (! function_exists('controller_path')) {
      */
     function controller_path(string $name = '', bool $only = true): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if ($only === true && ! preg_match('#Controller\.php$#', $name)) {
@@ -293,7 +293,7 @@ if (! function_exists('entity_path')) {
      */
     function entity_path(string $name = '', bool $only = true): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if ($only === true && ! preg_match('#Entity\.php$#', $name)) {
@@ -316,7 +316,7 @@ if (! function_exists('helper_path')) {
      */
     function helper_path(string $name = '', bool $system = false): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
@@ -342,7 +342,7 @@ if (! function_exists('library_path')) {
      */
     function library_path(string $name = '', bool $system = false): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
@@ -370,7 +370,7 @@ if (! function_exists('middleware_path')) {
      */
     function middleware_path(string $name = '', bool $system = false, bool $only = true): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if ($only === true && ! preg_match('#Middleware\.php$#', $name)) {
@@ -396,7 +396,7 @@ if (! function_exists('model_path')) {
      */
     function model_path(string $name = '', bool $only = true): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if ($only === true && ! preg_match('#Model\.php$#', $name)) {
@@ -418,7 +418,7 @@ if (! function_exists('app_resource_path')) {
      */
     function app_resource_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -436,7 +436,7 @@ if (! function_exists('migration_path')) {
      */
     function migration_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -454,7 +454,7 @@ if (! function_exists('seed_path')) {
      */
     function seed_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -473,7 +473,7 @@ if (! function_exists('lang_path')) {
      */
     function lang_path(string $name = '', bool $system = false): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
         if ($system === true) {
@@ -495,7 +495,7 @@ if (! function_exists('service_path')) {
      */
     function service_path(string $name = '', bool $only = true): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
             if ($only === true && ! preg_match('#Service\.php$#', $name)) {
@@ -517,7 +517,7 @@ if (! function_exists('view_path')) {
      */
     function view_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -535,7 +535,7 @@ if (! function_exists('layout_path')) {
      */
     function layout_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -553,7 +553,7 @@ if (! function_exists('partial_path')) {
      */
     function partial_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -571,7 +571,7 @@ if (! function_exists('app_path')) {
      */
     function app_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -589,7 +589,7 @@ if (! function_exists('cache_path')) {
      */
     function cache_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -607,7 +607,7 @@ if (! function_exists('dump_path')) {
      */
     function dump_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -625,7 +625,7 @@ if (! function_exists('storage_path')) {
      */
     function storage_path(string $name = ''): string
     {
-        if (! empty($name)) {
+        if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
 
@@ -1043,10 +1043,8 @@ if (! function_exists('include_config')) {
      * @param string $name     nom du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function include_config(string $name, array $data = [], bool $required = true)
+    function include_config(string $name, array $data = [], bool $required = true): void
     {
         _include_path(config_path($name), $data, $required);
     }
@@ -1062,10 +1060,8 @@ if (! function_exists('include_controller')) {
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
      * @param bool   $only     specifie si on veut seulement les contrôleurs (fichier php ayant le suffixe Controller)
-     *
-     * @return void
      */
-    function include_controller(string $name, array $data = [], bool $required = true, bool $only = true)
+    function include_controller(string $name, array $data = [], bool $required = true, bool $only = true): void
     {
         _include_path(controller_path($name, $only), $data, $required);
     }
@@ -1080,10 +1076,8 @@ if (! function_exists('include_class')) {
      * @param string $name     nom du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function include_class(string $name, array $data = [], bool $required = true)
+    function include_class(string $name, array $data = [], bool $required = true): void
     {
         _include_path(class_path($name), $data, $required);
     }
@@ -1099,10 +1093,8 @@ if (! function_exists('include_entity')) {
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
      * @param bool   $only     specifie si on veut seulement les entités (fichier php ayant le suffixe Entity)
-     *
-     * @return void
      */
-    function include_entity(string $name, array $data = [], bool $required = true, bool $only = true)
+    function include_entity(string $name, array $data = [], bool $required = true, bool $only = true): void
     {
         _include_path(entity_path($name, $only), $data, $required);
     }
@@ -1117,10 +1109,8 @@ if (! function_exists('include_helper')) {
      * @param string $name     nom du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function include_helper(string $name, array $data = [], bool $required = true)
+    function include_helper(string $name, array $data = [], bool $required = true): void
     {
         _include_path(helper_path($name), $data, $required);
     }
@@ -1136,10 +1126,8 @@ if (! function_exists('include_library')) {
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
      * @param bool   $system   specifie s'il s'agit des librairies systeme ou applicatif
-     *
-     * @return void
      */
-    function include_library(string $name, array $data = [], bool $required = true, bool $system = false)
+    function include_library(string $name, array $data = [], bool $required = true, bool $system = false): void
     {
         _include_path(library_path($name, $system), $data, $required);
     }
@@ -1156,10 +1144,8 @@ if (! function_exists('include_middleware')) {
      * @param bool   $required specifie si le fichier est obligatoire ou pas
      * @param bool   $system   specifie s'il s'agit des middlewares systeme ou applicatif
      * @param bool   $only     specifie si on veut seulement les middlewares (fichiers php ayant le suffixe Middleware)
-     *
-     * @return void
      */
-    function include_middleware(string $name, array $data = [], bool $required = true, bool $system = false, bool $only = true)
+    function include_middleware(string $name, array $data = [], bool $required = true, bool $system = false, bool $only = true): void
     {
         _include_path(middleware_path($name, $system, $only), $data, $required);
     }
@@ -1175,10 +1161,8 @@ if (! function_exists('include_model')) {
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
      * @param bool   $only     specifie si on veut seulement les modèles (fichier php ayant le suffixe Model)
-     *
-     * @return void
      */
-    function include_model(string $name, array $data = [], bool $required = true, bool $only = true)
+    function include_model(string $name, array $data = [], bool $required = true, bool $only = true): void
     {
         _include_path(model_path($name, $only), $data, $required);
     }
@@ -1193,10 +1177,8 @@ if (! function_exists('include_resource')) {
      * @param string $name     nom du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function include_resource(string $name, array $data = [], bool $required = true)
+    function include_resource(string $name, array $data = [], bool $required = true): void
     {
         _include_path(resource_path($name), $data, $required);
     }
@@ -1212,10 +1194,8 @@ if (! function_exists('include_service')) {
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
      * @param bool   $only     specifie si on veut seulement les services (fichier php ayant le suffixe Service)
-     *
-     * @return void
      */
-    function include_service(string $name, array $data = [], bool $required = true, bool $only = true)
+    function include_service(string $name, array $data = [], bool $required = true, bool $only = true): void
     {
         _include_path(service_path($name, $only), $data, $required);
     }
@@ -1230,10 +1210,8 @@ if (! function_exists('include_view')) {
      * @param string $name     nom du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function include_view(string $name, array $data = [], bool $required = true)
+    function include_view(string $name, array $data = [], bool $required = true): void
     {
         _include_path(view_path($name), $data, $required);
     }
@@ -1248,10 +1226,8 @@ if (! function_exists('include_layout')) {
      * @param string $name     nom du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function include_layout(string $name, array $data = [], bool $required = true)
+    function include_layout(string $name, array $data = [], bool $required = true): void
     {
         _include_path(layout_path($name), $data, $required);
     }
@@ -1266,10 +1242,8 @@ if (! function_exists('include_partial')) {
      * @param string $name     nom du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function include_partial(string $name, array $data = [], bool $required = true)
+    function include_partial(string $name, array $data = [], bool $required = true): void
     {
         _include_path(partial_path($name), $data, $required);
     }
@@ -1282,10 +1256,8 @@ if (! function_exists('_include_path')) {
      * @param string $path     chemin du fichier dont on veut inclure
      * @param array  $data     les données à transferer dans le fichier inclus
      * @param bool   $required specifie si le fichier est obligatoire ou pas
-     *
-     * @return void
      */
-    function _include_path(string $path, array $data = [], bool $required = true)
+    function _include_path(string $path, array $data = [], bool $required = true): void
     {
         if (file_exists($path)) {
             extract($data);

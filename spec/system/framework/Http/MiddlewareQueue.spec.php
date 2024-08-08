@@ -15,16 +15,16 @@ use BlitzPHP\Spec\ReflectionHelper;
 use Spec\BlitzPHP\App\Middlewares\DumbMiddleware;
 use Spec\BlitzPHP\App\Middlewares\SampleMiddleware;
 
-describe('Http / MiddlewareQueue', function () {
-    beforeAll(function () {
+describe('Http / MiddlewareQueue', function (): void {
+    beforeAll(function (): void {
 		$this->request    = Services::request();
 		$this->response   = Services::response();
 		$this->container  = Services::container();
 		$this->middleware = fn (array $middlewares = []) => new MiddlewareQueue($this->container, $middlewares, $this->request, $this->response);
     });
 
-    describe('Constructeur', function () {
-		it('Ajout de middleware via le constructeur', function () {
+    describe('Constructeur', function (): void {
+		it('Ajout de middleware via le constructeur', function (): void {
 			$cb = function (): void {
 			};
 
@@ -36,8 +36,8 @@ describe('Http / MiddlewareQueue', function () {
 		});
     });
 
-    describe('Recuperation du middleware courant', function () {
-		it('Est-ce que la recuperation du middleware courant fonctionne', function () {
+    describe('Recuperation du middleware courant', function (): void {
+		it('Est-ce que la recuperation du middleware courant fonctionne', function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -48,7 +48,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toBe($cb);
 		});
 
-		it('current() leve une exception pour une position actuelle invalide', function () {
+		it('current() leve une exception pour une position actuelle invalide', function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -56,8 +56,8 @@ describe('Http / MiddlewareQueue', function () {
 		});
     });
 
-    describe('Ajout de middleware a la pile', function () {
-		it('add() renvoie l\'instance', function () {
+    describe('Ajout de middleware a la pile', function (): void {
+		it('add() renvoie l\'instance', function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -67,7 +67,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->add($cb))->toBe($queue);
 		});
 
-		it('Les middlewares sont ajoutés dans le bon ordre', function () {
+		it('Les middlewares sont ajoutés dans le bon ordre', function (): void {
 			$one = function (): void {
 			};
 			$two = function (): void {
@@ -89,7 +89,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toBe($two);
 		});
 
-		it('prepend() renvoie l\'instance', function () {
+		it('prepend() renvoie l\'instance', function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -99,7 +99,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->prepend($cb))->toBe($queue);
 		});
 
-		it('Les middlewares sont ajoutés en debut de chaine dans le bon ordre', function () {
+		it('Les middlewares sont ajoutés en debut de chaine dans le bon ordre', function (): void {
 			$one = function (): void {
 			};
 			$two = function (): void {
@@ -121,7 +121,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toBe($one);
 		});
 
-		it('Ajout de middlewares sous forme de chaine de caractere', function () {
+		it('Ajout de middlewares sous forme de chaine de caractere', function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -132,7 +132,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current())->toBeAnInstanceOf(SampleMiddleware::class);
 		});
 
-		it('Ajout de middlewares via un tableau', function () {
+		it('Ajout de middlewares via un tableau', function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -140,7 +140,7 @@ describe('Http / MiddlewareQueue', function () {
 			};
 
 			$queue->add([$one]);
-	        $queue->prepend(['Spec\BlitzPHP\App\Middlewares\SampleMiddleware']);
+	        $queue->prepend([SampleMiddleware::class]);
 
 			expect($queue->current())->toBeAnInstanceOf(SampleMiddleware::class);
 			$queue->next();
@@ -148,8 +148,8 @@ describe('Http / MiddlewareQueue', function () {
 		});
     });
 
-    describe('Insertion', function () {
-		it('Insertion a une position quelconque', function () {
+    describe('Insertion', function (): void {
+		it('Insertion a une position quelconque', function (): void {
 			$one = function (): void {
 			};
 			$two = function (): void {
@@ -181,7 +181,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toBe($two);
 		});
 
-		it('Insertion a une position hors limite', function () {
+		it('Insertion a une position hors limite', function (): void {
 			$one = function (): void {
 			};
 			$two = function (): void {
@@ -198,7 +198,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toBe($two);
 		});
 
-		it('Insertion a une position negative', function () {
+		it('Insertion a une position negative', function (): void {
 			$one = function (): void {
 			};
 			$two = function (): void {
@@ -218,7 +218,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toBe($one);
 		});
 
-		it('Insertion avant une classe', function () {
+		it('Insertion avant une classe', function (): void {
 			$one = function (): void {
 			};
 			$two = new SampleMiddleware();
@@ -255,7 +255,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current())->toBeAnInstanceOf(SampleMiddleware::class);
 		});
 
-		it('Insertion avant une classe invalide leve une exception', function () {
+		it('Insertion avant une classe invalide leve une exception', function (): void {
 			$one = function (): void {
 			};
 			$two = new SampleMiddleware();
@@ -269,7 +269,7 @@ describe('Http / MiddlewareQueue', function () {
 				->toThrow(new LogicException("No middleware matching 'InvalidClassName' could be found."));
 		});
 
-		it('Insertion avant une classe', function () {
+		it('Insertion avant une classe', function (): void {
 			$one = new SampleMiddleware();
 			$two = function (): void {
 			};
@@ -294,9 +294,9 @@ describe('Http / MiddlewareQueue', function () {
 
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
-			$one = 'Spec\BlitzPHP\App\Middlewares\SampleMiddleware';
+			$one = SampleMiddleware::class;
 
-			$queue->add($one)->add($two)->insertAfter('Spec\BlitzPHP\App\Middlewares\SampleMiddleware', $three);
+			$queue->add($one)->add($two)->insertAfter(SampleMiddleware::class, $three);
 
 			expect($queue)->toHaveLength(3);
 			expect($queue->current())->toBeAnInstanceOf(SampleMiddleware::class);
@@ -306,7 +306,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toEqual($two);
 		});
 
-		it('Insertion apres une classe invalide ne leve pas une exception', function () {
+		it('Insertion apres une classe invalide ne leve pas une exception', function (): void {
 			$one = new SampleMiddleware();
 			$two = function (): void {
 			};
@@ -327,8 +327,8 @@ describe('Http / MiddlewareQueue', function () {
 		});
     });
 
-	describe('Container', function () {
-		it("S'assurer que le middleware fourni par le conteneur est le meme objet", function () {
+	describe('Container', function (): void {
+		it("S'assurer que le middleware fourni par le conteneur est le meme objet", function (): void {
 			$middleware = new SampleMiddleware();
 			$this->container->set(SampleMiddleware::class, $middleware);
 			$queue = new MiddlewareQueue($this->container, [], $this->request, $this->response);
@@ -337,7 +337,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current())->toBe($middleware);
 		});
 
-		it("S'assurer qu'une exception est levee pour les middlewares inconnu", function () {
+		it("S'assurer qu'une exception est levee pour les middlewares inconnu", function (): void {
 			$queue = new MiddlewareQueue($this->container, [], $this->request, $this->response);
 			$queue->add('UnresolvableMiddleware');
 
@@ -346,8 +346,8 @@ describe('Http / MiddlewareQueue', function () {
 		});
 	});
 
-	describe('Alias & register', function () {
-		it("Definition des alias", function () {
+	describe('Alias & register', function (): void {
+		it("Definition des alias", function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -367,7 +367,7 @@ describe('Http / MiddlewareQueue', function () {
 			]);
 		});
 
-		it("Utilisation des alias dans l'insertion", function () {
+		it("Utilisation des alias dans l'insertion", function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -395,7 +395,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current()->getCallable())->toBe($one);
 		});
 
-		it("Utilisation des alias dans la recuperation du middleware", function () {
+		it("Utilisation des alias dans la recuperation du middleware", function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -407,7 +407,7 @@ describe('Http / MiddlewareQueue', function () {
 			expect($queue->current())->toBeAnInstanceOf(DumbMiddleware::class);
         });
 
-		it('register', function () {
+		it('register', function (): void {
 			/** @var MiddlewareQueue $queue */
 			$queue = $this->middleware();
 
@@ -422,7 +422,7 @@ describe('Http / MiddlewareQueue', function () {
 			$config = [
 				'aliases' => $aliases,
 				'globals' => array_keys($aliases),
-				'build' => static function (\BlitzPHP\Http\MiddlewareQueue $queue) use ($cb) {
+				'build' => static function (MiddlewareQueue $queue) use ($cb): void {
 					$queue->insertAt(0, $cb);
 				},
 			];

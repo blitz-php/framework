@@ -67,9 +67,9 @@ class Publisher extends FileCollection
      *
      * @var array<string,string>
      */
-    private array $restrictions;
+    private readonly array $restrictions;
 
-    private ContentReplacer $replacer;
+    private readonly ContentReplacer $replacer;
 
     /**
      * Chemin de base à utiliser pour la source.

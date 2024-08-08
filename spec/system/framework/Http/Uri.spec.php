@@ -12,9 +12,9 @@
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Http\Uri;
 
-describe('Http / URI', function () {
-	describe('Uri', function () {
-		it("Teste si le constructeur definie toutes les parties", function () {
+describe('Http / URI', function (): void {
+	describe('Uri', function (): void {
+		it("Teste si le constructeur definie toutes les parties", function (): void {
 			$uri = new Uri('http://username:password@hostname:9090/path?arg=value#anchor');
 
 			expect($uri->getScheme())->toBe('http');
@@ -30,7 +30,7 @@ describe('Http / URI', function () {
 			expect($uri->getAuthority())->toBe('username@hostname:9090');
 		});
 
-		it("Teste si Segments est rempli correctement pour plusieurs segments", function () {
+		it("Teste si Segments est rempli correctement pour plusieurs segments", function (): void {
 			$uri = new Uri('http://hostname/path/to/script');
 
 			expect($uri->getSegments())->toBe(['path', 'to', 'script']);
@@ -42,19 +42,19 @@ describe('Http / URI', function () {
 			expect($uri->getTotalSegments())->toBe(3);
 		});
 
-		it("Teste les segments hors limites", function () {
+		it("Teste les segments hors limites", function (): void {
 			$uri = new Uri('http://hostname/path/to/script');
 
 			expect(fn() => $uri->getSegment(5))->toThrow(new HttpException());
 		});
 
-		it("Teste les segments hors limites avec une valeur par defaut", function () {
+		it("Teste les segments hors limites avec une valeur par defaut", function (): void {
 			$uri = new Uri('http://abc.com/a123/b/c');
 
 			expect(fn() => $uri->getSegment(22, 'something'))->toThrow(new HttpException());
 		});
 
-		it("Teste si Segments est rempli avec les valeurs par defaut", function () {
+		it("Teste si Segments est rempli avec les valeurs par defaut", function (): void {
 			$uri = new Uri('http://hostname/path/to');
 
 			expect($uri->getSegments())->toBe(['path', 'to']);
@@ -66,7 +66,7 @@ describe('Http / URI', function () {
 			expect($uri->getTotalSegments())->toBe(2);
 		});
 
-		it("Teste si l'URI peut etre caster en string", function () {
+		it("Teste si l'URI peut etre caster en string", function (): void {
 			$url = 'http://username:password@hostname:9090/path?arg=value#anchor';
 			$uri = new Uri($url);
 
@@ -75,7 +75,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe($expected);
 		});
 
-		it("Teste les URI simple", function () {
+		it("Teste les URI simple", function (): void {
 			$urls = [
 				[
 					'http://example.com', // url
@@ -102,7 +102,7 @@ describe('Http / URI', function () {
 			}
 		});
 
-		it('Teste les URL vide', function () {
+		it('Teste les URL vide', function (): void {
 			$url = '';
 			$uri = new Uri($url);
 
@@ -114,13 +114,13 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe('http://');
 		});
 
-		it('Teste les URL malformés', function () {
+		it('Teste les URL malformés', function (): void {
 			$url = 'http://abc:a123';
 
 			expect(fn() => new Uri($url))->toThrow(new HttpException());
 		});
 
-		it('Teste les schema manquant', function () {
+		it('Teste les schema manquant', function (): void {
 			$url = 'http://foo.bar/baz';
 			$uri = new Uri($url);
 
@@ -131,8 +131,8 @@ describe('Http / URI', function () {
 		});
 	});
 
-	describe('Getter et setter', function () {
-		it('setScheme', function () {
+	describe('Getter et setter', function (): void {
+		it('setScheme', function (): void {
 			$url = 'http://example.com/path';
 			$uri = new Uri($url);
 
@@ -143,7 +143,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe($expected);
 		});
 
-		it('withScheme', function () {
+		it('withScheme', function (): void {
 			$url = 'example.com';
 			$uri = new Uri('http://' . $url);
 
@@ -153,7 +153,7 @@ describe('Http / URI', function () {
 			expect((string) $new)->toBe('x://' . $url);
 		});
 
-		it('withScheme avec https', function () {
+		it('withScheme avec https', function (): void {
 			$url = 'http://example.com/path';
 			$uri = new Uri($url);
 
@@ -168,7 +168,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe($expected);
 		});
 
-		it('withScheme avec une valeur vide', function () {
+		it('withScheme avec une valeur vide', function (): void {
 			$url = 'example.com';
 			$uri = new Uri('http://' . $url);
 
@@ -178,7 +178,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe('http://' . $url);
 		});
 
-		it('setUserInfo', function () {
+		it('setUserInfo', function (): void {
 			$url = 'http://example.com/path';
 			$uri = new Uri($url);
 
@@ -189,7 +189,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe($expected);
 		});
 
-		it('Teste si UserInfo peut afficher le password', function () {
+		it('Teste si UserInfo peut afficher le password', function (): void {
 			$url = 'http://example.com/path';
 			$uri = new Uri($url);
 
@@ -205,7 +205,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe($expected);
 		});
 
-		it('setHost', function () {
+		it('setHost', function (): void {
 			$url = 'http://example.com/path';
 			$uri = new Uri($url);
 
@@ -216,7 +216,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe($expected);
 		});
 
-		it('setPort', function () {
+		it('setPort', function (): void {
 			$url = 'http://example.com/path';
 			$uri = new Uri($url);
 
@@ -227,7 +227,7 @@ describe('Http / URI', function () {
 			expect((string) $uri)->toBe($expected);
 		});
 
-		it('setPort avec une valeur invalide', function () {
+		it('setPort avec une valeur invalide', function (): void {
 			$url = 'http://example.com/path';
 			$uri = new Uri($url);
 
@@ -240,7 +240,7 @@ describe('Http / URI', function () {
 			}
 		});
 
-		it('setURI capture les mauvais port', function () {
+		it('setURI capture les mauvais port', function (): void {
 			$url = 'http://username:password@hostname:90909/path?arg=value#anchor';
         	$uri = new Uri();
 

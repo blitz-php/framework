@@ -274,7 +274,7 @@ trait InteractsWithInput
     /**
      * Récupérez l'entrée de la requête en tant qu'instance Stringable.
      */
-    public function str(string $key, mixed $default = null): Stringable
+    public function str(string $key, mixed $default = null): ?Stringable
     {
         if (null === $value = $this->string($key, $default)) {
             return null;
@@ -498,10 +498,8 @@ trait InteractsWithInput
 
     /**
      * Videz les éléments de la requête et terminez le script.
-     *
-     * @return never
      */
-    public function dd(...$keys)
+    public function dd(...$keys): never
     {
         $this->dump(...$keys);
 
@@ -517,7 +515,7 @@ trait InteractsWithInput
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        Kint::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
+        Kint::dump($keys !== [] ? $this->only($keys) : $this->all());
 
         return $this;
     }

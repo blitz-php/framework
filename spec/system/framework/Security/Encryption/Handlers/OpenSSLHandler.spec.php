@@ -13,14 +13,14 @@ use BlitzPHP\Exceptions\EncryptionException;
 use BlitzPHP\Security\Encryption\Encryption;
 use BlitzPHP\Security\Encryption\Handlers\OpenSSLHandler;
 
-describe('Security / Encryption / OpenSSL', function () {
-    beforeEach(function () {
+describe('Security / Encryption / OpenSSL', function (): void {
+    beforeEach(function (): void {
         skipIf(! extension_loaded('openssl'));
 
         $this->encryption = new Encryption();
     });
 
-    it(': Test de santé de base', function () {
+    it(': Test de santé de base', function (): void {
         $params         = (object) config('encryption');
         $params->driver = 'OpenSSL';
         $params->key    = "Quelque chose d'autre qu'une chaîne vide";
@@ -31,7 +31,7 @@ describe('Security / Encryption / OpenSSL', function () {
         expect($encrypter->cipher)->toBe('AES-256-CTR');
     });
 
-    it(': Test simple', function () {
+    it(': Test simple', function (): void {
         $params         = (object) config('encryption');
         $params->driver = 'OpenSSL';
         $params->key    = '\xd0\xc9\x08\xc4\xde\x52\x12\x6e\xf8\xcc\xdb\x03\xea\xa0\x3a\x5c';
@@ -51,16 +51,16 @@ describe('Security / Encryption / OpenSSL', function () {
         expect($encrypter->decrypt($encrypter->encrypt($message1)))->not->toBe($message2);
     });
 
-    it(": L'abscence de la cle leve une exception", function () {
+    it(": L'abscence de la cle leve une exception", function (): void {
         $encrypter = new OpenSSLHandler();
         $message1  = 'Ceci est un message en clair.';
 
-        expect(static function () use ($message1, $encrypter) {
+        expect(static function () use ($message1, $encrypter): void {
             $encrypter->encrypt($message1, ['key' => '']);
         })->toThrow(new EncryptionException());
     });
 
-    it(': Chiffrement avec une cle sous forme de chaine', function () {
+    it(': Chiffrement avec une cle sous forme de chaine', function (): void {
         $key       = 'abracadabra';
         $encrypter = new OpenSSLHandler();
         $message1  = 'Ceci est un message en clair.';
@@ -69,8 +69,8 @@ describe('Security / Encryption / OpenSSL', function () {
         expect($encrypter->decrypt($encoded, $key))->toBe($message1);
     });
 
-    it(': dechiffrement avec une cle erronée', function () {
-        expect(static function () {
+    it(': dechiffrement avec une cle erronée', function (): void {
+        expect(static function (): void {
             $key1      = 'abracadabra';
             $encrypter = new OpenSSLHandler();
             $message1  = 'Ceci est un message en clair.';
@@ -82,7 +82,7 @@ describe('Security / Encryption / OpenSSL', function () {
         })->toThrow(new EncryptionException());
     });
 
-    it(': Chiffrement avec une cle sous forme de tableau', function () {
+    it(': Chiffrement avec une cle sous forme de tableau', function (): void {
         $key       = 'abracadabra';
         $encrypter = new OpenSSLHandler();
         $message1  = 'Ceci est un message en clair.';
@@ -91,8 +91,8 @@ describe('Security / Encryption / OpenSSL', function () {
         expect($message1)->toBe($encrypter->decrypt($encoded, ['key' => $key]));
     });
 
-    it(": L'authentification échouera lors du décryptage avec la mauvaise clé", function () {
-        expect(static function () {
+    it(": L'authentification échouera lors du décryptage avec la mauvaise clé", function (): void {
+        expect(static function (): void {
             $key1      = 'abracadabra';
             $encrypter = new OpenSSLHandler();
             $message1  = 'Ceci est un message en clair.';

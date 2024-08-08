@@ -72,7 +72,7 @@ class Negotiator
 
         // If no charset is shown as a match, ignore the directive
         // as allowed by the RFC, and tell it a default value.
-        if (empty($match)) {
+        if ($match === '' || $match === '0') {
             return 'utf-8';
         }
 
@@ -127,11 +127,11 @@ class Negotiator
      */
     protected function getBestMatch(array $supported, ?string $header = null, bool $enforceTypes = false, bool $strictMatch = false): string
     {
-        if (empty($supported)) {
+        if ($supported === []) {
             throw new HttpException('You must provide an array of supported values to all Negotiations.');
         }
 
-        if (empty($header)) {
+        if ($header === null || $header === '' || $header === '0') {
             return $strictMatch ? '' : $supported[0];
         }
 

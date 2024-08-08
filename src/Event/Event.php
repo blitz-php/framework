@@ -28,13 +28,6 @@ class Event implements EventInterface
     protected $name = '';
 
     /**
-     * La cible de l'evenement
-     *
-     * @var mixed
-     */
-    protected $target;
-
-    /**
      * Les paramètres de l'evenement
      *
      * @var array
@@ -51,12 +44,11 @@ class Event implements EventInterface
     /**
      * Creation de l'evenement
      *
-     * @param mixed|null $target
+     * @param mixed|null $target La cible de l'evenement
      */
-    public function __construct(?string $name = '', $target = null, array $params = [])
+    public function __construct(?string $name = '', protected $target = null, array $params = [])
     {
         $this->name   = $name;
-        $this->target = $target;
         $this->params = $params;
     }
 

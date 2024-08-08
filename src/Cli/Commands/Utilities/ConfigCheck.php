@@ -90,7 +90,7 @@ class ConfigCheck extends Command
 
                 $this->justify($key, $val, ['second' => $options]);
             } else {
-                if (empty($val = (array) $val)) {
+                if (($val = (array) $val) === []) {
                     $others[$key] = $val;
 
                     continue;

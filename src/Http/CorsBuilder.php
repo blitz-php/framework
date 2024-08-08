@@ -147,7 +147,7 @@ class CorsBuilder
         } else {
             // Pour les en-têtes dynamiques, définir l'en-tête Origin demandé lorsqu'il est défini et autorisé.
             if ($this->isCorsRequest($request) && $this->isOriginAllowed($request)) {
-                $response = $response->withHeader('Access-Control-Allow-Origin', (string) $request->getHeaderLine('Origin'));
+                $response = $response->withHeader('Access-Control-Allow-Origin', $request->getHeaderLine('Origin'));
             }
 
             $response = $this->varyHeader($response, 'Origin');

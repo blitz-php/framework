@@ -13,6 +13,7 @@ namespace BlitzPHP\Cli\Console;
 
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
+use Ahc\Cli\IO\Interactor;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Debug\Logger;
@@ -211,7 +212,7 @@ class Console extends Application
 
             try {
                 $this->addCommand($className, $this->logger);
-            } catch (CLIException $e) {
+            } catch (CLIException) {
                 continue;
             } catch (ReflectionException $e) {
                 $this->logger->error($e->getMessage());
@@ -292,7 +293,7 @@ class Console extends Application
                 $version = $package[1] ?? null;
                 $package = $package[0];
 
-                /** @var \Ahc\Cli\IO\Interactor $io */
+                /** @var Interactor $io */
                 $io = $this->io();
 
                 if (! InstalledVersions::isInstalled($package)) {
@@ -318,10 +319,10 @@ class Console extends Application
             }
 
             $parameters = $command->values(false);
-            if (empty($arguments)) {
+            if ($arguments === null || $arguments === []) {
                 $arguments = $command->args();
             }
-            if (empty($options)) {
+            if ($options === null || $options === []) {
                 $options = array_diff_key($parameters, $arguments);
             }
             $parameters = array_merge($options, $arguments);
@@ -343,7 +344,7 @@ class Console extends Application
 
     private function registerException(Logger $logger)
     {
-        $this->onException(static function (Throwable $e, int $exitCode) use ($logger) {
+        $this->onException(static function (Throwable $e, int $exitCode) use ($logger): void {
             $logger->error((string) $e, ['exitCode' => $exitCode, 'klinge' => true]);
 
             throw new CLIException($e->getMessage(), $exitCode, $e);
