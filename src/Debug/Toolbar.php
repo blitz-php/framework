@@ -133,7 +133,7 @@ class Toolbar
             $data['vars']['varData'][esc($heading)] = $varData;
         }
 
-        if (! empty($_SESSION)) {
+        if ($_SESSION !== []) {
             foreach ($_SESSION as $key => $value) {
                 // Remplacez les données binaires par une chaîne pour éviter l'échec de json_encode.
                 if (is_string($value) && preg_match('~[^\x20-\x7E\t\r\n]~', $value)) {
@@ -289,7 +289,7 @@ class Toolbar
         array_multisort(...$sortArray);
 
         // Ajouter une heure de fin à chaque élément
-        array_walk($data, static function (&$row) {
+        array_walk($data, static function (&$row): void {
             $row['end'] = $row['start'] + $row['duration'];
         });
 
@@ -308,7 +308,7 @@ class Toolbar
         $element = array_shift($elements);
 
         // Si nous avons des enfants derrière nous, récupérez-les et attachez-les-nous
-        while (! empty($elements) && $elements[array_key_first($elements)]['end'] <= $element['end']) {
+        while ($elements !== [] && $elements[array_key_first($elements)]['end'] <= $element['end']) {
             $element['children'][] = array_shift($elements);
         }
 
@@ -318,7 +318,7 @@ class Toolbar
         }
 
         // Si nous n'avons pas de frères et sœurs plus jeunes, nous pouvons revenir
-        if (empty($elements)) {
+        if ($elements === []) {
             return [$element];
         }
 
@@ -461,9 +461,8 @@ class Toolbar
             ob_start();
             include $this->config->view_path . 'toolbarloader.js';
             $output = ob_get_clean();
-            $output = str_replace('{url}', rtrim(site_url(), '/'), $output);
 
-            return $output;
+            return str_replace('{url}', rtrim(site_url(), '/'), $output);
         }
 
         // Sinon, s'il inclut ?debugbar_time, alors
@@ -557,7 +556,7 @@ class Toolbar
             fclose($fp);
 
             return is_int($result);
-        } catch (Exception $fe) {
+        } catch (Exception) {
             return false;
         }
     }

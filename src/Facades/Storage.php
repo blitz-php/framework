@@ -11,6 +11,12 @@
 
 namespace BlitzPHP\Facades;
 
+use Closure;
+use BlitzPHP\Filesystem\FilesystemManager;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\DirectoryListing;
+use DateTimeInterface;
 use BlitzPHP\Container\Services;
 
 /**
@@ -18,7 +24,7 @@ use BlitzPHP\Container\Services;
  * @method static array                                              allFiles(string|null $directory = null)
  * @method static bool                                               append(string $path, string $data)
  * @method static \BlitzPHP\Filesystem\FilesystemInterface           build(array|string $config)
- * @method static void                                               buildTemporaryUrlsUsing(\Closure $callback)
+ * @method static void buildTemporaryUrlsUsing(Closure $callback)
  * @method static string|false                                       checksum(string $path, array $options = [])
  * @method static \BlitzPHP\Filesystem\FilesystemInterface           cloud()
  * @method static bool                                               copy(string $from, string $to)
@@ -37,24 +43,24 @@ use BlitzPHP\Container\Services;
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse download(string $path, string|null $name = null, array $headers = [])
  * @method static \BlitzPHP\Filesystem\FilesystemInterface           drive(string|null $name = null)
  * @method static bool                                               exists(string $path)
- * @method static \BlitzPHP\Filesystem\FilesystemManager             extend(string $driver, \Closure $callback)
+ * @method static FilesystemManager extend(string $driver, Closure $callback)
  * @method static bool                                               fileExists(string $path)
  * @method static bool                                               fileMissing(string $path)
  * @method static array                                              files(string|null $directory = null, bool $recursive = false)
  * @method static int                                                fileSize(string $path)
  * @method static void                                               flushMacros()
- * @method static \BlitzPHP\Filesystem\FilesystemManager             forgetDisk(array|string $disk)
+ * @method static FilesystemManager forgetDisk((array | string) $disk)
  * @method static string|null                                        get(string $path)
- * @method static \League\Flysystem\FilesystemAdapter                getAdapter()
+ * @method static FilesystemAdapter getAdapter()
  * @method static array                                              getConfig()
  * @method static string                                             getDefaultCloudDriver()
  * @method static string                                             getDefaultDriver()
- * @method static \League\Flysystem\FilesystemOperator               getDriver()
+ * @method static FilesystemOperator getDriver()
  * @method static string                                             getVisibility(string $path)
  * @method static bool                                               has(string $location)
  * @method static bool                                               hasMacro(string $name)
  * @method static int                                                lastModified(string $path)
- * @method static \League\Flysystem\DirectoryListing                 listContents(string $location, bool $deep = false)
+ * @method static DirectoryListing listContents(string $location, bool $deep = false)
  * @method static void                                               macro(string $name, callable|object $macro)
  * @method static mixed                                              macroCall(string $method, array $parameters)
  * @method static bool                                               makeDirectory(string $path)
@@ -72,15 +78,15 @@ use BlitzPHP\Container\Services;
  * @method static string                                             read(string $location)
  * @method static resource|null                                      readStream(string $path)
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse response(string $path, string|null $name = null, array $headers = [], string|null $disposition = 'inline')
- * @method static \BlitzPHP\Filesystem\FilesystemManager             set(string $name, mixed $disk)
- * @method static \BlitzPHP\Filesystem\FilesystemManager             setApplication(\Illuminate\Contracts\Foundation\Application $app)
+ * @method static FilesystemManager set(string $name, mixed $disk)
+ * @method static FilesystemManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static bool                                               setVisibility(string $path, string $visibility)
  * @method static int                                                size(string $path)
- * @method static string                                             temporaryUrl(string $path, \DateTimeInterface $expiration, array $options = [])
- * @method static \BlitzPHP\Filesystem\FilesystemAdapter|mixed       unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
+ * @method static string temporaryUrl(string $path, DateTimeInterface $expiration, array $options = [])
+ * @method static \BlitzPHP\Filesystem\FilesystemAdapter|mixed unless((Closure | mixed | null) $value = null, (callable | null) $callback = null, (callable | null) $default = null)
  * @method static string                                             url(string $path)
  * @method static string                                             visibility(string $path)
- * @method static \BlitzPHP\Filesystem\FilesystemAdapter|mixed       when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
+ * @method static \BlitzPHP\Filesystem\FilesystemAdapter|mixed when((Closure | mixed | null) $value = null, (callable | null) $callback = null, (callable | null) $default = null)
  * @method static void                                               write(string $location, string $contents, array $config = [])
  * @method static bool                                               writeStream(string $path, resource $resource, array $options = [])
  *

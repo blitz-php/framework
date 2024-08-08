@@ -11,11 +11,12 @@
 
 namespace BlitzPHP\Facades;
 
+use Closure;
 use BlitzPHP\Container\Services;
 
 /**
- * @method static void   add(string $key, \Closure $callback)                          Defini un element au conteneur sous forme de factory. Si l'element existe déjà, il sera remplacé.
- * @method static void   addIf(string $key, \Closure $callback)                        Defini un element au conteneur sous forme de factory. Si l'element existe déjà, il sera ignoré.
+ * @method static void add(string $key, Closure $callback) Defini un element au conteneur sous forme de factory. Si l'element existe déjà, il sera remplacé.
+ * @method static void addIf(string $key, Closure $callback) Defini un element au conteneur sous forme de factory. Si l'element existe déjà, il sera ignoré.
  * @method static bool   bound(string $name)                                           Verifie qu'une entree a été explicitement définie dans le conteneur.
  * @method static mixed  call(array|callable|string $callable, array $parameters = []) Appelez la fonction donnée en utilisant les paramètres donnés. Les paramètres manquants seront résolus à partir du conteneur.
  * @method static string debugEntry(string $name)                                      Obtenir les informations de débogage de l'entrée.

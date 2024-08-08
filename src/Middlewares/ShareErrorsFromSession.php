@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Middlewares;
 
+use BlitzPHP\Http\Request;
 use BlitzPHP\Validation\ErrorBag;
 use BlitzPHP\View\View;
 use Psr\Http\Message\ResponseInterface;
@@ -30,7 +31,7 @@ class ShareErrorsFromSession implements MiddlewareInterface
     /**
      * {@inheritDoc}
      *
-     * @param \BlitzPHP\Http\Request $request
+     * @param Request $request
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Controllers;
 
+use Psr\Http\Message\ResponseInterface;
 /**
  * Un contrôleur extensible pour fournir une API RESTful pour une ressource.
  */
@@ -19,7 +20,7 @@ class ResourceController extends RestController
     /**
      * Renvoie un tableau d'objets ressources, eux-mêmes au format tableau
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function index()
     {
@@ -31,7 +32,7 @@ class ResourceController extends RestController
      *
      * @param int|string|null $id
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function show($id = null)
     {
@@ -41,7 +42,7 @@ class ResourceController extends RestController
     /**
      * Renvoie un nouvel objet ressource, avec les propriétés par défaut
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function new()
     {
@@ -51,7 +52,7 @@ class ResourceController extends RestController
     /**
      * Créer un nouvel objet ressource, à partir des données envoyées
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function create()
     {
@@ -63,7 +64,7 @@ class ResourceController extends RestController
      *
      * @param int|string|null $id
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function edit($id = null)
     {
@@ -75,7 +76,7 @@ class ResourceController extends RestController
      *
      * @param int|string|null $id
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function update($id = null)
     {
@@ -87,7 +88,7 @@ class ResourceController extends RestController
      *
      * @param int|string|null $id
      *
-     * @return \Psr\Http\Message\ResponseInterface|string|void
+     * @return ResponseInterface|string|void
      */
     public function delete($id = null)
     {

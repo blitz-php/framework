@@ -426,7 +426,7 @@ class SymfonyMailer extends AbstractAdapter
 
     private function buildDsn(): string
     {
-        if (! empty($this->dsn)) {
+        if ($this->dsn !== '') {
             return $this->dsn;
         }
 

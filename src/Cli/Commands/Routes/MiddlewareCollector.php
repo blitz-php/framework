@@ -23,7 +23,7 @@ final class MiddlewareCollector
     /**
      * @param bool $resetRoutes Indique s'il faut réinitialiser les routes définies. S'il est défini sur true, les middlewares de routage sont introuvables.
      */
-    public function __construct(private bool $resetRoutes = false)
+    public function __construct(private readonly bool $resetRoutes = false)
     {
     }
 

@@ -53,7 +53,7 @@ final class AutoRouter implements AutoRouterInterface
      *  Indique si on doit traduire les tirets de l'URL pour les controleurs/methodes en CamelCase.
      *  E.g., blog-controller -> BlogController
      */
-    private bool $translateUriToCamelCase;
+    private readonly bool $translateUriToCamelCase;
 
     /**
      * Namespace des controleurs
@@ -113,11 +113,11 @@ final class AutoRouter implements AutoRouterInterface
      * @param bool           $translateURIDashes   Indique si les tirets dans les URI doivent être convertis en traits de soulignement lors de la détermination des noms de méthode.
      */
     public function __construct(
-        private array $protectedControllers,
+        private readonly array $protectedControllers,
         string $namespace,
         private string $defaultController,
-        private string $defaultMethod,
-        private bool $translateURIDashes
+        private readonly string $defaultMethod,
+        private readonly bool $translateURIDashes
     ) {
         $this->namespace = rtrim($namespace, '\\');
 
@@ -349,7 +349,7 @@ final class AutoRouter implements AutoRouterInterface
         // Verifier le nombre de parametres
         try {
             $this->checkParameters();
-        } catch (MethodNotFoundException $e) {
+        } catch (MethodNotFoundException) {
             throw PageNotFoundException::controllerNotFound($this->controller, $this->method);
         }
 
@@ -410,7 +410,7 @@ final class AutoRouter implements AutoRouterInterface
                 'AutoRouterImproved ne prend pas en charge la methode `_remap()`.'
                 . ' Contrôleur:' . $this->controller
             );
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             // Ne rien faire
         }
     }

@@ -48,7 +48,7 @@ class Config
      */
     private static bool $initialized = false;
 
-    private Configurator $configurator;
+    private readonly Configurator $configurator;
 
     public function __construct()
     {
@@ -125,11 +125,7 @@ class Config
      */
     public function reset(null|array|string $keys = null): void
     {
-        if (null !== $keys) {
-            $keys = (array) $keys;
-        } else {
-            $keys = array_keys(self::$originals);
-        }
+        $keys = null !== $keys ? (array) $keys : array_keys(self::$originals);
 
         foreach ($keys as $key) {
             $this->set($key, Arr::dataGet(self::$originals, $key));
@@ -180,7 +176,7 @@ class Config
 
             $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations);
 
-            if (empty($configurations) && ! $allow_empty && (empty($schema) || ! is_a($schema, Schema::class))) {
+            if (empty($configurations) && ! $allow_empty && ! is_a($schema, Schema::class, true)) {
                 return;
             }
 

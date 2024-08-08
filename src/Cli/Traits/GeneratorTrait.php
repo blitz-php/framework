@@ -236,7 +236,7 @@ trait GeneratorTrait
         // Obtient l'espace de noms à partir de l'entrée. N'oubliez pas la barre oblique inverse finale !
         $namespace = trim(str_replace('/', '\\', $this->getOption('namespace', APP_NAMESPACE)), '\\') . '\\';
 
-        if (strncmp($class, $namespace, strlen($namespace)) === 0) {
+        if (str_starts_with($class, $namespace)) {
             return $class; // @codeCoverageIgnore
         }
 

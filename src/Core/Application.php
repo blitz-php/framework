@@ -94,7 +94,7 @@ class Application
             ->requireDirectory(SYST_PATH, Checker::CHECK_IS_READABLE)
             ->requireDirectory(APP_PATH, Checker::CHECK_IS_READABLE);
 
-        $output = $checker->check();
+        $checker->check();
         if (! $checker->isSatisfied()) {
             echo '<h3>An error encourred</h3>';
 

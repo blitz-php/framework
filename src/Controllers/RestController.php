@@ -101,7 +101,7 @@ class RestController extends BaseController
 
             $instance->payload = $this->payload;
 
-            $response = Services::container()->call([$instance, $method], (array) $params);
+            $response = Services::container()->call([$instance, $method], $params);
 
             if ($response instanceof ResponseInterface) {
                 return $response;
@@ -136,7 +136,7 @@ class RestController extends BaseController
         }
 
         return $this->respondInternalError('Internal Server Error', [
-            'type'    => get_class($ex),
+            'type'    => $ex::class,
             'message' => $ex->getMessage(),
             'code'    => $ex->getCode(),
             'file'    => $ex->getFile(),
@@ -188,7 +188,7 @@ class RestController extends BaseController
         if (! empty($this->config->field['code'])) {
             $response[$this->config->field['code']] = $code;
         }
-        if (! empty($errors)) {
+        if ($errors !== []) {
             $response[$this->config->field['errors'] ?? 'errors'] = $errors;
         }
 
@@ -209,7 +209,7 @@ class RestController extends BaseController
     final protected function respondSuccess(?string $message = 'Resultat', $result = null, ?int $status = StatusCode::OK)
     {
         $message = $message ?: 'Resultat';
-        $status  = ! empty($status) ? $status : StatusCode::OK;
+        $status  = $status !== null && $status !== 0 ? $status : StatusCode::OK;
 
         $response = [
             $this->config->field['message'] ?? 'message' => $message,
@@ -321,7 +321,7 @@ class RestController extends BaseController
      */
     final protected function allowedMethods(string ...$methods): self
     {
-        if (! empty($methods)) {
+        if ($methods !== []) {
             $this->config->allowed_methods = array_map(static fn ($str) => strtoupper($str), $methods);
         }
 
@@ -511,7 +511,8 @@ class RestController extends BaseController
         // Verifie que l'ip qui emet la requete est dans la whitelist
         if (! empty($this->config->ip_whitelist)) {
             $whitelist = $this->config->ip_whitelist;
-            array_push($whitelist, '127.0.0.1', '0.0.0.0');
+            $whitelist[] = '127.0.0.1';
+            $whitelist[] = '0.0.0.0';
 
             // coupez les espaces de début et de fin des ip
             $whitelist = array_map('trim', $whitelist);
@@ -522,19 +523,16 @@ class RestController extends BaseController
         }
 
         // Verifie l'authentification du client
-        if (false !== $this->config->auth && ! $this->request->is('options')) {
-            if ('bearer' === strtolower($this->config->auth)) {
-                $token = $this->getBearerToken();
-                if (empty($token)) {
-                    return $this->respondInvalidToken($this->_translate('tokenNotFound'));
-                }
-
-                $payload = $this->decodeToken($token, 'bearer');
-                if ($payload instanceof Throwable) {
-                    return $this->respondInvalidToken($payload->getMessage());
-                }
-                $this->payload = $payload;
+        if (false !== $this->config->auth && ! $this->request->is('options') && 'bearer' === strtolower($this->config->auth)) {
+            $token = $this->getBearerToken();
+            if ($token === null || $token === '' || $token === '0') {
+                return $this->respondInvalidToken($this->_translate('tokenNotFound'));
             }
+            $payload = $this->decodeToken($token, 'bearer');
+            if ($payload instanceof Throwable) {
+                return $this->respondInvalidToken($payload->getMessage());
+            }
+            $this->payload = $payload;
         }
 
         return true;

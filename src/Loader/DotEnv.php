@@ -102,7 +102,7 @@ class DotEnv
             }
         }
 
-        if (! count($data)) {
+        if ($data === []) {
             return false;
         }
 
@@ -224,7 +224,7 @@ class DotEnv
      */
     protected function sanitizeValue(string $value): string
     {
-        if (! $value) {
+        if ($value === '' || $value === '0') {
             return $value;
         }
 

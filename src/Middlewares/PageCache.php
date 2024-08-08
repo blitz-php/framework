@@ -21,7 +21,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class PageCache implements MiddlewareInterface
 {
-    public function __construct(private ResponseCache $pageCache)
+    public function __construct(private readonly ResponseCache $pageCache)
     {
     }
 

@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Http;
 
+use GuzzleHttp\Psr7\Utils;
 use BadMethodCallException;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\FrameworkException;
@@ -235,15 +236,13 @@ class ServerRequest implements ServerRequestInterface
                 throw new FrameworkException('The `uri` key must be an instance of ' . UriInterface::class);
             }
             $uri = $config['uri'];
+        } elseif ($config['url'] !== '') {
+            $config = $this->processUrlOption($config);
+            $uri    = new Uri(implode('?', [$config['url'], $config['environment']['QUERY_STRING'] ?? '']));
+        } elseif (isset($config['environment']['REQUEST_URI'])) {
+            $uri = new Uri($config['environment']['REQUEST_URI']);
         } else {
-            if ($config['url'] !== '') {
-                $config = $this->processUrlOption($config);
-                $uri    = new Uri(implode('?', [$config['url'], $config['environment']['QUERY_STRING'] ?? '']));
-            } elseif (isset($config['environment']['REQUEST_URI'])) {
-                $uri = new Uri($config['environment']['REQUEST_URI']);
-            } else {
-                $uri = Psr7ServerRequest::getUriFromGlobals();
-            }
+            $uri = Psr7ServerRequest::getUriFromGlobals();
         }
 
         if (in_array($uri->getHost(), ['localhost', '127.0.0.1'], true)) {
@@ -257,11 +256,11 @@ class ServerRequest implements ServerRequestInterface
         $this->webroot = $config['webroot'];
 
         if (isset($config['input'])) {
-            $stream = new Stream(\GuzzleHttp\Psr7\Utils::tryFopen('php://memory', 'rw'));
+            $stream = new Stream(Utils::tryFopen('php://memory', 'rw'));
             $stream->write($config['input']);
             $stream->rewind();
         } else {
-            $stream = new Stream(\GuzzleHttp\Psr7\Utils::tryFopen('php://input', 'r'));
+            $stream = new Stream(Utils::tryFopen('php://input', 'r'));
         }
         $this->stream = $stream;
 
@@ -324,8 +323,8 @@ class ServerRequest implements ServerRequestInterface
     public function clientIp(): string
     {
         if ($this->trustProxy && $this->getEnv('HTTP_X_FORWARDED_FOR')) {
-            $addresses = array_map('trim', explode(',', (string) $this->getEnv('HTTP_X_FORWARDED_FOR')));
-            $trusted   = (count($this->trustedProxies) > 0);
+            $addresses = array_map('trim', explode(',', $this->getEnv('HTTP_X_FORWARDED_FOR')));
+            $trusted   = $this->trustedProxies !== [];
             $n         = count($addresses);
 
             if ($trusted) {
@@ -382,7 +381,7 @@ class ServerRequest implements ServerRequestInterface
         $ref = $this->getEnv('HTTP_REFERER');
 
         $base = config('app.base_url') . $this->webroot;
-        if (empty($base) || empty($ref)) {
+        if ($base === '' || ($ref === null || $ref === '')) {
             return null;
         }
 
@@ -452,7 +451,7 @@ class ServerRequest implements ServerRequestInterface
         if (! isset(static::$_detectors[$type])) {
             return false;
         }
-        if ($args) {
+        if ($args !== []) {
             return $this->_is($type, $args);
         }
 
@@ -493,7 +492,7 @@ class ServerRequest implements ServerRequestInterface
             return true;
         }
 
-        return (bool) (isset($detect['param']) && $this->_paramDetector($detect));
+        return isset($detect['param']) && $this->_paramDetector($detect);
     }
 
     /**
@@ -552,10 +551,10 @@ class ServerRequest implements ServerRequestInterface
         if (isset($detect['value'])) {
             $value = $detect['value'];
 
-            return isset($this->params[$key]) ? $this->params[$key] === $value : false;
+            return isset($this->params[$key]) && $this->params[$key] === $value;
         }
         if (isset($detect['options'])) {
-            return isset($this->params[$key]) ? in_array($this->params[$key], $detect['options'], true) : false;
+            return isset($this->params[$key]) && in_array($this->params[$key], $detect['options'], true);
         }
 
         return false;
@@ -989,8 +988,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function domain(int $tldLength = 1): string
     {
-        $host = $this->host();
-        if (empty($host)) {
+        if (empty($host = $this->host())) {
             return '';
         }
 
@@ -1010,8 +1008,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function subdomains(int $tldLength = 1): array
     {
-        $host = $this->host();
-        if (empty($host)) {
+        if (empty($host = $this->host())) {
             return [];
         }
 
@@ -1346,7 +1343,7 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getProtocolVersion(): string
     {
-        if ($this->protocol) {
+        if ($this->protocol !== null) {
             return $this->protocol;
         }
 
@@ -1716,12 +1713,10 @@ class ServerRequest implements ServerRequestInterface
             return $new;
         }
 
-        $host = $uri->getHost();
-        if (! $host) {
+        if (empty($host = $uri->getHost())) {
             return $new;
         }
-        $port = $uri->getPort();
-        if ($port) {
+        if (!empty($port = $uri->getPort())) {
             $host .= ':' . $port;
         }
         $new->_environment['HTTP_HOST'] = $host;
@@ -1765,11 +1760,11 @@ class ServerRequest implements ServerRequestInterface
         }
 
         $target = $this->uri->getPath();
-        if ($this->uri->getQuery()) {
+        if ($this->uri->getQuery() !== '') {
             $target .= '?' . $this->uri->getQuery();
         }
 
-        if (empty($target)) {
+        if ($target === '') {
             $target = '/';
         }
 
@@ -1799,22 +1794,13 @@ class ServerRequest implements ServerRequestInterface
         if (null === $this->negotiator) {
             $this->negotiator = Services::negotiator($this, true);
         }
-
-        switch (strtolower($type)) {
-            case 'media':
-                return $this->negotiator->media($supported, $strictMatch);
-
-            case 'charset':
-                return $this->negotiator->charset($supported);
-
-            case 'encoding':
-                return $this->negotiator->encoding($supported);
-
-            case 'language':
-                return $this->negotiator->language($supported);
-        }
-
-        throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.');
+        return match (strtolower($type)) {
+            'media' => $this->negotiator->media($supported, $strictMatch),
+            'charset' => $this->negotiator->charset($supported),
+            'encoding' => $this->negotiator->encoding($supported),
+            'language' => $this->negotiator->language($supported),
+            default => throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.'),
+        };
     }
 
     /**

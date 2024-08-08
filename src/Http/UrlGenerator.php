@@ -120,9 +120,9 @@ class UrlGenerator
     {
         $referrer = $this->request->getHeaderLine('Referer');
 
-        $url = $referrer ? $this->to($referrer) : $this->getPreviousUrlFromSession();
+        $url = $referrer !== '' ? $this->to($referrer) : $this->getPreviousUrlFromSession();
 
-        if ($url) {
+        if ($url !== null && $url !== '') {
             return $url;
         }
         if ($fallback) {
@@ -156,7 +156,7 @@ class UrlGenerator
             '/',
             array_map(
                 'rawurlencode',
-                (array) $this->formatParameters($extra)
+                $this->formatParameters($extra)
             )
         );
 

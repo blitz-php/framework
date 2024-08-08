@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Facades;
 
+use Symfony\Component\Finder\SplFileInfo;
+use BlitzPHP\Utilities\Iterable\LazyCollection;
 use BlitzPHP\Container\Services;
 
 /**
@@ -25,11 +27,11 @@ use BlitzPHP\Container\Services;
  * @method static bool                                        deleteDirectory(string $directory, bool $preserve = false)                                  Supprimer récursivement un répertoire.
  * @method static array                                       directories(string $directory, int $depth = 0, bool $hidden = false)                        Récupère tous les répertoires d'un répertoire donné.
  * @method static string                                      dirname(string $path)                                                                       Extraire le répertoire parent d'un chemin de fichier.
- * @method static \Symfony\Component\Finder\SplFileInfo[]     allFiles(string $directory, bool $hidden = false, string $sortBy = 'name')                  Récupère tous les fichiers du répertoire donné (récursif).
+ * @method static SplFileInfo[] allFiles(string $directory, bool $hidden = false, string $sortBy = 'name') Récupère tous les fichiers du répertoire donné (récursif).
  * @method static void                                        ensureDirectoryExists(string $path, int $mode = 0755, bool $recursive = true)               Assurez-vous qu'un répertoire existe.
  * @method static bool                                        exists(string $path)                                                                        Déterminez si un fichier ou un répertoire existe.
  * @method static string                                      extension(string $path)                                                                     Extrayez l'extension de fichier d'un chemin de fichier.
- * @method static \Symfony\Component\Finder\SplFileInfo[]     files(string $directory, bool $hidden = false, string $sortBy = 'name')                     Récupère un tableau de tous les fichiers d'un répertoire.
+ * @method static SplFileInfo[] files(string $directory, bool $hidden = false, string $sortBy = 'name') Récupère un tableau de tous les fichiers d'un répertoire.
  * @method static string                                      get(string $path, bool $lock = false)                                                       Obtenir le contenu d'un fichier.
  * @method static mixed                                       getRequire(string $path, array $data = [])                                                  Obtenir la valeur renvoyée d'un fichier.
  * @method static array                                       glob(string $pattern, int $flags = 0)                                                       Trouver les noms de chemin correspondant à un modèle donné.
@@ -41,7 +43,7 @@ use BlitzPHP\Container\Services;
  * @method static bool                                        isReadable(string $path)                                                                    Déterminez si le chemin donné est lisible.
  * @method static bool                                        isWritable(string $path)                                                                    Détermine si le chemin donné est accessible en écriture.
  * @method static int                                         lastModified(string $path)                                                                  Obtenir l'heure de la dernière modification du fichier.
- * @method static \BlitzPHP\Utilities\Iterable\LazyCollection lines(string $path)                                                                         Obtenir le contenu d'un fichier une ligne à la fois.
+ * @method static LazyCollection lines(string $path) Obtenir le contenu d'un fichier une ligne à la fois.
  * @method static bool|void                                   link(string $target, string $link)                                                          Créez un lien symbolique vers le fichier ou le répertoire cible. Sous Windows, un lien physique est créé si la cible est un fichier.
  * @method static bool                                        makeDirectory(string $path, int $mode = 0755, bool $recursive = false, bool $force = false) Créez un répertoire.
  * @method static false|string                                mimeType(string $path)                                                                      Récupère le type mime d'un fichier donné.

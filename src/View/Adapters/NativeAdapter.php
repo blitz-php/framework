@@ -142,16 +142,13 @@ class NativeAdapter extends AbstractAdapter
 
         $this->logPerformance($this->renderVars['start'], microtime(true), $this->renderVars['view']);
 
-        if (($this->debug && (! isset($options['debug']) || $options['debug'] === true))) {
-            if (in_array(ViewsCollector::class, config('toolbar.collectors'), true)) {
-                // Nettoyer nos noms de chemins pour les rendre un peu plus propres
-                $this->renderVars['file'] = clean_path($this->renderVars['file']);
-                $this->renderVars['file'] = ++$this->viewsCount . ' ' . $this->renderVars['file'];
-
-                $output = '<!-- DEBUG-VIEW START ' . $this->renderVars['file'] . ' -->' . PHP_EOL
-                    . $output . PHP_EOL
-                    . '<!-- DEBUG-VIEW ENDED ' . $this->renderVars['file'] . ' -->' . PHP_EOL;
-            }
+        if ($this->debug && (! isset($options['debug']) || $options['debug'] === true) && in_array(ViewsCollector::class, config('toolbar.collectors'), true)) {
+            // Nettoyer nos noms de chemins pour les rendre un peu plus propres
+            $this->renderVars['file'] = clean_path($this->renderVars['file']);
+            $this->renderVars['file'] = ++$this->viewsCount . ' ' . $this->renderVars['file'];
+            $output = '<!-- DEBUG-VIEW START ' . $this->renderVars['file'] . ' -->' . PHP_EOL
+                . $output . PHP_EOL
+                . '<!-- DEBUG-VIEW ENDED ' . $this->renderVars['file'] . ' -->' . PHP_EOL;
         }
 
         $output = $this->decorate($output);
@@ -205,7 +202,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function setData(array $data = [], ?string $context = null): self
     {
-        if ($context) {
+        if ($context !== null && $context !== '') {
             $data = esc($data, $context);
         }
 
@@ -219,7 +216,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function addData(array $data = [], ?string $context = null): self
     {
-        if ($context) {
+        if ($context !== null && $context !== '') {
             $data = esc($data, $context);
         }
 
@@ -234,7 +231,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function setVar(string $name, $value = null, ?string $context = null): self
     {
-        if ($context) {
+        if ($context !== null && $context !== '') {
             $value = esc($value, $context);
         }
 
@@ -632,11 +629,11 @@ class NativeAdapter extends AbstractAdapter
      */
     public function stylesBundle(): void
     {
-        if (! empty($this->_lib_styles)) {
+        if ($this->_lib_styles !== []) {
             lib_styles(array_unique($this->_lib_styles));
         }
 
-        if (! empty($this->_styles)) {
+        if ($this->_styles !== []) {
             styles(array_unique($this->_styles));
         }
 
@@ -668,11 +665,11 @@ class NativeAdapter extends AbstractAdapter
      */
     public function scriptsBundle(): void
     {
-        if (! empty($this->_lib_scripts)) {
+        if ($this->_lib_scripts !== []) {
             lib_scripts(array_unique($this->_lib_scripts));
         }
 
-        if (! empty($this->_scripts)) {
+        if ($this->_scripts !== []) {
             scripts(array_unique($this->_scripts));
         }
 

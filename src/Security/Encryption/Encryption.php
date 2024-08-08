@@ -32,12 +32,12 @@ class Encryption implements EncrypterInterface
     /**
      * Le pilote utilisé
      */
-    protected string $driver;
+    protected string $driver = '';
 
     /**
      * The key/seed being used
      */
-    protected string $key;
+    protected string $key = '';
 
     /**
      * La clé HMAC dérivée
@@ -124,7 +124,7 @@ class Encryption implements EncrypterInterface
             $this->digest = $config->digest ?? 'SHA512';
         }
 
-        if (empty($this->driver)) {
+        if ($this->driver === '') {
             throw EncryptionException::noDriverRequested();
         }
 
@@ -132,7 +132,7 @@ class Encryption implements EncrypterInterface
             throw EncryptionException::unKnownHandler($this->driver);
         }
 
-        if (empty($this->key)) {
+        if ($this->key === '' || $this->key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 

@@ -141,7 +141,7 @@ class Redirection extends Response
                         ? $this->generator->full()
                         : $this->generator->previous();
 
-        if ($intended) {
+        if ($intended !== '') {
             $this->setIntendedUrl($intended);
         }
 
@@ -194,7 +194,7 @@ class Redirection extends Response
             $errors = [$key => $errors];
         }
 
-        if (! empty($errors)) {
+        if ($errors !== []) {
             $this->session->flashErrors($errors, $key);
         }
 

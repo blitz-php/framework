@@ -56,57 +56,55 @@ function scl_upLoad($input, $path = '', $size = 2500000, $type = '', $output = '
         $extensions = ['sql', 'vcf'];
     } elseif ($type === 'zip') {
         $extensions = ['zip', 'rar'];
-    } else {
+    } elseif (preg_match('#^(image|audio|video|doc|web|db|zip){1}/(.*?)$#i', $type)) {
         // Si on veut travailler avec une(plusieurs) extensions spécifique du même type
-        if (preg_match('#^(image|audio|video|doc|web|db|zip){1}/(.*?)$#i', $type)) {
-            $extensions = explode('/', $type)[1];
-            if (empty($extensions)) {
-                // Si il n y'a rien après le slash
-                switch (explode('/', $type)[0]) {
-                    case 'image':
-                        $extensions = ['jpg', 'jpeg', 'png', 'gif'];
-                        break;
+        $extensions = explode('/', $type)[1];
+        if ($extensions === '' || $extensions === '0') {
+            // Si il n y'a rien après le slash
+            switch (explode('/', $type)[0]) {
+                case 'image':
+                    $extensions = ['jpg', 'jpeg', 'png', 'gif'];
+                    break;
 
-                    case 'audio':
-                        $extensions = ['mp3', 'wav', 'mpeg'];
-                        break;
+                case 'audio':
+                    $extensions = ['mp3', 'wav', 'mpeg'];
+                    break;
 
-                    case 'video':
-                        $extensions = ['mp4', 'avi', 'ogv', 'webm', 'flv', 'mov'];
-                        break;
+                case 'video':
+                    $extensions = ['mp4', 'avi', 'ogv', 'webm', 'flv', 'mov'];
+                    break;
 
-                    case 'doc':
-                        $extensions = ['txt', 'doc', 'docx', 'pdf'];
-                        break;
+                case 'doc':
+                    $extensions = ['txt', 'doc', 'docx', 'pdf'];
+                    break;
 
-                    case 'web':
-                        $extensions = ['htm', 'html', 'css', 'xml', 'js', 'json'];
-                        break;
+                case 'web':
+                    $extensions = ['htm', 'html', 'css', 'xml', 'js', 'json'];
+                    break;
 
-                    case 'db':
-                        $extensions = ['sql', 'vcf'];
-                        break;
+                case 'db':
+                    $extensions = ['sql', 'vcf'];
+                    break;
 
-                    case 'zip':
-                        $extensions = ['zip', 'rar'];
-                        break;
-                }
-            } elseif (count(explode(',', $extensions)) < 2) {
-                $extensions = [explode(',', $extensions)[0]]; // Si il y'a une seule extension
-            } else {
-                $ext        = explode(',', $extensions);
-                $extensions = []; // Si il y'a plusieurs extensions
-
-                foreach ($ext as $ex) {
-                    $extensions[] = $ex;
-                }
+                case 'zip':
+                    $extensions = ['zip', 'rar'];
+                    break;
             }
+        } elseif (count(explode(',', $extensions)) < 2) {
+            $extensions = [explode(',', $extensions)[0]]; // Si il y'a une seule extension
         } else {
-            $extensions = [
-                'jpg', 'jpeg', 'png', 'gif', 'mp3', 'wav', 'mpeg', 'mp4', 'avi', 'ogv', 'webm', 'flv', 'mov', 'txt', 'doc', 'docx',
-                'pdf', 'htm', 'html', 'css', 'xml', 'js', 'json', 'sql', 'vcf', 'zip', 'rar',
-            ];
+            $ext        = explode(',', $extensions);
+            $extensions = []; // Si il y'a plusieurs extensions
+
+            foreach ($ext as $ex) {
+                $extensions[] = $ex;
+            }
         }
+    } else {
+        $extensions = [
+            'jpg', 'jpeg', 'png', 'gif', 'mp3', 'wav', 'mpeg', 'mp4', 'avi', 'ogv', 'webm', 'flv', 'mov', 'txt', 'doc', 'docx',
+            'pdf', 'htm', 'html', 'css', 'xml', 'js', 'json', 'sql', 'vcf', 'zip', 'rar',
+        ];
     }
 
     if (! in_array(strtolower(pathinfo($input['name'])['extension']), $extensions, true)) {
@@ -120,21 +118,22 @@ function scl_upLoad($input, $path = '', $size = 2500000, $type = '', $output = '
     --  NB: ne pas confondre $extensions et $extension. l'un représente les différents extension autorisés et
         l'autre vérifie si l'extension originale du fichier doit être modifié ou non
     */
-    if (empty($output)) { // Si on ne defini pas le nom de sortie...
+    if (empty($output)) {
+        // Si on ne defini pas le nom de sortie...
         // on enregistre le fichier avec la date et l'heure courante
         $output    = 'scl_' . date('Ymd') . '-' . date('His');
         $extension = '0.';
-    } else { // Si on defini le nom de sortie...
-        if (! empty(explode('.', $output)[1]) && in_array(strtolower(explode('.', $output)[1]), $extensions, true)) {  // Si l'extension est presente dans ce nom et est valide...
-            $out       = explode('.', $output);
-            $output    = $out[0]; // On enregistre le fichier avec le nom specifié
-            $extension = '1.' . $out[1]; // On enregistre le fichier avec l'extension specifié (changement d'extension)
-        } else { // Sinon...on enregistre le fichier avec le nom specifié mais en conservant son extension
-            $output    = str_replace('.', '', $output);
-            $output    = str_replace(',', '', $output);
-            $output    = str_replace(';', '', $output);
-            $extension = '0.';
-        }
+    } elseif (isset(explode('.', $output)[1]) && (explode('.', $output)[1] !== '' && explode('.', $output)[1] !== '0') && in_array(strtolower(explode('.', $output)[1]), $extensions, true)) {
+        // Si on defini le nom de sortie...
+        // Si l'extension est presente dans ce nom et est valide...
+        $out       = explode('.', $output);
+        $output    = $out[0]; // On enregistre le fichier avec le nom specifié
+        $extension = '1.' . $out[1]; // On enregistre le fichier avec l'extension specifié (changement d'extension)
+    } else { // Sinon...on enregistre le fichier avec le nom specifié mais en conservant son extension
+        $output    = str_replace('.', '', $output);
+        $output    = str_replace(',', '', $output);
+        $output    = str_replace(';', '', $output);
+        $extension = '0.';
     }
     // si on a prévu modifier l'extension du fichier
     if (explode('.', $extension)[0] === 1) {
@@ -176,7 +175,7 @@ function scl_minimizeImg($src, $size = [], $relative = false)
     // Si on envoie un tableau comme $size
     if (is_array($size)) {
         // Si le tableau n'a pas 1 ou deux element
-        if (count($size) < 1 || count($size) > 2) {
+        if (! in_array(count($size), [1, 2])) {
             return [2, 'Violation du nombre de dimension'];
         }
         // Si l'un des element du tableau n'est pas un nombre
@@ -191,14 +190,12 @@ function scl_minimizeImg($src, $size = [], $relative = false)
     if (is_int($size)) {
         $dimensions['x'] = $size;
         $dimensions['y'] = $size;
+    } elseif (count($size) === 1) {
+        $dimensions['x'] = $size[0];
+        $dimensions['y'] = $size[0];
     } else {
-        if (count($size) === 1) {
-            $dimensions['x'] = $size[0];
-            $dimensions['y'] = $size[0];
-        } else {
-            $dimensions['x'] = $size[0];
-            $dimensions['y'] = $size[1];
-        }
+        $dimensions['x'] = $size[0];
+        $dimensions['y'] = $size[1];
     }
 
     if (preg_match('#\.jpe?g$#i', $src)) {
@@ -258,38 +255,18 @@ function scl_generateKeys($nbr = 8, $type = 0)
 {
     // Valeurs par défaut
     $nbr = (empty($nbr)) ? 8 : (int) $nbr;
-    $nbr = (! is_int($nbr)) ? 8 : (int) $nbr;
-    $nbr = ($nbr < 3 || $nbr > 64) ? 8 : (int) $nbr;
+    $nbr = (! is_int($nbr)) ? 8 : $nbr;
+    $nbr = ($nbr < 3 || $nbr > 64) ? 8 : $nbr;
 
-    switch ($type) {
-        case 1:
-            $chars = range('a', 'z');
-            break; // Caractères alphabetique minuscules
-
-        case 2:
-            $chars = range('A', 'Z');
-            break; // Caractères alphabetique majuscules
-
-        case 3:
-            $chars = range(0, 9);
-            break; // Caractères numerique
-
-        case 4:
-            $chars = array_merge(range('a', 'z'), range('A', 'Z'));
-            break; // Caractères alphabetique
-
-        case 5:
-            $chars = array_merge(range(0, 9), range('a', 'z'));
-            break; // Caractères numerique et alphabetique minuscules
-
-        case 6:
-            $chars = array_merge(range(0, 9), range('A', 'Z'));
-            break; // Caractères numerique et alphabetique majuscules
-
-        default:
-            $chars = array_merge(range(0, 9), range('a', 'z'), range('A', 'Z'));
-            break; // Tous les caractères
-    }
+    $chars = match ($type) {
+        1 => range('a', 'z'),
+        2 => range('A', 'Z'),
+        3 => range(0, 9),
+        4 => array_merge(range('a', 'z'), range('A', 'Z')),
+        5 => array_merge(range(0, 9), range('a', 'z')),
+        6 => array_merge(range(0, 9), range('A', 'Z')),
+        default => array_merge(range(0, 9), range('a', 'z'), range('A', 'Z')),
+    };
     $return  = ''; // Valeur de retour
     $nb_char = count($chars); // On compte le nombre de caractères disponible
 
@@ -319,7 +296,7 @@ function scl_date($date, $format = 'D, d M Y', $interval = true, $fuseau = 'Euro
     $format   = (empty($format) || ! is_string($format)) ? 'D, d M Y' : htmlspecialchars(trim($format)); // Le format de sortie, par défaut = D, d M Y
     $fuseau   = (empty($fuseau) || ! is_string($fuseau)) ? 'Europe/Paris' : htmlspecialchars(trim($fuseau)); // fuseau horaire
     $interval = (! is_bool($interval)) ? true : $interval; // Specifie si on gere les intervales ou pas
-    $interval = ($interval === false) ? false : true; // Specifie si on gere les intervales ou pas
+    $interval = $interval !== false; // Specifie si on gere les intervales ou pas
 
     $date = new DateTime($date);  // On contruit la date
 
@@ -753,10 +730,8 @@ function scl_cleaner(&$str)
  * @param string     $file      le fichier a inclure
  * @param array|null $data
  * @param bool       $exception
- *
- * @return void
  */
-function scl_include($file, $data = [], $exception = false)
+function scl_include($file, $data = [], $exception = false): void
 {
     $file = trim(htmlspecialchars($file));
     if (is_file($file) && file_exists($file)) {
@@ -774,10 +749,8 @@ function scl_include($file, $data = [], $exception = false)
  *
  * @param mixed $var
  * @param bool  $style specifie si on veut styliser le resultat ou pas (affichage classique de var_dump())
- *
- * @return void
  */
-function scl_debug($var, $style = false)
+function scl_debug($var, $style = false): void
 {
     $vars = (array) $var;
 
@@ -804,7 +777,7 @@ function scl_debug($var, $style = false)
         echo '<span style="width:auto;display:inline-block; margin-bottom: .25em; font-weight:bold;font-family:\'Lato\', candara, \'Arial Narrow\', sans-serif; color:#6c17cb; font-style:italic">';
         echo ucfirst(gettype($var));
         if (is_object($var)) {
-            echo ' | ' . get_class($var);
+            echo ' | ' . $var::class;
         }
 
         if (is_string($var)) {
@@ -883,8 +856,8 @@ function scl_byte2size($bytes, $format = 1024, $precision = 2)
 function scl_moveSpecialChar($str, $leaveSpecialChar = false, $UpperToLower = true, $specialChars = [])
 {
     // Valeurs par défaut
-    $leaveSpecialChar = ($leaveSpecialChar !== false) ? true : false;
-    $UpperToLower     = ($UpperToLower !== false) ? true : false;
+    $leaveSpecialChar = $leaveSpecialChar !== false;
+    $UpperToLower     = $UpperToLower !== false;
 
     // transformer les caractères accentués en entités HTML
     $str = htmlentities($str, ENT_NOQUOTES);
@@ -1008,7 +981,7 @@ function scl_getTags($content, $nb_tags = 10, $relief = false, $mots_a_bannir = 
 {
     // Valeurs par défaut
     $nb_tags = (empty($nb_tags)) ? 10 : (int) $nb_tags;
-    $relief  = ($relief !== true) ? false : true;
+    $relief  = $relief === true;
 
     if (is_file($mots_a_bannir) && file_exists($mots_a_bannir)) {
         $mots_a_bannir = file_get_contents($mots_a_bannir);

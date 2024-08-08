@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Facades;
 
+use Nette\Schema\Schema;
 use BlitzPHP\Container\Services;
 
 /**
@@ -18,7 +19,7 @@ use BlitzPHP\Container\Services;
  * @method static mixed get(string $key, mixed $default = null)                        Renvoie une configuration de l'application.
  * @method static bool  has(string $key)                                               Détermine s'il y'a une clé de configuration.
  * @method static bool  missing(string $key)                                           Détermine s'il manque une clé de configuration.
- * @method static $this ghost(array|string $key, ?\Nette\Schema\Schema $schema = null) Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration). Ceci est notament utilse pour definir des configurations à la volée
+ * @method static $this ghost((array | string) $key, ?Schema $schema = null) Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration). Ceci est notament utilse pour definir des configurations à la volée
  * @method static void  reset(null|array|string $keys = null)                          Reinitialise une configuration en fonction des donnees initiales issues des fichiers de configurations.
  * @method static void  set(string $key, mixed $value)                                 Définit une configuration de l'application.
  *

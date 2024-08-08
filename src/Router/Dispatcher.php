@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Router;
 
+use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Container\Container;
 use BlitzPHP\Container\Services;
@@ -420,12 +421,12 @@ class Dispatcher
     /**
      * Instancie la classe contrôleur.
      *
-     * @return \BlitzPHP\Controllers\BaseController|mixed
+     * @return BaseController|mixed
      */
     private function createController(ServerRequestInterface $request, ResponseInterface $response)
     {
         /**
-         * @var \BlitzPHP\Controllers\BaseController
+         * @var BaseController
          */
         $class = $this->container->get($this->controller);
 
@@ -632,7 +633,7 @@ class Dispatcher
 
         try {
             $response = $response->withBody(to_stream($returned));
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
         }
 
         return $response;
@@ -678,11 +679,9 @@ class Dispatcher
             $post = $request->getParsedBody();
 
             // Ne fonctionne qu'avec les formulaires POST
-            if ($request->getMethod() === Method::POST && ! empty($post['_method'])) {
-                // Accepte seulement PUT, PATCH, DELETE
-                if (in_array($post['_method'], [Method::PUT, Method::PATCH, Method::DELETE], true)) {
-                    $request = $request->withMethod($post['_method']);
-                }
+            // Accepte seulement PUT, PATCH, DELETE
+            if ($request->getMethod() === Method::POST && ! empty($post['_method']) && in_array($post['_method'], [Method::PUT, Method::PATCH, Method::DELETE], true)) {
+                $request = $request->withMethod($post['_method']);
             }
 
             return $next($request, $response);
@@ -730,11 +729,11 @@ class Dispatcher
     private function formatValidationResponse(ValidationException $e, ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $code = $e->getCode();
-        if (empty($errors = $e->getErrors())) {
+        if (null === $errors = $e->getErrors()) {
             $errors = [$e->getMessage()];
         }
 
-        if (in_array($request->getMethod(), ['OPTIONS', 'HEAD'], true)) {
+        if (in_array($request->getMethod(), [Method::OPTIONS, Method::HEAD], true)) {
             throw $e;
         }
 
@@ -742,7 +741,7 @@ class Dispatcher
             return $this->formatResponse($response->withStatus($code), [
                 'success' => false,
                 'code'    => $code,
-                'errors'  => $errors instanceof ErrorBag ? $errors->all() : (array) $errors,
+                'errors'  => $errors instanceof ErrorBag ? $errors->all() : $errors,
             ]);
         }
 

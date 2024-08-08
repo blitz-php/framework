@@ -53,7 +53,7 @@ return RectorConfig::configure()
     // paths to refactor; solid alternative to CLI arguments
     ->withPaths([
         __DIR__ . '/spec',
-        // __DIR__ . '/src',
+        __DIR__ . '/src',
     ])
     // do you need to include constants, class aliases or custom autoloader? files listed will be executed
     ->withBootstrapFiles([

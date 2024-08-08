@@ -27,7 +27,7 @@ if (! function_exists('now')) {
      */
     function now(?string $timezone = null, bool $returnObject = true)
     {
-        $timezone = empty($timezone) ? config('app.timezone') : $timezone;
+        $timezone = $timezone === null || $timezone === '' ? config('app.timezone') : $timezone;
 
         if ($returnObject) {
             return Date::now($timezone);

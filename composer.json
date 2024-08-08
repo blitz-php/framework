@@ -62,13 +62,10 @@
     "scripts": {
         "analyze": [
             "Composer\\Config::disableProcessTimeout",
-            "bash -c \"XDEBUG_MODE=off phpstan analyse\""
+            "@phpstan:check",
+            "vendor/bin/rector process --dry-run"
         ],
-		"phpstan:baseline": [
-            "Composer\\Config::disableProcessTimeout",
-            "bash -c \"XDEBUG_MODE=off phpstan analyse --generate-baseline phpstan-baseline.php\""
-		],
-		"cs": [
+        "cs": [
             "Composer\\Config::disableProcessTimeout",
             "php-cs-fixer fix --ansi --verbose --dry-run --diff"
         ],
@@ -76,6 +73,14 @@
             "Composer\\Config::disableProcessTimeout",
             "php-cs-fixer fix --ansi --verbose --diff"
         ],
+		"phpstan:baseline": [
+            "Composer\\Config::disableProcessTimeout",
+            "bash -c \"XDEBUG_MODE=off phpstan analyse --ansi --generate-baseline phpstan-baseline.php\""
+		],
+        "phpstan:check": [
+            "Composer\\Config::disableProcessTimeout",
+            "bash -c \"XDEBUG_MODE=off phpstan analyse --verbose --ansi\""
+		],
         "sa": "@analyze",
         "style": "@cs:fix",
         "test": "kahlan",
@@ -86,9 +91,11 @@
     },
     "scripts-descriptions": {
         "analyze": "Lance l'analyse statique du code du framework",
-        "test": "Execute les tests unitaires",
         "cs": "Vérifie les normes de codage",
-        "cs:fix": "Corriger le style de codage"
+        "cs:fix": "Corrige le style de codage",
+		"phpstan:baseline": "Exécute PHPStan puis transférer toutes les erreurs vers la ligne de base.",
+        "phpstan:check": "Exécute PHPStan avec la prise en charge des identifiants",
+        "test": "Execute les tests unitaires"
     },
     "extra": {
         "branch-alias": {

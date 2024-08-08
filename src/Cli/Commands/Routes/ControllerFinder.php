@@ -19,12 +19,12 @@ use BlitzPHP\Contracts\Autoloader\LocatorInterface;
  */
 final class ControllerFinder
 {
-    private LocatorInterface $locator;
+    private readonly LocatorInterface $locator;
 
     /**
      * @param string $namespace Namespace dans lequel on recherche
      */
-    public function __construct(private string $namespace)
+    public function __construct(private readonly string $namespace)
     {
         $this->locator = Services::locator();
     }

@@ -59,7 +59,7 @@ class Routes extends Command
     public function execute(array $params)
     {
         $sortByHandler = $this->option('h', false);
-        $host          = $this->option('host');
+        $this->option('host');
 
         $collection = Services::routes()->loadRoutes();
         $methods    = [
@@ -91,7 +91,7 @@ class Routes extends Command
                 $route['route'],
                 $routeName,
                 $route['handler'],
-                implode(' ', array_map([Helpers::class, 'classBasename'], $filters)),
+                implode(' ', array_map(Helpers::classBasename(...), $filters)),
             ];
         }
 

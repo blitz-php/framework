@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Http;
 
+use Stringable;
+use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Exceptions\HttpException;
@@ -39,28 +41,24 @@ use SplFileInfo;
  *
  * @credit CakePHP <a href="https://api.cakephp.org/4.3/class-Cake.Http.Response.html">Cake\Http\Response</a>
  */
-class Response implements ResponseInterface
+class Response implements ResponseInterface, Stringable
 {
     use MessageTrait;
     use ResponseTrait;
-
     /**
      * @var int
      */
     public const STATUS_CODE_MIN = 100;
-
     /**
      * @var int
      */
     public const STATUS_CODE_MAX = 599;
-
     /**
      * Codes d'état HTTP autorisés et leur description par défaut.
      *
      * @var array<int, string>
      */
     protected array $_statusCodes = StatusCode::VALID_CODES;
-
     /**
      * Contient la clé de type pour les mappages de type mime pour les types mime connus.
      *
@@ -303,61 +301,51 @@ class Response implements ResponseInterface
         'ajax'         => 'text/html',
         'bmp'          => 'image/bmp',
     ];
-
     /**
      * Code de statut à envoyer au client
      */
     protected int $_status = StatusCode::OK;
-
     /**
      * Objet de fichier pour le fichier à lire comme réponse
      *
      * @var SplFileInfo|null
      */
     protected $_file;
-
     /**
      * Gamme de fichiers. Utilisé pour demander des plages de fichiers.
      *
      * @var array<int>
      */
     protected array $_fileRange = [];
-
     /**
      * Le jeu de caractères avec lequel le corps de la réponse est encodé
      */
     protected string $_charset = 'UTF-8';
-
     /**
      * Contient toutes les directives de cache qui seront converties
      * dans les en-têtes lors de l'envoi de la requête
      */
     protected array $_cacheDirectives = [];
-
     /**
      * Collecte de cookies à envoyer au client
      *
      * @var CookieCollection
      */
     protected $_cookies;
-
     /**
      * Phrase de raison
      */
     protected string $_reasonPhrase = 'OK';
-
     /**
      * Options du mode flux.
      */
     protected string $_streamMode = 'wb+';
-
     /**
      * Cible de flux ou objet de ressource.
      *
      * @var resource|string
      */
     protected $_streamTarget = 'php://memory';
-
     /**
      * Constructeur
      *
@@ -405,7 +393,6 @@ class Response implements ResponseInterface
 
         $this->_cookies = new CookieCollection();
     }
-
     /**
      * Crée l'objet de flux.
      */
@@ -413,7 +400,6 @@ class Response implements ResponseInterface
     {
         $this->stream = new Stream(Utils::tryFopen($this->_streamTarget, $this->_streamMode));
     }
-
     /**
      * Formate l'en-tête Content-Type en fonction du contentType et du jeu de caractères configurés
      * le jeu de caractères ne sera défini dans l'en-tête que si la réponse est de type texte
@@ -446,7 +432,6 @@ class Response implements ResponseInterface
             $this->_setHeader('Content-Type', $type);
         }
     }
-
     /**
      * Effectuez une redirection vers une nouvelle URL, en deux versions : en-tête ou emplacement.
      *
@@ -458,7 +443,7 @@ class Response implements ResponseInterface
     public function redirect(string $uri, string $method = 'auto', ?int $code = null): static
     {
         // Suppose une réponse de code d'état 302 ; remplacer si nécessaire
-        if (empty($code)) {
+        if ($code === null || $code === 0) {
             $code = StatusCode::FOUND;
         }
 
@@ -479,7 +464,6 @@ class Response implements ResponseInterface
 
         return $new->withStatus($code);
     }
-
     /**
      * Renvoie une instance avec un en-tête d'emplacement mis à jour.
      *
@@ -499,7 +483,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Définit un en-tête.
      *
@@ -511,7 +494,6 @@ class Response implements ResponseInterface
         $this->headerNames[$normalized] = $header;
         $this->headers[$header]         = [$value];
     }
-
     /**
      * Effacer l'en-tête
      *
@@ -526,7 +508,6 @@ class Response implements ResponseInterface
         $original = $this->headerNames[$normalized];
         unset($this->headerNames[$normalized], $this->headers[$original]);
     }
-
     /**
      * Obtient le code d'état de la réponse.
      *
@@ -537,7 +518,6 @@ class Response implements ResponseInterface
     {
         return $this->_status;
     }
-
     /**
      * Renvoie une instance avec le code d'état spécifié et, éventuellement, la phrase de raison.
      *
@@ -575,7 +555,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Modificateur pour l'état de la réponse
      *
@@ -587,7 +566,7 @@ class Response implements ResponseInterface
             throw HttpException::invalidStatusCode($code);
         }
 
-        if (! array_key_exists($code, $this->_statusCodes) && empty($reasonPhrase)) {
+        if (! array_key_exists($code, $this->_statusCodes) && ($reasonPhrase === '' || $reasonPhrase === '0')) {
             throw HttpException::unkownStatusCode($code);
         }
 
@@ -602,7 +581,6 @@ class Response implements ResponseInterface
             $this->_clearHeader('Content-Type');
         }
     }
-
     /**
      * Obtient la phrase de motif de réponse associée au code d'état.
      *
@@ -619,7 +597,6 @@ class Response implements ResponseInterface
     {
         return $this->_reasonPhrase;
     }
-
     /**
      * Définit une définition de type de contenu dans la collection.
      *
@@ -634,7 +611,6 @@ class Response implements ResponseInterface
     {
         $this->_mimeTypes[$type] = $mimeType;
     }
-
     /**
      * Renvoie le type de contenu actuel.
      */
@@ -647,7 +623,6 @@ class Response implements ResponseInterface
 
         return $header;
     }
-
     /**
      * Obtenez une réponse mise à jour avec le type de contenu défini.
      *
@@ -664,7 +639,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Traduire et valider les types de contenu.
      *
@@ -686,7 +660,6 @@ class Response implements ResponseInterface
 
         return $contentType;
     }
-
     /**
      * Renvoie la définition du type mime pour un alias
      *
@@ -700,7 +673,6 @@ class Response implements ResponseInterface
     {
         return $this->_mimeTypes[$alias] ?? false;
     }
-
     /**
      * Mappe un type de contenu vers un alias
      *
@@ -713,7 +685,7 @@ class Response implements ResponseInterface
     public function mapType($ctype)
     {
         if (is_array($ctype)) {
-            return array_map([$this, 'mapType'], $ctype);
+            return array_map($this->mapType(...), $ctype);
         }
 
         foreach ($this->_mimeTypes as $alias => $types) {
@@ -724,7 +696,6 @@ class Response implements ResponseInterface
 
         return null;
     }
-
     /**
      * Renvoie le jeu de caractères actuel.
      */
@@ -732,7 +703,6 @@ class Response implements ResponseInterface
     {
         return $this->_charset;
     }
-
     /**
      * Obtenez une nouvelle instance avec un jeu de caractères mis à jour.
      */
@@ -744,7 +714,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Créez une nouvelle instance avec des en-têtes pour indiquer au client de ne pas mettre en cache la réponse
      */
@@ -754,7 +723,6 @@ class Response implements ResponseInterface
             ->withHeader('Last-Modified', gmdate(DATE_RFC7231))
             ->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
     }
-
     /**
      * Créez une nouvelle instance avec les en-têtes pour activer la mise en cache du client.
      *
@@ -779,7 +747,6 @@ class Response implements ResponseInterface
             ->withMaxAge($time - time())
             ->withHeader('Date', gmdate(DATE_RFC7231, time()));
     }
-
     /**
      * Créez une nouvelle instance avec le jeu de directives public/privé Cache-Control.
      *
@@ -802,7 +769,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Créez une nouvelle instance avec la directive Cache-Control s-maxage.
      *
@@ -819,7 +785,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Créez une instance avec l'ensemble de directives Cache-Control max-age.
      *
@@ -836,7 +801,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Créez une instance avec le jeu de directives must-revalidate de Cache-Control.
      *
@@ -859,7 +823,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Méthode d'assistance pour générer un en-tête Cache-Control valide à partir du jeu d'options
      * dans d'autres méthodes
@@ -875,7 +838,6 @@ class Response implements ResponseInterface
         $control = rtrim($control, ', ');
         $this->_setHeader('Cache-Control', $control);
     }
-
     /**
      * Créez une nouvelle instance avec l'ensemble d'en-tête Expires.
      *
@@ -897,7 +859,6 @@ class Response implements ResponseInterface
 
         return $this->withHeader('Expires', $date->format(DATE_RFC7231));
     }
-
     /**
      * Créez une nouvelle instance avec le jeu d'en-tête Last-Modified.
      *
@@ -919,7 +880,6 @@ class Response implements ResponseInterface
 
         return $this->withHeader('Last-Modified', $date->format(DATE_RFC7231));
     }
-
     /**
      * Définit la réponse comme non modifiée en supprimant tout contenu du corps
      * définir le code d'état sur "304 Non modifié" et supprimer tous
@@ -946,7 +906,6 @@ class Response implements ResponseInterface
             $this->_clearHeader($header);
         }
     }
-
     /**
      * Créer une nouvelle instance comme "non modifiée"
      *
@@ -974,7 +933,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Créez une nouvelle instance avec l'ensemble d'en-tête Vary.
      *
@@ -988,7 +946,6 @@ class Response implements ResponseInterface
     {
         return $this->withHeader('Vary', (array) $cacheVariances);
     }
-
     /**
      * Créez une nouvelle instance avec l'ensemble d'en-tête Etag.
      *
@@ -1015,7 +972,6 @@ class Response implements ResponseInterface
 
         return $this->withHeader('Etag', $hash);
     }
-
     /**
      * Renvoie un objet DateTime initialisé au paramètre $time et utilisant UTC
      * comme fuseau horaire
@@ -1035,7 +991,6 @@ class Response implements ResponseInterface
         /** @psalm-suppress UndefinedInterfaceMethod */
         return $result->setTimezone(new DateTimeZone('UTC'));
     }
-
     /**
      * Définit le bon gestionnaire de mise en mémoire tampon de sortie pour envoyer une réponse compressée.
      * Les réponses seront compressé avec zlib, si l'extension est disponible.
@@ -1050,7 +1005,6 @@ class Response implements ResponseInterface
 
         return $compressionEnabled && ob_start('ob_gzhandler');
     }
-
     /**
      * Retourne VRAI si la sortie résultante sera compressée par PHP
      */
@@ -1059,7 +1013,6 @@ class Response implements ResponseInterface
         return str_contains((string) env('HTTP_ACCEPT_ENCODING'), 'gzip')
             && (ini_get('zlib.output_compression') === '1' || in_array('ob_gzhandler', ob_list_handlers(), true));
     }
-
     /**
      * Créez une nouvelle instance avec l'ensemble d'en-tête Content-Disposition.
      *
@@ -1069,7 +1022,6 @@ class Response implements ResponseInterface
     {
         return $this->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
-
     /**
      * Créez une nouvelle réponse avec l'ensemble d'en-tête Content-Length.
      *
@@ -1079,7 +1031,6 @@ class Response implements ResponseInterface
     {
         return $this->withHeader('Content-Length', (string) $bytes);
     }
-
     /**
      * Créez une nouvelle réponse avec l'ensemble d'en-tête de lien.
      *
@@ -1109,13 +1060,12 @@ class Response implements ResponseInterface
         }
 
         $param = '';
-        if ($params) {
+        if ($params !== []) {
             $param = '; ' . implode('; ', $params);
         }
 
         return $this->withAddedHeader('Link', '<' . $url . '>' . $param);
     }
-
     /**
      * Vérifie si une réponse n'a pas été modifiée selon le 'If-None-Match'
      * (Etags) et requête 'If-Modified-Since' (dernière modification)
@@ -1137,7 +1087,7 @@ class Response implements ResponseInterface
         $etags       = preg_split('/\s*,\s*/', $request->getHeaderLine('If-None-Match'), 0, PREG_SPLIT_NO_EMPTY);
         $responseTag = $this->getHeaderLine('Etag');
         $etagMatches = null;
-        if ($responseTag) {
+        if ($responseTag !== '' && $responseTag !== '0') {
             $etagMatches = in_array('*', $etags, true) || in_array($responseTag, $etags, true);
         }
 
@@ -1156,7 +1106,6 @@ class Response implements ResponseInterface
 
         return $notModified;
     }
-
     /**
      * Conversion de chaînes. Récupère le corps de la réponse sous forme de chaîne.
      * N'envoie *pas* d'en-têtes.
@@ -1168,7 +1117,6 @@ class Response implements ResponseInterface
 
         return $this->stream->getContents();
     }
-
     /**
      * Créez une nouvelle réponse avec un jeu de cookies.
      *
@@ -1185,7 +1133,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Créez une nouvelle réponse avec un jeu de cookies expiré.
      *
@@ -1204,7 +1151,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Expire un cookie lors de l'envoi de la réponse.
      *
@@ -1218,7 +1164,6 @@ class Response implements ResponseInterface
 
         return $this->withExpiredCookie($cookie);
     }
-
     /**
      * Lire un seul cookie à partir de la réponse.
      *
@@ -1237,7 +1182,6 @@ class Response implements ResponseInterface
 
         return $this->_cookies->get($name)->toArray();
     }
-
     /**
      * Vérifier si la reponse contient un cookie avec le nom donné
      */
@@ -1253,7 +1197,6 @@ class Response implements ResponseInterface
 
         return true;
     }
-
     /**
      * Obtenez tous les cookies dans la réponse.
      *
@@ -1262,7 +1205,7 @@ class Response implements ResponseInterface
     public function getCookies(): array
     {
         $out = [];
-        /** @var array<\BlitzPHP\Session\Cookie\Cookie> $cookies */
+        /** @var array<Cookie> $cookies */
         $cookies = $this->_cookies;
 
         foreach ($cookies as $cookie) {
@@ -1271,7 +1214,6 @@ class Response implements ResponseInterface
 
         return $out;
     }
-
     /**
      * Obtenez la CookieCollection à partir de la réponse
      */
@@ -1279,7 +1221,6 @@ class Response implements ResponseInterface
     {
         return $this->_cookies;
     }
-
     /**
      * Obtenez une nouvelle instance avec la collection de cookies fournie.
      */
@@ -1290,7 +1231,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Créez une nouvelle instance basée sur un fichier.
      *
@@ -1349,7 +1289,7 @@ class Response implements ResponseInterface
 
         $new       = $new->withHeader('Accept-Ranges', 'bytes');
         $httpRange = (string) env('HTTP_RANGE');
-        if ($httpRange) {
+        if ($httpRange !== '' && $httpRange !== '0') {
             $new->_fileRange($file, $httpRange);
         } else {
             $new = $new->withHeader('Content-Length', (string) $fileSize);
@@ -1359,7 +1299,6 @@ class Response implements ResponseInterface
 
         return $new;
     }
-
     /**
      * Méthode pratique pour définir une chaîne dans le corps de la réponse
      *
@@ -1371,7 +1310,6 @@ class Response implements ResponseInterface
 
         return $new->withBody(Utils::streamFor($string));
     }
-
     /**
      * Valider qu'un chemin de fichier est un corps de réponse valide.
      *
@@ -1397,7 +1335,6 @@ class Response implements ResponseInterface
 
         return $file;
     }
-
     /**
      * Obtenir le fichier actuel s'il en existe un.
      *
@@ -1407,7 +1344,6 @@ class Response implements ResponseInterface
     {
         return $this->_file;
     }
-
     /**
      * Appliquez une plage de fichiers à un fichier et définissez le décalage de fin.
      *
@@ -1455,7 +1391,6 @@ class Response implements ResponseInterface
          */
         $this->_fileRange = [$start, $end];
     }
-
     /**
      * Retourne un tableau qui peut être utilisé pour décrire l'état interne de cet objet.
      *

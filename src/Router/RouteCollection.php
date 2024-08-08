@@ -712,11 +712,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function getRedirectCode(string $routeKey): int
     {
-        if (isset($this->routes['*'][$routeKey]['redirect'])) {
-            return $this->routes['*'][$routeKey]['redirect'];
-        }
-
-        return 0;
+        return $this->routes['*'][$routeKey]['redirect'] ?? 0;
     }
 
     /**
@@ -1214,8 +1210,8 @@ class RouteCollection implements RouteCollectionInterface
         // Ajoutez l'espace de noms par défaut si nécessaire.
         $namespace = trim($this->defaultNamespace, '\\') . '\\';
         if (
-            substr($search, 0, 1) !== '\\'
-            && substr($search, 0, strlen($namespace)) !== $namespace
+            !str_starts_with($search, '\\')
+            && !str_starts_with($search, $namespace)
         ) {
             $search = $namespace . $search;
         }
@@ -1684,10 +1680,8 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         // Vérifier les paramètres régionaux non valides
-        if ($locale !== null) {
-            if (! in_array($locale, config('app.supported_locales'), true)) {
-                $locale = null;
-            }
+        if ($locale !== null && ! in_array($locale, config('app.supported_locales'), true)) {
+            $locale = null;
         }
 
         if ($locale === null) {

@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\View;
 
+use BlitzPHP\Session\Store;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\View\RendererInterface;
 use BlitzPHP\Exceptions\ConfigException;
@@ -360,7 +361,7 @@ class View implements Stringable
         }
 
         $config = array_merge($this->config['adapters'][$adapter] ?? [], $config);
-        if (empty($config)) {
+        if ($config === []) {
             throw ConfigException::viewAdapterConfigNotFound($adapter);
         }
 
@@ -423,7 +424,7 @@ class View implements Stringable
     {
         $errors = [];
 
-        /** @var \BlitzPHP\Session\Store $session */
+        /** @var Store $session */
         $session = session();
 
         if (null !== $e = $session->getFlashdata('errors')) {

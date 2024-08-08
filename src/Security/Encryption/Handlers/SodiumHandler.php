@@ -33,7 +33,7 @@ class SodiumHandler extends BaseHandler
     {
         $this->parseParams($params);
 
-        if (empty($this->key)) {
+        if ($this->key === '' || $this->key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 
@@ -64,7 +64,7 @@ class SodiumHandler extends BaseHandler
     {
         $this->parseParams($params);
 
-        if (empty($this->key)) {
+        if ($this->key === '' || $this->key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 
@@ -122,6 +122,6 @@ class SodiumHandler extends BaseHandler
             return;
         }
 
-        $this->key = (string) $params;
+        $this->key = $params;
     }
 }

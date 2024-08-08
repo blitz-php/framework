@@ -86,7 +86,7 @@ abstract class AbstractAdapter implements RendererInterface
             }
         }
 
-        if (empty($this->locator) && ! is_dir($this->viewPath)) {
+        if (!$this->locator instanceof LocatorInterface && ! is_dir($this->viewPath)) {
             $this->viewPath = '';
             $this->locator  = Services::locator();
         }
@@ -99,7 +99,7 @@ abstract class AbstractAdapter implements RendererInterface
      */
     public function setData(array $data = [], ?string $context = null): self
     {
-        if ($context) {
+        if ($context !== null && $context !== '' && $context !== '0') {
             $data = esc($data, $context);
         }
 
@@ -121,7 +121,7 @@ abstract class AbstractAdapter implements RendererInterface
      */
     public function addData(array $data = [], ?string $context = null): self
     {
-        if ($context) {
+        if ($context !== null && $context !== '' && $context !== '0') {
             $data = esc($data, $context);
         }
 
@@ -135,7 +135,7 @@ abstract class AbstractAdapter implements RendererInterface
      */
     public function setVar(string $name, $value = null, ?string $context = null): self
     {
-        if ($context) {
+        if ($context !== null && $context !== '' && $context !== '0') {
             $value = esc($value, $context);
         }
 
@@ -215,7 +215,7 @@ abstract class AbstractAdapter implements RendererInterface
      */
     public function title(?string $title = null)
     {
-        if (empty($title)) {
+        if ($title === null || $title === '' || $title === '0') {
             return $this->getData()['title'] ?? '';
         }
 
@@ -231,7 +231,7 @@ abstract class AbstractAdapter implements RendererInterface
     {
         $meta = $this->getData()['meta'] ?? [];
 
-        if (empty($value)) {
+        if ($value === null || $value === '' || $value === '0') {
             return $meta[$key] ?? '';
         }
 
@@ -261,11 +261,7 @@ abstract class AbstractAdapter implements RendererInterface
         $ext ??= $this->ext;
 
         $viewPath = $options['viewPath'] ?? $this->viewPath;
-        if (! empty($viewPath)) {
-            $file = str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($view, '/\\'));
-        } else {
-            $file = $view;
-        }
+        $file = ! empty($viewPath) ? str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($view, '/\\')) : $view;
 
         $file = Helpers::ensureExt($file, $ext);
 

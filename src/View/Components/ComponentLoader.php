@@ -64,9 +64,7 @@ class ComponentLoader
     {
         [$instance, $method] = $this->determineClass($library);
 
-        $class = is_object($instance)
-            ? get_class($instance)
-            : null;
+        $class = is_object($instance) ? $instance::class : null;
 
         $params = $this->prepareParams($params);
 
@@ -245,7 +243,7 @@ class ComponentLoader
                     $mountParams[] = $params[$paramName];
                 }
             }
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             // ne rien faire
         }
 

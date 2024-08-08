@@ -21,7 +21,7 @@ if (! defined('TEST_PATH')) {
     chdir(WEBROOT);
 }
 
-return function (array $paths, string $paths_config_file, bool $is_cli) {
+return function (array $paths, string $paths_config_file, bool $is_cli): void {
     // Le chemin d'accès vers le dossier de l'application
     if (is_dir($paths['app'])) {
         if (($_temp = realpath($paths['app'])) !== false) {

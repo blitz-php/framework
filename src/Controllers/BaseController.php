@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Controllers;
 
+use BlitzPHP\Validation\DataValidation;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\ValidationException;
@@ -102,7 +103,7 @@ abstract class BaseController
 
         $this->getModel();
 
-        if (! empty($this->helpers)) {
+        if ($this->helpers !== []) {
             helper($this->helpers);
         }
     }
@@ -110,7 +111,7 @@ abstract class BaseController
     /**
      * Validation des donnees de la requete actuelle
      *
-     * @param array|class-string<\BlitzPHP\Validation\DataValidation> $rules
+     * @param array|class-string<DataValidation> $rules
      * @param array                                                   $messages Si $rules est une chaine (representant) la classe de validation,
      *                                                                          alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
      *                                                                          Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
@@ -138,7 +139,7 @@ abstract class BaseController
     /**
      * Cree un validateur avec les donnees de la requete actuelle
      *
-     * @param array|class-string<\BlitzPHP\Validation\DataValidation> $rules
+     * @param array|class-string<DataValidation> $rules
      * @param array                                                   $messages Si $rules est une chaine (representant) la classe de validation,
      *                                                                          alors, $messages est consideré comme un tableau d'attribut à passer à la classe de validation.
      *                                                                          Ceci peut par exemple être utilisé par spécifier l'ID à ignorer pour la règle `unique`.
@@ -166,7 +167,7 @@ abstract class BaseController
         }
 
         if (! empty($this->model) && empty($this->modelName)) {
-            $this->modelName = get_class($this->model);
+            $this->modelName = $this->model::class;
         }
     }
 
@@ -203,11 +204,7 @@ abstract class BaseController
      */
     private function getModel()
     {
-        if (! empty($this->modelName)) {
-            $model = $this->modelName;
-        } else {
-            $model = str_replace('Controller', 'Model', static::class);
-        }
+        $model = ! empty($this->modelName) ? $this->modelName : str_replace('Controller', 'Model', static::class);
 
         if (class_exists($model)) {
             $this->setModel($model);

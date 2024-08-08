@@ -11,6 +11,9 @@
 
 namespace BlitzPHP\Http;
 
+use BlitzPHP\Http\Concerns\InteractsWithContentTypes;
+use BlitzPHP\Http\Concerns\InteractsWithInput;
+use BlitzPHP\Http\Concerns\InteractsWithFlashData;
 use ArrayAccess;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Support\Arrayable;
@@ -27,9 +30,9 @@ use InvalidArgumentException;
 
 class Request extends ServerRequest implements Arrayable, ArrayAccess
 {
-    use Concerns\InteractsWithContentTypes;
-    use Concerns\InteractsWithInput;
-    use Concerns\InteractsWithFlashData;
+    use InteractsWithContentTypes;
+    use InteractsWithInput;
+    use InteractsWithFlashData;
 
     /**
      * Validation des donnees de la requete
@@ -147,7 +150,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function fullUrl(): string
     {
-        if (! empty($query = $this->getEnv('QUERY_STRING'))) {
+        if (($query = $this->getEnv('QUERY_STRING')) !== null && ($query = $this->getEnv('QUERY_STRING')) !== '') {
             return $this->url() . '?' . $query;
         }
 
@@ -173,7 +176,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     {
         $query = Arr::except($this->query(), $keys);
 
-        return count($query) > 0
+        return $query !== []
             ? $this->url() . '?' . Arr::query($query)
             : $this->url();
     }

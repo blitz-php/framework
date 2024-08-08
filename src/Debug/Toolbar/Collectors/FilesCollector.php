@@ -38,7 +38,7 @@ class FilesCollector extends BaseCollector
      */
     public function getTitleDetails(): string
     {
-        return '( ' . (int) count(get_included_files()) . ' )';
+        return '( ' . count(get_included_files()) . ' )';
     }
 
     /**

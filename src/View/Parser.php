@@ -171,7 +171,7 @@ class Parser extends NativeAdapter
      */
     public function setData(array $data = [], ?string $context = null): static
     {
-        if (! empty($context)) {
+        if ($context !== null && $context !== '' && $context !== '0') {
             foreach ($data as $key => &$value) {
                 if (is_array($value)) {
                     foreach ($value as &$obj) {
@@ -303,7 +303,7 @@ class Parser extends NativeAdapter
                     if (is_array($val)) {
                         $pair = $this->parsePair($key, $val, $match[1]);
 
-                        if (! empty($pair)) {
+                        if ($pair !== []) {
                             $pairs[array_keys($pair)[0]] = true;
 
                             $temp = array_merge($temp, $pair);
@@ -313,7 +313,7 @@ class Parser extends NativeAdapter
                     }
 
                     if (is_object($val)) {
-                        $val = 'Class: ' . get_class($val);
+                        $val = 'Class: ' . $val::class;
                     } elseif (is_resource($val)) {
                         $val = 'Resource';
                     }
@@ -443,7 +443,7 @@ class Parser extends NativeAdapter
 
         try {
             eval('?>' . $template . '<?php ');
-        } catch (ParseError $e) {
+        } catch (ParseError) {
             ob_end_clean();
 
             throw ViewException::tagSyntaxError(str_replace(['?>', '<?php '], '', $template));
@@ -491,7 +491,7 @@ class Parser extends NativeAdapter
             }
 
             return $this->prepareReplacement($matches, $content, $escape);
-        }, (string) $template);
+        }, $template);
     }
 
     /**
@@ -505,7 +505,7 @@ class Parser extends NativeAdapter
         // so we need to break them apart so we can apply them all.
         $filters = ! empty($matches[1]) ? explode('|', $matches[1]) : [];
 
-        if ($escape && empty($filters) && ($context = $this->shouldAddEscaping($orig))) {
+        if ($escape && $filters === [] && ($context = $this->shouldAddEscaping($orig))) {
             $filters[] = "esc({$context})";
         }
 
@@ -561,7 +561,7 @@ class Parser extends NativeAdapter
             $param = ! empty($param) ? trim($param[0], '() ') : null;
 
             // Params can be separated by commas to allow multiple parameters for the filter
-            if (! empty($param)) {
+            if ($param !== null && $param !== '' && $param !== '0') {
                 $param = explode(',', $param);
 
                 // Clean it up
@@ -573,7 +573,7 @@ class Parser extends NativeAdapter
             }
 
             // Get our filter name
-            $filter = ! empty($param) ? trim(strtolower(substr($filter, 0, strpos($filter, '(')))) : trim($filter);
+            $filter = $param !== [] ? trim(strtolower(substr($filter, 0, strpos($filter, '(')))) : trim($filter);
 
             $this->config['filters'] ??= [];
             if (! array_key_exists($filter, $this->config['filters'])) {

@@ -101,10 +101,10 @@ if (! function_exists('current_url')) {
         $path = $request->getPath();
 
         // Ajouter des chaine de requêtes et des fragments
-        if ($query = $request->getUri()->getQuery()) {
+        if (($query = $request->getUri()->getQuery()) !== '') {
             $path .= '?' . $query;
         }
-        if ($fragment = $request->getUri()->getFragment()) {
+        if (($fragment = $request->getUri()->getFragment()) !== '') {
             $path .= '#' . $fragment;
         }
 
@@ -298,7 +298,7 @@ if (! function_exists('safe_mailto')) {
             if ($ordinal < 128) {
                 $x[] = '|' . $ordinal;
             } else {
-                if (empty($temp)) {
+                if ($temp === []) {
                     $count = ($ordinal < 224) ? 2 : 3;
                 } else {
                     $count = 0;

@@ -28,13 +28,13 @@ if (! function_exists('number_to_size')) {
         try {
             // @phpstan-ignore-next-line
             $num = 0 + str_replace(',', '', $num);
-        } catch (ErrorException $ee) {
+        } catch (ErrorException) {
             return false;
         }
 
         // ignore sub part
         $generalLocale = $locale;
-        if (! empty($locale) && ($underscorePos = strpos($locale, '_'))) {
+        if ($locale !== null && ($underscorePos = strpos($locale, '_'))) {
             $generalLocale = substr($locale, 0, $underscorePos);
         }
 
@@ -80,7 +80,7 @@ if (! function_exists('number_to_amount')) {
         try {
             // @phpstan-ignore-next-line
             $num = 0 + str_replace(',', '', $num);
-        } catch (ErrorException $ee) {
+        } catch (ErrorException) {
             return false;
         }
 
@@ -88,7 +88,7 @@ if (! function_exists('number_to_amount')) {
 
         // ignore sub part
         $generalLocale = $locale;
-        if (! empty($locale) && ($underscorePos = strpos($locale, '_'))) {
+        if ($locale !== null && ($underscorePos = strpos($locale, '_'))) {
             $generalLocale = substr($locale, 0, $underscorePos);
         }
 
