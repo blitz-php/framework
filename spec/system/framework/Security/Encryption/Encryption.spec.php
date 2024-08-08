@@ -167,4 +167,29 @@ describe('Security / Encryption', function (): void {
             expect($decrypted)->toBe($expected);
         });
     });
+
+	describe('EncrypterInterface', function (): void {
+        it('getKey', function (): void {
+           $config           = (object) config('encryption');
+		   $this->encryption = new Encryption($config);
+		   expect(fn() => $this->encryption->getKey())->toThrow(EncryptionException::needsStarterKey());
+
+		   // try a different key
+		   $ikm              = 'Secret stuff';
+		   $config->key      = $ikm;
+		   $this->encryption = new Encryption($config);
+		   expect($this->encryption->getKey())->toBe($ikm);
+        });
+
+        it('Chiffrement', function (): void {
+			$config      = (object) config('encryption');
+			$config->key = 'abracadabra';
+			$encryption  = new Encryption($config);
+
+            $message1  = 'Ceci est un message en clair.';
+            $encoded   = $encryption->encrypt($message1, ['key' => $config->key]);
+
+            expect($message1)->toBe($encryption->decrypt($encoded, ['key' => $config->key]));
+        });
+    });
 });

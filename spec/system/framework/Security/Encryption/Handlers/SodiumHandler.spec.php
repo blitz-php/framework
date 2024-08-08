@@ -64,7 +64,7 @@ describe('Security / Encryption / Sodium', function (): void {
         })->toThrow(new EncryptionException());
     });
 
-    xit(':Un blocksize invalide lève une exception lors du déchiffrement', function (): void {
+    it(':Un blocksize invalide lève une exception lors du déchiffrement', function (): void {
         expect(function (): void {
             $key       = $this->config->key;
             $encrypter = $this->encryption->initialize($this->config);
