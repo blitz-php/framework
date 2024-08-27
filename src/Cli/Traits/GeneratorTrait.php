@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Cli\Traits;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\View\Adapters\NativeAdapter;
 
 /**
@@ -56,6 +55,12 @@ trait GeneratorTrait
     protected $classNameLang = '';
 
     /**
+     * Namespace a utiliser pour la classe.
+     * Laisser a null pour utiliser le namespace par defaut.
+     */
+    protected ?string $namespace = null;
+
+    /**
      * S'il faut exiger le nom de la classe.
      *
      * @internal
@@ -87,28 +92,67 @@ trait GeneratorTrait
      *
      * @internal
      *
-     * @var array
+     * @var array<int|string, string|null>
      */
     private $params = [];
 
     /**
-     * Exécute la commande.
+     * Exécute la generation.
+	 *
+     * @param array<int|string, string|null> $params
+	 *
+	 * @deprecated use generateClass() instead
      */
     protected function runGeneration(array $params): void
     {
+        $this->generateClass($params);
+    }
+
+    /**
+     * Génère un fichier de classe à partir d'un template existant.
+     *
+     * @param array<int|string, string|null> $params
+     *
+     * @return string|null Nom de la classe
+     */
+    protected function generateClass(array $params): ?string
+    {
         $this->params = $params;
 
-        // Recupere le FQCN.
+        // Récupère le nom complet de la classe à partir de l'entrée.
         $class = $this->qualifyClassName();
 
-        // Recupere le chemin du fichier a partir du nom de la classe.
+        // Obtenir le chemin d'accès au fichier à partir du nom de la classe.
         $target = $this->buildPath($class);
 
-        if (empty($target)) {
-            return;
+        // Vérifier si le chemin est vide.
+        if ($target === '') {
+            return null;
         }
 
         $this->generateFile($target, $this->buildContent($class));
+
+        return $class;
+    }
+
+    /**
+     * Générer un fichier de vue à partir d'un template existant.
+     *
+     * @param string                         $view   nom de la vue à espace de noms qui est générée
+     * @param array<int|string, string|null> $params
+     */
+    protected function generateView(string $view, array $params): void
+    {
+        $this->params = $params;
+
+        $target = $this->buildPath($view);
+
+        // Vérifier si le chemin est vide.
+        if ($target === '') {
+            return;
+        }
+
+        $this->generateFile($target, $this->buildContent($view));
     }
 
     /**
@@ -171,6 +215,10 @@ trait GeneratorTrait
 
     /**
      * Préparez les options et effectuez les remplacements nécessaires.
+     *
+     * @param string $class nom de classe avec namespace ou vue avec namespace.
+     *
+     * @return string contenu du fichier généré
      */
     protected function prepare(string $class): string
     {
@@ -202,45 +250,18 @@ trait GeneratorTrait
      */
     protected function qualifyClassName(): string
     {
-        // Obtient le nom de la classe à partir de l'entrée.
-        $class = $this->params[0] ?? $this->params['name'] ?? null;
+        $class = $this->normalizeInputClassName();
 
-        if ($class === null && $this->hasClassName) {
-            // @codeCoverageIgnoreStart
-            $nameLang = $this->classNameLang ?: 'CLI.generator.className.default';
-            $class    = $this->prompt(lang($nameLang));
-            $this->eol();
-            // @codeCoverageIgnoreEnd
-        }
-
-        helper('inflector');
-
-        $component = singular($this->component);
-
-        /**
-         * @see https://regex101.com/r/a5KNCR/1
-         */
-        $pattern = sprintf('/([a-z][a-z0-9_\/\\\\]+)(%s)/i', $component);
-
-        if (preg_match($pattern, $class, $matches) === 1) {
-            $class = $matches[1] . ucfirst($matches[2]);
-        }
-
-        if ($this->enabledSuffixing && $this->getOption('suffix') && ! strripos($class, $component)) {
-            $class .= ucfirst($component);
-        }
-
-        // Coupe l'entrée, normalise les séparateurs et s'assure que tous les chemins sont en Pascalcase.
-        $class = ltrim(implode('\\', array_map('pascalize', explode('\\', str_replace('/', '\\', trim($class))))), '\\/');
-
-        // Obtient l'espace de noms à partir de l'entrée. N'oubliez pas la barre oblique inverse finale !
-        $namespace = trim(str_replace('/', '\\', $this->getOption('namespace', APP_NAMESPACE)), '\\') . '\\';
+        // Récupère l'espace de noms à partir de l'entrée. N'oubliez pas le backslash finale !
+        $namespace = $this->getNamespace() . '\\';
 
         if (str_starts_with($class, $namespace)) {
             return $class; // @codeCoverageIgnore
         }
 
-        return $namespace . $this->directory . '\\' . str_replace('/', '\\', $class);
+        $directory = ($this->directory !== null) ? $this->directory . '\\' : '';
+
+        return $namespace . $directory . str_replace('/', '\\', $class);
     }
 
     /**
@@ -255,6 +276,8 @@ trait GeneratorTrait
 
     /**
      * Exécute les pseudo-variables contenues dans le fichier de vue.
+	 *
+	 * @param string $class nom de classe avec namespace ou vue avec namespace.
      */
     protected function parseTemplate(string $class, array $search = [], array $replace = [], array $data = []): string
     {
@@ -295,7 +318,8 @@ trait GeneratorTrait
     {
         $namespace = trim(str_replace('/', '\\', $this->option('namespace', APP_NAMESPACE)), '\\');
 
-        $base = Services::autoloader()->getNamespace($namespace);
+		// Vérifier que le namespace est réellement défini et que nous ne sommes pas en train de taper du charabia.
+        $base = service('autoloader')->getNamespace($namespace);
 
         if (! $base = reset($base)) {
             $this->io->error(lang('CLI.namespaceNotDefined', [$namespace]), true);
@@ -308,6 +332,16 @@ trait GeneratorTrait
 
         return implode(DS, array_slice(explode(DS, $file), 0, -1)) . DS . $this->basename($file);
     }
+
+    /**
+     * Recupere le namespace a partir de l'option du cli ou le namespace par defaut si l'option n'est pas defini.
+     * Peut etre directement modifier directement par la propriete $this->namespace.
+     */
+    protected function getNamespace(): string
+    {
+        return $this->namespace ?? trim(str_replace('/', '\\', $this->option('namespace') ?? APP_NAMESPACE), '\\');
+    }
+
 
     /**
      * Permet aux générateurs enfants de modifier le drapeau interne `$hasClassName`.
@@ -337,5 +371,44 @@ trait GeneratorTrait
         $this->enabledSuffixing = $enabledSuffixing;
 
         return $this;
+    }
+
+    /**
+     * Normaliser le nom de classe entrée.
+     */
+    private function normalizeInputClassName(): string
+    {
+		// Obtient le nom de la classe à partir de l'entrée.
+        $class = $this->params[0] ?? $this->params['name'] ?? null;
+
+        if ($class === null && $this->hasClassName) {
+            // @codeCoverageIgnoreStart
+            $nameLang = $this->classNameLang ?: 'CLI.generator.className.default';
+            $class    = $this->prompt(lang($nameLang));
+            $this->eol();
+            // @codeCoverageIgnoreEnd
+        }
+
+        helper('inflector');
+
+        $component = singular($this->component);
+
+        /**
+         * @see https://regex101.com/r/a5KNCR/1
+         */
+        $pattern = sprintf('/([a-z][a-z0-9_\/\\\\]+)(%s)$/i', $component);
+
+        if (preg_match($pattern, $class, $matches) === 1) {
+            $class = $matches[1] . ucfirst($matches[2]);
+        }
+
+		$suffix = $this->option('suffix') ?? array_key_exists('suffix', $this->params);
+
+        if ($this->enabledSuffixing && $suffix && preg_match($pattern, $class) !== 1) {
+            $class .= ucfirst($component);
+        }
+
+        // Coupe l'entrée, normalise les séparateurs et s'assure que tous les chemins sont en Pascalcase.
+        return ltrim(implode('\\', array_map(pascalize(...), explode('\\', str_replace('/', '\\', trim($class))))), '\\/');
     }
 }

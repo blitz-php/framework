@@ -18,11 +18,11 @@ return [
         'cancelOperation' => 'Operation has been cancelled.',
         'className'       => [
             'command'    => 'Command class name',
-            'config'     => 'Config class name',
+            'component'  => 'Component class name',
             'controller' => 'Controller class name',
             'default'    => 'Class name',
             'entity'     => 'Entity class name',
-            'filter'     => 'Filter class name',
+            'middleware' => 'Middleware class name',
             'migration'  => 'Migration class name',
             'model'      => 'Model class name',
             'seeder'     => 'Seeder class name',
