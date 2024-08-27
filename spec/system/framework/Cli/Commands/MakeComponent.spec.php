@@ -63,7 +63,7 @@ describe('Commandes / MakeComponent', function (): void {
 		$buffer = COH::buffer();
 		$files  = [
 			APP_PATH . 'Components' . DS . 'RecentComponent.php'  => 'class RecentComponent extends Component',
-			APP_PATH . 'Components' . DS . 'recent-component.php' => "<div>\r\n    <!-- Votre HTML ici -->\r\n</div>\r\n"
+			APP_PATH . 'Components' . DS . 'recent-component.php' => "<!-- Votre HTML ici -->"
 		];
 
 		foreach ($files as $file => $content) {
@@ -85,7 +85,7 @@ describe('Commandes / MakeComponent', function (): void {
 		$buffer = COH::buffer();
 		$files  = [
 			APP_PATH . 'Components' . DS . 'AnotherComponent.php'  => 'class AnotherComponent extends Component',
-			APP_PATH . 'Components' . DS . 'another-component.php' => "<div>\r\n    <!-- Votre HTML ici -->\r\n</div>\r\n"
+			APP_PATH . 'Components' . DS . 'another-component.php' => "<!-- Votre HTML ici -->"
 		];
 
 		foreach ($files as $file => $content) {
@@ -107,7 +107,7 @@ describe('Commandes / MakeComponent', function (): void {
 		$buffer = COH::buffer();
 		$files  = [
 			APP_PATH . 'Components' . DS . 'OneComponentFormComponent.php'  => 'class OneComponentFormComponent extends Component',
-			APP_PATH . 'Components' . DS . 'one-component-form-component.php' => "<div>\r\n    <!-- Votre HTML ici -->\r\n</div>\r\n"
+			APP_PATH . 'Components' . DS . 'one-component-form-component.php' => "<!-- Votre HTML ici -->"
 		];
 
 		foreach ($files as $file => $content) {
