@@ -42,7 +42,8 @@ describe('Publisher / PublisherRestrictions', function (): void {
             'flat' => ['banana'],
         ];
 
-        $pattern   = config('publisher.restrictions.' . WEBROOT);
+		config()->reset('publisher.restrictions');
+        $pattern = config('publisher.restrictions.' . WEBROOT);
 
         foreach ($paths as [$path]) {
             $publisher = new Publisher(ROOTPATH, WEBROOT);

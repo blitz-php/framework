@@ -13,13 +13,13 @@ namespace Spec\BlitzPHP\App\Controllers;
 
 use BlitzPHP\Controllers\ApplicationController;
 
-class ProductController extends ApplicationController
+class IndexController extends ApplicationController
 {
-    public function getIndex(): void
+    public function getIndex($p1 = ''): void
     {
     }
 
-	public function getSomemethod($first = ''): void
+    public function postIndex(): void
     {
     }
 }
