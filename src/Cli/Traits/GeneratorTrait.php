@@ -98,10 +98,10 @@ trait GeneratorTrait
 
     /**
      * Exécute la generation.
-	 *
+     *
      * @param array<int|string, string|null> $params
-	 *
-	 * @deprecated use generateClass() instead
+     *
+     * @deprecated use generateClass() instead
      */
     protected function runGeneration(array $params): void
     {
@@ -276,8 +276,8 @@ trait GeneratorTrait
 
     /**
      * Exécute les pseudo-variables contenues dans le fichier de vue.
-	 *
-	 * @param string $class nom de classe avec namespace ou vue avec namespace.
+     *
+     * @param string $class nom de classe avec namespace ou vue avec namespace.
      */
     protected function parseTemplate(string $class, array $search = [], array $replace = [], array $data = []): string
     {
@@ -318,7 +318,7 @@ trait GeneratorTrait
     {
         $namespace = trim(str_replace('/', '\\', $this->option('namespace', APP_NAMESPACE)), '\\');
 
-		// Vérifier que le namespace est réellement défini et que nous ne sommes pas en train de taper du charabia.
+        // Vérifier que le namespace est réellement défini et que nous ne sommes pas en train de taper du charabia.
         $base = service('autoloader')->getNamespace($namespace);
 
         if (! $base = reset($base)) {
@@ -341,7 +341,6 @@ trait GeneratorTrait
     {
         return $this->namespace ?? trim(str_replace('/', '\\', $this->option('namespace') ?? APP_NAMESPACE), '\\');
     }
-
 
     /**
      * Permet aux générateurs enfants de modifier le drapeau interne `$hasClassName`.
@@ -378,7 +377,7 @@ trait GeneratorTrait
      */
     private function normalizeInputClassName(): string
     {
-		// Obtient le nom de la classe à partir de l'entrée.
+        // Obtient le nom de la classe à partir de l'entrée.
         $class = $this->params[0] ?? $this->params['name'] ?? null;
 
         if ($class === null && $this->hasClassName) {
@@ -402,7 +401,7 @@ trait GeneratorTrait
             $class = $matches[1] . ucfirst($matches[2]);
         }
 
-		$suffix = $this->option('suffix') ?? array_key_exists('suffix', $this->params);
+        $suffix = $this->option('suffix') ?? array_key_exists('suffix', $this->params);
 
         if ($this->enabledSuffixing && $suffix && preg_match($pattern, $class) !== 1) {
             $class .= ucfirst($component);

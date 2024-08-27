@@ -63,11 +63,11 @@ class Component extends Command
      */
     public function execute(array $params)
     {
-		$this->component     = 'Component';
-		$this->directory     = 'Components';
-		$this->template      = 'component.tpl.php';
-		$this->classNameLang = 'CLI.generator.className.component';
-		$params              = array_merge($params, ['suffix' => null]);
+        $this->component     = 'Component';
+        $this->directory     = 'Components';
+        $this->template      = 'component.tpl.php';
+        $this->classNameLang = 'CLI.generator.className.component';
+        $params              = array_merge($params, ['suffix' => null]);
 
         $this->task('Creation du composant')->eol();
 
@@ -77,8 +77,8 @@ class Component extends Command
 
         $this->template = 'component_view.tpl.php';
 
-        $viewName  = Text::toKebab(Helpers::classBasename($className));
-        $viewName  = preg_replace(
+        $viewName = Text::toKebab(Helpers::classBasename($className));
+        $viewName = preg_replace(
             '/([a-z][a-z0-9_\/\\\\]+)(-component)$/i',
             '$1',
             $viewName
