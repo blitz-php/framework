@@ -25,7 +25,36 @@ if (! function_exists('directory_map')) {
      */
     function directory_map(string $sourceDir, int $directoryDepth = 0, bool $hidden = false): array
     {
-        return Services::fs()->directories($sourceDir, $directoryDepth, $hidden);
+        try {
+            $fp = opendir($sourceDir);
+
+            $fileData  = [];
+            $newDepth  = $directoryDepth - 1;
+            $sourceDir = rtrim($sourceDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+            while (false !== ($file = readdir($fp))) {
+                // Remove '.', '..', and hidden files [optional]
+                if ($file === '.' || $file === '..' || ($hidden === false && $file[0] === '.')) {
+                    continue;
+                }
+
+                if (is_dir($sourceDir . $file)) {
+                    $file .= DIRECTORY_SEPARATOR;
+                }
+
+                if (($directoryDepth < 1 || $newDepth > 0) && is_dir($sourceDir . $file)) {
+                    $fileData[$file] = directory_map($sourceDir . $file, $newDepth, $hidden);
+                } else {
+                    $fileData[] = $file;
+                }
+            }
+
+            closedir($fp);
+
+            return $fileData;
+        } catch (Throwable) {
+            return [];
+        }
     }
 }
 
