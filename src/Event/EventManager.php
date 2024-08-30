@@ -63,7 +63,7 @@ class EventManager implements EventManagerInterface
     /**
      * {@inheritDoc}
      */
-    public function attach(string $event, callable $callback, int $priority = 0): bool
+    public function on(string $event, callable $callback, int $priority = 0): bool
     {
         if (! array_key_exists($event, $this->events)) {
             $this->events[$event] = [];
@@ -82,17 +82,17 @@ class EventManager implements EventManagerInterface
     }
 
     /**
-     * Alias de la méthode attach
+     * @deprecated use on() instead
      */
-    public function on(string $event, callable $callback, int $priority = 0): bool
+    public function attach(string $event, callable $callback, int $priority = 0): bool
     {
-        return $this->attach($event, $callback, $priority);
+        return $this->on($event, $callback, $priority);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function detach(string $event, callable $callback): bool
+    public function off(string $event, callable $callback): bool
     {
         if (! array_key_exists($event, $this->events) || ! $this->events[$event]) {
             return false;
@@ -110,10 +110,18 @@ class EventManager implements EventManagerInterface
         return true;
     }
 
+	/**
+     * @deprecated use off() instead
+     */
+    public function detach(string $event, callable $callback, int $priority = 0): bool
+    {
+        return $this->off($event, $callback, $priority);
+    }
+
     /**
      * {@inheritDoc}
      */
-    public function trigger($event, $target = null, $argv = [])
+    public function emit($event, $target = null, $argv = [])
     {
         if (! ($event instanceof EventInterface)) {
             $event = new Event($event, $target, $argv);
@@ -157,6 +165,14 @@ class EventManager implements EventManagerInterface
         }
 
         return $result;
+    }
+
+	/**
+	 * @deprecated use emit() instead
+	 */
+	public function trigger($event, $target = null, $argv = [])
+    {
+        return $this->emit($event, $target, $argv);
     }
 
     /**
