@@ -55,9 +55,13 @@ class EventManager implements EventManagerInterface
     /**
      * {@inheritDoc}
      */
-    public function clearListeners(string $event): void
+    public function clearListeners(string $event = null): void
     {
-        $this->events[$event] = [];
+		if ($event === null) {
+			$this->events = array_filter($this->events, fn ($key) => $key === self::WILDCARD, ARRAY_FILTER_USE_KEY);
+		} elseif (array_key_exists($event, $this->events)) {
+			unset($this->events[$event]);
+		}
     }
 
     /**
