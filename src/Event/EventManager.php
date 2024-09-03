@@ -102,10 +102,12 @@ class EventManager implements EventManagerInterface
             if (is_array($events) && in_array($callback, $events, true)) {
                 $key = array_search($callback, $events, true);
                 unset($this->listeners[$event][$priority][$key]);
+
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     /**
