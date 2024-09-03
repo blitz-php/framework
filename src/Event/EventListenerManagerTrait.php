@@ -58,7 +58,7 @@ trait EventListenerManagerTrait
             $callback = Closure::bind($callback, $this, static::class);
         }
 
-        return $this->eventManager->attach($event, $callback, $priority);
+        return $this->eventManager->on($event, $callback, $priority);
     }
 
     /**
@@ -72,7 +72,7 @@ trait EventListenerManagerTrait
      */
     public function fireEvent($event, $target = null, $params = [])
     {
-        return $this->eventManager->trigger($event, $target, $params);
+        return $this->eventManager->emit($event, $target, $params);
     }
 
     /**
@@ -80,6 +80,6 @@ trait EventListenerManagerTrait
      */
     public function removeEventListener(string $event, callable $callback): bool
     {
-        return $this->eventManager->detach($event, $callback);
+        return $this->eventManager->off($event, $callback);
     }
 }
