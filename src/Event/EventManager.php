@@ -126,9 +126,9 @@ class EventManager implements EventManagerInterface
     /**
      * @deprecated use off() instead
      */
-    public function detach(string $event, callable $callback, int $priority = 0): bool
+    public function detach(string $event, callable $callback): bool
     {
-        return $this->off($event, $callback, $priority);
+        return $this->off($event, $callback);
     }
 
     /**
