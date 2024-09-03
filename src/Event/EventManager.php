@@ -139,8 +139,10 @@ class EventManager implements EventManagerInterface
             $this->listeners[$eventName] = [];
         }
 
-        $events = array_merge($this->listeners[self::WILDCARD], $this->listeners[$eventName]);
+        // $events = array_merge($this->listeners[self::WILDCARD], $this->listeners[$eventName]);
+        $events = $this->listeners[$eventName];
         $result = null;
+		ksort($events, SORT_NUMERIC);
 
         foreach ($events as $priority) {
             if (! is_array($priority)) {
