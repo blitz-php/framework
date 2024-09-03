@@ -154,13 +154,15 @@ class EventManager implements EventManagerInterface
 
                 $start = microtime(true);
 
-                $result = $callback($event, $result);
+                $result = $callback($event);
 
-                static::$performanceLog[] = [
-                    'start' => $start,
-                    'end'   => microtime(true),
-                    'event' => strtolower($eventName),
-                ];
+                if (BLITZ_DEBUG) {
+					static::$performanceLog[] = [
+						'start' => $start,
+						'end'   => microtime(true),
+						'event' => strtolower($eventName),
+					];
+				}
             }
         }
 
