@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\View\Components;
 
-use BlitzPHP\Cache\CacheInterface;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Exceptions\ViewException;
 use DI\NotFoundException;
 use ReflectionException;

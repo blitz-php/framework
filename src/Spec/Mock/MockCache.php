@@ -11,10 +11,12 @@
 
 namespace BlitzPHP\Spec\Mock;
 
-use BlitzPHP\Cache\CacheInterface;
 use BlitzPHP\Cache\Handlers\BaseHandler;
+use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Utilities\Date;
 use DateInterval;
+
+use function Kahlan\expect;
 
 class MockCache extends BaseHandler implements CacheInterface
 {

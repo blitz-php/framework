@@ -208,7 +208,7 @@ class Dispatcher
         $this->getRequestObject();
         $this->getResponseObject();
 
-        $this->event->trigger('pre_system');
+        $this->event->emit('pre_system');
 
         $this->timer->stop('bootstrap');
 
@@ -228,7 +228,7 @@ class Dispatcher
         }
 
         // Y a-t-il un événement post-système ?
-        $this->event->trigger('post_system');
+        $this->event->emit('post_system');
 
         if ($returnResponse) {
             return $this->response;
@@ -706,7 +706,7 @@ class Dispatcher
                     }
 
                     // Y'a t-il un evenement "post_controller_constructor"
-                    $this->event->trigger('post_controller_constructor');
+                    $this->event->emit('post_controller_constructor');
 
                     $returned = $this->runController($controller);
                 } else {
@@ -714,7 +714,7 @@ class Dispatcher
                     $this->timer->stop('controller');
                 }
 
-                $this->event->trigger('post_system');
+                $this->event->emit('post_system');
 
                 return $this->formatResponse($response, $returned);
             } catch (ValidationException $e) {

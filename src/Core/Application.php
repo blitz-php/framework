@@ -73,7 +73,7 @@ class Application
          * Initialisation du gestionnaire d'evenement
          */
         Services::singleton(EventDiscover::class)->discove();
-        Services::event()->trigger('app:init');
+        Services::event()->emit('app:init');
 
         return $this;
     }

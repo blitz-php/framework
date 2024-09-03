@@ -23,14 +23,17 @@ class EventDiscover
 {
     protected LocatorInterface $locator;
 
-    public function __construct(protected EventManagerInterface $event)
+    public function __construct(protected EventManagerInterface $manager)
     {
         $this->locator = Services::locator();
     }
 
     public function discove()
     {
-        $files = $this->locator->listFiles('Events/');
+        $files = array_merge(
+            $this->locator->listFiles('Events/'), // @deprecated just use for compatibility
+            $this->locator->listFiles('Listeners/')
+        );
 
         foreach ($files as $file) {
             $className = $this->locator->getClassname($file);
@@ -39,7 +42,7 @@ class EventDiscover
                 continue;
             }
 
-            Services::factory($className)->listen($this->event);
+            Services::factory($className)->listen($this->manager);
         }
     }
 }
