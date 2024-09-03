@@ -148,7 +148,7 @@ class EventManager implements EventManagerInterface
             }
 
             foreach ($priority as $callback) {
-                if ($event->isPropagationStopped()) {
+                if ($event->isPropagationStopped() || $result === false) {
                     break 2;
                 }
 
