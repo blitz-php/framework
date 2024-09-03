@@ -46,6 +46,19 @@ class EventManager implements EventManagerInterface
         }
     }
 
+	public function getListeners(string $event = null): array
+	{
+		if ($event === null) {
+			return array_filter($this->listeners, fn ($key) => $key !== self::WILDCARD, ARRAY_FILTER_USE_KEY);
+		}
+
+		if (! array_key_exists($event, $this->listeners)) {
+			return [];
+		}
+
+		return $this->listeners[$event] ?? [];
+	}
+
     /**
      * {@inheritDoc}
      */
