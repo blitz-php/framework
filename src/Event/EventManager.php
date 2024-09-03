@@ -27,11 +27,6 @@ class EventManager implements EventManagerInterface
     public const WILDCARD = '*';
 
     /**
-     * @var array
-     */
-    protected $events;
-
-    /**
      * Stocke des informations sur les événements
      * pour affichage dans la barre d'outils de débogage.
      *
@@ -42,13 +37,12 @@ class EventManager implements EventManagerInterface
     /**
      * Créer un objet gestionnaire d'événements
      *
-     * @param array $events [Optionnel]
+     * @param array $listeners Listeners initiaux
      */
-    public function __construct(array $events = [])
+    public function __construct(protected array $listeners = [])
     {
-        $this->events = $events;
-        if (! array_key_exists(self::WILDCARD, $this->events)) {
-            $this->events[self::WILDCARD] = [];
+        if (! array_key_exists(self::WILDCARD, $this->listeners)) {
+            $this->listeners[self::WILDCARD] = [];
         }
     }
 
@@ -58,9 +52,9 @@ class EventManager implements EventManagerInterface
     public function clearListeners(string $event = null): void
     {
 		if ($event === null) {
-			$this->events = array_filter($this->events, fn ($key) => $key === self::WILDCARD, ARRAY_FILTER_USE_KEY);
-		} elseif (array_key_exists($event, $this->events)) {
-			unset($this->events[$event]);
+			$this->listeners = array_filter($this->listeners, fn ($key) => $key === self::WILDCARD, ARRAY_FILTER_USE_KEY);
+		} elseif (array_key_exists($event, $this->listeners)) {
+			unset($this->listeners[$event]);
 		}
     }
 
@@ -69,15 +63,15 @@ class EventManager implements EventManagerInterface
      */
     public function on(string $event, callable $callback, int $priority = 0): bool
     {
-        if (! array_key_exists($event, $this->events)) {
-            $this->events[$event] = [];
+        if (! array_key_exists($event, $this->listeners)) {
+            $this->listeners[$event] = [];
         }
-        if (! array_key_exists($priority, $this->events[$event])) {
-            $this->events[$event][$priority] = [];
+        if (! array_key_exists($priority, $this->listeners[$event])) {
+            $this->listeners[$event][$priority] = [];
         }
 
-        if (! in_array($callback, $this->events[$event][$priority], true)) {
-            $this->events[$event][$priority][] = $callback;
+        if (! in_array($callback, $this->listeners[$event][$priority], true)) {
+            $this->listeners[$event][$priority][] = $callback;
 
             return true;
         }
@@ -98,16 +92,16 @@ class EventManager implements EventManagerInterface
      */
     public function off(string $event, callable $callback): bool
     {
-        if (! array_key_exists($event, $this->events) || ! $this->events[$event]) {
+        if (! array_key_exists($event, $this->listeners) || ! $this->listeners[$event]) {
             return false;
         }
 
-        $eventsAgregation = $this->events[$event];
+        $eventsAgregation = $this->listeners[$event];
 
         foreach ($eventsAgregation as $priority => $events) {
             if (is_array($events) && in_array($callback, $events, true)) {
                 $key = array_search($callback, $events, true);
-                unset($this->events[$event][$priority][$key]);
+                unset($this->listeners[$event][$priority][$key]);
             }
         }
 
@@ -139,11 +133,11 @@ class EventManager implements EventManagerInterface
         }
 
         $eventName = $event->getName();
-        if (! array_key_exists($eventName, $this->events)) {
-            $this->events[$eventName] = [];
+        if (! array_key_exists($eventName, $this->listeners)) {
+            $this->listeners[$eventName] = [];
         }
 
-        $events = array_merge($this->events[self::WILDCARD], $this->events[$eventName]);
+        $events = array_merge($this->listeners[self::WILDCARD], $this->listeners[$eventName]);
         $result = null;
 
         foreach ($events as $priority) {
