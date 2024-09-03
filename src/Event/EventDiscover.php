@@ -31,9 +31,9 @@ class EventDiscover
     public function discove()
     {
         $files = array_merge(
-			$this->locator->listFiles('Events/'), // @deprecated just use for compatibility
-			$this->locator->listFiles('Listeners/')
-		);
+            $this->locator->listFiles('Events/'), // @deprecated just use for compatibility
+            $this->locator->listFiles('Listeners/')
+        );
 
         foreach ($files as $file) {
             $className = $this->locator->getClassname($file);

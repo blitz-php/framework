@@ -68,11 +68,11 @@ class Controller extends Command
      */
     public function execute(array $params)
     {
-		$this->component     = 'Controller';
-		$this->directory     = 'Controllers';
-		$this->template      = 'controller.tpl.php';
-		$this->classNameLang = 'CLI.generator.className.controller';
-		$params              = array_merge($params, ['suffix' => null]);
+        $this->component     = 'Controller';
+        $this->directory     = 'Controllers';
+        $this->template      = 'controller.tpl.php';
+        $this->classNameLang = 'CLI.generator.className.controller';
+        $params              = array_merge($params, ['suffix' => null]);
 
         $this->task('Creation du controleur')->eol();
 

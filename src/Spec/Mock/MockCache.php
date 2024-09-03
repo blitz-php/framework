@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Spec\Mock;
 
-use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Cache\Handlers\BaseHandler;
+use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Utilities\Date;
 use DateInterval;
 

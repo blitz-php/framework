@@ -110,7 +110,7 @@ class EventManager implements EventManagerInterface
         return true;
     }
 
-	/**
+    /**
      * @deprecated use off() instead
      */
     public function detach(string $event, callable $callback, int $priority = 0): bool
@@ -167,10 +167,14 @@ class EventManager implements EventManagerInterface
         return $result;
     }
 
-	/**
-	 * @deprecated use emit() instead
-	 */
-	public function trigger($event, $target = null, $argv = [])
+    /**
+     * @deprecated use emit() instead
+     *
+     * @param mixed      $event
+     * @param mixed|null $target
+     * @param mixed      $argv
+     */
+    public function trigger($event, $target = null, $argv = [])
     {
         return $this->emit($event, $target, $argv);
     }
