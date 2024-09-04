@@ -24,8 +24,8 @@ class PerformanceMetrics implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-		$response = $handler->handle($request);
-		$body     = $response->getBody()->getContents();
+        $response = $handler->handle($request);
+        $body     = $response->getBody()->getContents();
 
         if ($body !== '' && $body !== '0') {
             $benchmark = Services::timer();

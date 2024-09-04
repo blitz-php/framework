@@ -54,8 +54,8 @@ class SmartyAdapter extends AbstractAdapter
      */
     public function render(string $view, ?array $options = null, ?bool $saveData = null): string
     {
-		$view     = str_replace([$this->viewPath, ' '], '', $view);
-		$pathinfo = pathinfo($view, PATHINFO_EXTENSION);
+        $view     = str_replace([$this->viewPath, ' '], '', $view);
+        $pathinfo = pathinfo($view, PATHINFO_EXTENSION);
         if ($pathinfo === [] || $pathinfo === '' || $pathinfo === '0') {
             $view .= '.' . $this->ext;
         }
@@ -67,7 +67,7 @@ class SmartyAdapter extends AbstractAdapter
         $this->renderVars['file'] = $this->getRenderedFile($options, $this->renderVars['view'], $this->ext);
 
         if (! empty($layout = $this->layout)) {
-			$pathinfo = pathinfo($layout, PATHINFO_EXTENSION);
+            $pathinfo = pathinfo($layout, PATHINFO_EXTENSION);
             if ($pathinfo === [] || $pathinfo === '' || $pathinfo === '0') {
                 $layout .= '.' . $this->ext;
             }

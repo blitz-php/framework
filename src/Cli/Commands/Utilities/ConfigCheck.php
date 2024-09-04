@@ -51,7 +51,7 @@ class ConfigCheck extends Command
      */
     public function execute(array $params)
     {
-		$file = strtolower($this->argument('config', ''));
+        $file = strtolower($this->argument('config', ''));
 
         if ($file === '' || $file === '0') {
             $this->fail('Vous devez spécifier la configuration à utiliser pour la vérification.')->eol();

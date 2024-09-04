@@ -22,7 +22,7 @@ if (! function_exists('css_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-			$pathinfo = pathinfo($name, PATHINFO_EXTENSION);
+            $pathinfo = pathinfo($name, PATHINFO_EXTENSION);
             if ($pathinfo === '' || $pathinfo === '0') {
                 $name .= '.css';
             }
