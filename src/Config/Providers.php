@@ -11,6 +11,34 @@
 
 namespace BlitzPHP\Config;
 
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
+use BlitzPHP\Contracts\Container\ContainerInterface;
+use BlitzPHP\Contracts\Event\EventManagerInterface;
+use BlitzPHP\Contracts\Mail\MailerInterface;
+use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Contracts\Security\EncrypterInterface;
+use BlitzPHP\Contracts\Session\CookieManagerInterface;
+use BlitzPHP\Contracts\Session\SessionInterface;
+use BlitzPHP\Contracts\View\RendererInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
+use BlitzPHP\Autoloader\Autoloader;
+use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Cache\Cache;
+use BlitzPHP\Cache\ResponseCache;
+use BlitzPHP\Filesystem\FilesystemManager;
+use BlitzPHP\Http\Negotiator;
+use BlitzPHP\Http\Redirection;
+use BlitzPHP\Http\Request;
+use BlitzPHP\Http\Response;
+use BlitzPHP\Mail\Mail;
+use BlitzPHP\Router\RouteCollection;
+use BlitzPHP\Router\Router;
+use BlitzPHP\Session\Cookie\CookieManager;
+use BlitzPHP\Session\Store;
+use BlitzPHP\Translator\Translate;
 use BlitzPHP\Container\AbstractProvider;
 
 class Providers extends AbstractProvider
@@ -29,20 +57,20 @@ class Providers extends AbstractProvider
     private static function interfaces(): array
     {
         return [
-            \BlitzPHP\Contracts\Autoloader\LocatorInterface::class     => static fn () => service('locator'),
-            \BlitzPHP\Contracts\Container\ContainerInterface::class    => static fn () => service('container'),
-            \BlitzPHP\Contracts\Event\EventManagerInterface::class     => static fn () => service('event'),
-            \BlitzPHP\Contracts\Mail\MailerInterface::class            => static fn () => service('mail'),
-            \BlitzPHP\Contracts\Router\RouteCollectionInterface::class => static fn () => service('routes'),
-            \BlitzPHP\Contracts\Security\EncrypterInterface::class     => static fn () => service('encrypter'),
-            \BlitzPHP\Contracts\Session\CookieManagerInterface::class  => static fn () => service('cookie'),
-            \BlitzPHP\Contracts\Session\SessionInterface::class        => static fn () => service('session'),
-            \BlitzPHP\Contracts\View\RendererInterface::class          => static fn () => service('viewer')->getAdapter(),
+            LocatorInterface::class     => static fn () => service('locator'),
+            ContainerInterface::class    => static fn () => service('container'),
+            EventManagerInterface::class     => static fn () => service('event'),
+            MailerInterface::class            => static fn () => service('mail'),
+            RouteCollectionInterface::class => static fn () => service('routes'),
+            EncrypterInterface::class     => static fn () => service('encrypter'),
+            CookieManagerInterface::class  => static fn () => service('cookie'),
+            SessionInterface::class        => static fn () => service('session'),
+            RendererInterface::class          => static fn () => service('viewer')->getAdapter(),
             \Psr\Container\ContainerInterface::class                   => static fn () => service('container'),
-            \Psr\Http\Message\ResponseInterface::class                 => static fn () => service('response'),
-            \Psr\Http\Message\ServerRequestInterface::class            => static fn () => service('request'),
-            \Psr\Log\LoggerInterface::class                            => static fn () => service('logger'),
-            \Psr\SimpleCache\CacheInterface::class                     => static fn () => service('cache'),
+            ResponseInterface::class                 => static fn () => service('response'),
+            ServerRequestInterface::class            => static fn () => service('request'),
+            LoggerInterface::class                            => static fn () => service('logger'),
+            CacheInterface::class                     => static fn () => service('cache'),
         ];
     }
 
@@ -52,21 +80,21 @@ class Providers extends AbstractProvider
     private static function classes(): array
     {
         return [
-            \BlitzPHP\Autoloader\Autoloader::class        => static fn () => service('autoloader'),
-            \BlitzPHP\Autoloader\Locator::class           => static fn () => service('locator'),
-            \BlitzPHP\Cache\Cache::class                  => static fn () => service('cache'),
-            \BlitzPHP\Cache\ResponseCache::class          => static fn () => service('responsecache'),
-            \BlitzPHP\Filesystem\FilesystemManager::class => static fn () => service('storage'),
-            \BlitzPHP\Http\Negotiator::class              => static fn () => service('negotiator'),
-            \BlitzPHP\Http\Redirection::class             => static fn () => service('redirection'),
-            \BlitzPHP\Http\Request::class                 => static fn () => service('request'),
-            \BlitzPHP\Http\Response::class                => static fn () => service('response'),
-            \BlitzPHP\Mail\Mail::class                    => static fn () => service('mail'),
-            \BlitzPHP\Router\RouteCollection::class       => static fn () => service('routes'),
-            \BlitzPHP\Router\Router::class                => static fn () => service('router'),
-            \BlitzPHP\Session\Cookie\CookieManager::class => static fn () => service('cookie'),
-            \BlitzPHP\Session\Store::class                => static fn () => service('session'),
-            \BlitzPHP\Translator\Translate::class         => static fn () => service('translator'),
+            Autoloader::class        => static fn () => service('autoloader'),
+            Locator::class           => static fn () => service('locator'),
+            Cache::class                  => static fn () => service('cache'),
+            ResponseCache::class          => static fn () => service('responsecache'),
+            FilesystemManager::class => static fn () => service('storage'),
+            Negotiator::class              => static fn () => service('negotiator'),
+            Redirection::class             => static fn () => service('redirection'),
+            Request::class                 => static fn () => service('request'),
+            Response::class                => static fn () => service('response'),
+            Mail::class                    => static fn () => service('mail'),
+            RouteCollection::class       => static fn () => service('routes'),
+            Router::class                => static fn () => service('router'),
+            CookieManager::class => static fn () => service('cookie'),
+            Store::class                => static fn () => service('session'),
+            Translate::class         => static fn () => service('translator'),
         ];
     }
 }

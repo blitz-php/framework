@@ -707,8 +707,7 @@ function scl_cleaner(&$str)
         foreach ($str as $key => $value) {
             if (is_string($value)) {
                 $str[$key] = trim(htmlspecialchars($value));
-            }
-            if (is_array($value)) {
+            } elseif (is_array($value)) {
                 foreach ($value as $cle => $valeur) {
                     $str[$key][$cle] = scl_cleaner($valeur);
                 }
@@ -943,7 +942,7 @@ function scl_splitInt($nbr, $pas = 3, $separateur = ' ')
 
     $nombre  = explode('.', $nbr);
     $nbr     = $nombre[0];
-    $virgule = (! empty($nombre[1])) ? '.' . $nombre[1] : '';
+    $virgule = (isset($nombre[1]) && ($nombre[1] !== '' && $nombre[1] !== '0')) ? '.' . $nombre[1] : '';
 
     $lenght = strlen($nbr); // nombre de chiffre
     $nbr    = strrev($nbr); // on inverse le nombre

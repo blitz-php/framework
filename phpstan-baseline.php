@@ -86,6 +86,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Debug/Toolbar.php',
 ];
 $ignoreErrors[] = [
+	// identifier: if.alwaysTrue
+	'message' => '#^If condition is always true\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Event/EventManager.php',
+];
+$ignoreErrors[] = [
 	// identifier: phpDoc.parseError
 	'message' => '#^PHPDoc tag @method has invalid value \\(static void         configure\\(callable \\$callback\\(RouteBuilder \\$route\\)\\)                         Configure les parametres de routing\\.\\)\\: Unexpected token "\\(", expected \'\\)\' at offset 63$#',
 	'count' => 1,
@@ -690,12 +696,6 @@ $ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$response \\(BlitzPHP\\\\Http\\\\Response\\) does not accept Psr\\\\Http\\\\Message\\\\ResponseInterface\\.$#',
 	'count' => 4,
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
-];
-$ignoreErrors[] = [
-	// identifier: function.notFound
-	'message' => '#^Function expect not found\\.$#',
-	'count' => 3,
-	'path' => __DIR__ . '/src/Spec/Mock/MockCache.php',
 ];
 $ignoreErrors[] = [
 	// identifier: class.notFound

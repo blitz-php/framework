@@ -177,7 +177,7 @@ class RestController extends BaseController
     final protected function respondFail(?string $message = "Une erreur s'est produite", ?int $status = StatusCode::INTERNAL_ERROR, null|int|string $code = null, array $errors = [])
     {
         $message = $message ?: "Une erreur s'est produite";
-        $code    = ! empty($code) ? $code : $status;
+        $code    = ($code !== 0 && $code !== '' && $code !== '0') ? $code : $status;
 
         $response = [
             $this->config->field['message'] ?? 'message' => $message,

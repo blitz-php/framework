@@ -513,7 +513,7 @@ class Services
      */
     public static function translator(?string $locale = null, bool $shared = true): Translate
     {
-        if (empty($locale) && empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
+        if (($locale === null || $locale === '' || $locale === '0') && empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
             $config = static::config()->get('app');
             if (($locale = static::negotiator()->language($config['supported_locales'])) === '' || ($locale = static::negotiator()->language($config['supported_locales'])) === '0') {
                 $locale = $config['language'];

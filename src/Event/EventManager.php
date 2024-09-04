@@ -171,7 +171,7 @@ class EventManager implements EventManagerInterface
 
                 $result = $callback($event);
 
-                if (BLITZ_DEBUG) {
+                if (BLITZ_DEBUG || on_dev()) {
 					static::$performanceLog[] = [
 						'start' => $start,
 						'end'   => microtime(true),

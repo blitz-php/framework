@@ -45,8 +45,9 @@ class LatteAdapter extends AbstractAdapter
      */
     public function render(string $view, ?array $options = null, ?bool $saveData = null): string
     {
-        $view = str_replace([$this->viewPath, ' '], '', $view);
-        if (empty(pathinfo($view, PATHINFO_EXTENSION))) {
+		$view     = str_replace([$this->viewPath, ' '], '', $view);
+		$pathinfo = pathinfo($view, PATHINFO_EXTENSION);
+        if ($pathinfo === '' || $pathinfo === '0' || $pathinfo === []) {
             $view .= '.' . $this->ext;
         }
 

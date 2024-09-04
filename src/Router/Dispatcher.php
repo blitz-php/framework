@@ -402,7 +402,7 @@ class Dispatcher
         }
 
         // Est-il acheminé vers une Closure ?
-        if (is_object($this->controller) && (get_class($this->controller) === 'Closure')) {
+        if (is_object($this->controller) && ($this->controller::class === 'Closure')) {
             if (empty($returned = $this->container->call($this->controller, $this->router->params()))) {
                 $returned = $this->outputBufferingEnd();
             }

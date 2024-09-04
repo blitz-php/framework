@@ -22,7 +22,8 @@ if (! function_exists('css_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+			$pathinfo = pathinfo($name, PATHINFO_EXTENSION);
+            if ($pathinfo === '' || $pathinfo === '0') {
                 $name .= '.css';
             }
         }
@@ -44,7 +45,8 @@ if (! function_exists('js_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+            $pathinfo = pathinfo($name, PATHINFO_EXTENSION);
+            if ($pathinfo === '' || $pathinfo === '0') {
                 $name .= '.js';
             }
         }
@@ -84,7 +86,8 @@ if (! function_exists('less_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+            $pathinfo = pathinfo($name, PATHINFO_EXTENSION);
+            if ($pathinfo === '' || $pathinfo === '0') {
                 $name .= '.less';
             }
         }
@@ -250,7 +253,8 @@ if (! function_exists('config_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+            $pathinfo = pathinfo($name, PATHINFO_EXTENSION);
+            if ($pathinfo === '' || $pathinfo === '0') {
                 $name .= '.php';
             }
         }
@@ -319,7 +323,8 @@ if (! function_exists('helper_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+            $pathinfo = pathinfo($name, PATHINFO_EXTENSION);
+            if ($pathinfo === '' || $pathinfo === '0') {
                 $name .= '.php';
             }
         }
@@ -345,7 +350,8 @@ if (! function_exists('library_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if (empty(pathinfo($name, PATHINFO_EXTENSION))) {
+            $pathinfo = pathinfo($name, PATHINFO_EXTENSION);
+            if ($pathinfo === '' || $pathinfo === '0') {
                 $name .= '.php';
             }
         }

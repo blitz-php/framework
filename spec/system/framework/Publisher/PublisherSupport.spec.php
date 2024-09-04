@@ -17,7 +17,7 @@ use Spec\BlitzPHP\App\Publishers\TestPublisher;
 use function Kahlan\expect;
 
 describe('Publisher / PublisherSupport', function (): void {
-	beforeAll(function () {
+	beforeAll(function (): void {
 		helper('filesystem');
 
 		$this->file = str_replace(['/', '\\'], DS, SUPPORT_PATH . 'Files/baker/banana.php');
@@ -79,7 +79,7 @@ describe('Publisher / PublisherSupport', function (): void {
 		expect(is_dir($scratch))->toBeFalsy();
 	});
 
-	it('Recuperation des erreurs', function () {
+	it('Recuperation des erreurs', function (): void {
 		$publisher = new Publisher();
         expect($publisher->getErrors())->toBe([]);
 
@@ -92,7 +92,7 @@ describe('Publisher / PublisherSupport', function (): void {
         expect($publisher->getErrors())->toBe($expected);
 	});
 
-	it('wipeDirectory', function () {
+	it('wipeDirectory', function (): void {
 		$directory = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . bin2hex(random_bytes(6));
         mkdir($directory, 0700);
         expect(is_dir($directory))->toBeTruthy();
@@ -103,14 +103,14 @@ describe('Publisher / PublisherSupport', function (): void {
         expect(is_dir($directory))->toBeFalsy();
 	});
 
-	it('wipeIgnoresFiles', function () {
+	it('wipeIgnoresFiles', function (): void {
 		$method = ReflectionHelper::getPrivateMethodInvoker(Publisher::class, 'wipeDirectory');
         $method($this->file);
 
         expect(is_file($this->file))->toBeTruthy();
 	});
 
-	it('wipe', function () {
+	it('wipe', function (): void {
 		$directory = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . bin2hex(random_bytes(6));
         mkdir($directory, 0700);
 		$directory = realpath($directory) ?: $directory;

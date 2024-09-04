@@ -25,13 +25,6 @@ use SeekableIterator;
 class MiddlewareQueue implements Countable, SeekableIterator
 {
     /**
-     * Middlewares a executer pour la requete courante
-     *
-     * @var array<int, mixed>
-     */
-    protected array $queue = [];
-
-    /**
      * Index du middleware actuellement executer
      */
     protected int $position = 0;
@@ -51,11 +44,10 @@ class MiddlewareQueue implements Countable, SeekableIterator
     /**
      * Constructor
      *
-     * @param array $middleware Liste des middlewares initiaux
+     * @param array $queue Liste des middlewares a executer pour la requete courante
      */
-    public function __construct(protected Container $container, array $middleware = [], protected ?Request $request = null, protected ?Response $response = null)
+    public function __construct(protected Container $container, protected array $queue = [], protected ?Request $request = null, protected ?Response $response = null)
     {
-        $this->queue    = $middleware;
         $this->request  = $request ?: $this->container->get(Request::class);
         $this->response = $response ?: $this->container->get(Response::class);
     }
