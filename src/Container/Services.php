@@ -17,9 +17,16 @@ use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
+use BlitzPHP\Contracts\Cache\CacheInterface;
+use BlitzPHP\Contracts\Container\ContainerInterface;
 use BlitzPHP\Contracts\Database\ConnectionResolverInterface;
+use BlitzPHP\Contracts\Event\EventManagerInterface;
+use BlitzPHP\Contracts\Mail\MailerInterface;
+use BlitzPHP\Contracts\Router\RouteCollectionInterface;
+use BlitzPHP\Contracts\Router\RouterInterface;
 use BlitzPHP\Contracts\Security\EncrypterInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
+use BlitzPHP\Contracts\Session\SessionInterface;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Debug\Toolbar;
@@ -50,6 +57,7 @@ use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\View\Components\ComponentLoader;
 use BlitzPHP\View\View;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
@@ -115,8 +123,10 @@ class Services
     /**
      * La classe de cache fournit un moyen simple de stocker et de récupérer
      * données complexes pour plus tard
+     *
+     * @return Cache
      */
-    public static function cache(?array $config = null, bool $shared = true): Cache
+    public static function cache(?array $config = null, bool $shared = true): CacheInterface
     {
         if ($config === null || $config === []) {
             $config = static::config()->get('cache');
@@ -161,8 +171,10 @@ class Services
 
     /**
      * Conteneur d'injection de dependances
+     *
+     * @return Container
      */
-    public static function container(bool $shared = true): Container
+    public static function container(bool $shared = true): ContainerInterface
     {
         if (true === $shared && isset(static::$instances[Container::class])) {
             return static::$instances[Container::class];
@@ -173,6 +185,8 @@ class Services
 
     /**
      * Gestionnaire de cookies
+     *
+     * @return CookieManager
      */
     public static function cookie(bool $shared = true): CookieManagerInterface
     {
@@ -205,6 +219,8 @@ class Services
 
     /**
      * La classe Encryption fournit un cryptage bidirectionnel.
+     *
+     * @return Encryption
      */
     public static function encrypter(?array $config = null, bool $shared = false): EncrypterInterface
     {
@@ -215,14 +231,17 @@ class Services
         $config ??= config('encryption');
         $config     = (object) $config;
         $encryption = new Encryption($config);
+        $encryption->initialize($config);
 
-        return static::$instances[Encryption::class] = $encryption->initialize($config);
+        return static::$instances[Encryption::class] = $encryption;
     }
 
     /**
      * Gestionnaire d'evenement
+     *
+     * @return EventManager
      */
-    public static function event(bool $shared = true): EventManager
+    public static function event(bool $shared = true): EventManagerInterface
     {
         if (true === $shared && isset(static::$instances[EventManager::class])) {
             return static::$instances[EventManager::class];
@@ -254,8 +273,10 @@ class Services
     }
 
     /**
-     * Le file locator fournit des methodes utilitaire pour chercher les fichiers non-classes
-     * dans les dossiers de namespace. C'est une excelente methode pour charger les 'vues', 'helpers', et 'libraries'.
+     * Le file locator fournit des methodes utilitaire pour chercher les fichiers non-classes dans les dossiers de namespace.
+     * C'est une excelente methode pour charger les 'vues', 'helpers', et 'libraries'.
+     *
+     * @return Locator
      */
     public static function locator(bool $shared = true): LocatorInterface
     {
@@ -283,8 +304,10 @@ class Services
 
     /**
      * La classe de mail vous permet d'envoyer par courrier électronique via mail, sendmail, SMTP.
+     *
+     * @return Mail
      */
-    public static function mail(?array $config = null, bool $shared = true): Mail
+    public static function mail(?array $config = null, bool $shared = true): MailerInterface
     {
         if ($config === null || $config === []) {
             $config = static::config()->get('mail');
@@ -373,10 +396,11 @@ class Services
     }
 
     /**
-     * Le service Routes est une classe qui permet de construire facilement
-     * une collection d'itinéraires.
+     * Le service Routes est une classe qui permet de construire facilement une collection de routes.
+     *
+     * @return RouteCollection
      */
-    public static function routes(bool $shared = true): RouteCollection
+    public static function routes(bool $shared = true): RouteCollectionInterface
     {
         if (true === $shared && isset(static::$instances[RouteCollection::class])) {
             return static::$instances[RouteCollection::class];
@@ -388,8 +412,10 @@ class Services
     /**
      * La classe Router utilise le tableau de routes d'une RouteCollection et détermine
      * le contrôleur et la méthode corrects à exécuter.
+     *
+     * @return Router
      */
-    public static function router(?RouteCollection $routes = null, ?ServerRequest $request = null, bool $shared = true): Router
+    public static function router(?RouteCollection $routes = null, ?ServerRequest $request = null, bool $shared = true): RouterInterface
     {
         if (true === $shared && isset(static::$instances[Router::class])) {
             return static::$instances[Router::class];
@@ -407,8 +433,10 @@ class Services
 
     /**
      * Retourne le gestionnaire de session.
+     *
+     * @return Store
      */
-    public static function session(bool $shared = true): Store
+    public static function session(bool $shared = true): SessionInterface
     {
         if (true === $shared && isset(static::$instances[Store::class])) {
             return static::$instances[Store::class];
@@ -485,7 +513,7 @@ class Services
      */
     public static function translator(?string $locale = null, bool $shared = true): Translate
     {
-        if (empty($locale) && empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
+        if (($locale === null || $locale === '' || $locale === '0') && empty($locale = static::$instances[Translate::class . 'locale'] ?? null)) {
             $config = static::config()->get('app');
             if (($locale = static::negotiator()->language($config['supported_locales'])) === '' || ($locale = static::negotiator()->language($config['supported_locales'])) === '0') {
                 $locale = $config['language'];
@@ -502,8 +530,10 @@ class Services
 
     /**
      * La classe URI fournit un moyen de modéliser et de manipuler les URI.
+     *
+     * @return Uri
      */
-    public static function uri(?string $uri = null, bool $shared = true): Uri
+    public static function uri(?string $uri = null, bool $shared = true): UriInterface
     {
         if (true === $shared && isset(static::$instances[Uri::class])) {
             return static::$instances[Uri::class]->setURI($uri);

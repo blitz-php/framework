@@ -578,7 +578,7 @@ final class AutoRouter implements AutoRouterInterface
      */
     public function directory(): string
     {
-        return ! empty($this->directory) ? $this->directory : '';
+        return $this->directory !== null && $this->directory !== '' && $this->directory !== '0' ? $this->directory : '';
     }
 
     /**

@@ -119,7 +119,7 @@ class Event implements EventInterface
     /**
      * {@inheritDoc}
      */
-    public function stopPropagation(bool $flag): void
+    public function stopPropagation(bool $flag = true): void
     {
         $this->isPropagationStopped = $flag;
     }

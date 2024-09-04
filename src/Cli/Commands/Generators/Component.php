@@ -77,7 +77,7 @@ class Component extends Command
 
         $this->template = 'component_view.tpl.php';
 
-        $viewName = Text::toKebab(Helpers::classBasename($className));
+        $viewName = Text::convertTo(Helpers::classBasename($className), 'kebab');
         $viewName = preg_replace(
             '/([a-z][a-z0-9_\/\\\\]+)(-component)$/i',
             '$1',

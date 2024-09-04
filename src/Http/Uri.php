@@ -168,7 +168,7 @@ class Uri implements UriInterface
     {
         $userInfo = $this->user ?: '';
 
-        if ($this->showPassword === true && ! empty($this->password)) {
+        if ($this->showPassword === true && ($this->password !== null && $this->password !== '' && $this->password !== '0')) {
             $userInfo .= ':' . $this->password;
         }
 
@@ -342,11 +342,11 @@ class Uri implements UriInterface
     public static function createURIString(?string $scheme = null, ?string $authority = null, ?string $path = null, ?string $query = null, ?string $fragment = null): string
     {
         $uri = '';
-        if (! empty($scheme)) {
+        if ($scheme !== null && $scheme !== '' && $scheme !== '0') {
             $uri .= $scheme . '://';
         }
 
-        if (! empty($authority)) {
+        if ($authority !== null && $authority !== '' && $authority !== '0') {
             $uri .= $authority;
         }
 
@@ -758,7 +758,7 @@ class Uri implements UriInterface
         $transformed = clone $relative;
 
         // 5.2.2 Transformer les références dans une méthode non stricte (pas de schéma)
-        if (! empty($relative->getAuthority())) {
+        if ($relative->getAuthority() !== '' && $relative->getAuthority() !== '0') {
             $transformed->setAuthority($relative->getAuthority())
                 ->setPath($relative->getPath())
                 ->setQuery($relative->getQuery());

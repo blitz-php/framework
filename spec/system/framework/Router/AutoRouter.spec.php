@@ -23,15 +23,13 @@ describe('AutoRouter', function (): void {
     beforeAll(function (): void {
         $this->collection      = new RouteCollection(Services::locator(), (object) config('routing'));
 
-		$this->createNewAutoRouter = function($namespace = 'Spec\BlitzPHP\App\Controllers'): AutoRouter {
-			return new AutoRouter(
+		$this->createNewAutoRouter = fn($namespace = 'Spec\BlitzPHP\App\Controllers'): AutoRouter => new AutoRouter(
 				[],
 				$namespace,
 				$this->collection->getDefaultController(),
 				$this->collection->getDefaultMethod(),
 				true
 			);
-		};
     });
 
     it('L\'autoroute trouve le controller et la methode par defaut "get"', function (): void {

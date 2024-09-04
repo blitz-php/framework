@@ -736,7 +736,7 @@ class RouteCollection implements RouteCollectionInterface
         // Pour enregistrer une route, nous allons définir un indicateur afin que notre routeur
         // donc il verra le nom du groupe.
         // Si le nom du groupe est vide, nous continuons à utiliser le nom du groupe précédemment construit.
-        $this->group = $name ? trim($oldGroup . '/' . $name, '/') : $oldGroup;
+        $this->group = $name !== '' && $name !== '0' ? trim($oldGroup . '/' . $name, '/') : $oldGroup;
 
         $callback = array_pop($params);
 

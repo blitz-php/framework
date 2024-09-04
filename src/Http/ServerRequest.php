@@ -1153,7 +1153,7 @@ class ServerRequest implements ServerRequestInterface
             if (! isset($accept[$prefValue])) {
                 $accept[$prefValue] = [];
             }
-            if ($prefValue) {
+            if ($prefValue !== '' && $prefValue !== '0') {
                 $accept[$prefValue][] = $value;
             }
         }
