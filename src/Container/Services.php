@@ -123,8 +123,8 @@ class Services
     /**
      * La classe de cache fournit un moyen simple de stocker et de récupérer
      * données complexes pour plus tard
-	 *
-	 * @return Cache
+     *
+     * @return Cache
      */
     public static function cache(?array $config = null, bool $shared = true): CacheInterface
     {
@@ -171,8 +171,8 @@ class Services
 
     /**
      * Conteneur d'injection de dependances
-	 *
-	 * @return Container
+     *
+     * @return Container
      */
     public static function container(bool $shared = true): ContainerInterface
     {
@@ -185,8 +185,8 @@ class Services
 
     /**
      * Gestionnaire de cookies
-	 *
-	 * @return CookieManager
+     *
+     * @return CookieManager
      */
     public static function cookie(bool $shared = true): CookieManagerInterface
     {
@@ -219,8 +219,8 @@ class Services
 
     /**
      * La classe Encryption fournit un cryptage bidirectionnel.
-	 *
-	 * @return Encryption
+     *
+     * @return Encryption
      */
     public static function encrypter(?array $config = null, bool $shared = false): EncrypterInterface
     {
@@ -231,15 +231,15 @@ class Services
         $config ??= config('encryption');
         $config     = (object) $config;
         $encryption = new Encryption($config);
-		$encryption->initialize($config);
+        $encryption->initialize($config);
 
         return static::$instances[Encryption::class] = $encryption;
     }
 
     /**
      * Gestionnaire d'evenement
-	 *
-	 * @return EventManager
+     *
+     * @return EventManager
      */
     public static function event(bool $shared = true): EventManagerInterface
     {
@@ -274,9 +274,9 @@ class Services
 
     /**
      * Le file locator fournit des methodes utilitaire pour chercher les fichiers non-classes dans les dossiers de namespace.
-	 * C'est une excelente methode pour charger les 'vues', 'helpers', et 'libraries'.
-	 *
-	 * @return Locator
+     * C'est une excelente methode pour charger les 'vues', 'helpers', et 'libraries'.
+     *
+     * @return Locator
      */
     public static function locator(bool $shared = true): LocatorInterface
     {
@@ -304,8 +304,8 @@ class Services
 
     /**
      * La classe de mail vous permet d'envoyer par courrier électronique via mail, sendmail, SMTP.
-	 *
-	 * @return Mail
+     *
+     * @return Mail
      */
     public static function mail(?array $config = null, bool $shared = true): MailerInterface
     {
@@ -397,8 +397,8 @@ class Services
 
     /**
      * Le service Routes est une classe qui permet de construire facilement une collection de routes.
-	 *
-	 * @return RouteCollection
+     *
+     * @return RouteCollection
      */
     public static function routes(bool $shared = true): RouteCollectionInterface
     {
@@ -412,8 +412,8 @@ class Services
     /**
      * La classe Router utilise le tableau de routes d'une RouteCollection et détermine
      * le contrôleur et la méthode corrects à exécuter.
-	 *
-	 * @return Router
+     *
+     * @return Router
      */
     public static function router(?RouteCollection $routes = null, ?ServerRequest $request = null, bool $shared = true): RouterInterface
     {
@@ -433,8 +433,8 @@ class Services
 
     /**
      * Retourne le gestionnaire de session.
-	 *
-	 * @return Store
+     *
+     * @return Store
      */
     public static function session(bool $shared = true): SessionInterface
     {
@@ -530,8 +530,8 @@ class Services
 
     /**
      * La classe URI fournit un moyen de modéliser et de manipuler les URI.
-	 *
-	 * @return Uri
+     *
+     * @return Uri
      */
     public static function uri(?string $uri = null, bool $shared = true): UriInterface
     {

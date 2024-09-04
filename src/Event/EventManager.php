@@ -46,29 +46,29 @@ class EventManager implements EventManagerInterface
         }
     }
 
-	public function getListeners(string $event = null): array
-	{
-		if ($event === null) {
-			return array_filter($this->listeners, fn ($key) => $key !== self::WILDCARD, ARRAY_FILTER_USE_KEY);
-		}
+    public function getListeners(?string $event = null): array
+    {
+        if ($event === null) {
+            return array_filter($this->listeners, static fn ($key) => $key !== self::WILDCARD, ARRAY_FILTER_USE_KEY);
+        }
 
-		if (! array_key_exists($event, $this->listeners)) {
-			return [];
-		}
+        if (! array_key_exists($event, $this->listeners)) {
+            return [];
+        }
 
-		return $this->listeners[$event] ?? [];
-	}
+        return $this->listeners[$event] ?? [];
+    }
 
     /**
      * {@inheritDoc}
      */
-    public function clearListeners(string $event = null): void
+    public function clearListeners(?string $event = null): void
     {
-		if ($event === null) {
-			$this->listeners = array_filter($this->listeners, fn ($key) => $key === self::WILDCARD, ARRAY_FILTER_USE_KEY);
-		} elseif (array_key_exists($event, $this->listeners)) {
-			unset($this->listeners[$event]);
-		}
+        if ($event === null) {
+            $this->listeners = array_filter($this->listeners, static fn ($key) => $key === self::WILDCARD, ARRAY_FILTER_USE_KEY);
+        } elseif (array_key_exists($event, $this->listeners)) {
+            unset($this->listeners[$event]);
+        }
     }
 
     /**
@@ -155,7 +155,7 @@ class EventManager implements EventManagerInterface
         // $events = array_merge($this->listeners[self::WILDCARD], $this->listeners[$eventName]);
         $events = $this->listeners[$eventName];
         $result = null;
-		ksort($events, SORT_NUMERIC);
+        ksort($events, SORT_NUMERIC);
 
         foreach ($events as $priority) {
             if (! is_array($priority)) {
