@@ -2,6 +2,18 @@
 
 Toutes les modifications notables apportées à `:package_name` seront documentées dans ce fichier.
 
+## 0.11.2 - 2024-09-04
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+### What's Changed
+
+* style: application de rector pour un code plus propre by @dimtrovich in https://github.com/blitz-php/framework/pull/16
+* feat: commande make:component by @dimtrovich in https://github.com/blitz-php/framework/pull/17
+* test: Ajout de test pour les commandes klinge by @dimtrovich in https://github.com/blitz-php/framework/pull/18
+* chore: Amélioration du système d'évènement by @dimtrovich in https://github.com/blitz-php/framework/pull/19
+
+**Full Changelog**: https://github.com/blitz-php/framework/compare/0.11.1...0.11.2
+
 ## 0.11.1 - 2024-06-05
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
