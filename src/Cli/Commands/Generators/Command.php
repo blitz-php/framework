@@ -53,7 +53,7 @@ class Command extends ConsoleCommand
     protected $options = [
         '--command'   => 'Le nom de la commande. Par défaut: "command:name"',
         '--type'      => ['Le type de commande. Options [basic, generator]. Par défault: "basic".', 'basic'],
-        '--group'     => 'Le groupe de la commande. Par défaut: [basic -> "BlitzPHP", generator -> "Generators"].',
+        '--group'     => 'Le groupe de la commande. Par défaut: [basic -> "{APP_NAME}", generator -> "{APP_NAME}:Generateurs"].',
         '--namespace' => ['Définissez l\'espace de noms racine. Par défaut: "APP_NAMESPACE".', APP_NAMESPACE],
         '--suffix'    => 'Ajouter le titre du composant au nom de la classe (par exemple, User => UserCommand).',
         '--force'     => "Forcer l'écrasement du fichier existant.",
@@ -69,7 +69,7 @@ class Command extends ConsoleCommand
         $this->template  = 'command.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.command';
-        $this->runGeneration($params);
+        $this->generateClass($params);
     }
 
     /**
@@ -92,7 +92,7 @@ class Command extends ConsoleCommand
         }
 
         if (! is_string($group)) {
-            $group = $type === 'generator' ? 'Generators' : 'BlitzPHP';
+            $group = $type === 'generator' ? config('app.name') . ':Generateurs' : config('app.name');
         }
 
         return $this->parseTemplate(
