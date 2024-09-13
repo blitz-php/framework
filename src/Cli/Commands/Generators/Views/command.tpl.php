@@ -4,7 +4,7 @@ namespace {namespace};
 
 use BlitzPHP\Cli\Console\Command;
 <?php if ($type === 'generator'): ?>
-use BlitzPHP\Cli\Console\GeneratorTrait;
+use BlitzPHP\Cli\Traits\GeneratorTrait;
 <?php endif ?>
 
 class {class} extends Command
@@ -43,7 +43,7 @@ class {class} extends Command
         $this->directory = 'Commands';
         $this->template  = 'command.tpl.php';
 
-        $this->run($params);
+        $this->generateClass($params);
 <?php else: ?>
         //
 <?php endif ?>

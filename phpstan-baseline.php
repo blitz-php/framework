@@ -86,8 +86,8 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Debug/Toolbar.php',
 ];
 $ignoreErrors[] = [
-	// identifier: if.alwaysTrue
-	'message' => '#^If condition is always true\\.$#',
+	// identifier: booleanOr.leftAlwaysTrue
+	'message' => '#^Left side of \\|\\| is always true\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Event/EventManager.php',
 ];
@@ -370,25 +370,43 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	// identifier: class.notFound
 	'message' => '#^Call to method clearAddresses\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
+	'count' => 2,
+	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
+];
+$ignoreErrors[] = [
+	// identifier: class.notFound
+	'message' => '#^Call to method clearAllRecipients\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
+];
+$ignoreErrors[] = [
+	// identifier: class.notFound
+	'message' => '#^Call to method clearAttachments\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
 ];
 $ignoreErrors[] = [
 	// identifier: class.notFound
 	'message' => '#^Call to method clearBCCs\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
+	'count' => 2,
 	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
 ];
 $ignoreErrors[] = [
 	// identifier: class.notFound
 	'message' => '#^Call to method clearCCs\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
+	'count' => 2,
+	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
+];
+$ignoreErrors[] = [
+	// identifier: class.notFound
+	'message' => '#^Call to method clearCustomHeaders\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
 ];
 $ignoreErrors[] = [
 	// identifier: class.notFound
 	'message' => '#^Call to method clearReplyTos\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
+	'count' => 2,
 	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
 ];
 $ignoreErrors[] = [

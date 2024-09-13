@@ -167,6 +167,22 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      */
+    public function clear(): self
+    {
+        $this->mailer->clearAddresses();
+        $this->mailer->clearAllRecipients();
+        $this->mailer->clearAttachments();
+        $this->mailer->clearBCCs();
+        $this->mailer->clearCCs();
+        $this->mailer->clearCustomHeaders();
+        $this->mailer->clearReplyTos();
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function alt(string $content): static
     {
         $this->mailer->AltBody = $content;
