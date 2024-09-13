@@ -169,6 +169,14 @@ class SymfonyMailer extends AbstractAdapter
         return $this;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public function clear(): self
+	{
+		return $this;
+	}
+
     /**
      * {@inheritDoc}
      */
