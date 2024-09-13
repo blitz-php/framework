@@ -89,10 +89,10 @@ abstract class AbstractAdapter implements MailerInterface
 
     abstract public function setEncryption(?string $encryption): static;
 
-	/**
-	 * Nettoie les elements d'envoie du message
-	 */
-	abstract public function clear(): self;
+    /**
+     * Nettoie les elements d'envoie du message
+     */
+    abstract public function clear(): self;
 
     public function __call(string $method, array $arguments)
     {

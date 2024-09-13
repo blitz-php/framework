@@ -65,18 +65,18 @@ class Mail implements MailerInterface
         $this->init($config);
     }
 
-	/**
-	 * Nettoie les elements d'envoie du message
-	 */
+    /**
+     * Nettoie les elements d'envoie du message
+     */
     public function clear(bool $reset = false): self
     {
-		$this->factory()->clear();
+        $this->factory()->clear();
 
-		if ($reset) {
-	        $this->adapter = null;
-		}
+        if ($reset) {
+            $this->adapter = null;
+        }
 
-		return $this;
+        return $this;
     }
 
     /**
@@ -300,12 +300,12 @@ class Mail implements MailerInterface
     public function send(): bool
     {
         if ($this->factory()->send()) {
-			$this->clear(false);
+            $this->clear(false);
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
+        return false;
     }
 
     /**
