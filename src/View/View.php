@@ -37,7 +37,7 @@ class View implements Stringable
     /**
      * @var RendererInterface
      */
-    private $adapter;
+    private object $adapter;
 
     /**
      * Liste des adapters pris en comptes
@@ -60,10 +60,8 @@ class View implements Stringable
 
     /**
      * La vue à rendre
-     *
-     * @var string
      */
-    private $view;
+    private ?string $view = null;
 
     /**
      * Données partagées à toutes les vues

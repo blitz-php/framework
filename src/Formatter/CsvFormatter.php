@@ -20,17 +20,13 @@ class CsvFormatter implements FormatterInterface
 {
     /**
      * Délimiteur de champ (un seul caractère)
-     *
-     * @var string
      */
-    private $delimiter = ',';
+    private string $delimiter = ',';
 
     /**
      * Encadrement du champ (un seul caractère).
-     *
-     * @var string
      */
-    private $enclosure = '"';
+    private string $enclosure = '"';
 
     /**
      * {@inheritDoc}

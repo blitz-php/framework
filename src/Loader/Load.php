@@ -19,10 +19,8 @@ class Load
     /**
      * Liste des elements deja chargés,
      * Si un element est deja chargé, on le renvoie simplement sans avoir besoin de le construire à nouveau
-     *
-     * @var array
      */
-    private static $loads = [
+    private static array $loads = [
         'controllers' => [],
         'helpers'     => [],
         'langs'       => [],

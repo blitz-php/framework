@@ -45,7 +45,7 @@ class Logger implements LoggerInterface
      *
      * @var object
      */
-    private $config;
+    private readonly stdClass $config;
 
     /**
      * Met en cache les appels de journalisation pour la barre de débogage.
@@ -61,10 +61,8 @@ class Logger implements LoggerInterface
 
     /**
      * Instance monolog
-     *
-     * @var MonologLogger
      */
-    private $monolog;
+    private readonly MonologLogger $monolog;
 
     public function __construct(bool $debug = BLITZ_DEBUG)
     {

@@ -95,10 +95,7 @@ class Dispatcher
      */
     protected $router;
 
-    /**
-     * @var MiddlewareQueue
-     */
-    private $middleware;
+    private ?MiddlewareQueue $middleware = null;
 
     /**
      * Contrôleur à utiliser.
