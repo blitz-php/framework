@@ -54,10 +54,8 @@ class Toolbar
 
     /**
      * Dossier de sauvegarde des information de debogage
-     *
-     * @var string
      */
-    private $debugPath = FRAMEWORK_STORAGE_PATH . 'debugbar';
+    private string $debugPath = FRAMEWORK_STORAGE_PATH . 'debugbar';
 
     /**
      * Constructeur
