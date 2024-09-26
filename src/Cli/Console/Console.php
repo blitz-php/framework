@@ -294,7 +294,7 @@ class Console extends Application
                 $package = $package[0];
 
                 /** @var Interactor $io */
-                $io = $this->io();
+                $io = $console->io();
 
                 if (! InstalledVersions::isInstalled($package)) {
                     $io->info('Cette commande nécessite le package "' . $package . '" mais vous ne l\'avez pas', true);
