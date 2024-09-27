@@ -562,33 +562,33 @@ abstract class Command
      */
     final public function justify(string $first, ?string $second = '', array $options = []): self
     {
-		$second = trim($second);
+        $second = trim($second);
         $first  = trim($first);
 
-		$start   = $first;
-		$end     = $second;
+        $start = $first;
+        $end   = $second;
 
-		$options = [
+        $options = [
             'first'  => $options['first'] ?? [],
             'second' => ($options['second'] ?? []) + ['bold' => 1],
             'sep'    => (string) ($options['sep'] ?? '.'),
         ];
 
         if (preg_match('/(\\x1b(?:.+)m)/U', $first, $matches)) {
-			$first = str_replace($matches[1], '', $first);
-			$first = preg_replace('/\\x1b\[0m/', '', $first);
-		}
-		if (preg_match('/(\\x1b(?:.+)m)/U', $second, $matches)) {
-			$second = str_replace($matches[1], '', $second);
-			$second = preg_replace('/\\x1b\[0m/', '', $second);
-		}
+            $first = str_replace($matches[1], '', $first);
+            $first = preg_replace('/\\x1b\[0m/', '', $first);
+        }
+        if (preg_match('/(\\x1b(?:.+)m)/U', $second, $matches)) {
+            $second = str_replace($matches[1], '', $second);
+            $second = preg_replace('/\\x1b\[0m/', '', $second);
+        }
 
-		$firstLength  = strlen($first);
+        $firstLength  = strlen($first);
         $secondLength = strlen($second);
 
         $dashWidth = ($this->terminal->width() ?: 100) - ($firstLength + $secondLength);
         $dashWidth -= $second === '' ? 1 : 2;
-		$dashWidth = $dashWidth < 0 ? 0 : $dashWidth;
+        $dashWidth = $dashWidth < 0 ? 0 : $dashWidth;
 
         $first = $this->color->line($start, $options['first']);
         if ($second !== '') {

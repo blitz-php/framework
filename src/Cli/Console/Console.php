@@ -288,6 +288,8 @@ class Console extends Application
 
         $console = $this;
         $action  = function (?array $arguments = [], ?array $options = [], ?bool $suppress = null) use ($instance, $command, $console) {
+            $this->name(); // ne pas retirer. car en cas, d'absence, cs-fixer mettra cette fonction en static. Et php-cli generera une erreur
+
             foreach ($instance->required as $package) {
                 $package = explode(':', $package);
                 $version = $package[1] ?? null;
