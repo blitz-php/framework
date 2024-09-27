@@ -562,31 +562,37 @@ abstract class Command
      */
     final public function justify(string $first, ?string $second = '', array $options = []): self
     {
-        $options = [
+		$second = trim($second);
+        $first  = trim($first);
+
+		$start   = $first;
+		$end     = $second;
+
+		$options = [
             'first'  => $options['first'] ?? [],
             'second' => ($options['second'] ?? []) + ['bold' => 1],
             'sep'    => (string) ($options['sep'] ?? '.'),
         ];
 
-        $second = trim((string) $second);
-        $first  = trim($first);
+        if (preg_match('/(\\x1b(?:.+)m)/U', $first, $matches)) {
+			$first = str_replace($matches[1], '', $first);
+			$first = preg_replace('/\\x1b\[0m/', '', $first);
+		}
+		if (preg_match('/(\\x1b(?:.+)m)/U', $second, $matches)) {
+			$second = str_replace($matches[1], '', $second);
+			$second = preg_replace('/\\x1b\[0m/', '', $second);
+		}
 
-        $firstLength  = strlen($first);
+		$firstLength  = strlen($first);
         $secondLength = strlen($second);
-
-        if (preg_match('/^\\x1b(?:.+)m(.+)\\x1b(?:.+)m$/', $first, $matches)) {
-            $firstLength = strlen($matches[1]);
-        }
-        if (preg_match('/^\\x1b(?:.+)m(.+)\\x1b(?:.+)m$/', $second, $matches)) {
-            $secondLength = strlen($matches[1]);
-        }
 
         $dashWidth = ($this->terminal->width() ?: 100) - ($firstLength + $secondLength);
         $dashWidth -= $second === '' ? 1 : 2;
+		$dashWidth = $dashWidth < 0 ? 0 : $dashWidth;
 
-        $first = $this->color->line($first, $options['first']);
+        $first = $this->color->line($start, $options['first']);
         if ($second !== '') {
-            $second = $this->color->line($second, $options['second']);
+            $second = $this->color->line($end, $options['second']);
         }
 
         return $this->write($first . ' ' . str_repeat($options['sep'], $dashWidth) . ' ' . $second)->eol();
@@ -640,6 +646,6 @@ abstract class Command
         $this->reader   = $this->io->reader();
         $this->color    = $this->writer->colorizer();
         $this->cursor   = $this->writer->cursor();
-        $this->terminal = new Terminal();
+        $this->terminal = $this->writer->terminal();
     }
 }
