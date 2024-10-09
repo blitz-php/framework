@@ -259,7 +259,7 @@ class Mail implements MailerInterface
      */
     public function html(string $content): static
     {
-		$content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $content);
+        $content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $content);
 
         $this->factory()->html($content);
 
