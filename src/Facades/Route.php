@@ -56,8 +56,8 @@ use Closure;
  * @method static RouteBuilder setPrioritize(bool $enabled = true)                                        Activer ou désactiver le tri des routes par priorité
  * @method static RouteBuilder setTranslateURIDashes(bool $value)                                         Indique au système s'il faut convertir les tirets des chaînes URI en traits de soulignement.
  * @method static RouteBuilder subdomain(string $subdomain)
+ * @method static RouteBuilder useSupportedLocalesOnly(bool $useOnly)                                     Indique au router de limiter ou non les routes avec l'espace réservé {locale} à App::$supportedLocales
  * @method static void         view(string $from, string $view, array $options = [])                      Spécifie une route qui n'affichera qu'une vue. Ne fonctionne que pour les requêtes GET.
- * @method static RouteBuilder useSupportedLocalesOnly(bool $useOnly)                                	  Indique au router de limiter ou non les routes avec l'espace réservé {locale} à App::$supportedLocales
  * @method static RouteBuilder where($placeholder, ?string $pattern = null)                               Enregistre une nouvelle contrainte auprès du système.
  *
  * @see RouteBuilder
