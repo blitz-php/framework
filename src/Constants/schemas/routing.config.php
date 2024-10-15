@@ -22,5 +22,6 @@ return Expect::structure([
     'auto_route'                  => Expect::bool()->default(false),
     'prioritize'                  => Expect::bool()->default(false),
     'multiple_segments_one_param' => Expect::bool()->default(false),
+    'use_supported_locales_only'  => Expect::bool()->default(false),
     'module_routes'               => Expect::array()->default([]),
 ])->otherItems();

@@ -224,14 +224,15 @@ class RouteCollection implements RouteCollectionInterface
         $this->httpHost = env('HTTP_HOST');
 
         // Configuration basée sur le fichier de config. Laissez le fichier routes substituer.
-        $this->defaultNamespace   = rtrim($routing->default_namespace ?: $this->defaultNamespace, '\\') . '\\';
-        $this->defaultController  = $routing->default_controller ?: $this->defaultController;
-        $this->defaultMethod      = $routing->default_method ?: $this->defaultMethod;
-        $this->translateURIDashes = $routing->translate_uri_dashes ?: $this->translateURIDashes;
-        $this->override404        = $routing->fallback ?: $this->override404;
-        $this->autoRoute          = $routing->auto_route ?: $this->autoRoute;
-        $this->routeFiles         = $routing->route_files ?: $this->routeFiles;
-        $this->prioritize         = $routing->prioritize ?: $this->prioritize;
+        $this->defaultNamespace   	   = rtrim($routing->default_namespace ?: $this->defaultNamespace, '\\') . '\\';
+        $this->defaultController       = $routing->default_controller ?: $this->defaultController;
+        $this->defaultMethod           = $routing->default_method ?: $this->defaultMethod;
+        $this->translateURIDashes      = $routing->translate_uri_dashes ?: $this->translateURIDashes;
+        $this->override404             = $routing->fallback ?: $this->override404;
+        $this->autoRoute               = $routing->auto_route ?: $this->autoRoute;
+        $this->routeFiles              = $routing->route_files ?: $this->routeFiles;
+        $this->prioritize              = $routing->prioritize ?: $this->prioritize;
+        $this->useSupportedLocalesOnly = $routing->use_supported_locales_only ?: $this->useSupportedLocalesOnly;
 
         // Normaliser la chaîne de path dans le tableau routeFiles.
         foreach ($this->routeFiles as $routeKey => $routesFile) {
