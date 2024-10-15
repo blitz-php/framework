@@ -224,7 +224,7 @@ class RouteCollection implements RouteCollectionInterface
         $this->httpHost = env('HTTP_HOST');
 
         // Configuration basée sur le fichier de config. Laissez le fichier routes substituer.
-        $this->defaultNamespace   	   = rtrim($routing->default_namespace ?: $this->defaultNamespace, '\\') . '\\';
+        $this->defaultNamespace        = rtrim($routing->default_namespace ?: $this->defaultNamespace, '\\') . '\\';
         $this->defaultController       = $routing->default_controller ?: $this->defaultController;
         $this->defaultMethod           = $routing->default_method ?: $this->defaultMethod;
         $this->translateURIDashes      = $routing->translate_uri_dashes ?: $this->translateURIDashes;
