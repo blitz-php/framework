@@ -52,6 +52,7 @@ use InvalidArgumentException;
  * @method $this setPrioritize(bool $enabled = true)                                   Activer ou désactiver le tri des routes par priorité
  * @method $this setTranslateURIDashes(bool $value)                                    Indique au système s'il faut convertir les tirets des chaînes URI en traits de soulignement.
  * @method $this subdomain(string $subdomain)                                          Defini une restriction de sous domaine pour la route
+ * @method $this useSupportedLocalesOnly(bool $useOnly)                                Indique au router de limiter ou non les routes avec l'espace réservé {locale} à App::$supportedLocales
  * @method $this where($placeholder, ?string $pattern = null)                          Enregistre une nouvelle contrainte auprès du système.
  */
 final class RouteBuilder
@@ -89,7 +90,7 @@ final class RouteBuilder
         'addRedirect', 'redirect', 'permanentRedirect',
         'set404Override', 'setAutoRoute', 'fallback',
         'setDefaultConstraint', 'setDefaultController', 'setDefaultMethod', 'setDefaultNamespace',
-        'setTranslateURIDashes', 'setPrioritize',
+        'setTranslateURIDashes', 'setPrioritize', 'useSupportedLocalesOnly',
     ];
 
     /**
