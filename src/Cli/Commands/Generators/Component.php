@@ -67,7 +67,7 @@ class Component extends Command
         $this->directory     = 'Components';
         $this->template      = 'component.tpl.php';
         $this->classNameLang = 'CLI.generator.className.component';
-        $params              = array_merge($params, ['suffix' => null]);
+        $params              = array_merge($params, ['suffix' => true]);
 
         $this->task('Creation du composant')->eol();
 

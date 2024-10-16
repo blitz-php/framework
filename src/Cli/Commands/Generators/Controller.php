@@ -58,7 +58,6 @@ class Controller extends Command
         '--bare'      => 'S\'étend de BlitzPHP\Controllers\BaseController au lieu de AppController.',
         '--restful'   => "S'étend à partir d'une ressource RESTful, Options\u{a0}: [controller, presenter]. Par défaut\u{a0}: \"controller\".",
         '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
-        '--suffix'    => ['Ajoutez le titre du composant au nom de la classe (par exemple, User => UserController).', true],
         '--force'     => 'Forcer l\'écrasement du fichier existant.',
         '--invokable' => 'Spécifie si on veut avoir un contrôleur à action unique.',
     ];
@@ -72,7 +71,7 @@ class Controller extends Command
         $this->directory     = 'Controllers';
         $this->template      = 'controller.tpl.php';
         $this->classNameLang = 'CLI.generator.className.controller';
-        $params              = array_merge($params, ['suffix' => null]);
+        $params              = array_merge($params, ['suffix' => true]);
 
         $this->task('Creation du controleur')->eol();
 
