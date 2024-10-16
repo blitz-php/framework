@@ -92,7 +92,7 @@ class Command extends ConsoleCommand
         }
 
         if (! is_string($group)) {
-            $group = $type === 'generator' ? config('app.name') . ':Generateurs' : config('app.name');
+            $group = $type === 'generator' ? config('app.name', 'App') . ':Generateurs' : config('app.name', 'App');
         }
 
         return $this->parseTemplate(

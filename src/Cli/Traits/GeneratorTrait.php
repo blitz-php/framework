@@ -401,9 +401,9 @@ trait GeneratorTrait
             $class = $matches[1] . ucfirst($matches[2]);
         }
 
-        $suffix = $this->option('suffix') ?? array_key_exists('suffix', $this->params);
+        $suffix = $this->option('suffix') ?? ($this->params['suffix'] ?? null);
 
-        if ($this->enabledSuffixing && $suffix && preg_match($pattern, $class) !== 1) {
+        if ($this->enabledSuffixing && $suffix === true && preg_match($pattern, $class) !== 1) {
             $class .= ucfirst($component);
         }
 
