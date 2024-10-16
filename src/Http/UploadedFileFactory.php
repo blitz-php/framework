@@ -86,7 +86,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
      *
      * @see https://github.com/laminas/laminas-diactoros/blob/3.4.x/src/functions/normalize_uploaded_files.php
      *
-     * @return UploadedFileInterface[]
+     * @return list<UploadedFileInterface>
      *
      * @throws InvalidArgumentException Pour les valeurs non reconnues.
      */
@@ -95,13 +95,13 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
         /**
          * Traverse une arborescence imbriquée de spécifications de fichiers téléchargés.
          *
-         * @param array[]|string[]      $tmpNameTree
-         * @param array[]|int[]         $sizeTree
-         * @param array[]|int[]         $errorTree
-         * @param array[]|string[]|null $nameTree
-         * @param array[]|string[]|null $typeTree
+         * @param list<array>|list<string>      $tmpNameTree
+         * @param list<array>|list<int>         $sizeTree
+         * @param list<array>|list<int>         $errorTree
+         * @param list<array>|list<string>|null $nameTree
+         * @param list<array>|list<string>|null $typeTree
          *
-         * @return array[]|UploadedFile[]
+         * @return list<array>|list<UploadedFile>
          */
         $recursiveNormalize = static function (
             array $tmpNameTree,
@@ -145,7 +145,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
          *
          * Cette fonction normalise un tableau `$_FILES` représentant un ensemble imbriqué de fichiers téléchargés tels que produits par les SAPI php-fpm, CGI SAPI, ou mod_php SAPI.
          *
-         * @return UploadedFile[]
+         * @return list<UploadedFile>
          */
         $normalizeUploadedFileSpecification = static function (array $files = []) use (&$recursiveNormalize): array {
             if (

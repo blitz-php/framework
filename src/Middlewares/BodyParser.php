@@ -35,14 +35,14 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
     /**
      * Parseurs enregistrés
      *
-     * @var Closure[]
+     * @var list<Closure>
      */
     protected array $parsers = [];
 
     /**
      * Les méthodes HTTP sur lesquelles analyser les données.
      *
-     * @var string[]
+     * @var list<string>
      */
     protected array $methods = ['PUT', 'POST', 'PATCH', 'DELETE'];
 
@@ -79,7 +79,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
     /**
      * Définissez les méthodes HTTP sur lesquelles analyser les corps de requête.
      *
-     * @param string[] $methods Les méthodes sur lesquelles analyser les données.
+     * @param list<string> $methods Les méthodes sur lesquelles analyser les données.
      */
     public function setMethods(?array $methods): static
     {
@@ -93,7 +93,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
     /**
      * Obtenez les méthodes HTTP pour analyser les corps de requête.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function getMethods(): array
     {
@@ -115,8 +115,8 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
      * });
      * ```
      *
-     * @param string[] $types  Un tableau de valeurs d'en-tête de type de contenu à faire correspondre. par exemple. application/json
-     * @param Closure  $parser La fonction de parser. Doit renvoyer un tableau de données à insérer dans la requête.
+     * @param list<string> $types  Un tableau de valeurs d'en-tête de type de contenu à faire correspondre. par exemple. application/json
+     * @param Closure      $parser La fonction de parser. Doit renvoyer un tableau de données à insérer dans la requête.
      */
     public function addParser(array $types, Closure $parser): static
     {
@@ -131,7 +131,7 @@ class BodyParser extends BaseMiddleware implements MiddlewareInterface
     /**
      * Obtenir les parseurs actuels
      *
-     * @return Closure[]
+     * @return list<Closure>
      */
     public function getParsers(): array
     {

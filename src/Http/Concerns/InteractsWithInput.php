@@ -32,7 +32,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function server(?string $key = null, null|array|string $default = null)
+    public function server(?string $key = null, array|string|null $default = null)
     {
         return Arr::get($this->_environment, $key, $default);
     }
@@ -42,7 +42,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function header(?string $key = null, null|array|string $default = null)
+    public function header(?string $key = null, array|string|null $default = null)
     {
         if (null === $key) {
             return $this->getHeaders();
@@ -361,7 +361,7 @@ trait InteractsWithInput
     /**
      * Récupérer l'entrée de la requête sous forme de collection.
      */
-    public function collect(null|array|string $key = null): Collection
+    public function collect(array|string|null $key = null): Collection
     {
         return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
@@ -411,7 +411,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function query(?string $key = null, null|array|string $default = null)
+    public function query(?string $key = null, array|string|null $default = null)
     {
         return $this->getQuery($key, $default);
     }
@@ -421,7 +421,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function post(?string $key = null, null|array|string $default = null)
+    public function post(?string $key = null, array|string|null $default = null)
     {
         if ($key === null) {
             return $this->data;
@@ -443,7 +443,7 @@ trait InteractsWithInput
      *
      * @return array|string|null
      */
-    public function cookie(?string $key = null, null|array|string $default = null)
+    public function cookie(?string $key = null, array|string|null $default = null)
     {
         if (null === $key) {
             return $this->getCookieParams();
@@ -489,7 +489,7 @@ trait InteractsWithInput
     /**
      * Récupérer un fichier à partir de la requête.
      *
-     * @return array|UploadedFile|UploadedFile[]|null
+     * @return array|list<UploadedFile>|UploadedFile|null
      */
     public function file(?string $key = null, mixed $default = null)
     {

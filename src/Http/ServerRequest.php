@@ -50,7 +50,7 @@ class ServerRequest implements ServerRequestInterface
      * Tableau de données POST. Contiendra des données de formulaire ainsi que des fichiers téléchargés.
      * Dans les requêtes PUT/PATCH/DELETE, cette propriété contiendra les données encodées du formulaire.
      */
-    protected null|array|object $data = [];
+    protected array|object|null $data = [];
 
     /**
      * Tableau d'arguments de chaîne de requête
@@ -90,7 +90,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Liste des proxys de confiance
      *
-     * @var string[]
+     * @var list<string>
      */
     protected array $trustedProxies = [];
 
@@ -100,7 +100,7 @@ class ServerRequest implements ServerRequestInterface
      * Il existe plusieurs façons de spécifier un détecteur, voir `addDetector()` pour
      * les différents formats et façons de définir des détecteurs.
      *
-     * @var array<array|Closure>
+     * @var array<string, array|Closure>
      */
     protected static array $_detectors = [
         'get'     => ['env' => 'REQUEST_METHOD', 'value' => 'GET'],
@@ -149,7 +149,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Une liste de propriétés émulées par les méthodes d'attribut PSR7.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected array $emulatedAttributes = ['session', 'flash', 'webroot', 'base', 'params', 'here'];
 
@@ -353,7 +353,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Enregistrer des proxys de confiance
      *
-     * @param string[] $proxies ips liste des proxys de confiance
+     * @param list<string> $proxies ips liste des proxys de confiance
      */
     public function setTrustedProxies(array $proxies): void
     {
@@ -431,7 +431,7 @@ class ServerRequest implements ServerRequestInterface
      * défini avec {@link \BlitzPHP\Http\ServerRequest::addDetector()}. Tout détecteur peut être appelé
      * comme `is($type)` ou `is$Type()`.
      *
-     * @param string|string[] $type Le type de requête que vous souhaitez vérifier. S'il s'agit d'un tableau, cette méthode renverra true si la requête correspond à n'importe quel type.
+     * @param list<string>|string $type Le type de requête que vous souhaitez vérifier. S'il s'agit d'un tableau, cette méthode renverra true si la requête correspond à n'importe quel type.
      *
      * @return bool Si la demande est du type que vous vérifiez.
      */
@@ -593,7 +593,7 @@ class ServerRequest implements ServerRequestInterface
      * Voir Request::is() pour savoir comment ajouter des types supplémentaires et le
      * types intégrés.
      *
-     * @param string[] $types Les types à vérifier.
+     * @param list<string> $types Les types à vérifier.
      *
      * @see ServerRequest::is()
      */
@@ -720,7 +720,7 @@ class ServerRequest implements ServerRequestInterface
      * Bien que les noms d'en-tête ne soient pas sensibles à la casse, getHeaders() normalisera
      * les en-têtes.
      *
-     * @return array<string[]> Un tableau associatif d'en-têtes et leurs valeurs.
+     * @return array<string, list<string>> Un tableau associatif d'en-têtes et leurs valeurs.
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
@@ -774,8 +774,8 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param string $name L'en-tête que vous souhaitez obtenir (insensible à la casse)
      *
-     * @return string[] Un tableau associatif d'en-têtes et leurs valeurs.
-     *                  Si l'en-tête n'existe pas, un tableau vide sera retourné.
+     * @return list<string> Un tableau associatif d'en-têtes et leurs valeurs.
+     *                      Si l'en-tête n'existe pas, un tableau vide sera retourné.
      *
      * @see http://www.php-fig.org/psr/psr-7/ Cette méthode fait partie de l'interface de requête du serveur PSR-7.
      */
@@ -1004,7 +1004,7 @@ class ServerRequest implements ServerRequestInterface
      * @param int $tldLength Nombre de segments que contient votre tld. Par exemple : `example.com` contient 1 tld.
      *                       Alors que `example.co.uk` contient 2.
      *
-     * @return string[] Un tableau de sous-domaines.
+     * @return list<string> Un tableau de sous-domaines.
      */
     public function subdomains(int $tldLength = 1): array
     {
@@ -1020,7 +1020,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Obtient une liste de types de contenu acceptables par le navigateur client dans l'ordre préférable.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function getAcceptableContentTypes(): array
     {
@@ -1055,9 +1055,9 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param array|string|null $types Le type de contenu à vérifier. Laissez null pour obtenir tous les types qu'un client accepte.
      *
-     * @return bool|string[] Soit un tableau de tous les types acceptés par le client, soit un booléen s'il accepte le type fourni.
+     * @return bool|list<string> Soit un tableau de tous les types acceptés par le client, soit un booléen s'il accepte le type fourni.
      */
-    public function accepts(null|array|string $types = null)
+    public function accepts(array|string|null $types = null)
     {
         $accept = $this->getAcceptableContentTypes();
 
@@ -1425,7 +1425,7 @@ class ServerRequest implements ServerRequestInterface
      * Si la requête est GET, l'en-tête de réponse "Autoriser : POST, SUPPRIMER" sera défini
      * et une erreur 405 sera renvoyée.
      *
-     * @param string|string[] $methods Méthodes de requête HTTP autorisées.
+     * @param list<string>|string $methods Méthodes de requête HTTP autorisées.
      *
      * @throws HttpException
      */
@@ -1600,7 +1600,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param string $path Le chemin séparé par des points vers le fichier que vous voulez.
      *
-     * @return UploadedFileInterface|UploadedFileInterface[]|null
+     * @return list<UploadedFileInterface>|UploadedFileInterface|null
      */
     public function getUploadedFile(string $path)
     {

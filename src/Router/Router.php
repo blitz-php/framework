@@ -112,7 +112,7 @@ class Router implements RouterInterface
      * Les informations des middlewares à executer
      * Si la route matchée necessite des filtres.
      *
-     * @var string[]
+     * @var list<string>
      */
     protected array $middlewaresInfo = [];
 
@@ -204,7 +204,7 @@ class Router implements RouterInterface
     /**
      * Renvoie les informations des middlewares de la routes matchée
      *
-     * @return string[]
+     * @return list<string>
      */
     public function getMiddlewares(): array
     {
@@ -389,7 +389,7 @@ class Router implements RouterInterface
                 // Cette route est-elle censée rediriger vers une autre ?
                 if ($this->collection->isRedirect($routeKey)) {
                     // remplacement des groupes de routes correspondants par des références : post/([0-9]+) -> post/$1
-                    $redirectTo = preg_replace_callback('/(\([^\(]+\))/', static function () {
+                    $redirectTo = preg_replace_callback('/(\([^\(]+\))/', static function (): string {
                         static $i = 1;
 
                         return '$' . $i++;

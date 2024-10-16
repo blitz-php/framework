@@ -52,7 +52,7 @@ trait ResponseTrait
     /**
      * Définissez un en-tête sur la réponse.
      *
-     * @param string|string[] $values
+     * @param list<string>|string $values
      */
     public function header(string $key, array|string $values, bool $replace = true): static
     {

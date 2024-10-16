@@ -12,6 +12,8 @@
 use BlitzPHP\Spec\CliOutputHelper as COH;
 use BlitzPHP\Spec\StreamInterceptor;
 
+use function Kahlan\expect;
+
 function resetEnvironment(): void
 {
     putenv('encryption.key');

@@ -8,13 +8,15 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use Psr\Http\Message\ResponseInterface;
 use BlitzPHP\Http\CorsBuilder;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequestFactory;
 use BlitzPHP\Middlewares\Cors;
 use Spec\BlitzPHP\Middlewares\TestRequestHandler;
+
+use function Kahlan\expect;
 
 describe('Middleware / Cors', function (): void {
     describe('CorsBuilder', function(): void {
@@ -228,7 +230,7 @@ describe('Middleware / Cors', function (): void {
 				$this->server = array_merge($this->server, $server);
 			};
 
-			$this->sendRequest = function (array $config = []) {
+			$this->sendRequest = function (array $config = []): ResponseInterface {
 				$request    = ServerRequestFactory::fromGlobals($this->server);
 				$handler    = new TestRequestHandler();
 				$middleware = new Cors($config);

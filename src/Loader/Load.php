@@ -49,7 +49,7 @@ class Load
     /**
      * Charge un modele
      *
-     * @return object|object[]
+     * @return list<object>|object
      *
      * @throws LoadException
      */
@@ -78,10 +78,8 @@ class Load
 
     /**
      * Verifie si un element est chargé dans la liste des modules
-     *
-     * @param mixed $element
      */
-    private static function isLoaded(string $module, $element): bool
+    private static function isLoaded(string $module, string $element): bool
     {
         if (! isset(self::$loads[$module]) || ! is_array(self::$loads[$module])) {
             return false;
@@ -103,11 +101,9 @@ class Load
     /**
      * Renvoie un element chargé
      *
-     * @param mixed $element
-     *
      * @return mixed
      */
-    private static function getLoaded(string $module, $element)
+    private static function getLoaded(string $module, string $element)
     {
         return self::$loads[$module][$element] ?? null;
     }

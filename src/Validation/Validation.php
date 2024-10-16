@@ -36,7 +36,7 @@ class Validation extends BaseValidation
     /**
      * {@inheritDoc}
      *
-     * @param array<AbstractRule> $rules
+     * @param list<AbstractRule> $rules
      */
     protected function registerRules(array $rules): void
     {
@@ -56,7 +56,7 @@ class Validation extends BaseValidation
     /**
      * Definie les fichiers qui pourront etre considerer comme regles de validations
      *
-     * @return string[] Chemins absolus des fichiers
+     * @return list<string> Chemins absolus des fichiers
      */
     protected function files(Locator $locator): array
     {

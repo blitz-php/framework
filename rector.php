@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodeQuality\Rector\BooleanAnd\SimplifyEmptyArrayCheckRector;
 use Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector;
@@ -25,6 +34,7 @@ use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
 use Rector\CodingStyle\Rector\FuncCall\VersionCompareFuncCallToConstantRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\EarlyReturn\Rector\Foreach_\ChangeNestedForeachIfsToEarlyContinueRector;
 use Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector;
 use Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector;
@@ -36,16 +46,19 @@ use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\Strict\Rector\If_\BooleanInIfConditionRuleFixerRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddMethodCallBasedStrictParamTypeRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnNeverTypeRector;
 use Rector\TypeDeclaration\Rector\Closure\AddClosureVoidReturnTypeWhereNoReturnRector;
+use Rector\TypeDeclaration\Rector\Closure\ClosureReturnTypeRector;
 use Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector;
 use Rector\TypeDeclaration\Rector\Function_\AddFunctionVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 
 return RectorConfig::configure()
-	->withPhpSets(php81: true)
-	->withPreparedSets(deadCode: true)
-	->withParallel(120, 8, 10)
+    ->withPhpSets(php81: true)
+    ->withPreparedSets(deadCode: true)
+    ->withParallel(120, 8, 10)
     ->withCache(
         // Github action cache or local
         is_dir('/tmp') ? '/tmp/rector' : null,
@@ -63,10 +76,12 @@ return RectorConfig::configure()
     ->withPHPStanConfigs([
         // __DIR__ . '/phpstan.neon.dist',
     ])
-	// is there a file you need to skip?
+    // is there a file you need to skip?
     ->withSkip([
         __DIR__ . '/src/Debug/Toolbar/Views/toolbar.tpl.php',
         __DIR__ . '/spec/support/application/app/Views',
+
+        RemoveUnusedPrivateMethodRector::class,
 
         RemoveUnusedConstructorParamRector::class => [
             // @TODO remove if deprecated $httpVerb is removed
@@ -77,6 +92,11 @@ return RectorConfig::configure()
         RandomFunctionRector::class,
 
         MixedTypeRector::class,
+
+        ReturnNeverTypeRector::class => [
+            __DIR__ . '/src/Router/Dispatcher.php',
+            __DIR__ . '/src/Helpers/kint.php',
+        ],
 
         // Unnecessary (string) is inserted
         NullToStrictStringFuncCallArgRector::class,
@@ -115,12 +135,11 @@ return RectorConfig::configure()
         ExplicitBoolCompareRector::class,
         AddClosureVoidReturnTypeWhereNoReturnRector::class,
         AddFunctionVoidReturnTypeWhereNoReturnRector::class,
-		TypedPropertyFromAssignsRector::class,
+        AddMethodCallBasedStrictParamTypeRector::class,
+        TypedPropertyFromAssignsRector::class,
+        ClosureReturnTypeRector::class,
     ])
     ->withConfiguredRule(StringClassNameToClassConstantRector::class, [
         // keep '\\' prefix string on string '\Foo\Bar'
         StringClassNameToClassConstantRector::SHOULD_KEEP_PRE_SLASH => true,
-    ])
-
-	;
-
+    ]);

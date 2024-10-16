@@ -52,12 +52,11 @@ class MiddlewareCheck extends Command
      */
     public function execute(array $params)
     {
-        $method = strtolower($this->argument('method', ''));
-        $route  = $this->argument('route', '');
+        $method = strtolower($this->argument('method', $params[0] ?? ''));
+        $route  = $this->argument('route', $params[1] ?? '');
 
         if (empty($route) || $method === '') {
             $this->fail('Vous devez spécifier un verbe HTTP et une route.')->eol();
-            $this->write('  Usage: ' . $this->usage)->eol();
             $this->write('Exemple: middleware:check get /')->eol();
             $this->write('         middleware:check put products/1');
 

@@ -1,5 +1,7 @@
 <?php
 
+use BlitzPHP\Router\RouteCollection;
+
 /**
  * This file is part of Blitz PHP framework.
  *
@@ -8,3 +10,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
+/**
+ * @var RouteCollection $routes
+ */
+$routes->get('/', 'Home::index', ['middleware' => ['forcehttps', 'pagecache']]);

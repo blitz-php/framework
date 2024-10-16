@@ -101,7 +101,7 @@ class Services
     /**
      * Un cache des noms de classes de services trouvés.
      *
-     * @var array<string>
+     * @var list<string>
      */
     private static array $serviceNames = [];
 

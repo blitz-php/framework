@@ -69,7 +69,7 @@ if (! function_exists('model')) {
      *
      * @template T
      *
-     * @param array<class-string<T>>|class-string<T> $name
+     * @param class-string<T>|list<class-string<T>> $name
      *
      * @return T
      */
@@ -201,7 +201,7 @@ if (! function_exists('config')) {
      *
      * @return Config|mixed|void
      */
-    function config(null|array|string $key = null, $default = null)
+    function config(array|string|null $key = null, $default = null)
     {
         $config = Services::config();
 
@@ -295,7 +295,7 @@ if (! function_exists('cookie')) {
      *
      * @return CookieInterface|CookieManagerInterface|null
      */
-    function cookie(?string $name = null, null|array|string $value = null, int $minutes = 0, array $options = [])
+    function cookie(?string $name = null, array|string|null $value = null, int $minutes = 0, array $options = [])
     {
         $cookie = Services::cookie();
 
@@ -387,10 +387,10 @@ if (! function_exists('purify')) {
      * Purifiez l'entrée à l'aide de la classe autonome HTMLPurifier.
      * Utilisez facilement plusieurs configurations de purificateur.
      *
-     * @param string|string[] $dirty_html
-     * @param false|string    $config
+     * @param list<string>|string $dirty_html
+     * @param false|string        $config
      *
-     * @return string|string[]
+     * @return list<string>|string
      */
     function purify($dirty_html, $config = false)
     {
@@ -482,7 +482,7 @@ if (! function_exists('environment')) {
      *
      * @return bool|string
      */
-    function environment(null|array|string $env = null)
+    function environment(array|string|null $env = null)
     {
         $current = env('ENVIRONMENT');
         if (empty($current) || $current === 'auto') {
@@ -729,8 +729,8 @@ if (! function_exists('old')) {
     /**
      * Fournit l'accès à "entrée ancienne" qui a été définie dans la session lors d'un redirect()-withInput().
      *
-     * @param false|string $escape
-     * @param mixed|null   $default
+     * @param         false|string                               $escape
+     * @param         mixed|null                                 $default
      * @phpstan-param false|'attr'|'css'|'html'|'js'|'raw'|'url' $escape
      *
      * @return array|string|null
@@ -975,7 +975,7 @@ if (! function_exists('component')) {
      *
      * @throws ReflectionException
      */
-    function component(array|string $library, null|array|string $params = null, int $ttl = 0, ?string $cacheName = null): string
+    function component(array|string $library, array|string|null $params = null, int $ttl = 0, ?string $cacheName = null): string
     {
         if (is_array($library)) {
             $library = implode('::', $library);
@@ -1096,7 +1096,7 @@ if (! function_exists('last')) {
      *
      * @template T
      *
-     * @param array<T> $array
+     * @param list<T> $array
      *
      * @return false|T
      */

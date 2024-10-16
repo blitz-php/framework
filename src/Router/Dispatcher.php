@@ -352,7 +352,7 @@ class Dispatcher
      * @param RouteCollectionInterface|null $routes Une interface de collecte à utiliser à la place
      *                                              du fichier de configuration.
      *
-     * @return string[]
+     * @return list<string>
      *
      * @throws RedirectException
      */

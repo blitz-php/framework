@@ -49,7 +49,7 @@ class Parser extends NativeAdapter
     /**
      * Stores any plugins registered at run-time.
      *
-     * @var array<string, array<string>|callable|string>
+     * @var array<string, callable|list<string>|string>
      */
     protected array $plugins = [];
 
@@ -481,7 +481,7 @@ class Parser extends NativeAdapter
     protected function replaceSingle(array|string $pattern, string $content, string $template, bool $escape = false): string
     {
         // Replace the content in the template
-        return preg_replace_callback($pattern, function ($matches) use ($content, $escape) {
+        return preg_replace_callback($pattern, function ($matches) use ($content, $escape): string {
             // Check for {! !} syntax to not escape this one.
             if (
                 str_starts_with($matches[0], $this->leftDelimiter . '!')
@@ -558,7 +558,7 @@ class Parser extends NativeAdapter
             preg_match('/\([\w<>=\/\\\,:.\-\s\+]+\)/u', $filter, $param);
 
             // Remove the () and spaces to we have just the parameter left
-            $param = ! empty($param) ? trim($param[0], '() ') : null;
+            $param = $param !== [] ? trim($param[0], '() ') : null;
 
             // Params can be separated by commas to allow multiple parameters for the filter
             if ($param !== null && $param !== '' && $param !== '0') {

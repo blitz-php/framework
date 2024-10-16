@@ -19,9 +19,9 @@ use BlitzPHP\Utilities\Helpers;
 final class AutoRouteCollector
 {
     /**
-     * @param string              $namespace            Namespace dans lequel on recherche
-     * @param array<class-string> $protectedControllers Liste des contrôleurs dans les routes définis qui ne doivent pas être consultés via Auto-Routing.
-     * @param string              $prefix               Préfixe URI pour Module Routing
+     * @param string             $namespace            Namespace dans lequel on recherche
+     * @param list<class-string> $protectedControllers Liste des contrôleurs dans les routes définis qui ne doivent pas être consultés via Auto-Routing.
+     * @param string             $prefix               Préfixe URI pour Module Routing
      */
     public function __construct(
         private readonly string $namespace,
@@ -29,12 +29,12 @@ final class AutoRouteCollector
         private readonly string $defaultMethod,
         private readonly array $httpMethods,
         private readonly array $protectedControllers,
-        private string $prefix = ''
+        private readonly string $prefix = ''
     ) {
     }
 
     /**
-     * @return array<int, array<int, string>>
+     * @return         array<int, array<int, string>>
      * @phpstan-return list<list<string>>
      */
     public function get(): array

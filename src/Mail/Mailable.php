@@ -27,7 +27,7 @@ abstract class Mailable
     /**
      * Définition des adresses de copie (BCC) au mail
      *
-     * @return array<string, string>|string[]
+     * @return array<string, string>|list<string>
      *
      * @example
      * ```php
@@ -45,7 +45,7 @@ abstract class Mailable
     /**
      * Définition des adresses de copie (CC) au mail
      *
-     * @return array<string, string>|string[]
+     * @return array<string, string>|list<string>
      *
      * @example
      * ```php
@@ -75,7 +75,7 @@ abstract class Mailable
     /**
      * Définition de l'adresse de l'expediteur du mail
      *
-     * @return string[]
+     * @return list<string>
      *
      * @example
      * ```php
@@ -118,7 +118,7 @@ abstract class Mailable
     /**
      * Définition des adresses de reponse (ReplyTo) du mail
      *
-     * @return array<string, string>|string[]
+     * @return array<string, string>|list<string>
      *
      * @example
      * ```php

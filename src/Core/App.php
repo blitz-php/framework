@@ -163,7 +163,7 @@ class App
      *
      * @param string $type Package type.
      *
-     * @return string[] Chemin d'accès complet au package
+     * @return list<string> Chemin d'accès complet au package
      */
     public static function core(string $type): array
     {
