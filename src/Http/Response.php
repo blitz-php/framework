@@ -321,7 +321,7 @@ class Response implements ResponseInterface, Stringable
     /**
      * Gamme de fichiers. Utilisé pour demander des plages de fichiers.
      *
-     * @var array<int>
+     * @var list<int>
      */
     protected array $_fileRange = [];
 
@@ -629,8 +629,8 @@ class Response implements ResponseInterface, Stringable
      *
      * Ceci est nécessaire pour RequestHandlerComponent et la reconnaissance des types.
      *
-     * @param string          $type     Type de contenu.
-     * @param string|string[] $mimeType Définition du type mime.
+     * @param string              $type     Type de contenu.
+     * @param list<string>|string $mimeType Définition du type mime.
      */
     public function setTypeMap(string $type, $mimeType): void
     {
@@ -984,7 +984,7 @@ class Response implements ResponseInterface, Stringable
      * chaîne séparée. Si aucun paramètre n'est passé, alors un
      * le tableau avec la valeur actuelle de l'en-tête Vary est renvoyé
      *
-     * @param string|string[] $cacheVariances Une seule chaîne Vary ou un tableau contenant la liste des écarts.
+     * @param list<string>|string $cacheVariances Une seule chaîne Vary ou un tableau contenant la liste des écarts.
      */
     public function withVary($cacheVariances): static
     {
@@ -1264,7 +1264,7 @@ class Response implements ResponseInterface, Stringable
     public function getCookies(): array
     {
         $out = [];
-        /** @var array<Cookie> $cookies */
+        /** @var list<Cookie> $cookies */
         $cookies = $this->_cookies;
 
         foreach ($cookies as $cookie) {

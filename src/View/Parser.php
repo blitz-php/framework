@@ -49,7 +49,7 @@ class Parser extends NativeAdapter
     /**
      * Stores any plugins registered at run-time.
      *
-     * @var array<string, array<string>|callable|string>
+     * @var array<string, callable|list<string>|string>
      */
     protected array $plugins = [];
 

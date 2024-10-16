@@ -123,7 +123,7 @@ class Config
     /**
      * Reinitialise une configuration en fonction des donnees initiales issues des fichiers de configurations
      */
-    public function reset(null|array|string $keys = null): void
+    public function reset(array|string|null $keys = null): void
     {
         $keys = null !== $keys ? (array) $keys : array_keys(self::$originals);
 
@@ -150,7 +150,7 @@ class Config
     /**
      * Charger la configuration spécifique dans le scoope
      *
-     * @param string|string[] $config
+     * @param list<string>|string $config
      */
     public function load($config, ?string $file = null, ?Schema $schema = null, bool $allow_empty = false)
     {

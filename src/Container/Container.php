@@ -32,14 +32,14 @@ class Container implements ContainerInterface
     /**
      * Providers deja charges (cache)
      *
-     * @var AbstractProvider[]
+     * @var list<AbstractProvider>
      */
     private static array $providers = [];
 
     /**
      * Noms des providers deja charges (cache)
      *
-     * @var array<class-string<AbstractProvider>>
+     * @var list<class-string<AbstractProvider>>
      */
     private static array $providerNames = [];
 

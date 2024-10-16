@@ -23,7 +23,7 @@ class Formatter
      * Ces formats ne sont vérifiés que lorsque les données sont transmises à la réponse ()
      * La méthode est un tableau.
      *
-     * @var string[]
+     * @var list<string>
      */
     protected static $supportedResponseFormats = [
         'application/json',

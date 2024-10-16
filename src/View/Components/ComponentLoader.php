@@ -60,7 +60,7 @@ class ComponentLoader
      *
      * @throws ReflectionException
      */
-    public function render(string $library, null|array|string $params = null, int $ttl = 0, ?string $cacheName = null): string
+    public function render(string $library, array|string|null $params = null, int $ttl = 0, ?string $cacheName = null): string
     {
         [$instance, $method] = $this->determineClass($library);
 

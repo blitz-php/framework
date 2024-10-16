@@ -112,7 +112,7 @@ class Router implements RouterInterface
      * Les informations des middlewares à executer
      * Si la route matchée necessite des filtres.
      *
-     * @var string[]
+     * @var list<string>
      */
     protected array $middlewaresInfo = [];
 
@@ -204,7 +204,7 @@ class Router implements RouterInterface
     /**
      * Renvoie les informations des middlewares de la routes matchée
      *
-     * @return string[]
+     * @return list<string>
      */
     public function getMiddlewares(): array
     {

@@ -185,7 +185,7 @@ final class Configurator
     }
 
     /**
-     * @param string[] $warnings
+     * @param list<string> $warnings
      */
     private function raiseAnyDeprecationNotices(array $warnings): void
     {

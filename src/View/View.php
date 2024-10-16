@@ -145,7 +145,7 @@ class View implements Stringable
     /**
      * Utilise le premier fichier de vue trouvé pour le rendu
      *
-     * @param string[] $views
+     * @param list<string> $views
      */
     public function first(array $views, array $data = [], array $options = []): static
     {

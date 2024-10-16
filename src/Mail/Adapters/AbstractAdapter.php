@@ -28,7 +28,7 @@ abstract class AbstractAdapter implements MailerInterface
     /**
      * Dependances necessaires a l'adapter
      *
-     * @var array<string, string>[]
+     * @var list<array<string, string>>
      */
     protected array $dependancies = [];
 

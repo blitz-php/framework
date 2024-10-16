@@ -174,7 +174,7 @@ class RestController extends BaseController
      *
      * @return ResponseInterface
      */
-    final protected function respondFail(?string $message = "Une erreur s'est produite", ?int $status = StatusCode::INTERNAL_ERROR, null|int|string $code = null, array $errors = [])
+    final protected function respondFail(?string $message = "Une erreur s'est produite", ?int $status = StatusCode::INTERNAL_ERROR, int|string|null $code = null, array $errors = [])
     {
         $message = $message ?: "Une erreur s'est produite";
         $code    = ($code !== 0 && $code !== '' && $code !== '0') ? $code : $status;
@@ -451,7 +451,7 @@ class RestController extends BaseController
     /**
      * Execute les annotations definies dans le contrôleur
      *
-     * @param IAnnotation[] $annotations Liste des annotations d'un contrôleur/méthode
+     * @param list<IAnnotation> $annotations Liste des annotations d'un contrôleur/méthode
      */
     protected function _execAnnotations(self $instance, array $annotations): self
     {

@@ -30,7 +30,7 @@ class MockCache extends BaseHandler implements CacheInterface
     /**
      * Temps d'expiration.
      *
-     * @var int[]
+     * @var list<int>
      */
     protected array $expirations = [];
 
@@ -54,7 +54,7 @@ class MockCache extends BaseHandler implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function set(string $key, mixed $value, null|DateInterval|int $ttl = null): bool
+    public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
         if ($this->bypass) {
             return false;
@@ -169,7 +169,7 @@ class MockCache extends BaseHandler implements CacheInterface
     /**
      * {@inheritDoc}
      *
-     * @return string[] Keys currently present in the store
+     * @return list<string> Keys currently present in the store
      */
     public function info(): array
     {

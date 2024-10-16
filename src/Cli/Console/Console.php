@@ -177,7 +177,7 @@ class Console extends Application
     /**
      * Definie les fichiers qui pourront etre considerer comme commandes
      *
-     * @return string[] Chemins absolus des fichiers
+     * @return list<string> Chemins absolus des fichiers
      */
     protected function files(LocatorInterface $locator): array
     {

@@ -390,8 +390,8 @@ abstract class Command
     /**
      * Générer une table pour la console. Les clés de la première ligne sont prises comme en-tête.
      *
-     * @param array[] $rows   Tableau de tableaux associés.
-     * @param array   $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
+     * @param list<array> $rows   Tableau de tableaux associés.
+     * @param array       $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
      */
     final public function table(array $rows, array $styles = []): self
     {

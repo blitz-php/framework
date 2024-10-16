@@ -137,8 +137,8 @@ if (! function_exists('lib_styles')) {
      *
      * inclu une ou plusieurs feuilles de style css
      *
-     * @param string|string[] $name  nom du fichier dont on veut inserer
-     * @param bool            $print Specifie si on affiche directement la sortie ou si on la retourne
+     * @param list<string>|string $name  nom du fichier dont on veut inserer
+     * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
      * @return string|void
      */
@@ -179,8 +179,8 @@ if (! function_exists('lib_scripts')) {
      *
      * inclu un ou plusieurs scripts js
      *
-     * @param string|string[] $name  nom du fichier dont on veut inserer
-     * @param bool            $print Specifie si on affiche directement la sortie ou si on la retourne
+     * @param list<string>|string $name  nom du fichier dont on veut inserer
+     * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
      * @return string|void
      */
@@ -219,8 +219,8 @@ if (! function_exists('styles')) {
      *
      * inclu une ou plusieurs feuilles de style css
      *
-     * @param string|string[] $name  nom du fichier dont on veut inserer
-     * @param bool            $print Specifie si on affiche directement la sortie ou si on la retourne
+     * @param list<string>|string $name  nom du fichier dont on veut inserer
+     * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
      * @return string|void
      */
@@ -261,8 +261,8 @@ if (! function_exists('scripts')) {
      *
      * inclu un ou plusieurs scripts js
      *
-     * @param string|string[] $name  nom du fichier dont on veut inserer
-     * @param bool            $print Specifie si on affiche directement la sortie ou si on la retourne
+     * @param list<string>|string $name  nom du fichier dont on veut inserer
+     * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
      * @return string|void
      */
@@ -325,8 +325,8 @@ if (! function_exists('less_styles')) {
      *
      * inclu une ou plusieurs feuilles de style less
      *
-     * @param string|string[] $name  nom du fichier dont on veut inserer
-     * @param bool            $print Specifie si on affiche directement la sortie ou si on la retourne
+     * @param list<string>|string $name  nom du fichier dont on veut inserer
+     * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
      * @return string|void
      */

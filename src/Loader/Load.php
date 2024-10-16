@@ -49,7 +49,7 @@ class Load
     /**
      * Charge un modele
      *
-     * @return object|object[]
+     * @return list<object>|object
      *
      * @throws LoadException
      */

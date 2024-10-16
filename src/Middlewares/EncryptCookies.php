@@ -29,7 +29,7 @@ class EncryptCookies implements MiddlewareInterface
     /**
      * Les noms des cookies qui ne doivent pas être cryptés.
      *
-     * @var string[]
+     * @var list<string>
      */
     protected array $except = [];
 

@@ -90,7 +90,7 @@ class Encryption implements EncrypterInterface
     /**
      * {@inheritDoc}
      */
-    public function encrypt(string $data, null|array|string $params = null): string
+    public function encrypt(string $data, array|string|null $params = null): string
     {
         return $this->encrypter()->encrypt($data, $params);
     }
@@ -98,7 +98,7 @@ class Encryption implements EncrypterInterface
     /**
      * {@inheritDoc}
      */
-    public function decrypt(string $data, null|array|string $params = null): string
+    public function decrypt(string $data, array|string|null $params = null): string
     {
         return $this->encrypter()->decrypt($data, $params);
     }

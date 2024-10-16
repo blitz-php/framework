@@ -37,7 +37,7 @@ class Publisher extends FileCollection
     /**
      * Tableau des éditeurs découverts.
      *
-     * @var array<string, self[]|null>
+     * @var array<string, list<self>|null>
      */
     private static array $discovered = [];
 
@@ -57,7 +57,7 @@ class Publisher extends FileCollection
     /**
      * Liste des fichiers publiés traitant la dernière opération d'écriture.
      *
-     * @var string[]
+     * @var list<string>
      */
     private array $published = [];
 
@@ -88,7 +88,7 @@ class Publisher extends FileCollection
     /**
      * Découvre et renvoie tous les éditeurs dans le répertoire d'espace de noms spécifié.
      *
-     * @return self[]
+     * @return list<self>
      */
     final public static function discover(string $directory = 'Publishers'): array
     {
@@ -239,7 +239,7 @@ class Publisher extends FileCollection
     /**
      * Renvoie les fichiers publiés par la dernière opération d'écriture.
      *
-     * @return string[]
+     * @return list<string>
      */
     final public function getPublished(): array
     {
@@ -253,7 +253,7 @@ class Publisher extends FileCollection
     /**
      * Vérifie et ajoute des chemins à la liste.
      *
-     * @param string[] $paths
+     * @param list<string> $paths
      */
     final public function addPaths(array $paths, bool $recursive = true): static
     {
@@ -277,7 +277,7 @@ class Publisher extends FileCollection
     /**
      * Télécharge et met en scène des fichiers à partir d'un tableau d'URI.
      *
-     * @param string[] $uris
+     * @param list<string> $uris
      */
     final public function addUris(array $uris): static
     {

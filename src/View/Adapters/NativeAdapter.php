@@ -51,7 +51,7 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Le nom de la section actuelle en cours de rendu, le cas échéant.
      *
-     * @var string[]
+     * @var list<string>
      */
     protected array $sectionStack = [];
 

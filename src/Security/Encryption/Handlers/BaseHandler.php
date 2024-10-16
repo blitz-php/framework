@@ -21,7 +21,7 @@ abstract class BaseHandler implements EncrypterInterface
     /**
      * Clé de démarrage
      */
-    protected string $key = '';
+    protected ?string $key = '';
 
     /**
      * Constructeur
