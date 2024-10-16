@@ -103,7 +103,7 @@ describe('Events / Event', function (): void {
 		it('Arrete l\'execution des autres listeners lorsque FALSE est renvoyé', function (): void {
 			$result = null;
 
-			$this->eventManager->on('foo', static function () use (&$result) {
+			$this->eventManager->on('foo', static function () use (&$result): bool {
 				$result = 1;
 
 				return false;
@@ -139,14 +139,14 @@ describe('Events / Event', function (): void {
 		it('Priorite', function (): void {
 			$result = 0;
 
-			$this->eventManager->on('foo', static function () use (&$result) {
+			$this->eventManager->on('foo', static function () use (&$result): bool {
 				$result = 1;
 
 				return false;
 			}, EventInterface::PRIORITY_NORMAL);
 
 			// Ceci doit etre lancer en premier car elle a une priorite elevee
-			$this->eventManager->on('foo', static function () use (&$result) {
+			$this->eventManager->on('foo', static function () use (&$result): bool {
 				$result = 2;
 
 				return false;

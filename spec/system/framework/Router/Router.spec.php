@@ -19,7 +19,7 @@ use Spec\BlitzPHP\App\Middlewares\CustomMiddleware;
 
 describe('Router', function (): void {
 	beforeAll(function (): void {
-		$this->createCollection = function(array $config = []) {
+		$this->createCollection = function(array $config = []): RouteCollection {
 			$default = array_merge(config('routing'), $config);
 
 			return (new RouteCollection(Services::locator(), (object) $default))

@@ -94,7 +94,7 @@ class About extends Command
                             ->all();
                     })->flatten(1)
             )
-            ->sortBy(static function ($data, $key) {
+            ->sortBy(static function ($data, $key): int {
                 $index = array_search($key, ['Environnement', 'Cache', 'Gestionnaires'], true);
 
                 return $index === false ? 99 : $index;
@@ -179,7 +179,7 @@ class About extends Command
 
         static::addToSection('Gestionnaires', static fn () => array_filter([
             'Cache' => config('cache.handler'),
-            'Logs'  => static function ($json) {
+            'Logs'  => static function ($json): string {
                 $handlers = [];
 
                 foreach (config('log.handlers') as $k => $v) {

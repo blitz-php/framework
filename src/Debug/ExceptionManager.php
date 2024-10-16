@@ -35,7 +35,7 @@ class ExceptionManager
      */
     public static function registerHttpErrors(Run $debugger, array $config): Run
     {
-        return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config) {
+        return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config): int {
             if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
                 Services::logger()->error($exception);
             }

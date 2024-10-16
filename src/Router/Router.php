@@ -389,7 +389,7 @@ class Router implements RouterInterface
                 // Cette route est-elle censée rediriger vers une autre ?
                 if ($this->collection->isRedirect($routeKey)) {
                     // remplacement des groupes de routes correspondants par des références : post/([0-9]+) -> post/$1
-                    $redirectTo = preg_replace_callback('/(\([^\(]+\))/', static function () {
+                    $redirectTo = preg_replace_callback('/(\([^\(]+\))/', static function (): string {
                         static $i = 1;
 
                         return '$' . $i++;

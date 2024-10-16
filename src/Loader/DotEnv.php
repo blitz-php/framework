@@ -280,7 +280,7 @@ class DotEnv
 
             $value = preg_replace_callback(
                 '/\${([a-zA-Z0-9_]+)}/',
-                static function ($matchedPatterns) use ($loader) {
+                static function ($matchedPatterns) use ($loader): string {
                     $nestedVariable = $loader->getVariable($matchedPatterns[1]);
 
                     if (null === $nestedVariable) {

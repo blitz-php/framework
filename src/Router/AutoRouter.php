@@ -115,7 +115,7 @@ final class AutoRouter implements AutoRouterInterface
     public function __construct(
         private readonly array $protectedControllers,
         string $namespace,
-        private string $defaultController,
+        private readonly string $defaultController,
         private readonly string $defaultMethod,
         private readonly bool $translateURIDashes
     ) {

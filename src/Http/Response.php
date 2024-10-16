@@ -1427,7 +1427,7 @@ class Response implements ResponseInterface, Stringable
         $end      = $lastByte;
 
         preg_match('/^bytes\s*=\s*(\d+)?\s*-\s*(\d+)?$/', $httpRange, $matches);
-        if ($matches) {
+        if ($matches !== []) {
             $start = $matches[1];
             $end   = $matches[2] ?? '';
         }
