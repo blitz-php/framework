@@ -20,6 +20,8 @@ use BlitzPHP\Spec\ReflectionHelper;
 use Spec\BlitzPHP\App\Controllers\HomeController;
 use Spec\BlitzPHP\App\Controllers\ProductController;
 
+use function Kahlan\expect;
+
 function getCollector(string $verb = Method::GET, array $config = [], array $files = []): RouteCollection
 {
     $defaults = ['App' => APP_PATH];
@@ -1269,6 +1271,54 @@ describe('RouteCollection', function (): void {
             ]);
         });
     });
+
+	describe('Multiples nom d\'hotes', function (): void {
+		it('La surchage d\'une route accepte plusieurs hotes', function (): void {
+			$_SERVER['HTTP_HOST'] = 'doc.domain.com';
+
+			setRequestMethod(Method::GET);
+            $router = Services::router(routes: $routes = getCollector(), shared: false);
+
+			$routes->setDefaultNamespace('App\Controllers');
+			$routes->setDefaultController('Home');
+			$routes->setDefaultMethod('index');
+
+			$routes->get('/', 'Home::index', ['as' => 'ddd']);
+			$routes->get('/', '\App\Controllers\Site\CDoc::index', ['hostname' => 'doc.domain.com', 'as' => 'doc_index']);
+
+            expect($router->handle('/'))->toBe('App\\Controllers\\Site\\CDocController');
+		});
+
+		it('Le routeur fonctionne normalement avec une route qui accepte plusieurs hotes', function (): void {
+			$_SERVER['HTTP_HOST'] = 'two.domain.com';
+
+            $router = Services::router(routes: $routes = getCollector(), shared: false);
+
+			$routes->setDefaultNamespace('App\Controllers');
+			$routes->setDefaultController('Home');
+			$routes->setDefaultMethod('index');
+
+			$routes->get('/', 'Home::index', ['as' => 'home']);
+			$routes->get('/', '\App\Controllers\Site\CDoc::index', ['hostname' => ['one.domain.com', 'two.domain.com', 'three.domain.com']]);
+
+            expect($router->handle('/'))->toBe('App\\Controllers\\Site\\CDocController');
+		});
+
+		it('Echec lorsqu\'aucun hote ne correspond a ceux specifiés par la route', function (): void {
+			$_SERVER['HTTP_HOST'] = 'dpc.domain.com';
+
+            $router = Services::router(routes: $routes = getCollector(), shared: false);
+
+			$routes->setDefaultNamespace('App\Controllers');
+			$routes->setDefaultController('Home');
+			$routes->setDefaultMethod('index');
+
+			$routes->get('/', 'Home::index', ['as' => 'home']);
+			$routes->get('/', '\App\Controllers\Site\CDoc::index', ['hostname' => ['one.domain.com', 'two.domain.com', 'three.domain.com']]);
+
+            expect($router->handle('/'))->toBe('App\\Controllers\\HomeController');
+		});
+	});
 
 	describe('Modules', function (): void {
 		it('Decouverte des routes de modules', function (): void {

@@ -1516,13 +1516,20 @@ class RouteCollection implements RouteCollectionInterface
     /**
      * Compare le nom d'hôte transmis avec le nom d'hôte actuel sur cette demande de page.
      *
-     * @param string $hostname Nom d'hôte dans les options d'itinéraire
+     * @param list<string>|string $hostname Nom d'hôte dans les options d'itinéraire
      */
-    private function checkHostname(string $hostname): bool
+    private function checkHostname(array|string $hostname): bool
     {
         // Les appels CLI ne peuvent pas être sur le nom d'hôte.
         if (! isset($this->httpHost)) {
             return false;
+        }
+
+        // hostname multiples
+        if (is_array($hostname)) {
+            $hostnameLower = array_map('strtolower', $hostname);
+
+            return in_array(strtolower($this->httpHost), $hostnameLower, true);
         }
 
         return strtolower($this->httpHost) === strtolower($hostname);
