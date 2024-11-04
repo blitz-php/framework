@@ -44,6 +44,21 @@ class Config
     private static array $registrars = [];
 
     /**
+     *  La découverte des modules est-elle terminée ?
+     */
+    protected static bool $didDiscovery = false;
+
+    /**
+     *  Le module discovery fonctionne-t-il ou non ?
+     */
+    protected static bool $discovering = false;
+
+    /**
+     * Le traitement du fichier Registrar pour le message d'erreur.
+     */
+    protected static string $registrarFile = '';
+
+    /**
      * Drapeau permettant de savoir si la config a deja ete initialiser
      */
     private static bool $initialized = false;
@@ -272,24 +287,38 @@ class Config
      */
     private function loadRegistrar()
     {
+        if (static::$didDiscovery) {
+            return;
+        }
+
+        // La decouverte doit etre complete pres la premiere initalisation de la classe.
+        if (static::$discovering) {
+            throw new ConfigException(
+                'Pendant la découverte automatique des Registrars,'
+                . ' "' . static::class . '" a été re-éxecuté.'
+                . ' "' . clean_path(static::$registrarFile) . '" doit avoir un mauvais code.'
+            );
+        }
+
+        static::$discovering = true;
+
         $autoloader = new Autoloader(['psr4' => [APP_NAMESPACE => APP_PATH]]);
         $locator    = new Locator($autoloader->initialize());
 
         $registrarsFiles = $locator->search('Config/Registrar.php');
 
         foreach ($registrarsFiles as $file) {
+            // Enregistre le fichier pour le message d'erreur.
+            static::$registrarFile = $file;
+
             if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
                 continue;
             }
 
             $class   = new ReflectionClass($classname);
-            $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
+            $methods = $class->getMethods(ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC);
 
             foreach ($methods as $method) {
-                if (! ($method->isPublic() && $method->isStatic())) {
-                    continue;
-                }
-
                 if (! is_array($result = $method->invoke(null))) {
                     continue;
                 }
@@ -298,6 +327,9 @@ class Config
                 self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
             }
         }
+
+        static::$didDiscovery = true;
+        static::$discovering  = false;
     }
 
     /**
