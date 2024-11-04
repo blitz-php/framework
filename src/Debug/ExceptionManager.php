@@ -55,6 +55,14 @@ class ExceptionManager
 
                 return Handler::QUIT;
             }
+            if (in_array('production', $files, true) && is_online()) {
+                $view = new View();
+                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path_locator' => $config['error_view_path']])
+                    ->display('production')
+                    ->render();
+
+                return Handler::QUIT;
+            }
 
             return Handler::DONE;
         });
