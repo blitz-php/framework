@@ -639,8 +639,16 @@ abstract class Command
      *
      * @return void
      */
-    private function initProps()
+    protected function initProps()
     {
+        if (! is_cli()) {
+            if (! file_exists($ou = TEMP_PATH . 'blitz-cli.txt')) {
+                file_put_contents($ou, '', LOCK_EX);
+            }
+
+            $this->app->io(new Interactor($ou, $ou));
+        }
+
         $this->io       = $this->app->io();
         $this->writer   = $this->io->writer();
         $this->reader   = $this->io->reader();
