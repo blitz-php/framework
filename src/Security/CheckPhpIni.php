@@ -43,7 +43,7 @@ class CheckPhpIni
 
     private static function outputForCli(array $output, array $thead, array $tbody): array
     {
-		$color = new Color;
+        $color = new Color();
 
         foreach ($output as $directive => $values) {
             $current        = $values['current'] ?? '';
@@ -66,6 +66,7 @@ class CheckPhpIni
         }
 
         $table = [];
+
         foreach ($tbody as $body) {
             $table[] = array_combine($thead, $body);
         }

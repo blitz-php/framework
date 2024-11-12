@@ -40,11 +40,11 @@ final class PhpIniCheck extends Command
      * {@inheritDoc}
      */
     public function execute(array $params)
-	{
+    {
         /** @var array $data */
-		$data = CheckPhpIni::run();
+        $data = CheckPhpIni::run();
 
-		$this->table($data);
+        $this->table($data);
 
         return EXIT_SUCCESS;
     }
