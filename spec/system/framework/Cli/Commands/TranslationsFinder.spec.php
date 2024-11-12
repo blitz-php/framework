@@ -238,13 +238,15 @@ describe('Commandes / TranslationsFinder', function (): void {
 		}
 	});
 
-	fit('Affichage des mauvaises traductions', function (): void {
+	it('Affichage des mauvaises traductions', function (): void {
 		$this->makeLocaleDirectory();
 
         command('translations:find --dir Translation --verbose');
 
 		$buffer = COH::buffer();
 		$lines  = explode("\n", $this->getActualTableWithBadKeys());
+		// hack pour les systemes linux (github actions)
+		$lines = array_map(fn($line) => str_replace(['Services\\', 'Translation\\'], ['Services' . DS, 'Translation' . DS], $line), $lines);
 
 		foreach ($lines as $line) {
 			expect($buffer)->toMatch(fn($actual) => str_contains($actual, $line));
