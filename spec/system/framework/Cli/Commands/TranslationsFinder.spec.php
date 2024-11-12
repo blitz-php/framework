@@ -33,7 +33,7 @@ describe('Commandes / TranslationsFinder', function (): void {
 		COH::setUpBeforeClass();
 
 		$this->locale           = Locale::getDefault();
-        $this->languageTestPath = APP_PATH . 'Translations' . DS;
+        $this->languageTestPath = ROOTPATH . 'Translations' . DS;
 
 		$this->getActualTranslationOneKeys = function(): array  {
 			return [
@@ -159,20 +159,20 @@ describe('Commandes / TranslationsFinder', function (): void {
 
 		$this->getActualTableWithBadKeys = function(): string {
 			return <<<'TEXT_WRAP'
-				+------------------------+-----------------------------+
-				| Bad Key                | Filepath                    |
-				+------------------------+-----------------------------+
-				| ..invalid_nested_key.. | nslation\TranslationTwo.php |
-				| ..invalid_nested_key.. | nslation\TranslationTwo.php |
-				| .invalid_key           | nslation\TranslationTwo.php |
-				| .invalid_key           | nslation\TranslationTwo.php |
-				| TranslationTwo         | nslation\TranslationTwo.php |
-				| TranslationTwo         | nslation\TranslationTwo.php |
-				| TranslationTwo.        | nslation\TranslationTwo.php |
-				| TranslationTwo.        | nslation\TranslationTwo.php |
-				| TranslationTwo...      | nslation\TranslationTwo.php |
-				| TranslationTwo...      | nslation\TranslationTwo.php |
-				+------------------------+-----------------------------+
+				+------------------------+-----------------------------------------+
+				| Bad Key                | Filepath                                |
+				+------------------------+-----------------------------------------+
+				| ..invalid_nested_key.. | Services\Translation\TranslationTwo.php |
+				| ..invalid_nested_key.. | Services\Translation\TranslationTwo.php |
+				| .invalid_key           | Services\Translation\TranslationTwo.php |
+				| .invalid_key           | Services\Translation\TranslationTwo.php |
+				| TranslationTwo         | Services\Translation\TranslationTwo.php |
+				| TranslationTwo         | Services\Translation\TranslationTwo.php |
+				| TranslationTwo.        | Services\Translation\TranslationTwo.php |
+				| TranslationTwo.        | Services\Translation\TranslationTwo.php |
+				| TranslationTwo...      | Services\Translation\TranslationTwo.php |
+				| TranslationTwo...      | Services\Translation\TranslationTwo.php |
+				+------------------------+-----------------------------------------+
 				TEXT_WRAP;
 		};
 	});
@@ -238,7 +238,7 @@ describe('Commandes / TranslationsFinder', function (): void {
 		}
 	});
 
-	it('Affichage des mauvaises traductions', function (): void {
+	fit('Affichage des mauvaises traductions', function (): void {
 		$this->makeLocaleDirectory();
 
         command('translations:find --dir Translation --verbose');

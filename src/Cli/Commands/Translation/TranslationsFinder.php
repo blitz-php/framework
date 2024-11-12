@@ -59,8 +59,8 @@ class TranslationsFinder extends Command
         $this->languagePath = $currentDir . 'Translations';
 
         if (ENVIRONMENT === 'testing') {
-            $currentDir         = SUPPORT_PATH . 'Services' . DS;
-            $this->languagePath = APP_PATH . 'Translations';
+            $currentDir         = ROOTPATH . 'Services' . DS;
+            $this->languagePath = ROOTPATH . 'Translations';
         }
 
         if (is_string($optionLocale)) {
