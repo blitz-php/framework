@@ -36,12 +36,17 @@ class Publish extends Command
     protected $description = 'Découvre et exécute toutes les classes Publisher prédéfinies.';
 
     /**
-     * The Command's arguments
-     *
-     * @var array<string, string>
+     * {@inheritDoc}
      */
     protected $arguments = [
-        '[directory:Publishers]' => "[Facultatif] Le répertoire à analyser dans chaque espace de noms. Par défaut\u{a0}: \"Publishers\".",
+        '[directory:Publishers]' => 'Le répertoire à analyser dans chaque namespace.',
+    ];
+
+    /**
+     * {@inheritDoc}
+     */
+    protected $options = [
+        '-n|--namespace' => 'Le namespace à partir duquel on devra chercher les fichiers à publier. Par défaut, tous les namespaces sont analysés.',
     ];
 
     /**
@@ -49,10 +54,15 @@ class Publish extends Command
      */
     public function execute(array $params)
     {
-        $directory = array_shift($params) ?? 'Publishers';
+        $directory = $this->argument('directory', $params['directory'] ?? 'Publishers');
+        $namespace = $this->option('namespace', $params['namespace'] ?? '');
 
-        if ([] === $publishers = Publisher::discover($directory)) {
-            $this->write(lang('Publisher.publishMissing', [$directory]));
+        if ([] === $publishers = Publisher::discover($directory, $namespace)) {
+            if ($namespace === '') {
+                $this->write(lang('Publisher.publishMissing', [$directory]));
+            } else {
+                $this->write(lang('Publisher.publishMissingNamespace', [$directory, $namespace]));
+            }
 
             return;
         }

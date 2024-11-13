@@ -90,17 +90,23 @@ class Publisher extends FileCollection
      *
      * @return list<self>
      */
-    final public static function discover(string $directory = 'Publishers'): array
+    final public static function discover(string $directory = 'Publishers', string $namespace = ''): array
     {
-        if (isset(self::$discovered[$directory])) {
-            return self::$discovered[$directory];
+        $key = implode('.', [$directory, $namespace]);
+
+        if (isset(self::$discovered[$key])) {
+            return self::$discovered[$key];
         }
 
-        self::$discovered[$directory] = [];
+        self::$discovered[$key] = [];
 
         $locator = Services::locator();
 
-        if ([] === $files = $locator->listFiles($directory)) {
+        $files = $namespace === ''
+            ? $locator->listFiles($directory)
+            : $locator->listNamespaceFiles($namespace, $directory);
+
+        if ([] === $files) {
             return [];
         }
 
@@ -109,13 +115,13 @@ class Publisher extends FileCollection
             $className = $locator->findQualifiedNameFromPath($file);
 
             if ($className !== false && class_exists($className) && is_a($className, self::class, true)) {
-                self::$discovered[$directory][] = Services::factory($className);
+                self::$discovered[$key][] = Services::factory($className);
             }
         }
 
-        sort(self::$discovered[$directory]);
+        sort(self::$discovered[$key]);
 
-        return self::$discovered[$directory];
+        return self::$discovered[$key];
     }
 
     /**
