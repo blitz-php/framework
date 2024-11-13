@@ -31,8 +31,21 @@ describe('Publisher / PublisherSupport', function (): void {
 		expect($result[0])->toBeAnInstanceOf(TestPublisher::class);
 	});
 
-	it('Decouverte dans un dossiers non existant', function (): void {
+	it('Decouverte dans un dossier non existant', function (): void {
 		$result = Publisher::discover('Nothing');
+
+		expect($result)->toBe([]);
+	});
+
+	it('Decouverte dans un namespace', function (): void {
+		$result = Publisher::discover('Publishers', 'Spec\BlitzPHP\App');
+
+		expect($result)->toHaveLength(1);
+		expect($result[0])->toBeAnInstanceOf(TestPublisher::class);
+	});
+
+	it('Decouverte dans un namespace inexistants', function (): void {
+		$result = Publisher::discover('Publishers', 'Nothing\App');
 
 		expect($result)->toBe([]);
 	});
