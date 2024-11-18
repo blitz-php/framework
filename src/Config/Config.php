@@ -316,9 +316,13 @@ class Config
             }
 
             $class   = new ReflectionClass($classname);
-            $methods = $class->getMethods(ReflectionMethod::IS_STATIC & ReflectionMethod::IS_PUBLIC);
+            $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
 
             foreach ($methods as $method) {
+                if (! ($method->isPublic() && $method->isStatic())) {
+                    continue;
+                }
+
                 if (! is_array($result = $method->invoke(null))) {
                     continue;
                 }
