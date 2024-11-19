@@ -230,4 +230,39 @@ describe('Views / Parser', function (): void {
         $this->parser->setData($data);
 		expect($this->parser->renderString($template))->toBe("Super Heroes\nTom Dick Henry ");
 	});
+
+	it("Parse un tableau ayant les memes cles dans un sous-tableau", function (): void {
+		$data = [
+            'type'   => 'Super Powers',
+            'powers' => [
+                [
+                    'type' => 'invisibility',
+                ],
+            ],
+        ];
+
+        $template = '{type} like {powers}{type}{/powers}';
+
+        $this->parser->setData($data);
+		expect($this->parser->renderString($template))->toBe('Super Powers like invisibility');
+	});
+
+	it("Parse un tableau ayant les memes cles dans un sous-tableau imbriqué", function (): void {
+		$data = [
+            'title'   => 'My title',
+            'similar' => [
+                ['items' => [
+                    [
+                        'title' => 'My similar title',
+                    ],
+                ],
+                ],
+            ],
+        ];
+
+        $template = '{title} with similar item {similar}{items}{title}{/items}{/similar}';
+
+        $this->parser->setData($data);
+		expect($this->parser->renderString($template))->toBe('My title with similar item My similar title');
+	});
 });
