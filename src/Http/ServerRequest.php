@@ -1827,11 +1827,10 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getLocale(): string
     {
-        $locale = $this->getAttribute('locale');
-        if (empty($locale)) {
+        if (empty($locale = $this->getAttribute('locale'))) {
             $locale = $this->getAttribute('lang');
         }
 
-        return $locale ?? Services::translator()->getLocale();
+        return $locale ?? config('app.language');
     }
 }
