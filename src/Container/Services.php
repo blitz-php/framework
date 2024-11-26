@@ -513,15 +513,15 @@ class Services
      */
     public static function translator(?string $locale = null, bool $shared = true): Translate
     {
-		if (null === $locale || $locale === '' || $locale === '0') {
-			$locale = static::request()->getLocale();
-		}
+        if (null === $locale || $locale === '' || $locale === '0') {
+            $locale = static::request()->getLocale();
+        }
 
-		if (true === $shared && isset(static::$instances[Translate::class])) {
+        if (true === $shared && isset(static::$instances[Translate::class])) {
             return static::$instances[Translate::class]->setLocale($locale);
         }
 
-		return static::$instances[Translate::class] = new Translate($locale, static::locator());
+        return static::$instances[Translate::class] = new Translate($locale, static::locator());
     }
 
     /**
