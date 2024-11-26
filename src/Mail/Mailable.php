@@ -142,6 +142,24 @@ abstract class Mailable
     }
 
     /**
+     * Définition des adresses de destination (to) au mail
+     *
+     * @return array<string, string>|list<string>
+     *
+     * @example
+     * ```php
+     *  [
+     *      'johndoe@mail.com' => 'john doe',
+     *      'janedoe@mail.com',
+     *  ]
+     * ```
+     */
+    public function to(): array
+    {
+        return [];
+    }
+
+    /**
      * Définition des données à transférer à la vue qui générera le mail
      */
     public function with(): array
@@ -226,6 +244,18 @@ abstract class Mailable
         }
 
         $mail->subject($this->subject());
+
+        foreach ($this->to() as $key => $value) {
+            if (empty($value) || ! is_string($value)) {
+                continue;
+            }
+
+            if (is_string($key)) {
+                $mail->to($key, $value);
+            } else {
+                $mail->to($value);
+            }
+        }
 
         return $mail->send();
     }
