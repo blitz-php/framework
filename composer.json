@@ -31,7 +31,7 @@
         "dimtrovich/validation": "^1.5",
         "guzzlehttp/psr7": "^2.5",
         "jawira/case-converter": "^3.5",
-        "kint-php/kint": "^5.0.1",
+        "kint-php/kint": "^5.0.1 || ^6.0",
         "mirazmac/php-requirements-checker": "^0.2.0",
         "monolog/monolog": "^3.0",
         "nette/schema": "^1.2",
