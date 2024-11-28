@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Cli\Commands\Translation;
 
+use Ahc\Cli\Output\Color;
 use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Utilities\Iterable\Arr;
 use Locale;
@@ -50,15 +51,15 @@ class TranslationsFinder extends Command
      */
     public function execute(array $params)
     {
-        $this->verbose      = array_key_exists('verbose', $params);
-        $this->showNew      = array_key_exists('show-new', $params);
+        $this->verbose      = $this->option('verbose', false);
+        $this->showNew      = $this->option('show-new', false);
         $optionLocale       = $params['locale'] ?? null;
         $optionDir          = $params['dir'] ?? null;
         $currentLocale      = Locale::getDefault();
         $currentDir         = APP_PATH;
         $this->languagePath = $currentDir . 'Translations';
 
-        if (ENVIRONMENT === 'testing') {
+        if (on_test()) {
             $currentDir         = ROOTPATH . 'Services' . DS;
             $this->languagePath = ROOTPATH . 'Translations';
         }
@@ -66,8 +67,8 @@ class TranslationsFinder extends Command
         if (is_string($optionLocale)) {
             if (! in_array($optionLocale, config('app.supported_locales'), true)) {
                 $this->error(
-                    'Erreur: "' . $optionLocale . '" n\'est pas supporté. Les langues supportées sont: '
-                    . implode(', ', config('app.supported_locales'))
+                    $this->color->error('"' . $optionLocale . '" n\'est pas supporté. Les langues supportées sont: '
+                    . implode(', ', config('app.supported_locales')))
                 );
 
                 return EXIT_USER_INPUT;
@@ -80,13 +81,13 @@ class TranslationsFinder extends Command
             $tempCurrentDir = realpath($currentDir . $optionDir);
 
             if ($tempCurrentDir === false) {
-                $this->error('Erreur: Le dossier doit se trouvé dans "' . $currentDir . '"');
+                $this->error($this->color->error('Le dossier doit se trouvé dans "' . $currentDir . '"'));
 
                 return EXIT_USER_INPUT;
             }
 
             if ($this->isSubDirectory($tempCurrentDir, $this->languagePath)) {
-                $this->error('Erreur: Le dossier "' . $this->languagePath . '" est restreint à l\'analyse.');
+                $this->error($this->color->error('Le dossier "' . $this->languagePath . '" est restreint à l\'analyse.'));
 
                 return EXIT_USER_INPUT;
             }
@@ -96,7 +97,7 @@ class TranslationsFinder extends Command
 
         $this->process($currentDir, $currentLocale);
 
-        $this->ok('Opérations terminées!');
+        $this->eol()->ok('Opérations terminées!');
 
         return EXIT_SUCCESS;
     }
@@ -128,6 +129,9 @@ class TranslationsFinder extends Command
             if (is_file($languageFilePath)) {
                 // Charge les anciennes traductions
                 $languageStoredKeys = require $languageFilePath;
+            } elseif (! is_dir($dir = dirname($languageFilePath))) {
+                // Si le dossier n'existe pas, on le cree
+                @mkdir($dir, 0777, true);
             }
 
             $languageDiff = Arr::diffRecursive($foundLanguageKeys[$langFileName], $languageStoredKeys);
@@ -140,9 +144,17 @@ class TranslationsFinder extends Command
 
                 if ($languageDiff !== []) {
                     if (file_put_contents($languageFilePath, $this->templateFile($newLanguageKeys)) === false) {
-                        $this->writeIsVerbose('Fichier de traduction ' . $langFileName . ' (error write).', 'red');
+                        if ($this->verbose) {
+                            $this->justify('Fichier de traduction "' . $langFileName . '"', 'Erreur lors de la modification', [
+                                'second' => ['fg' => Color::RED],
+                            ]);
+                        }
                     } else {
-                        $this->writeIsVerbose('Le fichier de traduction "' . $langFileName . '" a été modifié avec succès!', 'green');
+                        if ($this->verbose) {
+                            $this->justify('Fichier de traduction "' . $langFileName . '"', 'Modification éffectuée avec succès', [
+                                'second' => ['fg' => Color::GREEN],
+                            ]);
+                        }
                     }
                 }
             }
@@ -153,18 +165,18 @@ class TranslationsFinder extends Command
             $table = [];
 
             foreach ($tableRows as $body) {
-                $table[] = array_combine(['File', 'Key'], $body);
+                $table[] = array_combine(['Fichier', 'Clé'], $body);
             }
             $this->table($table);
         }
 
-        if (! $this->showNew && $countNewKeys > 0) {
-            $this->writer->bgRed('Note: Vous devez utiliser votre outil de linting pour résoudre les problèmes liés aux normes de codage.');
+        if ($this->verbose) {
+            $this->eol()->border(char: '*');
         }
 
-        $this->writeIsVerbose('Fichiers trouvés: ' . $countFiles);
-        $this->writeIsVerbose('Nouvelles traductions trouvées: ' . $countNewKeys);
-        $this->writeIsVerbose('Mauvaises traductions trouvées: ' . count($badLanguageKeys));
+        $this->justify('Fichiers analysés', $countFiles, ['second' => ['fg' => Color::GREEN]]);
+        $this->justify('Nouvelles traductions trouvées', $countNewKeys, ['second' => ['fg' => Color::GREEN]]);
+        $this->justify('Mauvaises traductions trouvées', count($badLanguageKeys), ['second' => ['fg' => Color::RED]]);
 
         if ($this->verbose && $badLanguageKeys !== []) {
             $tableBadRows = [];
@@ -178,10 +190,14 @@ class TranslationsFinder extends Command
             $table = [];
 
             foreach ($tableBadRows as $body) {
-                $table[] = array_combine(['Bad Key', 'Filepath'], $body);
+                $table[] = array_combine(['Mauvaise clé', 'Fichier'], $body);
             }
 
             $this->table($table);
+        }
+
+        if (! $this->showNew && $countNewKeys > 0) {
+            $this->eol()->writer->bgRed('Note: Vous devez utiliser votre outil de linting pour résoudre les problèmes liés aux normes de codage.', true);
         }
     }
 
@@ -200,7 +216,14 @@ class TranslationsFinder extends Command
         }
 
         $fileContent = file_get_contents($file->getRealPath());
-        preg_match_all('/lang\(\'([._a-z0-9\-]+)\'\)/ui', $fileContent, $matches);
+
+        preg_match_all('/\_\_\(\'([_a-z0-9À-ÿ\-]+)\'\)/ui', $fileContent, $matches);
+
+        if ($matches[1] !== []) {
+            $fileContent = str_replace($matches[0], array_map(static fn ($val) => "lang('App.{$val}')", $matches[1]), $fileContent);
+        }
+
+        preg_match_all('/lang\(\'([._a-z0-9À-ÿ\-]+)\'\)/ui', $fileContent, $matches);
 
         if ($matches[1] === []) {
             return compact('foundLanguageKeys', 'badLanguageKeys');
@@ -351,16 +374,6 @@ class TranslationsFinder extends Command
         return $rows;
     }
 
-    /**
-     * Affiche les détails dans la console si l'indicateur est défini
-     */
-    private function writeIsVerbose(string $text = '', ?string $foreground = null, ?string $background = null): void
-    {
-        if ($this->verbose) {
-            $this->write($this->color->line($text, ['fg' => $foreground, 'bg' => $background]));
-        }
-    }
-
     private function isSubDirectory(string $directory, string $rootDirectory): bool
     {
         return 0 === strncmp($directory, $rootDirectory, strlen($directory));
@@ -383,7 +396,11 @@ class TranslationsFinder extends Command
                 continue;
             }
 
-            $this->writeIsVerbose('Ficher trouvé: ' . mb_substr($file->getRealPath(), mb_strlen(APP_PATH)));
+            if ($this->verbose) {
+                $this->justify(mb_substr($file->getRealPath(), mb_strlen(APP_PATH)), 'Analysé', [
+                    'second' => ['fg' => Color::YELLOW],
+                ]);
+            }
             $countFiles++;
 
             $findInFile = $this->findTranslationsInFile($file);

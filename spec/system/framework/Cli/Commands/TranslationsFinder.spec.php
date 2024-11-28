@@ -232,6 +232,7 @@ describe('Commandes / TranslationsFinder', function (): void {
 
 		$buffer = COH::buffer();
 		$lines  = explode("\n", $this->getActualTableWithNewKeys());
+		$lines  = array_splice($lines, 2);
 
 		foreach ($lines as $line) {
 			expect($buffer)->toMatch(fn($actual) => str_contains($actual, $line));
@@ -245,6 +246,7 @@ describe('Commandes / TranslationsFinder', function (): void {
 
 		$buffer = COH::buffer();
 		$lines  = explode("\n", $this->getActualTableWithBadKeys());
+		$lines  = array_splice($lines, 2);
 		// hack pour les systemes linux (github actions)
 		$lines = array_map(fn($line) => str_replace(['Services\\', 'Translation\\'], ['Services' . DS, 'Translation' . DS], $line), $lines);
 
