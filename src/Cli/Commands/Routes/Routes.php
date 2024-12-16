@@ -62,8 +62,8 @@ class Routes extends Command
         $sortByHandler = $this->option('h', false);
         $host          = $this->option('host');
 
-		if ($host) {
-            putenv('HTTP_HOST='  . $host);
+        if ($host) {
+            putenv('HTTP_HOST=' . $host);
         }
 
         $collection = Services::routes()->loadRoutes();
