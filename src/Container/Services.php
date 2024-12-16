@@ -281,13 +281,13 @@ class Services
     public static function locator(bool $shared = true): LocatorInterface
     {
         if ($shared) {
-			if (!isset(static::$instances[Locator::class])) {
-				$locator = new Locator(static::autoloader());
-				if (true === config('optimize.locator_cache_enabled', false)) {
-					static::$instances[Locator::class] = new LocatorCached($locator, new FileVarExportHandler());
-				} else {
-					static::$instances[Locator::class] = $locator;
-				}
+            if (! isset(static::$instances[Locator::class])) {
+                $locator = new Locator(static::autoloader());
+                if (true === config('optimize.locator_cache_enabled', false)) {
+                    static::$instances[Locator::class] = new LocatorCached($locator, new FileVarExportHandler());
+                } else {
+                    static::$instances[Locator::class] = $locator;
+                }
             }
 
             return static::$instances[Locator::class];

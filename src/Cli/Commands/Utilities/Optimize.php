@@ -58,13 +58,13 @@ final class Optimize extends Command
         return EXIT_SUCCESS;
     }
 
-	private function clearCache(): void
+    private function clearCache(): void
     {
-		$locator = new LocatorCached(new Locator(service('autoloader')), new FileVarExportHandler());
+        $locator = new LocatorCached(new Locator(service('autoloader')), new FileVarExportHandler());
 
         $locator->deleteCache();
 
-		$this->ok('Suppression de FileLocatorCache.')->eol();
+        $this->ok('Suppression de FileLocatorCache.')->eol();
 
         $this->removeFile(FRAMEWORK_STORAGE_PATH . 'cache/FactoriesCache_config');
     }
