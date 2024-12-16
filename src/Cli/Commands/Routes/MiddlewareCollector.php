@@ -35,7 +35,7 @@ final class MiddlewareCollector
      */
     public function get(string $method, string $uri): array
     {
-        if ($method === 'cli') {
+        if ($method === 'CLI') {
             return [];
         }
 

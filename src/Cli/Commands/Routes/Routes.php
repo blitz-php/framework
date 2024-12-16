@@ -14,6 +14,7 @@ namespace BlitzPHP\Cli\Commands\Routes;
 use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Router\DefinedRouteCollector;
+use BlitzPHP\Router\Router;
 use BlitzPHP\Utilities\Helpers;
 
 /**
@@ -59,21 +60,14 @@ class Routes extends Command
     public function execute(array $params)
     {
         $sortByHandler = $this->option('h', false);
-        $this->option('host');
+        $host          = $this->option('host');
+
+        if ($host) {
+            putenv('HTTP_HOST=' . $host);
+        }
 
         $collection = Services::routes()->loadRoutes();
-        $methods    = [
-            'get',
-            'head',
-            'post',
-            'patch',
-            'put',
-            'delete',
-            'options',
-            'trace',
-            'connect',
-            'cli',
-        ];
+        $methods    = Router::HTTP_METHODS;
 
         $tbody                 = [];
         $uriGenerator          = new SampleURIGenerator($collection);
@@ -106,7 +100,7 @@ class Routes extends Command
 
             $autoRoutes = $autoRouteCollector->get();
 
-            // Check for Module Routes.
+            // Verification des routes de modules
             if ([] !== $routingConfig = config('routing')) {
                 foreach ($routingConfig['module_routes'] as $uri => $namespace) {
                     $autoRouteCollector = new AutoRouteCollector(
@@ -134,12 +128,16 @@ class Routes extends Command
 
         foreach ($tbody as $route) {
             $table[] = [
-                'Methode'                                          => $route[0],
+                'Méthode'                                          => $route[0],
                 'Route'                                            => $route[1],
                 'Nom'                                              => $route[2],
                 $sortByHandler ? 'Gestionnaire ↓' : 'Gestionnaire' => $route[3],
                 'Middlewares'                                      => $route[4],
             ];
+        }
+
+        if ($host) {
+            $this->write('Hôte: ' . $host);
         }
 
         $this->table($table);

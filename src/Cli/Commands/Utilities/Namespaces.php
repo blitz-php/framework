@@ -117,13 +117,13 @@ class Namespaces extends Command
         $tbody = [];
 
         foreach ($config->psr4 as $ns => $paths) {
-            if (null !== $this->option('r')) {
-                $pathOutput = $this->truncate($paths, $maxLength);
-            } else {
-                $pathOutput = $this->truncate(clean_path($paths), $maxLength);
-            }
-
             foreach ((array) $paths as $path) {
+                if (null !== $this->option('r')) {
+                    $pathOutput = $this->truncate($path, $maxLength);
+                } else {
+                    $pathOutput = $this->truncate(clean_path($path), $maxLength);
+                }
+
                 $path = realpath($path) ?: $path;
 
                 $tbody[] = [

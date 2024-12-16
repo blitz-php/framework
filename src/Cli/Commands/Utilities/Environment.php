@@ -66,6 +66,8 @@ final class Environment extends Command
             return;
         }
 
+        $env = strtolower($env);
+
         if ($env === 'testing') {
             $this->fail('L\'environnement « test » est réservé aux tests PHPUnit ou Kahlan.');
             $this->fail('Vous ne pourrez pas exécuter klinge sous un environnement « test ».');
