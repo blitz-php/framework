@@ -348,8 +348,6 @@ class Console extends Application
     {
         $this->onException(static function (Throwable $e, int $exitCode) use ($logger): void {
             $logger->error((string) $e, ['exitCode' => $exitCode, 'klinge' => true]);
-
-            throw new CLIException($e->getMessage(), $exitCode, $e);
         });
     }
 

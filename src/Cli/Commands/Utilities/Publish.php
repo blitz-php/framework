@@ -39,7 +39,7 @@ class Publish extends Command
      * {@inheritDoc}
      */
     protected $arguments = [
-        '[directory:Publishers]' => 'Le répertoire à analyser dans chaque namespace.',
+        'directory' => '[Optionel] Le répertoire à analyser dans chaque namespace.',
     ];
 
     /**

@@ -51,9 +51,9 @@ class Serve extends Command
      * @var array Options
      */
     protected $options = [
-        '--php'  => ['The PHP Binary [default: "PHP_BINARY"]', PHP_BINARY],
-        '--host' => ['The HTTP Host [default: "localhost"]', 'localhost'],
-        '--port' => ['The HTTP Host Port [default: "3300"]', 3300],
+        '--php'  => ['Le binaire PHP [défaut: "PHP_BINARY"]', PHP_BINARY],
+        '--host' => ['L\'hôte HTTP [défaut: "localhost"]', 'localhost'],
+        '--port' => ['Le port de l\'hôte HTTP [défaut: "3300"]', 3300],
     ];
 
     /**

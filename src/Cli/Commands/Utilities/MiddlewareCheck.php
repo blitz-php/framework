@@ -57,8 +57,8 @@ class MiddlewareCheck extends Command
 
         if (empty($route) || $method === '') {
             $this->fail('Vous devez spécifier un verbe HTTP et une route.')->eol();
-            $this->write('Exemple: middleware:check get /')->eol();
-            $this->write('         middleware:check put products/1');
+            $this->write('Exemple: middleware:check GET /')->eol();
+            $this->write('         middleware:check PUT products/1');
 
             return EXIT_ERROR;
         }
@@ -80,7 +80,7 @@ class MiddlewareCheck extends Command
 
         $this->table([
             [
-                'Methode'     => strtoupper($method),
+                'Méthode'     => strtoupper($method),
                 'Route'       => $route,
                 'Middlewares' => implode(' ', $middlewares),
             ],
