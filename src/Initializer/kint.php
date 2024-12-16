@@ -31,7 +31,6 @@ if (! empty($config->plugins)) {
 
 RichRenderer::$theme  = $config->rich_theme;
 RichRenderer::$folder = $config->rich_folder;
-RichRenderer::$sort   = $config->rich_sort;
 
 if (! empty($config->rich_value_plugins)) {
     RichRenderer::$value_plugins = $config->rich_value_plugins;

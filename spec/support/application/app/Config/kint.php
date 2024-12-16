@@ -1,6 +1,5 @@
 <?php
 
-use Kint\Renderer\AbstractRenderer;
 /**
  * This file is part of Blitz PHP framework.
  *
@@ -16,7 +15,6 @@ return [
     'expanded'               => false,
     'rich_theme'             => 'original.css',
     'rich_folder'            => false,
-    'rich_sort'              => AbstractRenderer::SORT_FULL,
     'rich_value_plugins'     => [],
     'rich_tab_plugins'       => [],
     'cli_colors'             => true,
