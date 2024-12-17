@@ -18,11 +18,11 @@ use Psr\Http\Message\ResponseInterface;
  */
 class ResourceController extends RestController
 {
-	protected string $returnFormat = '';
+    protected string $returnFormat = '';
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
     public function __construct()
     {
         parent::__construct();
