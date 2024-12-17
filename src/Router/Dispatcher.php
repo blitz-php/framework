@@ -754,6 +754,7 @@ class Dispatcher
                 || $this->request->isJson()
                 || $this->request->is('ajax')
                 || $this->request->hasHeader('Hx-Request')
-                || Text::contains($this->response->getType(), ['/json', '+json']);
+                || Text::contains($this->response->getType(), ['/json', '+json'])
+                || Text::contains($this->response->getType(), ['/xml', '+xml']);
     }
 }
