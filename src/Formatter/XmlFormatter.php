@@ -23,7 +23,7 @@ class XmlFormatter implements FormatterInterface
     {
         // SimpleXML est installé par défaut, mais il est préférable de vérifier, puis de fournir une solution de repli.
         if (! extension_loaded('simplexml')) {
-            throw FormatException::missingExtension(); // @codeCoverageIgnore
+            throw FormatException::missingExtension();
         }
 
         helper('inflector');
@@ -37,7 +37,7 @@ class XmlFormatter implements FormatterInterface
      */
     public function format($data)
     {
-        $basenode  = 'response';
+        $basenode  = 'xml';
         $structure = simplexml_load_string("<?xml version='1.0' encoding='utf-8'?><{$basenode} />");
 
         $this->arrayToXml((array) $data, $structure, $basenode);
@@ -52,7 +52,7 @@ class XmlFormatter implements FormatterInterface
      */
     public function parse(string $data): array
     {
-        $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $xml = @simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
 
         if ($xml === false) {
             return [];
