@@ -18,6 +18,17 @@ use Psr\Http\Message\ResponseInterface;
  */
 class ResourceController extends RestController
 {
+	protected string $returnFormat = '';
+
+	/**
+	 * {@inheritDoc}
+	 */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setFormat($this->returnFormat);
+    }
+
     /**
      * Renvoie un tableau d'objets ressources, eux-mêmes au format tableau
      *
