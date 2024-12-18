@@ -90,26 +90,26 @@ class CsvFormatter implements FormatterInterface
      */
     public function parse(string $data): array
     {
-		$array = [];
-		$lines = explode("\n", trim($data));
+        $array = [];
+        $lines = explode("\n", trim($data));
 
-		foreach ($lines as $line) {
-			$array[] = str_getcsv($line, $this->delimiter, $this->enclosure);
-		}
+        foreach ($lines as $line) {
+            $array[] = str_getcsv($line, $this->delimiter, $this->enclosure);
+        }
 
-		$head   = array_shift($array);
+        $head = array_shift($array);
 
-		if ($array === []) {
-			return $head;
-		}
+        if ($array === []) {
+            return $head;
+        }
 
-		$result = [];
+        $result = [];
 
-		foreach ($array as $values) {
-			$result[] = array_combine($head, $values);
-		}
+        foreach ($array as $values) {
+            $result[] = array_combine($head, $values);
+        }
 
-		return $result;
+        return $result;
     }
 
     /**
