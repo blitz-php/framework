@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Validation;
 
-use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Validation\Rules\AbstractRule;
 use Dimtrovich\Validation\Validation as BaseValidation;
 
@@ -58,7 +58,7 @@ class Validation extends BaseValidation
      *
      * @return list<string> Chemins absolus des fichiers
      */
-    protected function files(Locator $locator): array
+    protected function files(LocatorInterface $locator): array
     {
         $files = array_merge(
             $locator->listFiles('Rules/'), // Regles de l'application ou des fournisseurs
