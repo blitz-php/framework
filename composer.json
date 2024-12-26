@@ -42,7 +42,7 @@
         "blitz-php/coding-standard": "^1.5",
         "blitz-php/http-client": "^0.0.2",
         "filp/whoops": "^2.15",
-        "kahlan/kahlan": "^5.2",
+        "kahlan/kahlan": "^5.2 || ^6.0",
         "mikey179/vfsstream": "^1.6",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^1.11",
