@@ -9,8 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
-
 if (! function_exists('directory_map')) {
     /**
      * Créer une carte de répertoire

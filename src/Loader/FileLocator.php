@@ -35,7 +35,7 @@ class FileLocator
     {
         static $loaded = [];
 
-		/** @var LocatorInterface */
+        /** @var LocatorInterface */
         $loader = service('locator');
 
         if (! is_array($filenames)) {

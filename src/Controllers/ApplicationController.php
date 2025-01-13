@@ -63,7 +63,7 @@ class ApplicationController extends BaseController
             }
         }
 
-		/** @var \BlitzPHP\View\View */
+        /** @var View */
         $viewer = service('viewer');
 
         $viewer->setData($data)->options($options);

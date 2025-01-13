@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Router;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Enums\Method;

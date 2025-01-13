@@ -99,7 +99,7 @@ class Publisher extends FileCollection
 
         self::$discovered[$key] = [];
 
-		/** @var \BlitzPHP\Contracts\Autoloader\LocatorInterface */
+        /** @var \BlitzPHP\Contracts\Autoloader\LocatorInterface */
         $locator = service('locator');
 
         $files = $namespace === ''

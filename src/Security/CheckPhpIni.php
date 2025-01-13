@@ -112,7 +112,7 @@ class CheckPhpIni
 
         return '<pre>' . $table->generate($tbody) . '</pre>'; */
 
-		return '';
+        return '';
     }
 
     /**

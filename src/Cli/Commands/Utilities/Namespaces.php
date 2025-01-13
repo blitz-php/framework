@@ -13,7 +13,6 @@ namespace BlitzPHP\Cli\Commands\Utilities;
 
 use Ahc\Cli\Output\Color;
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Container\Services;
 
 /**
  * Répertorie les namespace dans Config\autoload.php avec le chemin d'accès du serveur complet.

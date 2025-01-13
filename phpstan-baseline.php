@@ -32,6 +32,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Cli/Console/Command.php',
 ];
 $ignoreErrors[] = [
+	// identifier: arguments.count
+	'message' => '#^Method Ahc\\\\Cli\\\\IO\\\\Interactor\\:\\:choice\\(\\) invoked with 4 parameters, 1\\-2 required\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Cli/Console/Command.php',
+];
+$ignoreErrors[] = [
 	// identifier: property.notFound
 	'message' => '#^Access to an undefined property Ahc\\\\Cli\\\\Output\\\\Writer\\:\\:\\$bold\\.$#',
 	'count' => 1,
@@ -98,50 +104,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Facades/Route.php',
 ];
 $ignoreErrors[] = [
-	// identifier: return.unusedType
-	'message' => '#^Function img\\(\\) never returns void so it can be removed from the return type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Helpers/assets.php',
-];
-$ignoreErrors[] = [
-	// identifier: return.unusedType
-	'message' => '#^Function less_styles\\(\\) never returns void so it can be removed from the return type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Helpers/assets.php',
-];
-$ignoreErrors[] = [
-	// identifier: return.unusedType
-	'message' => '#^Function lib_scripts\\(\\) never returns void so it can be removed from the return type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Helpers/assets.php',
-];
-$ignoreErrors[] = [
-	// identifier: return.unusedType
-	'message' => '#^Function lib_styles\\(\\) never returns void so it can be removed from the return type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Helpers/assets.php',
-];
-$ignoreErrors[] = [
-	// identifier: return.unusedType
-	'message' => '#^Function scripts\\(\\) never returns void so it can be removed from the return type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Helpers/assets.php',
-];
-$ignoreErrors[] = [
-	// identifier: return.unusedType
-	'message' => '#^Function styles\\(\\) never returns void so it can be removed from the return type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Helpers/assets.php',
-];
-$ignoreErrors[] = [
 	// identifier: booleanNot.alwaysFalse
 	'message' => '#^Negated boolean expression is always false\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Helpers/assets.php',
 ];
 $ignoreErrors[] = [
-	// identifier: return.unusedType
-	'message' => '#^Function logger\\(\\) never returns void so it can be removed from the return type\\.$#',
+	// identifier: method.nonObject
+	'message' => '#^Cannot call method regenerate\\(\\) on array\\|bool\\|float\\|int\\|object\\|string\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Helpers/common.php',
+];
+$ignoreErrors[] = [
+	// identifier: method.nonObject
+	'message' => '#^Cannot call method token\\(\\) on array\\|bool\\|float\\|int\\|object\\|string\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Helpers/common.php',
 ];
@@ -704,6 +680,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Middlewares/BaseMiddleware.php',
 ];
 $ignoreErrors[] = [
+	// identifier: method.nonObject
+	'message' => '#^Cannot call method setPreviousUrl\\(\\) on array\\|bool\\|float\\|int\\|object\\|string\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Router/Dispatcher.php',
+];
+$ignoreErrors[] = [
 	// identifier: assign.propertyType
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$request \\(BlitzPHP\\\\Http\\\\Request\\) does not accept Psr\\\\Http\\\\Message\\\\ServerRequestInterface\\.$#',
 	'count' => 1,
@@ -712,7 +694,7 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	// identifier: assign.propertyType
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$response \\(BlitzPHP\\\\Http\\\\Response\\) does not accept Psr\\\\Http\\\\Message\\\\ResponseInterface\\.$#',
-	'count' => 4,
+	'count' => 3,
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
 ];
 $ignoreErrors[] = [

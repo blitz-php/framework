@@ -12,7 +12,6 @@
 namespace BlitzPHP\Cli\Commands\Routes;
 
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Router\DefinedRouteCollector;
 use BlitzPHP\Router\Router;
 use BlitzPHP\Utilities\Helpers;

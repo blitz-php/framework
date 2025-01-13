@@ -204,7 +204,7 @@ if (! function_exists('config')) {
      */
     function config(array|string|null $key = null, $default = null)
     {
-		/** @var Config */
+        /** @var Config */
         $config = service('config');
 
         if (null === $key) {
@@ -245,7 +245,7 @@ if (! function_exists('logger')) {
      */
     function logger($level = null, ?string $message = null, array $context = [])
     {
-		/** @var Logger */
+        /** @var Logger */
         $logger = service('logger');
 
         if (empty($level) || $message === null) {
@@ -268,11 +268,11 @@ if (! function_exists('cache')) {
      *
      * @param mixed|null $value
      *
-     * @return Cache|bool|mixed
+     * @return bool|Cache|mixed
      */
     function cache(?string $key = null, $value = null)
     {
-		/** @var Cache */
+        /** @var Cache */
         $cache = service('cache');
 
         if ($key === null) {
@@ -301,7 +301,7 @@ if (! function_exists('cookie')) {
      */
     function cookie(?string $name = null, array|string|null $value = null, int $minutes = 0, array $options = [])
     {
-		/** @var CookieManagerInterface */
+        /** @var CookieManagerInterface */
         $cookie = service('cookie');
 
         if (null === $name) {
@@ -328,7 +328,7 @@ if (! function_exists('session')) {
      */
     function session(?string $val = null)
     {
-		/** @var Store */
+        /** @var Store */
         $session = service('session');
 
         // Vous retournez un seul element ?
