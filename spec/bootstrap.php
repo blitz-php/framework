@@ -9,8 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
-
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -60,4 +58,4 @@ $bootstrap = require_once SYST_PATH . 'Initializer' . DS . 'bootstrap.php';
  */
 $bootstrap(['app' => APP_PATH, 'storage' => STORAGE_PATH], __FILE__, true);
 
-Services::routes()->loadRoutes();
+service('routes')->loadRoutes();

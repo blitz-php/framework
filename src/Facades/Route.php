@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Router\RouteBuilder;
 use Closure;
 
@@ -66,6 +65,6 @@ final class Route extends Facade
 {
     protected static function accessor(): object
     {
-        return new RouteBuilder(Services::routes());
+        return new RouteBuilder(service('routes'));
     }
 }

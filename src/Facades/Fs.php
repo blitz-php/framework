@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Utilities\Iterable\LazyCollection;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -66,6 +65,6 @@ final class Fs extends Facade
 {
     protected static function accessor(): object
     {
-        return Services::fs();
+        return service('fs');
     }
 }

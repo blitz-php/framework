@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
-
 /**
  * @method static void action(string|Stringable $message, array $context = [])                 Des mesures doivent être prises immédiatement.
  * @method static void critical(string|Stringable $message, array $context = [])               Conditions critiques.
@@ -30,6 +28,6 @@ final class Log extends Facade
 {
     protected static function accessor(): object
     {
-        return Services::logger();
+        return service('logger');
     }
 }

@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Debug;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\View\View;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
@@ -37,11 +36,11 @@ class ExceptionManager
     {
         return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config): int {
             if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
-                Services::logger()->error($exception);
+                service('logger')->error($exception);
             }
 
             if (is_dir($config['error_view_path'])) {
-                $files = array_map(static fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), Services::fs()->files($config['error_view_path']));
+                $files = array_map(static fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), service('fs')->files($config['error_view_path']));
             } else {
                 $files = [];
             }
@@ -77,7 +76,7 @@ class ExceptionManager
             if (is_callable($handler)) {
                 $debugger->pushHandler($handler);
             } elseif (is_string($handler) && class_exists($handler)) {
-                $class = Services::container()->make($handler);
+                $class = service('container')->make($handler);
                 if (is_callable($class) || $class instanceof HandlerInterface) {
                     $debugger->pushHandler($class);
                 }
@@ -97,7 +96,7 @@ class ExceptionManager
         }
 
         if (! is_online()) {
-            if (Misc::isAjaxRequest() || Services::request()->isJson()) {
+            if (Misc::isAjaxRequest() || service('request')->isJson()) {
                 $debugger->pushHandler(new JsonResponseHandler());
             } else {
                 $handler = new PrettyPageHandler();

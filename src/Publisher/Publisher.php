@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Publisher;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\PublisherException;
 use BlitzPHP\Filesystem\Files\FileCollection;
 use BlitzPHP\Http\Uri;
@@ -100,7 +99,8 @@ class Publisher extends FileCollection
 
         self::$discovered[$key] = [];
 
-        $locator = Services::locator();
+		/** @var \BlitzPHP\Contracts\Autoloader\LocatorInterface */
+        $locator = service('locator');
 
         $files = $namespace === ''
             ? $locator->listFiles($directory)
@@ -115,7 +115,7 @@ class Publisher extends FileCollection
             $className = $locator->findQualifiedNameFromPath($file);
 
             if ($className !== false && class_exists($className) && is_a($className, self::class, true)) {
-                self::$discovered[$key][] = Services::factory($className);
+                self::$discovered[$key][] = service('factory', $className);
             }
         }
 

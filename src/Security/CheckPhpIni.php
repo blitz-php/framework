@@ -102,7 +102,7 @@ class CheckPhpIni
             ];
         }
 
-        $table    = new Table();
+        /* $table    = new Table();
         $template = [
             'table_open' => '<table border="1" cellpadding="4" cellspacing="0">',
         ];
@@ -110,7 +110,9 @@ class CheckPhpIni
 
         $table->setHeading($thead);
 
-        return '<pre>' . $table->generate($tbody) . '</pre>';
+        return '<pre>' . $table->generate($tbody) . '</pre>'; */
+
+		return '';
     }
 
     /**

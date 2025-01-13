@@ -9,10 +9,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Security\EncrypterInterface;
 use BlitzPHP\Exceptions\EncryptionException;
 use BlitzPHP\Security\Encryption\Encryption;
+
+use function Kahlan\expect;
 
 describe('Security / Encryption', function (): void {
     beforeEach(function (): void {
@@ -71,7 +72,7 @@ describe('Security / Encryption', function (): void {
             $config['driver'] = 'OpenSSL';
             $config['key']    = 'anything';
 
-            $encrypter = Services::encrypter($config);
+            $encrypter = service('encrypter', $config);
 
             expect($encrypter)->toBeAnInstanceOf(EncrypterInterface::class);
         });
@@ -83,13 +84,13 @@ describe('Security / Encryption', function (): void {
             $config['key']    = 'anything';
 
             expect(static function () use ($config): void {
-                Services::encrypter($config);
+                service('encrypter', $config);
             })->toThrow(new EncryptionException());
         });
 
         it(": Le service encrypter leve une exception s'il n'y a pas de cle", static function (): void {
             expect(static function (): void {
-                Services::encrypter();
+                service('encrypter');
             })->toThrow(new EncryptionException());
         });
 
@@ -98,10 +99,10 @@ describe('Security / Encryption', function (): void {
             $config['driver'] = 'OpenSSL';
             $config['key']    = 'anything';
 
-            $encrypter = Services::encrypter($config, true);
+            $encrypter = single_service('encrypter', $config);
 
             $config['key'] = 'Abracadabra';
-            $encrypter     = Services::encrypter($config, true);
+            $encrypter     = single_service('encrypter', $config);
 
             expect($encrypter->key)->toBe('anything');
         });
@@ -128,7 +129,7 @@ describe('Security / Encryption', function (): void {
             $config['rawData']        = false;
             $config['encryptKeyInfo'] = 'encryption';
             $config['authKeyInfo']    = 'authentication';
-            $encrypter                = Services::encrypter($config, false);
+            $encrypter                = single_service('encrypter', $config);
 
             $encrypted = '211c55b9d1948187557bff88c1e77e0f6b965e3711d477d97fb0b60907a7336028714dbb8dfe90598039e9bc7147b54e552d739b378cd864fb91dde9ad6d4ffalIvVxFDDLTPBYGaHLNDzUSJExBKbQJ0NW27KDaR83bYqz8MDz/mXXpE+HHdaWjEE';
             $decrypted = $encrypter->decrypt($encrypted);
@@ -145,7 +146,7 @@ describe('Security / Encryption', function (): void {
             $config['rawData']        = false;
             $config['encryptKeyInfo'] = 'encryption';
             $config['authKeyInfo']    = 'authentication';
-            $encrypter                = Services::encrypter($config, false);
+            $encrypter                = single_service('encrypter', $config);
 
             $encrypted = 'f5eeb3f056b2dc5e8119b4a5f5ba793d724b9ca2d1ca23ab89bc72e51863f8da233a83ccb48d5daf3d6905d61f357877aaad32c8bc7a7c5e48f3268d2ba362b9UTw2A7U4CB9vb+6izrDzJHAdz1hAutIt2Ex2C2FqamJAXc8Z8RQor9UvaWy2';
             $decrypted = $encrypter->decrypt($encrypted);
@@ -158,7 +159,7 @@ describe('Security / Encryption', function (): void {
             $config           = config('encryption');
             $config['driver'] = 'OpenSSL';
             $config['key']    = hex2bin('64c70b0b8d45b80b9eba60b8b3c8a34d0193223d20fea46f8644b848bf7ce67f');
-            $encrypter        = Services::encrypter($config, false);
+            $encrypter        = single_service('encrypter', $config);
 
             $encrypted = base64_decode('UB9PC3QfQIoLY5+/GU8BUQnfhEcCml6i4Sve6k0f8r6Id6IzlbkvMhfWf5E2lBH5+OTWuv5MUoTBQWv9Pd46ua07QsqS6/vHaW3rCg6cpLM/8d2IZE/VO+uXeaU6XHO5mJ8ehGKg96JITvKjxA==', true);
             $decrypted = $encrypter->decrypt($encrypted);

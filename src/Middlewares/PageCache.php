@@ -12,7 +12,6 @@
 namespace BlitzPHP\Middlewares;
 
 use BlitzPHP\Cache\ResponseCache;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Http\Redirection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,7 +29,7 @@ class PageCache implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (null !== $cachedResponse = $this->pageCache->get($request, Services::response())) {
+        if (null !== $cachedResponse = $this->pageCache->get($request, service('response'))) {
             return $cachedResponse;
         }
 

@@ -145,7 +145,7 @@ class Dispatcher
         $this->startTime = microtime(true);
         $this->config    = (object) config('app');
 
-        $this->pageCache = Services::responsecache();
+        $this->pageCache = service('responsecache');
     }
 
     /**
@@ -155,7 +155,7 @@ class Dispatcher
     {
         $method = Services::singleton(self::class)->method;
         if (empty($method)) {
-            $method = Services::routes()->getDefaultMethod();
+            $method = service('routes')->getDefaultMethod();
         }
 
         return $method;
@@ -168,7 +168,7 @@ class Dispatcher
      */
     public static function getController(bool $fullName = true)
     {
-        $routes = Services::routes();
+        $routes = service('routes');
 
         $controller = Services::singleton(self::class)->controller;
         if (empty($controller)) {
@@ -272,7 +272,7 @@ class Dispatcher
             $this->startTime = microtime(true);
         }
 
-        $this->timer = Services::timer();
+        $this->timer = service('timer');
         $this->timer->start('total_execution', $this->startTime);
         $this->timer->start('bootstrap');
     }
@@ -312,7 +312,7 @@ class Dispatcher
         // Assurez-vous que la version est au bon format
         $version = number_format((float) $version, 1);
 
-        $this->request = Services::request()->withProtocolVersion($version);
+        $this->request = service('request')->withProtocolVersion($version);
     }
 
     /**
@@ -322,7 +322,7 @@ class Dispatcher
     protected function getResponseObject()
     {
         // Supposons le succès jusqu'à preuve du contraire.
-        $this->response = Services::response()->withStatus(200);
+        $this->response = service('response')->withStatus(200);
 
         if (! is_cli() || on_test()) {
         }
@@ -361,11 +361,11 @@ class Dispatcher
         $this->timer->start('routing');
 
         if ($routes === null) {
-            $routes = Services::routes()->loadRoutes();
+            $routes = service('routes')->loadRoutes();
         }
 
         // $routes est defini dans app/Config/routes.php
-        $this->router = Services::router($routes, $this->request, false);
+        $this->router = single_service('router', $routes, $this->request);
 
         $this->outputBufferingStart();
 
@@ -428,7 +428,7 @@ class Dispatcher
         $class = $this->container->get($this->controller);
 
         if (method_exists($class, 'initialize')) {
-            $class->initialize($request, $response, Services::logger());
+            $class->initialize($request, $response, service('logger'));
         }
 
         $this->timer->stop('controller_constructor');
@@ -557,10 +557,10 @@ class Dispatcher
 
         // Ceci est principalement nécessaire lors des tests ...
         if (is_string($uri)) {
-            $uri = Services::uri($uri, false);
+            $uri = single_service('uri', $uri);
         }
 
-        Services::session()->setPreviousUrl(Uri::createURIString(
+        session()->setPreviousUrl(Uri::createURIString(
             $uri->getScheme(),
             $uri->getAuthority(),
             $uri->getPath(),
@@ -576,14 +576,14 @@ class Dispatcher
     protected function sendResponse()
     {
         if (! $this->isAjaxRequest()) {
-            $this->response = Services::toolbar()->prepare(
+            $this->response = service('toolbar')->prepare(
                 $this->getPerformanceStats(),
                 $this->request,
                 $this->response
             );
         }
 
-        Services::emitter()->emit($this->response);
+        service('emitter')->emit($this->response);
     }
 
     protected function emitResponse()
@@ -742,7 +742,7 @@ class Dispatcher
             ]);
         }
 
-        return Services::redirection()->back()->withInput()->withErrors($errors)->withStatus($code);
+        return back()->withInput()->withErrors($errors)->withStatus($code);
     }
 
     /**

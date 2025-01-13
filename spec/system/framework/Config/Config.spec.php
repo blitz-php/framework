@@ -10,14 +10,15 @@
  */
 
 use BlitzPHP\Config\Config;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Spec\ReflectionHelper;
 use Nette\Schema\Schema;
 
+use function Kahlan\expect;
+
 describe('Config / Config', function (): void {
 	beforeEach(function(): void {
-		$this->config = Services::config();
+		$this->config = service('config');
 	});
 
     describe('Initialisation', function (): void {

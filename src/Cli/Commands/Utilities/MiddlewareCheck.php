@@ -13,7 +13,6 @@ namespace BlitzPHP\Cli\Commands\Utilities;
 
 use BlitzPHP\Cli\Commands\Routes\MiddlewareCollector;
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Container\Services;
 
 /**
  * verifie les middleware d'une route.
@@ -64,7 +63,7 @@ class MiddlewareCheck extends Command
         }
 
         // Chargement des routes
-        Services::routes()->loadRoutes();
+        service('routes')->loadRoutes();
 
         $middlewareCollector = new MiddlewareCollector();
 

@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Filesystem\FilesystemManager;
 use Closure;
 use DateTimeInterface;
@@ -95,6 +94,6 @@ final class Storage extends Facade
 {
     protected static function accessor(): object
     {
-        return Services::storage();
+        return service('storage');
     }
 }

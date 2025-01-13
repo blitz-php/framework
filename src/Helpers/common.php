@@ -9,6 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cli\Console\Console;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Container\Services;
@@ -116,7 +117,7 @@ if (! function_exists('single_service')) {
         // Assurez-vous qu'il ne s'agit PAS d'une instance partagée
         $params[] = false;
 
-        return Services::$name(...$params);
+        return service($name, ...$params);
     }
 }
 
@@ -203,7 +204,8 @@ if (! function_exists('config')) {
      */
     function config(array|string|null $key = null, $default = null)
     {
-        $config = Services::config();
+		/** @var Config */
+        $config = service('config');
 
         if (null === $key) {
             return $config;
@@ -243,7 +245,8 @@ if (! function_exists('logger')) {
      */
     function logger($level = null, ?string $message = null, array $context = [])
     {
-        $logger = Services::logger();
+		/** @var Logger */
+        $logger = service('logger');
 
         if (empty($level) || $message === null) {
             return $logger;
@@ -265,11 +268,12 @@ if (! function_exists('cache')) {
      *
      * @param mixed|null $value
      *
-     * @return BlitzPHP\Cache\Cache|bool|mixed
+     * @return Cache|bool|mixed
      */
     function cache(?string $key = null, $value = null)
     {
-        $cache = Services::cache();
+		/** @var Cache */
+        $cache = service('cache');
 
         if ($key === null) {
             return $cache;
@@ -297,7 +301,8 @@ if (! function_exists('cookie')) {
      */
     function cookie(?string $name = null, array|string|null $value = null, int $minutes = 0, array $options = [])
     {
-        $cookie = Services::cookie();
+		/** @var CookieManagerInterface */
+        $cookie = service('cookie');
 
         if (null === $name) {
             return $cookie;
@@ -323,7 +328,8 @@ if (! function_exists('session')) {
      */
     function session(?string $val = null)
     {
-        $session = Services::session();
+		/** @var Store */
+        $session = service('session');
 
         // Vous retournez un seul element ?
         if (is_string($val)) {
@@ -432,7 +438,7 @@ if (! function_exists('csrf_token')) {
      */
     function csrf_token(): string
     {
-        return Services::session()->token();
+        return session()->token();
     }
 }
 
@@ -588,7 +594,7 @@ if (! function_exists('is_https')) {
      */
     function is_https(): bool
     {
-        return Services::request()->is('ssl');
+        return service('request')->is('ssl');
     }
 }
 
@@ -632,7 +638,7 @@ if (! function_exists('is_ajax_request')) {
      */
     function is_ajax_request(): bool
     {
-        return Services::request()->is('ajax');
+        return service('request')->is('ajax');
     }
 }
 
@@ -644,7 +650,7 @@ if (! function_exists('redirection')) {
     {
         $response = redirect()->to($uri, $code, [], null, $method);
 
-        Services::emitter()->emitHeaders($response);
+        service('emitter')->emitHeaders($response);
 
         exit(EXIT_SUCCESS);
     }
@@ -662,7 +668,7 @@ if (! function_exists('redirect')) {
      */
     function redirect(?string $uri = null): Redirection
     {
-        $redirection = Services::redirection();
+        $redirection = service('redirection');
 
         if ($uri !== null && $uri !== '') {
             return $redirection->route($uri);
@@ -694,7 +700,7 @@ if (! function_exists('link_to')) {
      */
     function link_to(string $method, ...$params): string
     {
-        $url = Services::routes()->reverseRoute($method, ...$params);
+        $url = service('routes')->reverseRoute($method, ...$params);
 
         if (empty($url)) {
             return '';
@@ -743,7 +749,7 @@ if (! function_exists('old')) {
         }
 
         // Retourne la valeur par défaut si rien n'a été trouvé dans l'ancien input.
-        if (null === $value = Services::request()->old($key)) {
+        if (null === $value = service('request')->old($key)) {
             return $default;
         }
 
@@ -840,8 +846,8 @@ if (! function_exists('force_https')) {
      */
     function force_https(int $duration = 31536000, ?ServerRequest $request = null, ?Redirection $response = null): void
     {
-        $request ??= Services::request();
-        $response ??= Services::redirection();
+        $request ??= service('request');
+        $response ??= service('redirection');
 
         if (is_cli() || $request->is('ssl')) {
             return;
@@ -850,7 +856,7 @@ if (! function_exists('force_https')) {
         // Si la session est active, nous devons régénérer
         // l'ID de session pour des raisons de sécurité.
         if (! on_test() && session_status() === PHP_SESSION_ACTIVE) {
-            Services::session()->regenerate(); // @codeCoverageIgnore
+            session()->regenerate(); // @codeCoverageIgnore
         }
 
         $uri = (string) $request->getUri()->withScheme('https');
@@ -885,7 +891,7 @@ if (! function_exists('ip_address')) {
      */
     function ip_address(): string
     {
-        return Services::request()->clientIp();
+        return service('request')->clientIp();
     }
 }
 
@@ -906,7 +912,7 @@ if (! function_exists('lang')) {
      */
     function lang(string $line, array $args = [], ?string $locale = null): string
     {
-        return Services::translator($locale)->getLine($line, $args);
+        return service('translator', $locale)->getLine($line, $args);
     }
 }
 
@@ -950,7 +956,7 @@ if (! function_exists('view_exist')) {
      */
     function view_exist(string $name, ?string $ext = null, array $options = []): bool
     {
-        return Services::viewer()->exists($name, $ext, $options);
+        return service('viewer')->exists($name, $ext, $options);
     }
 }
 
@@ -965,7 +971,7 @@ if (! function_exists('view')) {
      */
     function view(string $view, array $data = [], array $options = [])
     {
-        return Services::viewer()->make($view, $data, $options);
+        return service('viewer')->make($view, $data, $options);
     }
 }
 
@@ -981,7 +987,7 @@ if (! function_exists('component')) {
             $library = implode('::', $library);
         }
 
-        return Services::componentLoader()->render($library, $params, $ttl, $cacheName);
+        return service('componentLoader')->render($library, $params, $ttl, $cacheName);
     }
 }
 

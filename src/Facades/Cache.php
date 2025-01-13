@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
-
 /**
  * @method static bool                    add(string $key, mixed $value)                                                 Écrit les données de la clé dans un moteur de cache si elles n'existent pas déjà.
  * @method static bool                    clear()                                                                        Supprime toutes les clés du cache.
@@ -40,6 +38,6 @@ final class Cache extends Facade
 {
     protected static function accessor(): object
     {
-        return Services::cache();
+        return service('cache');
     }
 }

@@ -13,7 +13,6 @@ namespace BlitzPHP\Config;
 
 use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Autoloader\Locator;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
@@ -228,7 +227,7 @@ class Config
             return $file;
         }
 
-        $paths = Services::locator()->search('Config/' . $path);
+        $paths = service('locator')->search('Config/' . $path);
 
         if (isset($paths[0]) && file_exists($path[0])) {
             return $paths[0];
@@ -251,7 +250,7 @@ class Config
         } elseif (file_exists($app_schema)) {
             $schema = require $app_schema;
         } else {
-            $paths = Services::locator()->search('Config/schemas/' . $key);
+            $paths = service('locator')->search('Config/schemas/' . $key);
 
             if (isset($paths[0]) && file_exists($paths[0])) {
                 $schema = require $paths[0];

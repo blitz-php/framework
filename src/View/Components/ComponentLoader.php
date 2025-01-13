@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\View\Components;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Exceptions\ViewException;
 use DI\NotFoundException;
@@ -76,7 +75,7 @@ class ComponentLoader
         }
 
         if (method_exists($instance, 'initialize')) {
-            $instance->initialize(Services::request(), Services::response(), Services::logger());
+            $instance->initialize(service('request'), service('response'), service('logger'));
         }
 
         if (! method_exists($instance, $method)) {
@@ -159,9 +158,9 @@ class ComponentLoader
 
         //  localise et renvoie une instance du composant
         try {
-            $object = Services::container()->get($class);
+            $object = service('container')->get($class);
         } catch (NotFoundException) {
-            $locator = Services::locator();
+            $locator = service('locator');
 
             if (false === $path = $locator->locateFile($class, 'Components')) {
                 throw ViewException::invalidComponentClass($class);
@@ -171,7 +170,7 @@ class ComponentLoader
             }
 
             try {
-                $object = Services::container()->get($_class);
+                $object = service('container')->get($_class);
             } catch (NotFoundException) {
                 throw ViewException::invalidComponentClass($class);
             }

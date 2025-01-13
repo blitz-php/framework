@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Validation;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Validation\Rules\AbstractRule;
 use Dimtrovich\Validation\Validation as BaseValidation;
@@ -49,7 +48,7 @@ class Validation extends BaseValidation
                 $rule = $key;
             }
 
-            $this->addValidator($name, Services::container()->get($rule));
+            $this->addValidator($name, service('container')->get($rule));
         }
     }
 
@@ -74,7 +73,7 @@ class Validation extends BaseValidation
      */
     private function discoverRules()
     {
-        $files = $this->files($locator = Services::locator());
+        $files = $this->files($locator = service('locator'));
         $rules = [];
 
         foreach ($files as $file) {

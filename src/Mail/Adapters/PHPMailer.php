@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Mail\Adapters;
 
-use BlitzPHP\Container\Services;
 use PHPMailer\PHPMailer\PHPMailer as Mailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -33,7 +32,7 @@ class PHPMailer extends AbstractAdapter
     {
         $this->mailer              = new Mailer();
         $this->mailer->Debugoutput = static function ($str, $level): void {
-            Services::logger()->info('[Mail][' . $level . ']: ' . $str);
+            service('logger')->info('[Mail][' . $level . ']: ' . $str);
         };
 
         parent::__construct($debug);

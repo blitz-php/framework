@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Formatter;
 
-use BlitzPHP\Container\Services;
-
 /**
  * Formateur de données JSON
  */
@@ -27,7 +25,7 @@ class JsonFormatter implements FormatterInterface
     public function format($data)
     {
         // Obtenir le paramètre de rappel (si défini)
-        $callback = Services::request()->getQuery('callback');
+        $callback = service('request')->getQuery('callback');
 
         if (empty($callback)) {
             return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

@@ -12,7 +12,6 @@
 namespace BlitzPHP\Http;
 
 use BadMethodCallException;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\FrameworkException;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Filesystem\Files\UploadedFile;
@@ -222,7 +221,7 @@ class ServerRequest implements ServerRequestInterface
     protected function _setConfig(array $config): void
     {
         if (empty($config['session'])) {
-            $config['session'] = Services::session(false);
+            $config['session'] = single_service('session');
         }
 
         if (empty($config['environment']['REQUEST_METHOD'])) {
@@ -1792,7 +1791,7 @@ class ServerRequest implements ServerRequestInterface
     public function negotiate(string $type, array $supported, bool $strictMatch = false): string
     {
         if (null === $this->negotiator) {
-            $this->negotiator = Services::negotiator($this, true);
+            $this->negotiator = service('negotiator', $this);
         }
 
         return match (strtolower($type)) {
@@ -1816,7 +1815,7 @@ class ServerRequest implements ServerRequestInterface
             $locale = config('app.language');
         }
 
-        Services::translator()->setLocale($locale);
+        service('translator')->setLocale($locale);
 
         return $this->withAttribute('locale', $locale);
     }

@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Core\Application;
 
 /**
@@ -39,7 +38,7 @@ class Config
             'baseURL'       => $config->base_url ?? '',
             'documentRoot'  => $_SERVER['DOCUMENT_ROOT'] ?? WEBROOT,
             'timezone'      => $config->timezone,
-            'locale'        => Services::request()->getLocale(),
+            'locale'        => service('request')->getLocale(),
         ];
     }
 }

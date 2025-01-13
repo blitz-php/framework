@@ -9,12 +9,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\View\Parser;
 
 describe('Views / Parser', function (): void {
     beforeAll(function (): void {
-        $this->parser = new Parser(config('view'), Services::locator());
+        $this->parser = new Parser(config('view'), service('locator'));
     });
 
 	afterEach(function (): void {

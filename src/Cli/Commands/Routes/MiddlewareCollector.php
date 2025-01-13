@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Router\Router;
 
@@ -39,7 +38,7 @@ final class MiddlewareCollector
             return [];
         }
 
-        $request = Services::request(false)->withMethod($method);
+        $request = single_service('request')->withMethod($method);
 
         $router = $this->createRouter($request);
 
@@ -50,7 +49,7 @@ final class MiddlewareCollector
 
     private function createRouter(Request $request): Router
     {
-        $routes = Services::routes();
+        $routes = service('routes');
 
         if ($this->resetRoutes) {
             $routes->resetRoutes();

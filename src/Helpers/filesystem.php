@@ -67,7 +67,7 @@ if (! function_exists('directory_mirror')) {
      */
     function directory_mirror(string $originDir, string $targetDir, bool $overwrite = true): bool
     {
-        return Services::fs()->copyDirectory($originDir, $targetDir, $overwrite);
+        return service('fs')->copyDirectory($originDir, $targetDir, $overwrite);
     }
 }
 

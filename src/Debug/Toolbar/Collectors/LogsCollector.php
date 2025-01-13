@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Container\Services;
-
 /**
  * Collecteur de logs pour la barre d'outils de débogage
  *
@@ -79,6 +77,6 @@ class LogsCollector extends BaseCollector
             return $this->data;
         }
 
-        return $this->data = Services::logger(true)->logCache;
+        return $this->data = single_service('logger')->logCache;
     }
 }

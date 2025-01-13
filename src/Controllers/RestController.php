@@ -14,7 +14,6 @@ namespace BlitzPHP\Controllers;
 use BlitzPHP\Annotations\AnnotationReader;
 use BlitzPHP\Annotations\Http\AjaxOnlyAnnotation;
 use BlitzPHP\Annotations\Http\RequestMappingAnnotation;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Formatter\Formatter;
@@ -88,7 +87,7 @@ class RestController extends BaseController
 
         // Appel de la méthode du contrôleur et passage des arguments
         try {
-            $instance = Services::container()->get($class);
+            $instance = service('container')->get($class);
             $instance->initialize($this->request, $this->response, $this->logger);
 
             $instance = $this->_execAnnotations($instance, AnnotationReader::fromClass($instance));
@@ -101,7 +100,7 @@ class RestController extends BaseController
 
             $instance->payload = $this->payload;
 
-            $response = Services::container()->call([$instance, $method], $params);
+            $response = service('container')->call([$instance, $method], $params);
 
             if ($response instanceof ResponseInterface) {
                 return $response;
@@ -238,7 +237,7 @@ class RestController extends BaseController
         /*
         if ($element instanceof Entity) {
             if (method_exists($element, 'format')) {
-                return Services::injector()->call([$element, 'format']);
+                return service('container')->call([$element, 'format']);
             }
 
             return call_user_func([$element, 'toArray']);

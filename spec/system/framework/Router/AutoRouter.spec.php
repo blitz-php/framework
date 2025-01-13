@@ -9,7 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Router\AutoRouter;
@@ -21,7 +20,7 @@ use function Kahlan\expect;
 
 describe('AutoRouter', function (): void {
     beforeAll(function (): void {
-        $this->collection      = new RouteCollection(Services::locator(), (object) config('routing'));
+        $this->collection      = new RouteCollection(service('locator'), (object) config('routing'));
 
 		$this->createNewAutoRouter = fn($namespace = 'Spec\BlitzPHP\App\Controllers'): AutoRouter => new AutoRouter(
 				[],

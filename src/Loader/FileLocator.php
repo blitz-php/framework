@@ -11,7 +11,7 @@
 
 namespace BlitzPHP\Loader;
 
-use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Utilities\String\Text;
@@ -35,7 +35,8 @@ class FileLocator
     {
         static $loaded = [];
 
-        $loader = Services::locator();
+		/** @var LocatorInterface */
+        $loader = service('locator');
 
         if (! is_array($filenames)) {
             $filenames = [$filenames];
@@ -111,7 +112,7 @@ class FileLocator
     {
         static $loadedSchema = [];
 
-        $loader = Services::locator();
+        $loader = service('locator');
 
         // Stockez nos versions de schame système et d'application afin que nous puissions contrôler l'ordre de chargement.
         $systemSchema = null;
@@ -188,7 +189,7 @@ class FileLocator
             throw LoadException::modelNotFound($model);
         }
 
-        return Services::container()->make($model, ['db' => $connection]);
+        return service('container')->make($model, ['db' => $connection]);
     }
 
     /**

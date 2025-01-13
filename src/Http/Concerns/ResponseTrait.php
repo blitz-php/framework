@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Http\Concerns;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Exceptions\LoadException;
@@ -94,7 +93,7 @@ trait ResponseTrait
     public function withHeaders(array $headers = []): static
     {
         $new     = clone $this;
-        $headers = $headers === [] ? Services::response()->getHeaders() : $headers;
+        $headers = $headers === [] ? service('response')->getHeaders() : $headers;
 
         foreach ($headers as $name => $header) {
             $new = $new->withHeader($name, $header);

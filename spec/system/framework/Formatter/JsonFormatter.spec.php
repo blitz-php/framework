@@ -40,7 +40,7 @@ describe('JsonFormatter', function() {
         it('devrait gérer le rappel JSONP valide', function() {
 			Services::set(
 				Request::class,
-				Services::request()->withQueryParams(['callback' => 'maFonction'])
+				service('request')->withQueryParams(['callback' => 'maFonction'])
 			);
 
             $data = ['nom' => 'Jean'];
@@ -51,7 +51,7 @@ describe('JsonFormatter', function() {
         it('devrait gérer le rappel JSONP invalide', function() {
             Services::set(
 				Request::class,
-				Services::request()->withQueryParams(['callback' => 'fonction invalide'])
+				service('request')->withQueryParams(['callback' => 'fonction invalide'])
 			);
 
 			$data = ['nom' => 'Jean'];

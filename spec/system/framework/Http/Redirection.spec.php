@@ -21,9 +21,11 @@ use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Spec\Mock\MockRequest;
 use BlitzPHP\Spec\ReflectionHelper;
 
+use function Kahlan\expect;
+
 describe('Redirection', function (): void {
     beforeAll(function (): void {
-        $this->routes = new RouteCollection(Services::locator(), (object) config('routing'));
+        $this->routes = new RouteCollection(service('locator'), (object) config('routing'));
         Services::injectMock('routes', $this->routes);
 
         $this->request = new MockRequest();
@@ -165,7 +167,7 @@ describe('Redirection', function (): void {
         it('WithCookies', function (): void {
             Services::set(
                 Response::class,
-                Services::response()->cookie('foo', 'bar')
+                service('response')->cookie('foo', 'bar')
             );
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -178,7 +180,7 @@ describe('Redirection', function (): void {
             expect($response->getCookie('foo'))->toContainKey('value');
             expect($response->getCookie('foo')['value'])->toBe('bar');
 
-            $response = Services::response();
+            $response = service('response');
 
             ReflectionHelper::setPrivateProperty($response, '_cookies', new CookieCollection());
             Services::set(Response::class, $response);
@@ -194,7 +196,7 @@ describe('Redirection', function (): void {
         it('WithHeaders', function (): void {
             Services::set(
                 Response::class,
-                $baseResponse = Services::response()->header('foo', 'bar')
+                $baseResponse = service('response')->header('foo', 'bar')
             );
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -210,7 +212,7 @@ describe('Redirection', function (): void {
         });
 
         it('WithHeaders vide', function (): void {
-            $baseResponse = Services::response();
+            $baseResponse = service('response');
 
             foreach (array_keys($baseResponse->getHeaders()) as $key) {
                 $baseResponse = $baseResponse->withoutHeader($key);

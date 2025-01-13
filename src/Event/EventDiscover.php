@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Event;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Event\EventListenerInterface;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
@@ -25,7 +24,7 @@ class EventDiscover
 
     public function __construct(protected EventManagerInterface $manager)
     {
-        $this->locator = Services::locator();
+        $this->locator = service('locator');
     }
 
     public function discove()
@@ -42,7 +41,7 @@ class EventDiscover
                 continue;
             }
 
-            Services::factory($className)->listen($this->manager);
+            service('factory', $className)->listen($this->manager);
         }
     }
 }

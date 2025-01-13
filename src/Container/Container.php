@@ -257,7 +257,7 @@ class Container implements ContainerInterface
     private function discoveProviders(): void
     {
         if (! self::$discovered) {
-            $locator = Services::locator();
+            $locator = service('locator');
             $files   = array_merge(
                 $locator->search('Config/Providers'),
                 $locator->listFiles('Providers/'),

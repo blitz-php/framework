@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Middlewares;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\RedirectException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,7 +34,7 @@ class ForceHTTPS implements MiddlewareInterface
         }
 
         try {
-            force_https(YEAR, $request, Services::redirection());
+            force_https(YEAR, $request, service('redirection'));
 
             return $handler->handle($request);
         } catch (RedirectException $e) {

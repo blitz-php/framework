@@ -62,7 +62,7 @@ class Application
         /**
          * On initialise le conteneur d'injection de dependences
          */
-        Services::container()->initialize();
+        service('container')->initialize();
 
         /**
          * Lance la capture des exceptions et erreurs
@@ -73,7 +73,7 @@ class Application
          * Initialisation du gestionnaire d'evenement
          */
         Services::singleton(EventDiscover::class)->discove();
-        Services::event()->emit('app:init');
+        service('event')->emit('app:init');
 
         return $this;
     }

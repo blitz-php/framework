@@ -12,7 +12,6 @@
 namespace BlitzPHP\Cli\Commands\Cache;
 
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Container\Services;
 
 /**
  * Affiche des informations sur le cache.
@@ -60,7 +59,7 @@ class Info extends Command
             return;
         }
 
-        $cache  = Services::cache($config);
+        $cache  = service('cache', $config);
         $caches = $cache->info();
         $tbody  = [];
 

@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Http;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Session\Store;
@@ -235,7 +234,7 @@ class Redirection extends Response
      */
     public function withCookies(): static
     {
-        return $this->withCookieCollection(Services::response()->getCookieCollection());
+        return $this->withCookieCollection(service('response')->getCookieCollection());
     }
 
     /**

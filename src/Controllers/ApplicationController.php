@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Controllers;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Router\Dispatcher;
 use BlitzPHP\View\View;
 use Psr\Http\Message\ResponseInterface;
@@ -64,7 +63,8 @@ class ApplicationController extends BaseController
             }
         }
 
-        $viewer = Services::viewer();
+		/** @var \BlitzPHP\View\View */
+        $viewer = service('viewer');
 
         $viewer->setData($data)->options($options);
 

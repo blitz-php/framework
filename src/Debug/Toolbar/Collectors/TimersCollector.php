@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Container\Services;
-
 /**
  * Collecteur de temporisateurs pour la barre d'outils de débogage
  *
@@ -42,7 +40,7 @@ class TimersCollector extends BaseCollector
     {
         $data = [];
 
-        $benchmark = Services::timer(true);
+        $benchmark = single_service('timer');
         $rows      = $benchmark->getTimers(6);
 
         foreach ($rows as $name => $info) {

@@ -12,7 +12,6 @@
 namespace BlitzPHP\Http;
 
 use ArrayAccess;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Http\Concerns\InteractsWithContentTypes;
@@ -70,7 +69,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
             }
 
             /** @var DataValidation $validation */
-            $validation = Services::container()->make($rules);
+            $validation = service('container')->make($rules);
 
             return $validation->process($this, $messages);
         }

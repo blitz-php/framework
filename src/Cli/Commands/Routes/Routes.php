@@ -66,7 +66,7 @@ class Routes extends Command
             putenv('HTTP_HOST=' . $host);
         }
 
-        $collection = Services::routes()->loadRoutes();
+        $collection = service('routes')->loadRoutes();
         $methods    = Router::HTTP_METHODS;
 
         $tbody                 = [];

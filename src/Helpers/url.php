@@ -9,7 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Core\App;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Http\ServerRequest;
@@ -97,7 +96,7 @@ if (! function_exists('current_url')) {
      */
     function current_url(bool $returnObject = false, ?ServerRequest $request = null)
     {
-        $request ??= Services::request();
+        $request ??= service('request');
         $path = $request->getPath();
 
         // Ajouter des chaine de requêtes et des fragments
@@ -127,7 +126,7 @@ if (! function_exists('previous_url')) {
     {
         $referer = url()->previous();
 
-        return $returnObject ? Services::uri($referer) : $referer;
+        return $returnObject ? service('uri', $referer) : $referer;
     }
 }
 
@@ -140,8 +139,8 @@ if (! function_exists('uri_string')) {
     function uri_string(bool $relative = false): string
     {
         return $relative
-            ? ltrim(Services::request()->getPath(), '/')
-            : Services::request()->getUri()->getPath();
+            ? ltrim(service('request')->getPath(), '/')
+            : service('request')->getUri()->getPath();
     }
 }
 
@@ -499,7 +498,7 @@ if (! function_exists('route')) {
      */
     function route(string $method, ...$params)
     {
-        return Services::routes()->reverseRoute($method, ...$params);
+        return service('routes')->reverseRoute($method, ...$params);
     }
 }
 

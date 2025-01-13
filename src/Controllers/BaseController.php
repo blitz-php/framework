@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Controllers;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Http\Request;
@@ -94,8 +93,8 @@ abstract class BaseController
         $this->response = $response;
         $this->logger   = $logger;
 
-        Services::container()->set(Request::class, $request);
-        Services::container()->set(Response::class, $response);
+        service('container')->set(Request::class, $request);
+        service('container')->set(Response::class, $response);
 
         if ($this->forceHTTPS > 0) {
             $this->forceHTTPS($this->forceHTTPS);
@@ -194,7 +193,7 @@ abstract class BaseController
      */
     protected function cachePage(int $time)
     {
-        Services::responsecache()->setTtl($time);
+        service('responsecache')->setTtl($time);
     }
 
     /**

@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Middlewares;
 
-use BlitzPHP\Container\Services;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -28,7 +27,7 @@ class PerformanceMetrics implements MiddlewareInterface
         $body     = $response->getBody()->getContents();
 
         if ($body !== '' && $body !== '0') {
-            $benchmark = Services::timer();
+            $benchmark = service('timer');
 
             $output = str_replace(
                 [

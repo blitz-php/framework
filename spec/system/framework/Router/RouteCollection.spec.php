@@ -27,9 +27,9 @@ function getCollector(string $verb = Method::GET, array $config = [], array $fil
     $defaults = ['App' => APP_PATH];
     $config   = array_merge($config, $defaults);
 
-    Services::autoloader()->addNamespace($config);
+    service('autoloader')->addNamespace($config);
 
-    $loader = Services::locator();
+    $loader = service('locator');
 
     $routing                    = (object) config('routing');
     $routing->default_namespace = '\\';
@@ -39,7 +39,7 @@ function getCollector(string $verb = Method::GET, array $config = [], array $fil
 
 function setRequestMethod(string $method): void
 {
-    Services::set(Request::class, Services::request()->withMethod($method));
+    Services::set(Request::class, service('request')->withMethod($method));
 }
 
 describe('RouteCollection', function (): void {
@@ -197,7 +197,7 @@ describe('RouteCollection', function (): void {
 
 			setRequestMethod(Method::GET);
         	$routes = getCollector();
-        	$router = new Router($routes, Services::request());
+        	$router = new Router($routes, service('request'));
 
         	$routes->setDefaultNamespace('App\Controllers');
         	$routes->get('/', 'Core\Home::index');
@@ -247,7 +247,7 @@ describe('RouteCollection', function (): void {
 			expect($routes->shouldUseSupportedLocalesOnly())->toBeTruthy();
 
 			$routes->get('{locale}/products', 'Products::list');
-			$router = new Router($routes, Services::request());
+			$router = new Router($routes, service('request'));
 
 			expect(fn() => $router->handle('fr/products'))
 				->toThrow(new PageNotFoundException());
@@ -1277,7 +1277,7 @@ describe('RouteCollection', function (): void {
 			$_SERVER['HTTP_HOST'] = 'doc.domain.com';
 
 			setRequestMethod(Method::GET);
-            $router = Services::router(routes: $routes = getCollector(), shared: false);
+			$router = single_service('router', $routes = getCollector(), null);
 
 			$routes->setDefaultNamespace('App\Controllers');
 			$routes->setDefaultController('Home');
@@ -1292,7 +1292,7 @@ describe('RouteCollection', function (): void {
 		it('Le routeur fonctionne normalement avec une route qui accepte plusieurs hotes', function (): void {
 			$_SERVER['HTTP_HOST'] = 'two.domain.com';
 
-            $router = Services::router(routes: $routes = getCollector(), shared: false);
+            $router = single_service('router', $routes = getCollector(), null);
 
 			$routes->setDefaultNamespace('App\Controllers');
 			$routes->setDefaultController('Home');
@@ -1307,7 +1307,7 @@ describe('RouteCollection', function (): void {
 		it('Echec lorsqu\'aucun hote ne correspond a ceux specifiés par la route', function (): void {
 			$_SERVER['HTTP_HOST'] = 'dpc.domain.com';
 
-            $router = Services::router(routes: $routes = getCollector(), shared: false);
+            $router = single_service('router', $routes = getCollector(), null);
 
 			$routes->setDefaultNamespace('App\Controllers');
 			$routes->setDefaultController('Home');
@@ -1610,7 +1610,7 @@ describe('RouteCollection', function (): void {
             $routes = getCollector();
 			$routes->setDefaultNamespace('App\Controllers');
 
-            $router = new Router($routes, Services::request());
+            $router = new Router($routes, service('request'));
 
 			$routes->get('/0', 'Core\Home::index');
 
@@ -1624,7 +1624,7 @@ describe('RouteCollection', function (): void {
 			setRequestMethod(Method::GET);
 
 			$routes = getCollector(Method::GET);
-			$router = new Router($routes, Services::request());
+			$router = new Router($routes, service('request'));
 
 			$routes->get('/', '\App\Controllers\Site\CDoc::index', ['subdomain' => 'doc', 'as' => 'doc_index']);
 			$routes->get('/', 'Home::index', ['subdomain' => 'dev']);
@@ -1639,7 +1639,7 @@ describe('RouteCollection', function (): void {
 			setRequestMethod(Method::GET);
 
 			$routes = getCollector(Method::GET);
-			$router = new Router($routes, Services::request());
+			$router = new Router($routes, service('request'));
 
 			// Le sous-domaine de l'URL actuel est `doc`, donc cette route est enregistrée.
 			$routes->get('/', '\App\Controllers\Site\CDoc::index', ['subdomain' => 'doc', 'as' => 'doc_index']);
@@ -1656,7 +1656,7 @@ describe('RouteCollection', function (): void {
 			setRequestMethod(Method::GET);
 
 			$routes = getCollector(Method::GET);
-			$router = new Router($routes, Services::request());
+			$router = new Router($routes, service('request'));
 
 			$routes->get('/', 'Home::index');
 	        $routes->get('/', '\App\Controllers\Site\CDoc::index', ['subdomain' => 'doc', 'as' => 'doc_index']);
@@ -1671,7 +1671,7 @@ describe('RouteCollection', function (): void {
 			setRequestMethod(Method::GET);
 
 			$routes = getCollector(Method::GET);
-			$router = new Router($routes, Services::request());
+			$router = new Router($routes, service('request'));
 
 			$routes->get('/', 'Home::index', ['as' => 'ddd']);
 	        $routes->get('/', '\App\Controllers\Site\CDoc::index', ['subdomain' => 'doc', 'as' => 'doc_index']);
@@ -1686,7 +1686,7 @@ describe('RouteCollection', function (): void {
 			setRequestMethod(Method::GET);
 
 			$routes = getCollector(Method::GET);
-			$router = new Router($routes, Services::request());
+			$router = new Router($routes, service('request'));
 
 			$routes->get('/', 'Home::index', ['as' => 'ddd']);
 	        $routes->get('/', '\App\Controllers\Site\CDoc::index', ['hostname' => 'doc.domain.com', 'as' => 'doc_index']);
@@ -1838,7 +1838,7 @@ describe('RouteCollection', function (): void {
 				$routes->setDefaultNamespace($namespace);
 
 
-				$router = new Router($routes, Services::request());
+				$router = new Router($routes, service('request'));
 				$router->handle('/product');
 
 				expect($router->controllerName())->toBe(ProductController::class);
@@ -1853,7 +1853,7 @@ describe('RouteCollection', function (): void {
 				$routes->setDefaultNamespace($namespace);
 				$routes->get('/product', 'Product');
 
-				$router = new Router($routes, Services::request());
+				$router = new Router($routes, service('request'));
 				$router->handle('/product');
 
 				expect($router->controllerName())->toBe(ProductController::class);

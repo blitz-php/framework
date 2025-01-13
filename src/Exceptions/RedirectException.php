@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Exceptions;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\ResponsableInterface;
 use Exception;
 use LogicException;
@@ -60,11 +59,11 @@ class RedirectException extends Exception implements ResponsableInterface
     public function getResponse(): ResponseInterface
     {
         if (null === $this->response) {
-            $this->response = Services::response()
+            $this->response = service('response')
                 ->redirect(base_url($this->getMessage()), 'auto', $this->getCode());
         }
 
-        Services::logger()->info(
+        service('logger')->info(
             'REDIRECTED ROUTE at '
             . ($this->response->getHeaderLine('Location') ?: substr($this->response->getHeaderLine('Refresh'), 6))
         );

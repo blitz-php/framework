@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Validation\ErrorBag;
 
 /**
@@ -31,6 +30,6 @@ final class View extends Facade
 {
     protected static function accessor(): object
     {
-        return Services::viewer();
+        return service('viewer');
     }
 }

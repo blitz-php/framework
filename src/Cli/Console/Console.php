@@ -14,7 +14,6 @@ namespace BlitzPHP\Cli\Console;
 use Ahc\Cli\Application;
 use Ahc\Cli\Input\Command as AhcCommand;
 use Ahc\Cli\IO\Interactor;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Exceptions\CLIException;
@@ -139,7 +138,7 @@ class Console extends Application
 
         $this->logo($this->logos[array_rand($this->logos)]);
 
-        $this->registerException($this->logger = Services::logger());
+        $this->registerException($this->logger = service('logger'));
 
         $this->discoverCommands();
     }
@@ -199,7 +198,7 @@ class Console extends Application
             return;
         }
 
-        if ([] === $files = $this->files($locator = Services::locator())) {
+        if ([] === $files = $this->files($locator = service('locator'))) {
             return; // @codeCoverageIgnore
         }
 
@@ -230,7 +229,7 @@ class Console extends Application
     private function addCommand(string $className, ?Logger $logger = null)
     {
         $class  = new ReflectionClass($className);
-        $logger = $logger ?: Services::logger();
+        $logger = $logger ?: service('logger');
 
         if (! $class->isInstantiable() || ! $class->isSubclassOf(Command::class)) {
             throw CLIException::invalidCommand($className);
@@ -239,7 +238,7 @@ class Console extends Application
         /**
          * @var Command $instance
          */
-        $instance = Services::container()->make($className, ['app' => $this, 'logger' => $logger]);
+        $instance = service('container')->make($className, ['app' => $this, 'logger' => $logger]);
 
         $command = new AhcCommand(
             $instance->name,

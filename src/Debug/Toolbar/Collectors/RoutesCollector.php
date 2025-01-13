@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Router\DefinedRouteCollector;
 use BlitzPHP\Router\Router;
 use ReflectionException;
@@ -46,8 +45,8 @@ class RoutesCollector extends BaseCollector
 
     public function __construct()
     {
-        $rawRoutes                   = Services::routes(true);
-        $this->router                = Services::router($rawRoutes, null, true);
+        $rawRoutes                   = single_service('routes');
+        $this->router                = single_service('router', $rawRoutes, null);
         $this->definedRouteCollector = new DefinedRouteCollector($rawRoutes);
         $this->isAutoRoute           = $rawRoutes->shouldAutoRoute();
     }

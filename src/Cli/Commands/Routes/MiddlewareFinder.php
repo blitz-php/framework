@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Router\Router;
@@ -25,7 +24,7 @@ final class MiddlewareFinder
 
     public function __construct(?Router $router = null)
     {
-        $this->router = $router ?? Services::router();
+        $this->router = $router ?? service('router');
     }
 
     /**

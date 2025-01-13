@@ -9,14 +9,13 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Event\EventInterface;
 
 use function Kahlan\expect;
 
 describe('Events / Event', function (): void {
     beforeAll(function (): void {
-		$this->eventManager = Services::event();
+		$this->eventManager = service('event');
 		$this->eventManager->clearListeners();
     });
 

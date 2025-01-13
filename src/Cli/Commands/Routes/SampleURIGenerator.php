@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Router\RouteCollection;
 
 /**
@@ -38,7 +37,7 @@ final class SampleURIGenerator
 
     public function __construct(?RouteCollection $routes = null)
     {
-        $this->routes = $routes ?? Services::routes();
+        $this->routes = $routes ?? service('routes');
     }
 
     /**

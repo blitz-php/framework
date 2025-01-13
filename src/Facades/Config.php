@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
 use Nette\Schema\Schema;
 
 /**
@@ -29,6 +28,6 @@ final class Config extends Facade
 {
     protected static function accessor(): object
     {
-        return Services::config();
+        return service('config');
     }
 }

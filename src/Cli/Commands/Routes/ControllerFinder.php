@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Cli\Commands\Routes;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 
 /**
@@ -26,7 +25,7 @@ final class ControllerFinder
      */
     public function __construct(private readonly string $namespace)
     {
-        $this->locator = Services::locator();
+        $this->locator = service('locator');
     }
 
     /**

@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Middlewares;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Utilities\Iterable\Arr;
 use Closure;
@@ -49,7 +48,7 @@ class ClosureDecorator implements MiddlewareInterface
      */
     public function __construct(protected Closure $callable, protected ?Response $response = null)
     {
-        $this->response = $response ?: Services::response();
+        $this->response = $response ?: service('response');
     }
 
     /**

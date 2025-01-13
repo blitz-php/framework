@@ -12,7 +12,6 @@
 namespace BlitzPHP\Cli\Commands\Cache;
 
 use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Container\Services;
 
 /**
  * Efface le cache actuel.
@@ -61,7 +60,7 @@ class Clear extends Command
         }
 
         $config['handler'] = $handler;
-        $cache             = Services::cache($config);
+        $cache             = service('cache', $config);
 
         if (! $cache->clear()) {
             // @codeCoverageIgnoreStart

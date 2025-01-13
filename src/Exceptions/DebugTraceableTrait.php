@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Exceptions;
 
-use BlitzPHP\Loader\Services;
 use Throwable;
 
 /**
@@ -51,8 +50,6 @@ trait DebugTraceableTrait
      */
     protected static function lang(string $line, array $args = []): string
     {
-        $lang = Services::language(null, false);
-
-        return $lang->getLine($line, $args);
+        return single_service('translator')->getLine($line, $args);
     }
 }

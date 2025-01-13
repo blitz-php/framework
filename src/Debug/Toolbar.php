@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Debug;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Core\Application;
 use BlitzPHP\Debug\Toolbar\Collectors\BaseCollector;
 use BlitzPHP\Debug\Toolbar\Collectors\Config;
@@ -90,7 +89,7 @@ class Toolbar
         // Éléments de données utilisés dans la vue.
         $data['url']             = current_url();
         $data['method']          = strtoupper($request->getMethod());
-        $data['isAJAX']          = Services::request()->ajax();
+        $data['isAJAX']          = service('request')->ajax();
         $data['startTime']       = $startTime;
         $data['totalTime']       = $totalTime * 1000;
         $data['totalMemory']     = number_format(memory_get_peak_usage() / 1024 / 1024, 3);
@@ -161,7 +160,7 @@ class Toolbar
             $data['vars']['cookies'][esc($name)] = esc($value);
         }
 
-        $data['vars']['request'] = (Services::request()->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
+        $data['vars']['request'] = (service('request')->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
 
         $data['vars']['response'] = [
             'statusCode'  => $response->getStatusCode(),
@@ -363,8 +362,8 @@ class Toolbar
     public function prepare(array $stats, ?RequestInterface $request = null, ?ResponseInterface $response = null): ResponseInterface
     {
         /** @var Request $request */
-        $request ??= Services::request();
-        $response ??= Services::response();
+        $request ??= service('request');
+        $response ??= service('response');
 
         // Si on est en CLI ou en prod, pas la peine de continuer car la debugbar n'est pas utilisable dans ces environnements
         if (is_cli() || on_prod()) {
@@ -376,7 +375,7 @@ class Toolbar
             return $response;
         }
 
-        $toolbar = Services::toolbar($this->config);
+        $toolbar = service('toolbar', $this->config);
         $data    = $toolbar->run(
             $stats['startTime'],
             $stats['totalTime'],
@@ -449,7 +448,7 @@ class Toolbar
             return '';
         }
 
-        $request = Services::request();
+        $request = service('request');
 
         // Si la requête contient '?debugbar alors nous sommes
         // renvoie simplement le script de chargement
@@ -513,7 +512,6 @@ class Toolbar
                 $data['styles'] = [];
                 extract($data);
                 $parser = new Parser([], $this->config->view_path);
-                // $parser = Services::parser($this->config->view_path, null, false);
                 ob_start();
                 include rtrim($this->config->view_path, '/\\') . DS . 'toolbar.tpl.php';
                 $output = ob_get_clean();

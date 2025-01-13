@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Validation\ErrorBag;
 use BlitzPHP\View\View;
 
@@ -64,7 +63,7 @@ class ViewsCollector extends BaseCollector
      */
     public function __construct()
     {
-        $this->viewer = Services::viewer();
+        $this->viewer = service('viewer');
     }
 
     /**

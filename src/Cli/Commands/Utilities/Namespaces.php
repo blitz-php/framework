@@ -76,7 +76,7 @@ class Namespaces extends Command
 
     private function outputAllNamespaces(int $maxLength): array
     {
-        $autoloader = Services::autoloader();
+        $autoloader = service('autoloader');
 
         $tbody = [];
 

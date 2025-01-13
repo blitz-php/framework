@@ -1153,7 +1153,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function view(string $from, string $view, array $options = []): self
     {
-        $to = static fn (...$data) => Services::viewer()
+        $to = static fn (...$data) => service('viewer')
             ->setData(['segments' => $data], 'raw')
             ->display($view)
             ->options($options)
@@ -1693,7 +1693,7 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         if ($locale === null) {
-            $locale = Services::request()->getLocale();
+            $locale = service('request')->getLocale();
         }
 
         return strtr($route, ['{locale}' => $locale]);

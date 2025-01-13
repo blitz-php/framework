@@ -11,8 +11,9 @@
 
 use App\Controllers\HomeController;
 use BlitzPHP\Autoloader\Autoloader;
-use BlitzPHP\Container\Services;
 use BlitzPHP\Spec\ReflectionHelper;
+
+use function Kahlan\expect;
 
 describe('Autoloader', function (): void {
     beforeEach(function (): void {
@@ -64,7 +65,7 @@ describe('Autoloader', function (): void {
         });
 
         it(": Recuperation de l'autoloader a partir d'une instance partagée du Service", function (): void {
-            $classLoader = ReflectionHelper::getPrivateMethodInvoker(Services::autoloader(), 'loadInNamespace');
+            $classLoader = ReflectionHelper::getPrivateMethodInvoker(service('autoloader'), 'loadInNamespace');
 
             // recherchez HomeController, comme cela devrait être dans le dépôt de base
             $actual   = $classLoader(HomeController::class);
@@ -73,7 +74,7 @@ describe('Autoloader', function (): void {
         });
 
         it(': Service autoloader', function (): void {
-            $autoloader = Services::autoloader(false);
+            $autoloader = single_service('autoloader');
             $autoloader->initialize();
             $autoloader->register();
 

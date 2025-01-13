@@ -9,7 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Router\DefinedRouteCollector;
 use BlitzPHP\Router\RouteCollection;
 
@@ -19,9 +18,9 @@ describe('DefinedRouteCollector', function (): void {
             $defaults = ['App' => APP_PATH];
             $config   = array_merge($config, $defaults);
 
-            Services::autoloader()->addNamespace($config);
+            service('autoloader')->addNamespace($config);
 
-            $loader = Services::locator();
+            $loader = service('locator');
 
             $routing = (object) config('routing');
 

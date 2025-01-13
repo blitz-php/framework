@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Facades;
 
-use BlitzPHP\Container\Services;
 use Closure;
 
 /**
@@ -35,6 +34,6 @@ final class Container extends Facade
 {
     protected static function accessor(): object
     {
-        return Services::container();
+        return service('container');
     }
 }

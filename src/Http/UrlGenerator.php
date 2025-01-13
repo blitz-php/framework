@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Http;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\RouterException;
@@ -442,7 +441,7 @@ class UrlGenerator
             return ($this->sessionResolver)();
         }
 
-        return Services::session();
+        return session();
     }
 
     /**

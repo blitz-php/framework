@@ -9,17 +9,18 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Http\MiddlewareQueue;
 use BlitzPHP\Spec\ReflectionHelper;
 use Spec\BlitzPHP\App\Middlewares\DumbMiddleware;
 use Spec\BlitzPHP\App\Middlewares\SampleMiddleware;
 
+use function Kahlan\expect;
+
 describe('Http / MiddlewareQueue', function (): void {
     beforeAll(function (): void {
-		$this->request    = Services::request();
-		$this->response   = Services::response();
-		$this->container  = Services::container();
+		$this->request    = service('request');
+		$this->response   = service('response');
+		$this->container  = service('container');
 		$this->middleware = fn (array $middlewares = []) => new MiddlewareQueue($this->container, $middlewares, $this->request, $this->response);
     });
 

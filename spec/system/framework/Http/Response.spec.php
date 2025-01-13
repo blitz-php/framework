@@ -9,13 +9,14 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\HttpException;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Spec\ReflectionHelper;
+
+use function Kahlan\expect;
 
 describe('Http / Response', function (): void {
 	describe('Constructeur', function (): void {
@@ -327,7 +328,7 @@ describe('Http / Response', function (): void {
             expect($actual)->toBeAnInstanceOf(Response::class);
             expect($actual->getHeaderLine('Content-Disposition'))->toBe('attachment; filename="unit-test.txt"');
 
-            $emitter = ReflectionHelper::getPrivateMethodInvoker(Services::emitter(), 'emitBody');
+            $emitter = ReflectionHelper::getPrivateMethodInvoker(service('emitter'), 'emitBody');
 
             expect(static fn () => $emitter($actual, 8192))->toEcho('data');
         });
@@ -347,7 +348,7 @@ describe('Http / Response', function (): void {
             expect($actual)->toBeAnInstanceOf(Response::class);
             expect($actual->getHeaderLine('Content-Disposition'))->toBe('attachment; filename="' . basename(__FILE__) . '"');
 
-            $emitter = ReflectionHelper::getPrivateMethodInvoker(Services::emitter(), 'emitBody');
+            $emitter = ReflectionHelper::getPrivateMethodInvoker(service('emitter'), 'emitBody');
 
             expect(static fn () => $emitter($actual, 8192))->toEcho(file_get_contents(__FILE__));
         });

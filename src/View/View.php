@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\View;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\View\RendererInterface;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Exceptions\ViewException;
@@ -92,10 +91,10 @@ class View implements Stringable
     public static function share(array|Closure|string $key, mixed $value = null): void
     {
         if ($key instanceof Closure) {
-            $key = Services::container()->call($key);
+            $key = service('container')->call($key);
         }
         if ($value instanceof Closure) {
-            $value = Services::container()->call($value);
+            $value = service('container')->call($value);
         }
         if (is_string($key)) {
             $key = [$key => $value];
@@ -370,7 +369,7 @@ class View implements Stringable
 
         $this->adapter = new self::$validAdapters[$adapter](
             $config,
-            $config['view_path_locator'] ?? Services::locator(),
+            $config['view_path_locator'] ?? service('locator'),
             $debug
         );
 
@@ -405,7 +404,7 @@ class View implements Stringable
         $compress = $compress === 'auto' ? ($this->config['compress_output'] ?? 'auto') : $compress;
 
         if (is_callable($compress)) {
-            $compress = Services::container()->call($compress);
+            $compress = service('container')->call($compress);
         }
 
         if ($compress === 'auto') {

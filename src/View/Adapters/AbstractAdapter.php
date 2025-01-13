@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\View\Adapters;
 
-use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\View\RendererInterface;
 use BlitzPHP\Exceptions\ViewException;
@@ -88,7 +87,7 @@ abstract class AbstractAdapter implements RendererInterface
 
         if (! $this->locator instanceof LocatorInterface && ! is_dir($this->viewPath)) {
             $this->viewPath = '';
-            $this->locator  = Services::locator();
+            $this->locator  = service('locator');
         }
 
         $this->ext = preg_replace('#^\.#', '', $config['extension'] ?? $this->ext);
