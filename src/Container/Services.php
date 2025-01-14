@@ -595,14 +595,6 @@ class Services
     }
 
     /**
-     * Injectez un objet fictif pour les tests.
-     */
-    public static function injectMock(string $name, object $mock): void
-    {
-        static::$mocks[strtolower($name)] = $mock;
-    }
-
-    /**
      * Essaie d'obtenir un service à partir du conteneur
      *
      * @return mixed
@@ -677,15 +669,41 @@ class Services
     }
 
     /**
+     * Injectez un objet fictif pour les tests.
+	 *
+	 * @testTag disponible uniquement pour le code de test
+     */
+    public static function injectMock(string $name, object $mock): void
+    {
+        static::$mocks[strtolower($name)] = $mock;
+    }
+
+    /**
      * Réinitialisez les instances partagées et les simulations pour les tests.
+	 *
+	 * @testTag disponible uniquement pour le code de test
      */
     public static function reset(bool $initAutoloader = true): void
     {
-        // static::$mocks     = [];
+        static::$mocks     = [];
         static::$instances = [];
 
         if ($initAutoloader) {
             static::autoloader()->initialize();
+        }
+    }
+
+    /**
+     * Réinitialise toutes les instances fictives et partagées pour un seul service.
+     *
+     * @testTag disponible uniquement pour le code de test
+     */
+    public static function resetSingle(string ...$name)
+    {
+        foreach ($name as $n) {
+            unset(static::$mocks[$n], static::$instances[$n]);
+			$n = strtolower($n);
+            unset(static::$mocks[$n], static::$instances[$n]);
         }
     }
 }
