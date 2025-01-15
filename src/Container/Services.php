@@ -670,8 +670,8 @@ class Services
 
     /**
      * Injectez un objet fictif pour les tests.
-	 *
-	 * @testTag disponible uniquement pour le code de test
+     *
+     * @testTag disponible uniquement pour le code de test
      */
     public static function injectMock(string $name, object $mock): void
     {
@@ -680,8 +680,8 @@ class Services
 
     /**
      * Réinitialisez les instances partagées et les simulations pour les tests.
-	 *
-	 * @testTag disponible uniquement pour le code de test
+     *
+     * @testTag disponible uniquement pour le code de test
      */
     public static function reset(bool $initAutoloader = true): void
     {
@@ -702,7 +702,7 @@ class Services
     {
         foreach ($name as $n) {
             unset(static::$mocks[$n], static::$instances[$n]);
-			$n = strtolower($n);
+            $n = strtolower($n);
             unset(static::$mocks[$n], static::$instances[$n]);
         }
     }
