@@ -154,9 +154,9 @@ class Config
      * Rend disponible un groupe de configuration qui n'existe pas (pas de fichier de configuration)
      * Ceci est notament utilse pour definir des configurations à la volée
      */
-    public function ghost(array|string $key, null|array|Schema $structure = null): static
+    public function ghost(array|string $key, array|Schema|null $structure = null): static
     {
-		$schema = is_array($structure) ? Expect::mixed($structure) : $structure;
+        $schema = is_array($structure) ? Expect::mixed($structure) : $structure;
 
         $this->load($key, null, $schema, true);
 

@@ -225,9 +225,9 @@ abstract class Command
      */
     final public function argument(string $name, mixed $default = null): mixed
     {
-		if (isset($this->_arguments[$name])) {
-			return $this->_arguments[$name];
-		}
+        if (isset($this->_arguments[$name])) {
+            return $this->_arguments[$name];
+        }
 
         return $this->_arguments[Text::camel($name)] ?? $default;
     }
@@ -245,9 +245,9 @@ abstract class Command
      */
     final public function option(string $name, mixed $default = null): mixed
     {
-		if (isset($this->_options[$name])) {
-			return $this->_options[$name];
-		}
+        if (isset($this->_options[$name])) {
+            return $this->_options[$name];
+        }
 
         return $this->_options[Text::camel($name)] ?? $default;
     }
@@ -267,9 +267,9 @@ abstract class Command
     {
         $params = array_merge($this->_arguments, $this->_options);
 
-		if (isset($params[$name])) {
-			return $params[$name];
-		}
+        if (isset($params[$name])) {
+            return $params[$name];
+        }
 
         return $params[Text::camel($name)] ?? $default;
     }
@@ -403,8 +403,8 @@ abstract class Command
     /**
      * Générer une table pour la console. Les clés de la première ligne sont prises comme en-tête.
      *
-     * @param array[] $rows   Tableau de tableaux associés.
-     * @param array   $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
+     * @param list<array> $rows   Tableau de tableaux associés.
+     * @param array       $styles Par exemple : ['head' => 'bold', 'odd' => 'comment', 'even' => 'green']
      */
     final public function table(array $rows, array $styles = []): self
     {
