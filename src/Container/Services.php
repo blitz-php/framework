@@ -523,7 +523,7 @@ class Services
     public static function translator(?string $locale = null, bool $shared = true): Translate
     {
         if (null === $locale || $locale === '' || $locale === '0') {
-            $locale = static::request()->getLocale();
+            $locale = is_cli() ? static::config()->get('app.language') : static::request()->getLocale();
         }
 
         if (true === $shared && isset(static::$instances[Translate::class])) {

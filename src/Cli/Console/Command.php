@@ -19,6 +19,7 @@ use Ahc\Cli\Output\Cursor;
 use Ahc\Cli\Output\ProgressBar;
 use Ahc\Cli\Output\Writer;
 use BlitzPHP\Exceptions\CLIException;
+use BlitzPHP\Utilities\String\Text;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -169,7 +170,7 @@ abstract class Command
     /**
      * Options recus apres executions
      */
-    private array $_options = [];
+    protected array $_options = [];
 
     /**
      * @param Console         $app    Application Console
@@ -224,7 +225,11 @@ abstract class Command
      */
     final public function argument(string $name, mixed $default = null): mixed
     {
-        return $this->_arguments[$name] ?? $default;
+        if (isset($this->_arguments[$name])) {
+            return $this->_arguments[$name];
+        }
+
+        return $this->_arguments[Text::camel($name)] ?? $default;
     }
 
     /**
@@ -240,7 +245,11 @@ abstract class Command
      */
     final public function option(string $name, mixed $default = null): mixed
     {
-        return $this->_options[$name] ?? $default;
+        if (isset($this->_options[$name])) {
+            return $this->_options[$name];
+        }
+
+        return $this->_options[Text::camel($name)] ?? $default;
     }
 
     /**
@@ -258,7 +267,11 @@ abstract class Command
     {
         $params = array_merge($this->_arguments, $this->_options);
 
-        return $params[$name] ?? $default;
+        if (isset($params[$name])) {
+            return $params[$name];
+        }
+
+        return $params[Text::camel($name)] ?? $default;
     }
 
     /**
@@ -639,16 +652,8 @@ abstract class Command
      *
      * @return void
      */
-    protected function initProps()
+    private function initProps()
     {
-        if (! is_cli()) {
-            if (! file_exists($ou = TEMP_PATH . 'blitz-cli.txt')) {
-                file_put_contents($ou, '', LOCK_EX);
-            }
-
-            $this->app->io(new Interactor($ou, $ou));
-        }
-
         $this->io       = $this->app->io();
         $this->writer   = $this->io->writer();
         $this->reader   = $this->io->reader();

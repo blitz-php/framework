@@ -45,8 +45,8 @@ class RoutesCollector extends BaseCollector
 
     public function __construct()
     {
-        $rawRoutes                   = single_service('routes');
-        $this->router                = single_service('router', $rawRoutes, null);
+        $rawRoutes                   = service('routes');
+        $this->router                = service('router', $rawRoutes, null);
         $this->definedRouteCollector = new DefinedRouteCollector($rawRoutes);
         $this->isAutoRoute           = $rawRoutes->shouldAutoRoute();
     }
