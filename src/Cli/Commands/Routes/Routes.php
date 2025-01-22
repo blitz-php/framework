@@ -303,22 +303,6 @@ class Routes extends Command
     }
 
     /**
-     * Convertir les routes donnees en JSON.
-     */
-    protected function asJson(Collection $routes)
-    {
-        $this->json(
-            $routes->map(static function ($route) {
-                $route['middleware'] = empty($route['middleware']) ? [] : explode(' ', $route['middleware']);
-
-                return $route;
-            })
-                ->values()
-                ->toArray()
-        );
-    }
-
-    /**
      * Affiche les informations relatives à la route sur la console.
      *
      * @param int $total Nombre de route total collecté, indépendement des filtres appliqués
@@ -326,29 +310,41 @@ class Routes extends Command
     protected function displayRoutes(array $routes, int $total): void
     {
         $routes = collect($routes)->map(static fn ($route) => array_merge($route, [
-            'route' => $route['domain'] ? ($route['domain'] . '/' . ltrim($route['route'], '/')) : $route['route'],
-            'name'  => $route['route'] === $route['name'] ? null : $route['name'],
-        ]));
+            'middleware' => empty($route['middleware']) ? [] : explode(' ', $route['middleware']),
+            'name'       => $route['route'] === $route['name'] ? null : $route['name'],
+            'route'      => $route['domain'] ? ($route['domain'] . '/' . ltrim($route['route'], '/')) : $route['route'],
+        ]))->values();
 
         if ($this->option('json')) {
-            $this->asJson($routes);
+            $this->json($routes);
 
             return;
         }
 
-        $maxMethodLength = $routes->map(static fn ($route) => strlen($route['method']))->max();
+        $maxMethodLength = $routes->map(static fn ($route) => strlen($route['method']) + 3)->max();
+        $verbose         = $this->option('verbosity');
 
-        foreach ($routes->values()->toArray() as $route) {
+        foreach ($routes->toArray() as $route) {
             $left = implode('', [
                 $this->color->line(str_pad($route['method'], $maxMethodLength), ['fg' => $this->verbColors[$route['method']]]),
                 ' ',
                 $route['route'],
             ]);
-            $right = implode(' > ', array_filter([$route['name'], $route['handler']]));
+            $right = implode(' › ', array_filter([$route['name'], $route['handler']]));
 
             $this->justify($left, $right, [
                 'second' => ['fg' => Color::fg256(6), 'bold' => 1],
             ]);
+            if ($verbose) {
+                foreach ($route['middleware'] as $middleware) {
+                    $this->write(
+                        $this->color->line(
+                            sprintf('%s⇂ %s', str_repeat(' ', $maxMethodLength), $middleware),
+                            ['fg' => Color::fg256(60)]
+                        )
+                    )->eol();
+                }
+            }
         }
 
         if ($this->option('show-stats')) {
