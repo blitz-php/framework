@@ -319,7 +319,7 @@ class Console extends Application
                 $console->start($instance);
             }
 
-            $parameters = $command->values(false);
+            $parameters = $command->values();
             if ($arguments === null || $arguments === []) {
                 $arguments = $command->args();
             }
