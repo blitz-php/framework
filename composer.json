@@ -95,7 +95,7 @@
         "analyze": "Lance l'analyse statique du code du framework",
         "cs": "Vérifie les normes de codage",
         "cs:fix": "Corrige le style de codage",
-		"phpstan:baseline": "Exécute PHPStan puis transférer toutes les erreurs vers la ligne de base.",
+		"phpstan:baseline": "Exécute PHPStan puis transférer toutes les erreurs vers le fichier de baseline.",
         "phpstan:check": "Exécute PHPStan avec la prise en charge des identifiants",
         "test": "Execute les tests unitaires"
     },
