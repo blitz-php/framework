@@ -12,6 +12,7 @@
 namespace BlitzPHP\Security\Encryption\Handlers;
 
 use BlitzPHP\Contracts\Security\EncrypterInterface;
+use BlitzPHP\Utilities\String\Text;
 
 /**
  * Classe de base pour les gestionnaires de chiffrement
@@ -34,7 +35,9 @@ abstract class BaseHandler implements EncrypterInterface
         foreach (get_object_vars($config) as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->{$key} = $value;
-            }
+            } elseif (property_exists($this, $key = Text::camel($key))) {
+				$this->{$key} = $value;
+			}
         }
     }
 
