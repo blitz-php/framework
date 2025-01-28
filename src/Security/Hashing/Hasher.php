@@ -101,7 +101,7 @@ class Hasher implements HasherInterface
     /**
      * Initialiser ou réinitialiser le hasheur
      *
-     * @throws EncryptionException
+     * @throws HashingException
      */
     public function initialize(?object $config = null): HasherInterface
     {

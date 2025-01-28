@@ -698,6 +698,24 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
 ];
 $ignoreErrors[] = [
+	// identifier: booleanAnd.alwaysFalse
+	'message' => '#^Result of && is always false\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Security/Hashing/Handlers/ArgonHandler.php',
+];
+$ignoreErrors[] = [
+	// identifier: identical.alwaysFalse
+	'message' => '#^Strict comparison using \\=\\=\\= between \'standard\' and \'sodium\' will always evaluate to false\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Security/Hashing/Handlers/ArgonHandler.php',
+];
+$ignoreErrors[] = [
+	// identifier: method.notFound
+	'message' => '#^Call to an undefined method BlitzPHP\\\\Contracts\\\\Security\\\\HasherInterface\\:\\:verifyConfiguration\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Security/Hashing/Hasher.php',
+];
+$ignoreErrors[] = [
 	// identifier: class.notFound
 	'message' => '#^Call to method directive\\(\\) on an unknown class Jenssegers\\\\Blade\\\\Blade\\.$#',
 	'count' => 1,

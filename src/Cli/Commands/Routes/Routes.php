@@ -82,7 +82,7 @@ class Routes extends Command
     protected array $headers = ['Domain', 'Method', 'Route', 'Name', 'Handler', 'Middleware'];
 
     /**
-     * @var array<string,string>
+     * @var array<string,int>
      */
     protected array $verbColors = [
         'GET'     => Color::BLUE,
@@ -209,7 +209,7 @@ class Routes extends Command
             'domain'     => $route['domain'] ?? '',
             'method'     => $route['method'],
             'route'      => $route['route'],
-            'uri'        => $sampleUri,
+            'uri'        => $sampleUri ?? '',
             'name'       => $route['name'],
             'handler'    => ltrim($route['handler'], '\\'),
             'middleware' => $route['middleware'],
