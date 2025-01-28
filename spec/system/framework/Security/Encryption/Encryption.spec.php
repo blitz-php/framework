@@ -66,8 +66,8 @@ describe('Security / Encryption', function (): void {
         });
     });
 
-    describe('Service', static function (): void {
-        it(': Le service encrypter fonctionne', static function (): void {
+    describe('Service', function (): void {
+        it(': Le service encrypter fonctionne', function (): void {
             $config           = config('encryption');
             $config['driver'] = 'OpenSSL';
             $config['key']    = 'anything';
@@ -77,32 +77,32 @@ describe('Security / Encryption', function (): void {
             expect($encrypter)->toBeAnInstanceOf(EncrypterInterface::class);
         });
 
-        it(': Le service encrypter leve une exception si le pilote est mauvais', static function (): void {
+        it(': Le service encrypter leve une exception si le pilote est mauvais', function (): void {
             // ask for a bad driver
             $config           = config('encryption');
             $config['driver'] = 'Bogus';
             $config['key']    = 'anything';
 
-            expect(static function () use ($config): void {
+            expect(function () use ($config): void {
                 service('encrypter', $config);
             })->toThrow(new EncryptionException());
         });
 
-        it(": Le service encrypter leve une exception s'il n'y a pas de cle", static function (): void {
-            expect(static function (): void {
+        it(": Le service encrypter leve une exception s'il n'y a pas de cle", function (): void {
+            expect(function (): void {
                 service('encrypter');
             })->toThrow(new EncryptionException());
         });
 
-        it(': Service encrypter partagé', static function (): void {
+        it(': Service encrypter partagé', function (): void {
             $config           = config('encryption');
             $config['driver'] = 'OpenSSL';
             $config['key']    = 'anything';
 
-            $encrypter = single_service('encrypter', $config);
+            $encrypter = service('encrypter', $config);
 
             $config['key'] = 'Abracadabra';
-            $encrypter     = single_service('encrypter', $config);
+            $encrypter     = service('encrypter', $config, true);
 
             expect($encrypter->key)->toBe('anything');
         });
@@ -120,8 +120,8 @@ describe('Security / Encryption', function (): void {
         });
     });
 
-    describe('Decryptage', static function (): void {
-        it(': Decrypte une chaine codée avec AES-128-CBC', static function (): void {
+    describe('Decryptage', function (): void {
+        it(': Decrypte une chaine codée avec AES-128-CBC', function (): void {
             $config                   = config('encryption');
             $config['driver']         = 'OpenSSL';
             $config['key']            = hex2bin('64c70b0b8d45b80b9eba60b8b3c8a34d0193223d20fea46f8644b848bf7ce67f');
@@ -138,7 +138,7 @@ describe('Security / Encryption', function (): void {
             expect($decrypted)->toBe($expected);
         });
 
-        it(': Decrypte une chaine codée avec AES-256-CTR', static function (): void {
+        it(': Decrypte une chaine codée avec AES-256-CTR', function (): void {
             $config                   = config('encryption');
             $config['driver']         = 'OpenSSL';
             $config['key']            = hex2bin('64c70b0b8d45b80b9eba60b8b3c8a34d0193223d20fea46f8644b848bf7ce67f');
@@ -155,7 +155,7 @@ describe('Security / Encryption', function (): void {
             expect($decrypted)->toBe($expected);
         });
 
-        it(': Decrypte une chaine codée avec base64_encode', static function (): void {
+        it(': Decrypte une chaine codée avec base64_encode', function (): void {
             $config           = config('encryption');
             $config['driver'] = 'OpenSSL';
             $config['key']    = hex2bin('64c70b0b8d45b80b9eba60b8b3c8a34d0193223d20fea46f8644b848bf7ce67f');

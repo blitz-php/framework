@@ -73,12 +73,12 @@ class Publish extends Command
                     $publisher::class,
                     count($publisher->getPublished()),
                     $publisher->getDestination(),
-                ]));
+                ]))->eol();
             } else {
                 $this->fail(lang('Publisher.publishFailure', [
                     $publisher::class,
                     $publisher->getDestination(),
-                ]));
+                ]))->eol();
 
                 foreach ($publisher->getErrors() as $file => $exception) {
                     $this->write($file);

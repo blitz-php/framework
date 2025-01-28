@@ -13,6 +13,7 @@ namespace BlitzPHP\Cli\Commands\Encryption;
 
 use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Loader\DotEnv;
+use BlitzPHP\Security\Encryption\Encryption;
 
 /**
  * Genere une nouvelle cle d'encryption.
@@ -32,20 +33,20 @@ class GenerateKey extends Command
     /**
      * @var string Description
      */
-    protected $description = 'Génère une nouvelle clé d\'encryption et la met dans le fichier `.env`.';
+    protected $description = 'Génère une nouvelle clé de chiffrememt et la met dans le fichier `.env`.';
 
     /**
      * @var string
      */
-    protected $service = 'Service de d\'encryption';
+    protected $service = 'Service de chiffrememt';
 
     /**
      * @var array Options
      */
     protected $options = [
         '--force'  => 'Force l\'écrasement de clé existante dans le fichier `.env`.',
-        '--length' => ['La longeur de la chaîne aléatoire qui doit être retournée en bytes. Par défaut "32".', 32],
-        '--prefix' => ['Prefix à ajouter à la clé encodée (doit être hex2bin ou base64). Par défaut "hex2bin".', 'hex2bin'],
+        '--length' => ['La longueur de la chaîne aléatoire qui doit être retournée en bytes.', 32],
+        '--prefix' => ['Prefix à ajouter à la clé encodée (doit être hex2bin ou base64).', 'hex2bin'],
         '--show'   => 'Indique qu\'on souhaite afficher la clé générée dans le terminal après l\'avoir mis dans le fichier `.env`.',
     ];
 
@@ -68,7 +69,7 @@ class GenerateKey extends Command
             $length = 32;
         }
 
-        $this->task('Génération d\'une nouvelle clé d\'encryption');
+        $this->task('Génération d\'une nouvelle clé de chiffrememt');
 
         $encodedKey = $this->generateRandomKey($prefix, $length);
 
@@ -79,12 +80,12 @@ class GenerateKey extends Command
         }
 
         if (! $this->setNewEncryptionKey($encodedKey)) {
-            $this->writer->error('Erreur dans la configuration d\'une nouvelle cle d\'encryption dans le fichier `.env`.', true);
+            $this->writer->error('Erreur dans la configuration d\'une nouvelle clé de chiffrememt dans le fichier `.env`.', true);
 
             return;
         }
 
-        $this->success('Une nouvelle clé d\'encryption de l\'application a été définie avec succès.');
+        $this->success('Une nouvelle clé de chiffrement de l\'application a été définie avec succès.');
     }
 
     /**
@@ -92,7 +93,7 @@ class GenerateKey extends Command
      */
     protected function generateRandomKey(string $prefix, int $length): string
     {
-        $key = random_bytes($length); // @todo prevoir l'utilisation d'une classe Encryption
+        $key = Encryption::createKey($length);
 
         if ($prefix === 'hex2bin') {
             return 'hex2bin:' . bin2hex($key);
