@@ -241,25 +241,6 @@ class Services
     }
 
     /**
-     * La classe Encryption fournit un cryptage bidirectionnel.
-     *
-     * @return Hasher
-     */
-    public static function hashing(?array $config = null, bool $shared = true): HasherInterface
-    {
-        if (true === $shared && isset(static::$instances[Hasher::class])) {
-            return static::$instances[Hasher::class];
-        }
-
-        $config ??= config('hashing');
-        $config = (object) $config;
-        $hasher = new Hasher($config);
-        $hasher->initialize($config);
-
-        return static::$instances[Hasher::class] = $hasher;
-    }
-
-    /**
      * Gestionnaire d'evenement
      *
      * @return EventManager
@@ -286,6 +267,25 @@ class Services
     }
 
     /**
+     * La classe Encryption fournit un cryptage bidirectionnel.
+     *
+     * @return Hasher
+     */
+    public static function hashing(?array $config = null, bool $shared = true): HasherInterface
+    {
+        if (true === $shared && isset(static::$instances[Hasher::class])) {
+            return static::$instances[Hasher::class];
+        }
+
+        $config ??= config('hashing');
+        $config = (object) $config;
+        $hasher = new Hasher($config);
+        $hasher->initialize($config);
+
+        return static::$instances[Hasher::class] = $hasher;
+    }
+
+    /**
      * Responsable du chargement des traductions des chaînes de langue.
      *
      * @deprecated 0.9 use translators instead
@@ -305,7 +305,7 @@ class Services
             if (! isset(static::$instances[Locator::class])) {
                 $locator = new Locator(static::autoloader());
                 if (true === config('optimize.locator_cache_enabled', false)) {
-                    static::$instances[Locator::class] = new LocatorCached($locator, new FileVarExportHandler());
+                    static::$instances[Locator::class] = new LocatorCached($locator, new FileVarExportHandler(FRAMEWORK_STORAGE_PATH . 'cache'));
                 } else {
                     static::$instances[Locator::class] = $locator;
                 }
