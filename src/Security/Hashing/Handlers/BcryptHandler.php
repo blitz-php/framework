@@ -116,11 +116,7 @@ class BcryptHandler extends BaseHandler implements HasherInterface
             return false;
         }
 
-        if ($options['cost'] > $this->rounds) {
-            return false;
-        }
-
-        return true;
+        return ! ($options['cost'] > $this->rounds);
     }
 
     /**

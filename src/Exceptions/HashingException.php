@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Exceptions;
 
-use RuntimeException;
-
 /**
  * Hashing exception
  */

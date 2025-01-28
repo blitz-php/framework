@@ -29,7 +29,7 @@ class Hasher implements HasherInterface
      */
     protected string $driver = '';
 
-	/**
+    /**
      * Pilotes aux classes de gestionnaires, par ordre de préférence
      */
     protected array $drivers = [
@@ -37,6 +37,7 @@ class Hasher implements HasherInterface
         'argon',
         'argon2id',
     ];
+
     /**
      * Constructeur
      */
@@ -45,7 +46,7 @@ class Hasher implements HasherInterface
         $config ??= (object) config('hashing');
 
         $this->config = $config;
-		$this->driver = $config->driver;
+        $this->driver = $config->driver;
     }
 
     /**
@@ -118,8 +119,8 @@ class Hasher implements HasherInterface
         }
 
         $handlerName  = 'BlitzPHP\\Security\\Hashing\\Handlers\\' . ucfirst($this->driver) . 'Handler';
-		$params       = (array) $config;
-		$this->hasher = new $handlerName($params[$this->driver]);
+        $params       = (array) $config;
+        $this->hasher = new $handlerName($params[$this->driver]);
 
         return $this->hasher;
     }

@@ -36,8 +36,8 @@ abstract class BaseHandler implements EncrypterInterface
             if (property_exists($this, $key)) {
                 $this->{$key} = $value;
             } elseif (property_exists($this, $key = Text::camel($key))) {
-				$this->{$key} = $value;
-			}
+                $this->{$key} = $value;
+            }
         }
     }
 

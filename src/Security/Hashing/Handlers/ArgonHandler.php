@@ -53,7 +53,7 @@ class ArgonHandler extends BaseHandler implements HasherInterface
         $this->verifyAlgorithm = $options['verify'] ?? $this->verifyAlgorithm;
     }
 
-	/**
+    /**
      * {@inheritDoc}
      *
      * @throws RuntimeException
@@ -124,7 +124,7 @@ class ArgonHandler extends BaseHandler implements HasherInterface
     /**
      * Vérifie l'algorithme de la valeur hachée.
      */
-	protected function isUsingCorrectAlgorithm(string $hashedValue): bool
+    protected function isUsingCorrectAlgorithm(string $hashedValue): bool
     {
         return $this->info($hashedValue)['algoName'] === 'argon2i';
     }
@@ -137,22 +137,18 @@ class ArgonHandler extends BaseHandler implements HasherInterface
         ['options' => $options] = $this->info($hashedValue);
 
         if (
-            ! is_int($options['memory_cost'] ?? null) ||
-            ! is_int($options['time_cost'] ?? null) ||
-            ! is_int($options['threads'] ?? null)
+            ! is_int($options['memory_cost'] ?? null)
+            || ! is_int($options['time_cost'] ?? null)
+            || ! is_int($options['threads'] ?? null)
         ) {
             return false;
         }
 
-        if (
-            $options['memory_cost'] > $this->memory ||
-            $options['time_cost'] > $this->time ||
-            $options['threads'] > $this->threads
-        ) {
-            return false;
-        }
-
-        return true;
+        return ! (
+            $options['memory_cost'] > $this->memory
+            || $options['time_cost'] > $this->time
+            || $options['threads'] > $this->threads
+        );
     }
 
     /**
