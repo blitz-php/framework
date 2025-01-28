@@ -27,6 +27,7 @@ use BlitzPHP\Contracts\Mail\MailerInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Router\RouterInterface;
 use BlitzPHP\Contracts\Security\EncrypterInterface;
+use BlitzPHP\Contracts\Security\HasherInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
 use BlitzPHP\Contracts\Session\SessionInterface;
 use BlitzPHP\Debug\Logger;
@@ -48,6 +49,7 @@ use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
 use BlitzPHP\Security\Encryption\Encryption;
+use BlitzPHP\Security\Hashing\Hasher;
 use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Session\Cookie\CookieManager;
 use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
@@ -236,6 +238,25 @@ class Services
         $encryption->initialize($config);
 
         return static::$instances[Encryption::class] = $encryption;
+    }
+
+    /**
+     * La classe Encryption fournit un cryptage bidirectionnel.
+     *
+     * @return Hasher
+     */
+    public static function hashing(?array $config = null, bool $shared = true): HasherInterface
+    {
+        if (true === $shared && isset(static::$instances[Hasher::class])) {
+            return static::$instances[Hasher::class];
+        }
+
+        $config ??= config('hashing');
+        $config = (object) $config;
+        $hasher = new Hasher($config);
+        $hasher->initialize($config);
+
+        return static::$instances[Hasher::class] = $hasher;
     }
 
     /**
