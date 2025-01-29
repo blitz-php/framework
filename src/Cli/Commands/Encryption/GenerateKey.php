@@ -69,7 +69,7 @@ class GenerateKey extends Command
             $length = 32;
         }
 
-        $this->task('Génération d\'une nouvelle clé de chiffrememt');
+        $this->task('Génération d\'une nouvelle clé de chiffrement');
 
         $encodedKey = $this->generateRandomKey($prefix, $length);
 
@@ -80,7 +80,7 @@ class GenerateKey extends Command
         }
 
         if (! $this->setNewEncryptionKey($encodedKey)) {
-            $this->writer->error('Erreur dans la configuration d\'une nouvelle clé de chiffrememt dans le fichier `.env`.', true);
+            $this->writer->error('Erreur dans la configuration d\'une nouvelle clé de chiffrement dans le fichier `.env`.', true);
 
             return;
         }

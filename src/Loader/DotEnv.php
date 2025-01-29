@@ -115,7 +115,7 @@ class DotEnv
             foreach ($env as $env_key => $env_value) {
                 $entry = explode('=', $env_value, 2);
                 $entry = array_map('trim', $entry);
-                if ($entry[0] === $key) {
+                if ($entry[0] === $key || $entry[0] === '# ' . $key) {
                     $env[$env_key] = $key . '=' . (is_string($value) ? '"' . $value . '"' : $value);
                 } else {
                     $env[$env_key] = $env_value;
@@ -280,7 +280,7 @@ class DotEnv
 
             $value = preg_replace_callback(
                 '/\${([a-zA-Z0-9_]+)}/',
-                static function ($matchedPatterns) use ($loader): string {
+                static function ($matchedPatterns) use ($loader) {
                     $nestedVariable = $loader->getVariable($matchedPatterns[1]);
 
                     if (null === $nestedVariable) {
