@@ -44,7 +44,11 @@ if (! function_exists('env')) {
      */
     function env(string $key, $default = null)
     {
-        return Helpers::env($key, $default);
+        if (is_string($value = Helpers::env($key, $default)) && trim($value) === '') {
+            $value = $default;
+        }
+
+        return $value;
     }
 }
 

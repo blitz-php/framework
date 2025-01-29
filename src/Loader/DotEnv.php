@@ -48,17 +48,7 @@ class DotEnv
      */
     public function load(): bool
     {
-        $vars = $this->parse();
-
-        if ($vars === null) {
-            return false;
-        }
-
-        foreach ($vars as $name => $value) {
-            $this->setVariable($name, $value);
-        }
-
-        return true; // notifie de la reussite de l'operation
+        return $this->parse() !== null;
     }
 
     /**
@@ -145,7 +135,7 @@ class DotEnv
 
         // Assurez-vous que le fichier est lisible
         if (! is_readable($this->path)) {
-            throw new InvalidArgumentException("The .env file is not readable: {$this->path}");
+            throw new InvalidArgumentException("Le fichier `.env` est n'est pas lisible: {$this->path}");
         }
 
         $vars = [];
@@ -162,6 +152,7 @@ class DotEnv
             if (str_contains($line, '=')) {
                 [$name, $value] = $this->normaliseVariable($line);
                 $vars[$name]    = $value;
+                $this->setVariable($name, $value);
             }
         }
 
@@ -201,17 +192,14 @@ class DotEnv
         $value = trim($value);
 
         // Assainir le nom
-        $name = str_replace(['export', '\'', '"'], '', $name);
+        $name = preg_replace('/^export[ \t]++(\S+)/', '$1', $name);
+        $name = str_replace(['\'', '"'], '', $name);
 
         // Assainir la valeur
         $value = $this->sanitizeValue($value);
-
         $value = $this->resolveNestedVariables($value);
 
-        return [
-            $name,
-            $value,
-        ];
+        return [$name, $value];
     }
 
     /**
@@ -231,33 +219,34 @@ class DotEnv
         // Commence-t-il par une citation ?
         if (strpbrk($value[0], '"\'') !== false) {
             // la valeur commence par un guillemet
-            $quote        = $value[0];
+            $quote = $value[0];
+
             $regexPattern = sprintf(
                 '/^
-					%1$s          # match a quote at the start of the value
-					(             # capturing sub-pattern used
-								  (?:          # we do not need to capture this
-								   [^%1$s\\\\] # any character other than a quote or backslash
-								   |\\\\\\\\   # or two backslashes together
-								   |\\\\%1$s   # or an escaped quote e.g \"
-								  )*           # as many characters that match the previous rules
-					)             # end of the capturing sub-pattern
-					%1$s          # and the closing quote
-					.*$           # and discard any string after the closing quote
-					/mx',
-                $quote
+                %1$s          # match a quote at the start of the value
+                (             # capturing sub-pattern used
+                 (?:          # we do not need to capture this
+                 [^%1$s\\\\] # any character other than a quote or backslash
+                 |\\\\\\\\   # or two backslashes together
+                 |\\\\%1$s   # or an escaped quote e.g \"
+                 )*           # as many characters that match the previous rules
+                )             # end of the capturing sub-pattern
+                %1$s          # and the closing quote
+                .*$           # and discard any string after the closing quote
+                /mx',
+                $quote,
             );
+
             $value = preg_replace($regexPattern, '$1', $value);
             $value = str_replace("\\{$quote}", $quote, $value);
             $value = str_replace('\\\\', '\\', $value);
         } else {
             $parts = explode(' #', $value, 2);
-
             $value = trim($parts[0]);
 
             // Les valeurs sans guillemets ne peuvent pas contenir d'espaces
             if (preg_match('/\s+/', $value) > 0) {
-                throw new InvalidArgumentException('.env values containing spaces must be surrounded by quotes.');
+                throw new InvalidArgumentException('Les valeurs du fichier `.env` contenant des espaces doivent être entourées de guillemets.');
             }
         }
 
@@ -276,20 +265,18 @@ class DotEnv
     protected function resolveNestedVariables(string $value): string
     {
         if (str_contains($value, '$')) {
-            $loader = $this;
-
             $value = preg_replace_callback(
-                '/\${([a-zA-Z0-9_]+)}/',
-                static function ($matchedPatterns) use ($loader) {
-                    $nestedVariable = $loader->getVariable($matchedPatterns[1]);
+                '/\${([a-zA-Z0-9_\.]+)}/',
+                function ($matchedPatterns) {
+                    $nestedVariable = $this->getVariable($matchedPatterns[1]);
 
-                    if (null === $nestedVariable) {
+                    if ($nestedVariable === null) {
                         return $matchedPatterns[0];
                     }
 
                     return $nestedVariable;
                 },
-                $value
+                $value,
             );
         }
 
