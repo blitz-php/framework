@@ -35,7 +35,12 @@ class ExceptionManager
     public static function registerHttpErrors(Run $debugger, array $config): Run
     {
         return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config): int {
-            if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
+            $exception_code = $exception->getCode();
+            if ($exception_code >= 400 && $exception_code < 600) {
+                $run->sendHttpCode($exception_code);
+            }
+
+			if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
                 service('logger')->error($exception);
             }
 
