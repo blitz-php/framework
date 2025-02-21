@@ -100,7 +100,7 @@ class Encryption implements EncrypterInterface
      */
     public function decrypt(string $data, array|string|null $params = null): string
     {
-        return $this->encrypter()->decrypt(base64_decode($data), $params);
+        return $this->encrypter()->decrypt(base64_decode($data, true), $params);
     }
 
     /**
