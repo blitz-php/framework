@@ -40,7 +40,7 @@ class ExceptionManager
                 $run->sendHttpCode($exception_code);
             }
 
-			if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
+            if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
                 service('logger')->error($exception);
             }
 
