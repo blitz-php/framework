@@ -98,7 +98,7 @@ class Parser extends NativeAdapter
 
         if (! is_file($file)) {
             $fileOrig = $file;
-            $file     = ($this->locator ?: service('locator'))->locateFile($view, 'Views');
+            $file     = $this->locator->locateFile($view, 'Views');
 
             // locateFile will return an empty string if the file cannot be found.
             if (empty($file)) {
