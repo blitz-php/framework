@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Debug;
 
+use BlitzPHP\Exceptions\HttpException;
+use BlitzPHP\Exceptions\TokenMismatchException;
 use BlitzPHP\View\View;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
@@ -35,6 +37,8 @@ class ExceptionManager
     public static function registerHttpErrors(Run $debugger, array $config): Run
     {
         return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config): int {
+            $exception = self::prepareException($exception);
+
             $exception_code = $exception->getCode();
             if ($exception_code >= 400 && $exception_code < 600) {
                 $run->sendHttpCode($exception_code);
@@ -52,7 +56,7 @@ class ExceptionManager
 
             if (in_array((string) $exception->getCode(), $files, true)) {
                 $view = new View();
-                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path_locator' => $config['error_view_path']])
+                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path' => $config['error_view_path']])
                     ->display((string) $exception->getCode())
                     ->setData(['message' => $exception->getMessage()])
                     ->render();
@@ -165,5 +169,17 @@ class ExceptionManager
         }
 
         return $handler;
+    }
+
+    /**
+     * Prepare exception for rendering.
+     */
+    private static function prepareException(Throwable $e): Throwable
+    {
+        if ($e instanceof TokenMismatchException) {
+            $e = new HttpException($e->getMessage(), 419, $e);
+        }
+
+        return $e;
     }
 }

@@ -50,7 +50,7 @@ abstract class AbstractAdapter implements RendererInterface
     /**
      * Instance de Locator lorsque nous devons tenter de trouver une vue qui n'est pas à l'emplacement standard.
      */
-    protected ?LocatorInterface $locator = null;
+    protected LocatorInterface $locator;
 
     /**
      * Le nom de la mise en page utilisée, le cas échéant.
@@ -70,25 +70,19 @@ abstract class AbstractAdapter implements RendererInterface
     /**
      * {@inheritDoc}
      *
-     * @param array $config Configuration actuelle de l'adapter
-     * @param bool  $debug  Devrions-nous stocker des informations sur les performances ?
+     * @param array       $config   Configuration actuelle de l'adapter
+     * @param string|null $viewPath Dossier principal dans lequel les vues doivent être cherchées
+     * @param bool        $debug    Devrions-nous stocker des informations sur les performances ?
      */
-    public function __construct(protected array $config, $viewPathLocator = null, protected bool $debug = BLITZ_DEBUG)
+    public function __construct(protected array $config, $viewPath = null, protected bool $debug = BLITZ_DEBUG)
     {
         helper('assets');
 
-        if (! empty($viewPathLocator)) {
-            if (is_string($viewPathLocator)) {
-                $this->viewPath = rtrim($viewPathLocator, '\\/ ') . DS;
-            } elseif ($viewPathLocator instanceof LocatorInterface) {
-                $this->locator = $viewPathLocator;
-            }
+        if (is_string($viewPath) && is_dir($viewPath = rtrim($viewPath, '\\/ ') . DS)) {
+            $this->viewPath = $viewPath;
         }
 
-        if (! $this->locator instanceof LocatorInterface && ! is_dir($this->viewPath)) {
-            $this->viewPath = '';
-            $this->locator  = service('locator');
-        }
+        $this->locator = service('locator');
 
         $this->ext = preg_replace('#^\.#', '', $config['extension'] ?? $this->ext);
     }
@@ -264,7 +258,7 @@ abstract class AbstractAdapter implements RendererInterface
 
         $file = Helpers::ensureExt($file, $ext);
 
-        if (! is_file($file) && $this->locator instanceof LocatorInterface) {
+        if (! is_file($file)) {
             $file = $this->locator->locateFile($view, 'Views', $ext);
         }
 

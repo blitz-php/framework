@@ -369,7 +369,7 @@ class View implements Stringable
 
         $this->adapter = new self::$validAdapters[$adapter](
             $config,
-            $config['view_path_locator'] ?? service('locator'),
+            $config['view_path'] ?? null,
             $debug
         );
 
