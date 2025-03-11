@@ -52,7 +52,7 @@ class ExceptionManager
 
             if (in_array((string) $exception->getCode(), $files, true)) {
                 $view = new View();
-                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path_locator' => $config['error_view_path']])
+                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path' => $config['error_view_path']])
                     ->display((string) $exception->getCode())
                     ->setData(['message' => $exception->getMessage()])
                     ->render();
