@@ -100,7 +100,11 @@ class Encryption implements EncrypterInterface
      */
     public function decrypt(string $data, array|string|null $params = null): string
     {
-        return $this->encrypter()->decrypt(base64_decode($data, true), $params);
+        if (function_exists('mb_check_encoding')) {
+            $data = ! mb_check_encoding($data, 'UTF-8') ? $data : base64_decode($data, true);
+        }
+
+        return $this->encrypter()->decrypt($data, $params);
     }
 
     /**

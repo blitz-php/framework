@@ -131,7 +131,7 @@ describe('Security / Encryption', function (): void {
             $config['authKeyInfo']    = 'authentication';
             $encrypter                = single_service('encrypter', $config);
 
-            $encrypted = '211c55b9d1948187557bff88c1e77e0f6b965e3711d477d97fb0b60907a7336028714dbb8dfe90598039e9bc7147b54e552d739b378cd864fb91dde9ad6d4ffalIvVxFDDLTPBYGaHLNDzUSJExBKbQJ0NW27KDaR83bYqz8MDz/mXXpE+HHdaWjEE';
+            $encrypted = 'ZGY3OWMyODBjN2M4MjBlNWEyMjRkY2RlOTQzNDIwNjA1ZGI2MzU2NDVjMDFmNjdhODM4ZDE1YmYyYzczZTYyNmQ1MmNhZmUyMjU1MTMxYWI2ZjRlNTFjYWUyYjY1OWJkNjNhMjhjZTU2ZTkyZWNlNTE1NTE5NDlhYThmMDlhZjVMNWN0SXVrU0hkQjJOVVczT1paK0RkbTM4WFRWTnNUVTJFTlZQWmxHNGJSS1hPaUpCMHNhMXBxcUlsc3RTaXpr';
             $decrypted = $encrypter->decrypt($encrypted);
 
             $expected = 'This is a plain-text message.';
@@ -148,7 +148,7 @@ describe('Security / Encryption', function (): void {
             $config['authKeyInfo']    = 'authentication';
             $encrypter                = single_service('encrypter', $config);
 
-            $encrypted = 'f5eeb3f056b2dc5e8119b4a5f5ba793d724b9ca2d1ca23ab89bc72e51863f8da233a83ccb48d5daf3d6905d61f357877aaad32c8bc7a7c5e48f3268d2ba362b9UTw2A7U4CB9vb+6izrDzJHAdz1hAutIt2Ex2C2FqamJAXc8Z8RQor9UvaWy2';
+            $encrypted = 'ZDY2MjM0NGYzNTdmNDE4NjZlOWQ4MzhkYjBmMTdkYjQ5ZGRhZDU3OTQ3YWM2YTFmZGU2YWM3YjhjMDQ5NWM4ZDU1MTUwMDljZjI5YjBmOGM2MTkxNGNiMWI1ZjE5ZjU1ZmRmOTdlMDY2Y2VkMzU5OTQ0ODdlZjgwMDUyMzU2ZGFMVmdpakhLUmY1ZFdsM09Mb0I0RGlIcGwxNUtkcTQxaU94eHVlYTNNK2dlaTlXdU5zYXladXdmcndqOUY=';
             $decrypted = $encrypter->decrypt($encrypted);
 
             $expected = 'This is a plain-text message.';
