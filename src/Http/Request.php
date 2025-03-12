@@ -193,7 +193,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function decodedPath(): string
     {
-        return rawurldecode($this->path());
+        return rawurldecode(trim($this->path(), '/'));
     }
 
     /**
