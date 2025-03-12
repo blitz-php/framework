@@ -36,7 +36,7 @@ class ExceptionManager
     /**
      * Gestionnaire d'exception (instance Whoops)
      */
-    private Run $debugger;
+    private ?Run $debugger = null;
 
     /**
      * Configuration du gestionnaire d'exception

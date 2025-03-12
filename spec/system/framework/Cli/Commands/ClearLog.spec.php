@@ -23,6 +23,10 @@ describe('Commandes / ClearLog', function (): void {
 			$date = $this->date;
 			$path = STORAGE_PATH . 'logs' . DS . "log-{$date}.log";
 
+			if (! is_dir($dir = dirname($path))) {
+				@mkdir($dir, 0777, true);
+			}
+
 			// creer 10 faux ficher de log
 			for ($i = 0; $i < 10; $i++) {
 				$newDate = date('Y-m-d', strtotime("+1 year -{$i} day"));
