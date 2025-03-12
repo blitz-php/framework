@@ -12,7 +12,7 @@
 namespace BlitzPHP\Core;
 
 use BlitzPHP\Container\Services;
-use BlitzPHP\Debug\Debugger;
+use BlitzPHP\Debug\ExceptionManager;
 use BlitzPHP\Event\EventDiscover;
 use BlitzPHP\Exceptions\ExceptionInterface;
 use BlitzPHP\Router\Dispatcher;
@@ -67,7 +67,7 @@ class Application
         /**
          * Lance la capture des exceptions et erreurs
          */
-        Debugger::init();
+        service(ExceptionManager::class)->register();
 
         /**
          * Initialisation du gestionnaire d'evenement

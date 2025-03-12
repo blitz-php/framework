@@ -27,46 +27,102 @@ use Whoops\RunInterface;
 use Whoops\Util\Misc;
 
 /**
- * Gestionnaire d'exceptions
+ * Capture et affiche les erreurs et exceptions via whoops
+ *
+ * Necessite l'instalation de `flip/whoops`
  */
 class ExceptionManager
 {
     /**
-     * Gestionnaire d'exceptions de type http (404, 500) qui peuvent avoir une page d'erreur personnalisée.
+     * Gestionnaire d'exception (instance Whoops)
      */
-    public static function registerHttpErrors(Run $debugger, array $config): Run
-    {
-        return $debugger->pushHandler(static function (Throwable $exception, InspectorInterface $inspector, RunInterface $run) use ($config): int {
-            $exception = self::prepareException($exception);
+    private Run $debugger;
 
+    /**
+     * Configuration du gestionnaire d'exception
+     */
+    private object $config;
+
+    public function __construct()
+    {
+        if (class_exists(Run::class)) {
+            $this->debugger = new Run();
+            $this->config   = (object) config('exceptions');
+        }
+    }
+
+    /**
+     * Demarre le processus
+     */
+    public function register(): void
+    {
+        if (! $this->debugger) {
+            return;
+        }
+
+        $this->registerWhoopsHandler()
+            ->registerHttpErrorsHandler()
+            ->registerAppHandlers();
+
+        $this->debugger->register();
+    }
+
+    /**
+     * Enregistre les gestionnaires d'exception spécifiques à l'application.
+     *
+     * Cette méthode parcourt les gestionnaires configurés et les ajoute au débogueur.
+     * Elle prend en charge à la fois les gestionnaires callable et les noms de classe sous forme de chaîne qui peuvent être instanciés.
+     */
+    private function registerAppHandlers(): self
+    {
+        foreach ($this->config->handlers as $handler) {
+            if (is_callable($handler)) {
+                $this->debugger->pushHandler($handler);
+            } elseif (is_string($handler) && class_exists($handler)) {
+                $class = service('container')->make($handler);
+                if (is_callable($class) || $class instanceof HandlerInterface) {
+                    $this->debugger->pushHandler($class);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Enregistre un gestionnaire pour les erreurs HTTP.
+     *
+     * Cette méthode met en place un gestionnaire d'erreurs personnalisé qui traite les exceptions,
+     * les consigne si elle est configurée, et tente d'afficher les vues d'erreur appropriées.
+     * Elle gère les codes d'état HTTP, la journalisation et les vues d'erreur personnalisées.
+     */
+    private function registerHttpErrorsHandler(): self
+    {
+        $this->debugger->pushHandler(function (Throwable $exception, InspectorInterface $inspector, RunInterface $run): int {
+            $exception      = $this->prepareException($exception);
             $exception_code = $exception->getCode();
+
             if ($exception_code >= 400 && $exception_code < 600) {
                 $run->sendHttpCode($exception_code);
             }
 
-            if (true === $config['log'] && ! in_array($exception->getCode(), $config['ignore_codes'], true)) {
+            if (true === $this->config->log && ! in_array($exception_code, $this->config->ignore_codes, true)) {
                 service('logger')->error($exception);
             }
 
-            if (is_dir($config['error_view_path'])) {
-                $files = array_map(static fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), service('fs')->files($config['error_view_path']));
+            if (is_dir($this->config->error_view_path)) {
+                $files = array_map(static fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), service('fs')->files($this->config->error_view_path));
             } else {
                 $files = [];
             }
 
-            if (in_array((string) $exception->getCode(), $files, true)) {
-                $view = new View();
-                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path' => $config['error_view_path']])
-                    ->display((string) $exception->getCode())
-                    ->setData(['message' => $exception->getMessage()])
-                    ->render();
+            $files = collect($files)->flip()->only($exception_code, is_online() ? 'production' : '')->flip()->all();
 
-                return Handler::QUIT;
-            }
-            if (in_array('production', $files, true) && is_online()) {
+            if ($files !== []) {
                 $view = new View();
-                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path_locator' => $config['error_view_path']])
-                    ->display('production')
+
+                $view->setAdapter(config('view.active_adapter', 'native'), ['view_path' => $this->config->error_view_path])
+                    ->first($files, ['message' => $exception->getMessage()])
                     ->render();
 
                 return Handler::QUIT;
@@ -74,70 +130,46 @@ class ExceptionManager
 
             return Handler::DONE;
         });
+
+        return $this;
     }
 
     /**
-     * Gestionnaire d'applications fournis par le developpeur.
+     * Enregistre un gestionnaire de Whoops à des fins de débogage.
+     *
+     * Cette méthode met en place différents gestionnaires en fonction de l'environnement et des paramètres de configuration.
+     * Elle vérifie la ligne de commande, l'état en ligne, les requêtes AJAX et les requêtes JSON.
+     * En fonction des conditions, elle utilise PlainTextHandler, JsonResponseHandler ou PrettyPageHandler.
+     *
+     * Le PrettyPageHandler est configuré avec les paramètres de l'éditeur, le titre de la page, les chemins d'accès à l'application,
+     * les données sur liste noire et les tables de données. Il gère également différents types de données pour les tables de données.
      */
-    public static function registerAppHandlers(Run $debugger, array $config): Run
-    {
-        foreach ($config['handlers'] ?? [] as $handler) {
-            if (is_callable($handler)) {
-                $debugger->pushHandler($handler);
-            } elseif (is_string($handler) && class_exists($handler)) {
-                $class = service('container')->make($handler);
-                if (is_callable($class) || $class instanceof HandlerInterface) {
-                    $debugger->pushHandler($class);
-                }
-            }
-        }
-
-        return $debugger;
-    }
-
-    /**
-     * Gestionnaire d'erreurs globales whoops
-     */
-    public static function registerWhoopsHandler(Run $debugger, array $config): Run
+    private function registerWhoopsHandler(): self
     {
         if (Misc::isCommandLine()) {
-            $debugger->pushHandler(new PlainTextHandler());
+            $this->debugger->pushHandler(new PlainTextHandler(service('logger')));
+
+            return $this;
         }
 
-        if (! is_online()) {
-            if (Misc::isAjaxRequest() || service('request')->isJson()) {
-                $debugger->pushHandler(new JsonResponseHandler());
-            } else {
-                $handler = new PrettyPageHandler();
-
-                $handler->setEditor($config['editor'] ?: PrettyPageHandler::EDITOR_VSCODE);
-                $handler->setPageTitle($config['title'] ?: $handler->getPageTitle());
-                $handler->setApplicationRootPath(APP_PATH);
-                $handler->setApplicationPaths([APP_PATH, SYST_PATH, VENDOR_PATH]);
-
-                $handler = self::setBlacklist($handler, $config['blacklist']);
-
-                foreach ($config['data'] as $label => $data) {
-                    if (is_array($data)) {
-                        $handler->addDataTable($label, $data);
-                    } elseif (is_callable($data)) {
-                        $handler->addDataTableCallback($label, $data);
-                    }
-                }
-
-                $debugger->pushHandler($handler);
-            }
+        if (is_online()) {
+            return $this;
         }
 
-        return $debugger;
-    }
+        if (Misc::isAjaxRequest() || service('request')->isJson()) {
+            $this->debugger->pushHandler(new JsonResponseHandler());
 
-    /**
-     * Enregistre les elements blacklisté dans l'affichage du rapport d'erreur
-     */
-    private static function setBlacklist(PrettyPageHandler $handler, array $blacklists): PrettyPageHandler
-    {
-        foreach ($blacklists as $blacklist) {
+            return $this;
+        }
+
+        $handler = new PrettyPageHandler();
+
+        $handler->handleUnconditionally(true);
+        $handler->setEditor($this->config->editor ?: PrettyPageHandler::EDITOR_VSCODE);
+        $handler->setPageTitle($this->config->title ?: $handler->getPageTitle());
+        $handler->setApplicationPaths($this->getApplicationPaths());
+
+        foreach ($this->config->blacklist as $blacklist) {
             [$name, $key] = explode('/', $blacklist) + [1 => '*'];
 
             if ($name[0] !== '_') {
@@ -168,18 +200,40 @@ class ExceptionManager
             }
         }
 
-        return $handler;
+        foreach ($this->config->data as $label => $data) {
+            if (is_array($data)) {
+                $handler->addDataTable($label, $data);
+            } elseif (is_callable($data)) {
+                $handler->addDataTableCallback($label, $data);
+            }
+        }
+
+        $this->debugger->pushHandler($handler);
+
+        return $this;
     }
 
     /**
-     * Prepare exception for rendering.
+     * Préparer l'exception pour le rendu.
      */
     private static function prepareException(Throwable $e): Throwable
     {
         if ($e instanceof TokenMismatchException) {
-            $e = new HttpException($e->getMessage(), 419, $e);
+            return new HttpException($e->getMessage(), 419, $e);
         }
 
         return $e;
+    }
+
+    /**
+     * Récupère les chemins d'accès à l'application.
+     */
+    private function getApplicationPaths(): array
+    {
+        return collect(service('fs')->directories(base_path()))
+            ->flip()
+            ->except(base_path('vendor'))
+            ->flip()
+            ->all();
     }
 }
