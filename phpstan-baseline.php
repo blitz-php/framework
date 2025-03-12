@@ -74,12 +74,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Controllers/RestController.php',
 ];
 $ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to static method make\\(\\) on an unknown class Spatie\\\\Ignition\\\\Ignition\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Debug/Debugger.php',
-];
-$ignoreErrors[] = [
 	// identifier: booleanNot.alwaysFalse
 	'message' => '#^Negated boolean expression is always false\\.$#',
 	'count' => 1,
