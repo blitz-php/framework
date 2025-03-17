@@ -77,7 +77,7 @@ return function (array $paths, string $paths_config_file, bool $is_cli): void {
     if (file_exists(APP_PATH . 'Config' . DS . 'constants.php')) {
         require_once APP_PATH . 'Config' . DS . 'constants.php';
     }
-    require_once SYST_PATH . 'Constants' . DS . 'constants.php';
+    require_once SYST_PATH . 'Config' . DS . 'constants.php';
 
     /**
      * On charge le helper `common` qui est utilisé par le framework et presque toutes les applications
