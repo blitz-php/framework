@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace BlitzPHP\Cli\Commands\Utilities;
+namespace BlitzPHP\Cli\Commands\Config;
 
 use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Autoloader\LocatorCached;
