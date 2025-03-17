@@ -12,7 +12,8 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'aliases' => Expect::arrayOf('string', 'string')->required(),
-    'globals' => Expect::listOf(Expect::type('string|closure'))->required(),
-    'build'   => Expect::closure()->required(),
+    'aliases' => Expect::arrayOf('string', 'string'),
+    'globals' => Expect::listOf(Expect::type('string|closure')),
+    'groups'  => Expect::arrayOf('array', 'string'),
+    'build'   => Expect::type('closure'),
 ])->otherItems();

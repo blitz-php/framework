@@ -5,7 +5,7 @@ $ignoreErrors[] = [
 	// identifier: method.notFound
 	'message' => '#^Call to an undefined method BlitzPHP\\\\Traits\\\\Mixins\\\\HigherOrderCollectionProxy\\:\\:__invoke\\(\\)\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Cli/Commands/Utilities/About.php',
+	'path' => __DIR__ . '/src/Cli/Commands/Config/About.php',
 ];
 $ignoreErrors[] = [
 	// identifier: method.notFound
@@ -54,12 +54,6 @@ $ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Ahc\\\\Cli\\\\IO\\\\Interactor\\:\\:write\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Cli/Console/Console.php',
-];
-$ignoreErrors[] = [
-	// identifier: staticMethod.notFound
-	'message' => '#^Call to an undefined static method Nette\\\\Schema\\\\Expect\\:\\:closure\\(\\)\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Constants/schemas/middlewares.config.php',
 ];
 $ignoreErrors[] = [
 	// identifier: method.templateTypeNotInParameter

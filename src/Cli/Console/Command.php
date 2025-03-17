@@ -385,7 +385,7 @@ abstract class Command
     /**
      * Écrit EOL n fois.
      */
-    final public function eol(int $n = 1): self
+    final public function eol(int $n = 1): static
     {
         $this->writer->eol($n);
 
