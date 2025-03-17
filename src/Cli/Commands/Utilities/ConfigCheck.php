@@ -13,7 +13,8 @@ namespace BlitzPHP\Cli\Commands\Utilities;
 
 use Ahc\Cli\Output\Color;
 use BlitzPHP\Cli\Console\Command;
-use Kint\Kint;
+use BlitzPHP\Exceptions\ConfigException;
+use BlitzPHP\Utilities\Iterable\Arr;
 
 /**
  * Verifie les valeurs d'une configuartion.
@@ -51,109 +52,97 @@ class ConfigCheck extends Command
      */
     public function execute(array $params)
     {
-        $file = strtolower($this->argument('config', ''));
+        $name = $this->argument('config', '');
 
-        if ($file === '' || $file === '0') {
+        if ($name === '' || $name === '0') {
             $this->fail('Vous devez spécifier la configuration à utiliser pour la vérification.')->eol();
-            $this->write('  Usage: ' . $this->usage)->eol();
             $this->write('Exemple: config:check app')->eol();
-            $this->write('         config:check \'BlitzPHP\Schild\Config\auth\'');
+            $this->write('         config:check auth');
 
             return EXIT_ERROR;
         }
 
-        if (null === $config = config()->get($file)) {
-            $this->fail('Aucune configuration trouvée pour: ' . $file);
+        try {
+            $data = config()->get($name);
+        } catch (ConfigException) {
+            $this->fail('Aucune configuration trouvée pour: ' . $name);
+
+            return EXIT_ERROR;
         }
 
-        $this->center('Valeurs de la configuration ' . $this->color->ok($file));
+        if (! is_array($data)) {
+            $this->title($name, $this->formatValue($data));
 
-        $this->border()->eol();
-
-        $others = [];
-
-        foreach ($config as $key => $val) {
-            $options = ['fg' => Color::CYAN];
-
-            if (is_scalar($val)) {
-                if (is_bool($val)) {
-                    if ($val === true) {
-                        $options['fg'] = Color::GREEN;
-                        $val           = 'Enabled';
-                    } else {
-                        $options['fg'] = Color::YELLOW;
-                        $val           = 'Disabled';
-                    }
-                } elseif ('' === $val) {
-                    $others[$key] = $val;
-
-                    continue;
-                }
-
-                $this->justify($key, $val, ['second' => $options]);
-            } else {
-                if (($val = (array) $val) === []) {
-                    $others[$key] = $val;
-
-                    continue;
-                }
-                if (array_is_list($val)) {
-                    $options = ['fg' => Color::PURPLE];
-                    $this->justify($key, implode(', ', array_values($val)), ['second' => $options]);
-                } else {
-                    $others[$key] = $val;
-
-                    continue;
-                }
-            }
+            return EXIT_SUCCESS;
         }
 
-        if ($others !== []) {
-            $this->eol()->task('Autres configuration')->eol();
+        $this->title($name);
 
-            if (defined('KINT_DIR') && Kint::$enabled_mode !== false) {
-                $this->write($this->getKintDump($others));
+        foreach (Arr::dot($data) as $key => $value) {
+            if (is_array($value = $this->formatValue($value))) {
+                $options = $value[1];
+                $value   = $value[0];
             } else {
-                $this->write(
-                    $this->color->line($this->getVarDump($others), ['fg' => Color::CYAN])
-                );
+                $options = ['fg' => Color::CYAN];
             }
+
+            if (str_contains($key = $this->formatKey($key), '->')) {
+                $options['fg'] = Color::PURPLE;
+            }
+
+            $this->justify($key, $this->formatValue($value), ['second' => $options]);
         }
 
         return EXIT_SUCCESS;
     }
 
     /**
-     * Obtiens le dump de la config via la function d() de Kint
+     * Rendu du titre.
      */
-    private function getKintDump(array $config): string
+    public function title(string $title, mixed $subtitle = ''): void
     {
-        ob_start();
-        d($config);
-        $output = ob_get_clean();
+        if (is_array($subtitle)) {
+            $options  = $subtitle[1];
+            $subtitle = $subtitle[0];
+        }
 
-        $output = trim($output);
-
-        $lines = explode("\n", $output);
-        array_splice($lines, 0, 3);
-        array_splice($lines, -3);
-
-        return implode("\n", $lines);
+        $this->justify($title, $subtitle, [
+            'first'  => ['fg' => Color::GREEN, 'bold' => 1],
+            'second' => $options ?? [],
+        ]);
     }
 
     /**
-     * Obtiens le dump de la config via la function var_dump() de PHP
+     * Formate la clé de configuration donnée.
      */
-    private function getVarDump(array $config): string
+    protected function formatKey(string $key): string
     {
-        ob_start();
-        var_dump($config);
-        $output = ob_get_clean();
-
-        return preg_replace(
-            '!.*Commands/Utilities/ConfigCheck.php.*\n!u',
-            '',
-            $output
+        return preg_replace_callback(
+            '/(.*)\.(.*)$/', fn ($matches) => sprintf(
+                '%s -> %s',
+                str_replace('.', ' ⇁ ', $matches[1]),
+                $matches[2]
+            ), $key
         );
+    }
+
+    /**
+     * Formate la valeur de configuration donnée.
+     *
+     * @return array|string
+     */
+    protected function formatValue(mixed $value)
+    {
+        return match (true) {
+            is_bool($value)    => [$value ? 'Enabled' : 'Disabled', ['fg' => $value ? Color::GREEN : Color::YELLOW]],
+            is_null($value)    => 'NULL',
+            $value === ''      => ['Empty value', ['fg' => Color::RED]],
+            is_numeric($value) => $value,
+            is_array($value) && array_is_list($value) => [implode(', ', $value), ['fg' => Color::PURPLE]],
+            is_array($value)   => '[]',
+            is_object($value)  => get_class($value),
+            is_string($value)  => $value,
+            default            => print_r($value, true),
+        };
     }
 }
