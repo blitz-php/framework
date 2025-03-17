@@ -12,12 +12,12 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'key'            => Expect::string()->default(''),
-    'driver'         => Expect::string()->default('OpenSSL'),
-    'block_size'     => Expect::int()->default(16),
-    'digest'         => Expect::string()->default('SHA512'),
-    'rawData'        => Expect::bool()->default(true),
-    'encryptKeyInfo' => Expect::string()->default(''),
-    'authKeyInfo'    => Expect::string()->default(''),
-    'cipher'         => Expect::string()->default('AES-256-CTR'),
+    'key'              => Expect::string(env('encryption.key', '')),
+    'driver'           => Expect::anyOf('OpenSSL', 'Sodium')->default(env('encryption.driver', 'OpenSSL')),
+    'block_size'       => Expect::int((int) env('encryption.blockSize', 16)),
+    'digest'           => Expect::string(env('encryption.digest', 'SHA512')),
+    'rawData'          => Expect::bool(true),
+    'encrypt_key_info' => Expect::string(''),
+    'auth_key_info'    => Expect::string(''),
+    'cipher'           => Expect::string('AES-256-CTR'),
 ])->otherItems();

@@ -12,9 +12,9 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'log'             => Expect::bool()->default(true)->required(),
-    'ignore_codes'    => Expect::listOf('int')->default([404])->required(),
-    'error_view_path' => Expect::string()->default(VIEW_PATH . 'errors')->required(),
+    'log'             => Expect::bool()->default(true),
+    'ignore_codes'    => Expect::listOf('int')->default([404]),
+    'error_view_path' => Expect::string()->default(VIEW_PATH . 'errors'),
     'title'           => Expect::string()->default('Oups ! Il y avait une erreur.'),
     'editor'          => Expect::type('string|closure')->default('vscode'),
     'blacklist'       => Expect::listOf('string')->default([]),

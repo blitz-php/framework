@@ -13,12 +13,12 @@ use BlitzPHP\Session\Handlers\File;
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'handler'            => Expect::string()->default(File::class),
-    'cookie_name'        => Expect::string()->default('blitz_session'),
-    'expiration'         => Expect::int()->default(7200),
-    'savePath'           => Expect::string()->default(FRAMEWORK_STORAGE_PATH . 'session'),
-    'matchIP'            => Expect::bool()->default(false),
-    'time_to_update'     => Expect::int()->default(300),
-    'regenerate_destroy' => Expect::bool()->default(true),
+    'handler'            => Expect::string(env('session.driver', File::class)),
+    'cookie_name'        => Expect::string(env('session.cookieName', config('app.name', 'blitz_app') . '_session')),
+    'expiration'         => Expect::int(env('session.expiration', 7200)),
+    'savePath'           => Expect::string(env('session.savePath', FRAMEWORK_STORAGE_PATH . 'session')),
+    'matchIP'            => Expect::bool(env('session.matchIP', false)),
+    'time_to_update'     => Expect::int(env('session.timeToUpdate', 300)),
+    'regenerate_destroy' => Expect::bool(env('session.regenerateDestroy', false)),
     'group'              => Expect::string()->nullable(),
 ]);

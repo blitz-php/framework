@@ -13,12 +13,12 @@ use BlitzPHP\Session\Cookie\Cookie;
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'prefix'   => Expect::string()->default(''),
+    'prefix'   => Expect::string(''),
     'expires'  => Expect::type('DateTimeInterface|int|string')->default(0),
-    'path'     => Expect::string()->default('/'),
-    'domain'   => Expect::string()->default(''),
-    'secure'   => Expect::bool()->default(false),
-    'httponly' => Expect::bool()->default(true),
+    'path'     => Expect::string('/'),
+    'domain'   => Expect::string(''),
+    'secure'   => Expect::bool(false),
+    'httponly' => Expect::bool(true),
     'samesite' => Expect::anyOf('', ...Cookie::SAMESITE_VALUES)->default(Cookie::SAMESITE_LAX),
-    'raw'      => Expect::bool()->default(false),
+    'raw'      => Expect::bool(false),
 ]);

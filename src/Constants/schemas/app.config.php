@@ -12,15 +12,15 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'base_url'                     => Expect::string()->default('auto'),
-    'charset'                      => Expect::string()->default('UTF-8'),
-    'environment'                  => Expect::string()->default('auto'),
-    'language'                     => Expect::string()->default('en'),
-    'force_global_secure_requests' => Expect::bool()->default(false),
-    'url_suffix'                   => Expect::string()->default(''),
-    'use_absolute_link'            => Expect::bool()->default(true),
-    'negotiate_locale'             => Expect::bool()->default(true),
+    'base_url'                     => Expect::string('auto'),
+    'charset'                      => Expect::string('UTF-8'),
+    'environment'                  => Expect::string('auto'),
+    'language'                     => Expect::string('en'),
+    'force_global_secure_requests' => Expect::bool(false),
+    'url_suffix'                   => Expect::string(''),
+    'use_absolute_link'            => Expect::bool(true),
+    'negotiate_locale'             => Expect::bool(true),
     'supported_locales'            => Expect::listOf('string')->default([]),
     'timezone'                     => Expect::anyOf(...DateTimeZone::listIdentifiers())->default('UTC'),
-    'index_page'                   => Expect::string()->default(''),
+    'index_page'                   => Expect::string(''),
 ])->otherItems();

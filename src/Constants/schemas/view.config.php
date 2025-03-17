@@ -12,11 +12,16 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'active_adapter'  => Expect::string()->default('native'),
+    'active_adapter'  => Expect::string('native'),
     'compress_output' => Expect::type('bool|closure|string')->default('auto'),
-    'view_base'       => Expect::string()->default(VIEW_PATH),
+    'view_base'       => Expect::string(VIEW_PATH),
     'debug'           => Expect::anyOf(true, false, 'auto')->default('auto'),
-    'shared'          => Expect::type('closure')->required()->default(static fn () => []),
-    'decorators'      => Expect::listOf('string')->required()->default([]),
-    'adapters'        => Expect::arrayOf('array', 'string')->required(),
+    'shared'          => Expect::type('closure')->default(static fn () => []),
+    'decorators'      => Expect::listOf('string')->default([]),
+    'adapters'        => Expect::structure([
+        'native' => Expect::structure([
+            'extension' => Expect::string('php'),
+            'save_data' => Expect::bool(true),
+        ]),
+    ])->otherItems(),
 ])->otherItems();

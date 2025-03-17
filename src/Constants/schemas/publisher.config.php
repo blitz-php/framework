@@ -12,6 +12,5 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'config_cache_enabled'  => Expect::bool(false),
-    'locator_cache_enabled' => Expect::bool(false),
+    'restrictions' => Expect::arrayOf('string', 'string'),
 ]);

@@ -14,13 +14,13 @@ use Nette\Schema\Expect;
 return Expect::structure([
     'driver' => Expect::anyOf('bcrypt', 'argon', 'argon2id')->default('bcrypt'),
     'bcrypt' => Expect::structure([
-        'rounds' => Expect::int()->default(12),
-        'verify' => Expect::bool()->default(true),
+        'rounds' => Expect::int(12),
+        'verify' => Expect::bool(true),
     ]),
     'argon' => Expect::structure([
-        'memory'  => Expect::int()->default(65536),
-        'threads' => Expect::int()->default(1),
-        'time'    => Expect::int()->default(4),
-        'verify'  => Expect::bool()->default(true),
+        'memory'  => Expect::int(65536),
+        'threads' => Expect::int(1),
+        'time'    => Expect::int(4),
+        'verify'  => Expect::bool(true),
     ]),
 ])->otherItems();

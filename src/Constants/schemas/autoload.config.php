@@ -17,7 +17,7 @@ return Expect::structure([
     'files'    => Expect::listOf('string'),
     'helpers'  => Expect::listOf('string'),
     'composer' => Expect::structure([
-        'discover' => Expect::bool()->default(true),
+        'discover' => Expect::bool(true),
         'packages' => Expect::arrayOf(Expect::listOf('string')->default([]), Expect::anyOf('only', 'exclude'))->default([]),
     ]),
 ])->otherItems();
