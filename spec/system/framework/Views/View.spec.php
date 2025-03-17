@@ -15,6 +15,8 @@ use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\Validation\ErrorBag;
 use BlitzPHP\View\View;
 
+use function Kahlan\expect;
+
 describe('Views / View', function (): void {
     describe('Donnees', function (): void {
         it('Peut-on stocker des variable', function (): void {
@@ -304,12 +306,12 @@ describe('Views / View', function (): void {
 		});
 
 		it('setAdapter leve une exception', function (): void {
-			$config = config()->get('view.adapters.native');
-			config()->set('view.adapters.native', []);
+			$config = config()->get('view.active_adapter');
+			config()->set('view.active_adapter', 'blade');
 
 			expect(fn() => new View())->toThrow(new ConfigException());
 
-			config()->set('view.adapters.native', $config);
+			config()->set('view.active_adapter', $config);
 		});
 	});
 

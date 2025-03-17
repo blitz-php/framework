@@ -37,7 +37,7 @@ return Expect::structure([
 		'database' => Expect::int(0),
 	]),
 
-    'valid_handlers' => Expect::listOf('string')->default([
+    'valid_handlers' => Expect::arrayOf('string', 'string')->default([
         'apcu'      => \BlitzPHP\Cache\Handlers\Apcu::class,
         'array'     => \BlitzPHP\Cache\Handlers\ArrayHandler::class,
         'dummy'     => \BlitzPHP\Cache\Handlers\Dummy::class,
