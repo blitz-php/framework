@@ -179,20 +179,20 @@ class Config
 
             return;
         }
-        
+
         if (isset(self::$loaded[$config])) {
             return;
         }
 
         $file ??= self::path($config);
         $schema ??= self::schema($config);
-        
+
         if (file_exists($file) && ! in_array($file, get_included_files(), true)) {
             $configurations = (array) require $file;
         }
 
         $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations ?? []);
-        
+
         if ($configurations === [] && ! $allow_empty && ! is_a($schema, Schema::class, true)) {
             return;
         }

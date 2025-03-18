@@ -100,7 +100,7 @@ final class Configurator
         if (array_key_exists($key, $this->cache)) {
             return $this->cache[$key];
         }
-        
+
         try {
             $this->build(self::getTopLevelKey($key));
 
@@ -180,9 +180,8 @@ final class Configurator
      *
      * @param T $data
      *
-     * @return mixed
-     *
-     * @phpstan-return ($data is \stdClass ? array<string, mixed> : T)
+     * @return         mixed
+     * @phpstan-return ($data is stdClass ? array<string, mixed> : T)
      */
     private static function convertStdClassesToArrays($data)
     {
