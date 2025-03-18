@@ -172,36 +172,36 @@ class Config
     {
         if (is_array($config)) {
             foreach ($config as $key => $value) {
-                if (is_string($key)) {
-                    $file = $value;
-                    $conf = $key;
-                } else {
-                    $file = null;
-                    $conf = $value;
-                }
+                [$file, $conf] = is_string($key) ? [$value, $key] : [null, $value];
+
                 $this->load($conf, $file, null, $allow_empty);
             }
-        } elseif (! isset(self::$loaded[$config])) {
-            $file ??= self::path($config);
-            $schema ??= self::schema($config);
 
-            $configurations = [];
-            if (file_exists($file) && ! in_array($file, get_included_files(), true)) {
-                $configurations = (array) require $file;
-            }
-
-            $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations);
-
-            if (empty($configurations) && ! $allow_empty && ! is_a($schema, Schema::class, true)) {
-                return;
-            }
-
-            $this->configurator->addSchema($config, $schema ?: Expect::mixed(), false);
-            $this->configurator->merge([$config => $configurations]);
-
-            self::$loaded[$config]    = $file;
-            self::$originals[$config] = $this->configurator->get($config);
+            return;
         }
+        
+        if (isset(self::$loaded[$config])) {
+            return;
+        }
+
+        $file ??= self::path($config);
+        $schema ??= self::schema($config);
+        
+        if (file_exists($file) && ! in_array($file, get_included_files(), true)) {
+            $configurations = (array) require $file;
+        }
+
+        $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations ?? []);
+        
+        if ($configurations === [] && ! $allow_empty && ! is_a($schema, Schema::class, true)) {
+            return;
+        }
+
+        $this->configurator->addSchema($config, $schema ?: Expect::mixed());
+        $this->configurator->merge([$config => $configurations]);
+
+        self::$loaded[$config]    = $file;
+        self::$originals[$config] = $this->configurator->get($config);
     }
 
     /**

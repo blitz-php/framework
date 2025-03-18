@@ -36,7 +36,7 @@ final class Configurator
     /**
      * @psalm-allow-private-mutation
      */
-    private ?Data $finalConfig = null;
+    private Data $finalConfig;
 
     /**
      * @var array<string, mixed>
@@ -50,7 +50,8 @@ final class Configurator
      */
     public function __construct(private array $configSchemas = [])
     {
-        $this->userConfig = new Data();
+        $this->userConfig  = new Data();
+        $this->finalConfig = new Data();
     }
 
     /**
@@ -58,13 +59,11 @@ final class Configurator
      *
      * @psalm-allow-private-mutation
      */
-    public function addSchema(string $key, Schema $schema, bool $overwrite = true): void
+    public function addSchema(string $key, Schema $schema): void
     {
         $this->invalidate();
 
-        if ($overwrite || ! isset($this->configSchemas[$key])) {
-            $this->configSchemas[$key] = $schema;
-        }
+        $this->configSchemas[$key] = $schema;
     }
 
     /**
@@ -98,13 +97,13 @@ final class Configurator
      */
     public function get(string $key)
     {
-        if ($this->finalConfig === null) {
-            $this->finalConfig = $this->build();
-        } elseif (\array_key_exists($key, $this->cache)) {
+        if (array_key_exists($key, $this->cache)) {
             return $this->cache[$key];
         }
-
+        
         try {
+            $this->build(self::getTopLevelKey($key));
+
             return $this->cache[$key] = $this->finalConfig->get($key);
         } catch (InvalidPathException|MissingPathException $ex) {
             throw new UnknownOptionException($ex->getMessage(), $key, (int) $ex->getCode(), $ex);
@@ -116,15 +115,15 @@ final class Configurator
      */
     public function exists(string $key): bool
     {
-        if ($this->finalConfig === null) {
-            $this->finalConfig = $this->build();
-        } elseif (\array_key_exists($key, $this->cache)) {
+        if (array_key_exists($key, $this->cache)) {
             return true;
         }
 
         try {
+            $this->build(self::getTopLevelKey($key));
+
             return $this->finalConfig->has($key);
-        } catch (InvalidPathException) {
+        } catch (InvalidPathException|UnknownOptionException) {
             return false;
         }
     }
@@ -135,7 +134,7 @@ final class Configurator
     private function invalidate(): void
     {
         $this->cache       = [];
-        $this->finalConfig = null;
+        $this->finalConfig = new Data();
     }
 
     /**
@@ -145,16 +144,30 @@ final class Configurator
      *
      * @psalm-allow-private-mutation
      */
-    private function build(): Data
+    private function build(string $topLevelKey): void
     {
+        if ($this->finalConfig->has($topLevelKey)) {
+            return;
+        }
+
+        if (! isset($this->configSchemas[$topLevelKey])) {
+            throw new UnknownOptionException(sprintf('Schéma de configuration manquant pour "%s".', $topLevelKey), $topLevelKey);
+        }
+
         try {
-            $schema    = Expect::structure($this->configSchemas);
+            $userData = [$topLevelKey => $this->userConfig->get($topLevelKey)];
+        } catch (DataException) {
+            $userData = [];
+        }
+
+        try {
+            $schema    = $this->configSchemas[$topLevelKey];
             $processor = new Processor();
-            $processed = $processor->process($schema, $this->userConfig->export());
+            $processed = $processor->process(Expect::structure([$topLevelKey => $schema]), $userData);
 
             $this->raiseAnyDeprecationNotices($processor->getWarnings());
 
-            return $this->finalConfig = new Data(self::convertStdClassesToArrays($processed));
+            $this->finalConfig->import((array) self::convertStdClassesToArrays($processed));
         } catch (ValidationException $ex) {
             throw new ConfigException($ex->getMessage(), $ex->getCode());
         }
@@ -163,11 +176,13 @@ final class Configurator
     /**
      * Convertit récursivement les instances stdClass en tableaux
      *
-     * @param mixed $data
+     * @phpstan-template T
+     *
+     * @param T $data
      *
      * @return mixed
      *
-     * @psalm-pure
+     * @phpstan-return ($data is \stdClass ? array<string, mixed> : T)
      */
     private static function convertStdClassesToArrays($data)
     {
@@ -175,7 +190,7 @@ final class Configurator
             $data = (array) $data;
         }
 
-        if (\is_array($data)) {
+        if (is_array($data)) {
             foreach ($data as $k => $v) {
                 $data[$k] = self::convertStdClassesToArrays($v);
             }
@@ -190,7 +205,26 @@ final class Configurator
     private function raiseAnyDeprecationNotices(array $warnings): void
     {
         foreach ($warnings as $warning) {
-            @\trigger_error($warning, \E_USER_DEPRECATED);
+            @trigger_error($warning, E_USER_DEPRECATED);
         }
+    }
+
+    /**
+     * @throws InvalidPathException
+     */
+    private static function getTopLevelKey(string $path): string
+    {
+        if ($path === '') {
+            throw new InvalidPathException('$path ne peut pas être une chaîne vide');
+        }
+
+        $path = str_replace(['.', '/'], '.', $path);
+
+        $firstDelimiter = strpos($path, '.');
+        if ($firstDelimiter === false) {
+            return $path;
+        }
+
+        return substr($path, 0, $firstDelimiter);
     }
 }
