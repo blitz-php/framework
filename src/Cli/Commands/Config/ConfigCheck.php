@@ -118,11 +118,13 @@ class ConfigCheck extends Command
     protected function formatKey(string $key): string
     {
         return preg_replace_callback(
-            '/(.*)\.(.*)$/', fn ($matches) => sprintf(
+            '/(.*)\.(.*)$/',
+            static fn ($matches) => sprintf(
                 '%s -> %s',
                 str_replace('.', ' ⇁ ', $matches[1]),
                 $matches[2]
-            ), $key
+            ),
+            $key
         );
     }
 
@@ -134,15 +136,15 @@ class ConfigCheck extends Command
     protected function formatValue(mixed $value)
     {
         return match (true) {
-            is_bool($value)    => [$value ? 'Enabled' : 'Disabled', ['fg' => $value ? Color::GREEN : Color::YELLOW]],
-            is_null($value)    => 'NULL',
-            $value === ''      => ['Empty value', ['fg' => Color::RED]],
-            is_numeric($value) => $value,
+            is_bool($value)                           => [$value ? 'Enabled' : 'Disabled', ['fg' => $value ? Color::GREEN : Color::YELLOW]],
+            null === $value                           => 'NULL',
+            $value === ''                             => ['Empty value', ['fg' => Color::RED]],
+            is_numeric($value)                        => $value,
             is_array($value) && array_is_list($value) => [implode(', ', $value), ['fg' => Color::PURPLE]],
-            is_array($value)   => '[]',
-            is_object($value)  => get_class($value),
-            is_string($value)  => $value,
-            default            => print_r($value, true),
+            is_array($value)                          => '[]',
+            is_object($value)                         => get_class($value),
+            is_string($value)                         => $value,
+            default                                   => print_r($value, true),
         };
     }
 }

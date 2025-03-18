@@ -55,9 +55,9 @@ class ConfigPublish extends Command
     {
         $config = $this->getBaseConfigurationFiles();
 
-        if (is_null($this->argument('name')) && $this->option('all')) {
+        if (null === $this->argument('name') && $this->option('all')) {
             foreach ($config as $key => $file) {
-                $this->publish($key, $file, config_path($key.'.php'));
+                $this->publish($key, $file, config_path($key . '.php'));
             }
 
             return EXIT_SUCCESS;
@@ -65,6 +65,7 @@ class ConfigPublish extends Command
 
         if (null === $name = $this->argument('name')) {
             $choices = [];
+
             foreach (array_keys($config) as $key => $val) {
                 $choices[$key + 1] = $val;
             }
@@ -79,7 +80,7 @@ class ConfigPublish extends Command
             return EXIT_ERROR;
         }
 
-        $this->eol()->publish($name, $config[$name], config_path($name.'.php'));
+        $this->eol()->publish($name, $config[$name], config_path($name . '.php'));
     }
 
     /**

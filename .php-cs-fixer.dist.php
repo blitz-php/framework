@@ -23,9 +23,12 @@ $finder = Finder::create()
         __DIR__ . '/src',
         // __DIR__ . '/spec',
     ])
-    ->notName('#Foobar.php$#')
+    ->exclude([
+        'Config/stubs',
+    ])
     ->append([
         __FILE__,
+        __DIR__ . '/.php-cs-fixer.no-header.php',
         __DIR__ . '/rector.php',
     ]);
 

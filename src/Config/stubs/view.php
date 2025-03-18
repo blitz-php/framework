@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
 | -------------------------------------------------- -----------------
@@ -6,59 +6,55 @@
 | -------------------------------------------------- -----------------
 | Ce fichier contiendra les paramètres necessaires pour rendre des vues au navigateur de l'utilisateur
 |
-| Pour des instructions complètes, veuillez consulter la « Configuration des vues » dans le Guide de l'utilisateur.
+| Pour des instructions complètes, veuillez consulter la « Configuration des vues » dans le Guide de l'utilisateur.
 |
 */
-
 
 return [
     /**
      * Adapteur responsable du rendu des vues
-     * 
+     *
      * voir le tableau `adapters` ci-dessous
      */
     'active_adapter' => 'native',
 
     /**
      * Specifie si on doit compresser le code html final ou pas avant de l'envoyer au navigateur
-     * 
-     * @var bool|'auto'|Closure Si auto, le systeme compressera le code uniquement si vous passez dans un environement de production.
+     *
+     * @var 'auto'|bool|Closure Si auto, le systeme compressera le code uniquement si vous passez dans un environement de production.
      *                          Peut egalement etre une closure qui renvoie un boolean ou la chaine 'auto'.
      */
     'compress_output' => 'auto',
 
     /**
      * Chemin de base de stockage des vues
-     * 
+     *
      * Les vues serront recherchées à partir de ce dossier
-     * 
+     *
      * @var string
      */
     'view_base' => VIEW_PATH,
 
     /**
      * Specifie si on doit stocker des informations sur les performances ou non
-     * 
-     * @var bool|'auto' Si auto, le systeme stockera les informations de performances uniquement dans un environnement de developpement
+     *
+     * @var 'auto'|bool Si auto, le systeme stockera les informations de performances uniquement dans un environnement de developpement
      */
     'debug' => 'auto',
 
     /**
      * Données partagées à toutes les vues
      */
-    'shared' => function(): array {
-        return [
-
-        ];
-    },
+    'shared' => static fn (): array => [
+    ],
 
     /**
      * Les decorateurs de vues sont des méthodes de classe qui seront exécutées en séquence pour avoir la possibilité de modifier la sortie générée juste avant la mise en cache des résultats.
      *
      * Toutes les classes doivent implémenter BlitzPHP\View\ViewDecoratorInterface
      *
-     * @var classe-string<\BlitzPHP\View\ViewDecoratorInterface>[]
-      */
+     * @var list<classe-string<BlitzPHP\View\ViewDecoratorInterface>>
+     */
     'decorators' => [],
 
     'adapters' => [
@@ -86,7 +82,7 @@ return [
 
         /**
          * [Configuration Blade](https://laravel.com/docs/9.x/views)
-         * 
+         *
          * executer `composer require jenssegers/blade`
          * require jenssegers/blade
          */
@@ -98,21 +94,21 @@ return [
 
             // /**
             //  * Répertoire où sont stockés les caches de vues
-            //  * 
+            //  *
             //  * @var string
             //  */
-			// 'cache_path'      => VIEW_CACHE_PATH.'blade'.DIRECTORY_SEPARATOR,
+            // 'cache_path'      => VIEW_CACHE_PATH.'blade'.DIRECTORY_SEPARATOR,
 
             // /**
             //  * Enregistrez un gestionnaire pour les directives personnalisées.
-            //  * 
+            //  *
             //  * @var array<string, callable>
             //  */
             // 'directives' => [],
 
             // /**
             //  * Enregistrez une directive d'instruction "if".
-            //  * 
+            //  *
             //  * @var array<string, callable>
             //  */
             // 'if' => [],
@@ -128,7 +124,7 @@ return [
 
         /**
          * [Configuration Latte]
-         * 
+         *
          * executer `composer require latte/latte`
          * requiet latte 3.x or higher
          */
@@ -139,11 +135,11 @@ return [
             // 'extension' => 'latte',
 
             // /**
-            //  * Latte régénère automatiquement le cache à chaque fois que vous modifiez le template, 
+            //  * Latte régénère automatiquement le cache à chaque fois que vous modifiez le template,
             //  * qui peut être désactivé dans l'environnement de production pour économiser un peu de performances
-            //  * 
+            //  *
             //  * @var bool|'auto' SI auto, desactivera ce comportement en production
-            //  */ 
+            //  */
             // 'auto_refresh' => 'auto',
 
             // /**
@@ -162,7 +158,7 @@ return [
 
         /**
          * [Configuration Plates](https://platesphp.com/engine/overview/)
-         * 
+         *
          * executer `composer require league/plates`
          * requiet plates 3.x or higher
          */
@@ -174,7 +170,7 @@ return [
 
             // /**
             //  * Fonctions
-            //  * 
+            //  *
             //  * @var array<string, callable>
             //  */
             // 'functions' => [],
@@ -190,7 +186,7 @@ return [
 
         /**
          * [Configuration Smarty](https://www.smarty.net/docs/en/api.variables.tpl)
-         * 
+         *
          * executer `composer require smarty/smarty`
          * requiet smarty 3.x or higher
          */
@@ -202,70 +198,70 @@ return [
 
             // /**
             //  * Répertoire ou répertoires utilisés pour stocker les fichiers de configuration utilisés dans les modèles
-            //  * 
+            //  *
             //  * @var string|string[]
             //  */
-			// 'config_dir'     => [CONFIG_PATH],
+            // 'config_dir'     => [CONFIG_PATH],
 
             // /**
             //  * Répertoire où sont stockés les caches de vues
-            //  * 
+            //  *
             //  * @var string
             //  */
-			// 'cache_dir'      => VIEW_CACHE_PATH.'smarty'.DIRECTORY_SEPARATOR.'cache',
+            // 'cache_dir'      => VIEW_CACHE_PATH.'smarty'.DIRECTORY_SEPARATOR.'cache',
 
             // /**
             //  * Répertoire où se trouvent les modèles compilés
-            //  * 
+            //  *
             //  * @var string|string[]
             //  */
-			// 'compile_dir'    => VIEW_CACHE_PATH.'smarty'.DIRECTORY_SEPARATOR.'compile',
+            // 'compile_dir'    => VIEW_CACHE_PATH.'smarty'.DIRECTORY_SEPARATOR.'compile',
 
             // /**
-            //  * Mise en cache activée ?
-            //  * 
+            //  * Mise en cache activée ?
+            //  *
             //  * @var bool|int
             //  */
-			// 'caching'        => \Smarty::CACHING_OFF,
+            // 'caching'        => \Smarty::CACHING_OFF,
 
             // /**
             //  * Durée de vie du cache en secondes
-            //  * 
+            //  *
             //  * @var int
             //  */
-			// 'cache_lifetime' => 5 * MINUTE,
+            // 'cache_lifetime' => 5 * MINUTE,
 
             // /**
-            //  * Mettre à jour les modèles de cache à chaque appel ?
-            //  * 
+            //  * Mettre à jour les modèles de cache à chaque appel ?
+            //  *
             //  * @var bool
             //  */
-			// 'force_cache'    => true,
+            // 'force_cache'    => true,
 
             // /**
-            //  * Mettre à jour les modèles de compilation à chaque appel ?
-            //  * 
+            //  * Mettre à jour les modèles de compilation à chaque appel ?
+            //  *
             //  * @var bool
             //  */
-			// 'force_compile'  => false,
+            // 'force_compile'  => false,
 
             // /**
-            //  * Échappera à toutes les sorties de variable du template ?
-            //  * 
+            //  * Échappera à toutes les sorties de variable du template ?
+            //  *
             //  * @var bool
             //  */
-			// 'escape_html'    => on_prod(),
+            // 'escape_html'    => on_prod(),
 
             // /**
-            //  * Active la console de débogage ?
-            //  * 
+            //  * Active la console de débogage ?
+            //  *
             //  * @var bool
             //  */
-			// 'debugging'      => on_dev(),
-            
+            // 'debugging'      => on_dev(),
+
             // /**
-            //  * Vérifier le modèle pour les modifications ?
-            //  * 
+            //  * Vérifier le modèle pour les modifications ?
+            //  *
             //  * @var bool
             //  */
             // 'compile_check'  => on_dev(),
@@ -281,7 +277,7 @@ return [
 
         /**
          * [Configuration Twig](https://twig.symfony.com/doc/3.x/api.html#environment-options)
-         * 
+         *
          * executer `composer require twig/twig`
          * requiet twig 3.x or higher
          */
@@ -293,42 +289,42 @@ return [
 
             // /**
             //  * Répertoire où sont stockés les caches de modèles
-            //  * 
+            //  *
             //  * @var string
             //  */
             // 'cache_dir'            => VIEW_CACHE_PATH.'twig',
 
             // /**
             //  * Afficher les noeuds générés ?
-            //  * 
+            //  *
             //  * @var bool|'auto' Si auto, le systeme affichera les noeuds en phase de developpement mais pas en production
             //  */
-			// 'debug'            => 'auto',
+            // 'debug'            => 'auto',
 
             // /**
             //  * Le jeu de caractères utilisé par les templates
-            //  * 
+            //  *
             //  * @var string
             //  */
-			// 'charset'          => 'UTF-8',
+            // 'charset'          => 'UTF-8',
 
             // /**
             //  * Recompiler le modèle chaque fois que le code source change
-            //  * 
+            //  *
             //  * @var bool|'auto' Si auto, la recompilation s'effectuera uniquement en phase de developpement
             //  */
-			// 'auto_reload'      => true,
+            // 'auto_reload'      => true,
 
             // /**
             //  * Si défini sur `FALSE`, ignorera silencieusement les variables invalides, sinon lèvera une exception à la place
-            //  * 
+            //  *
             //  * @var bool|'auto' Si auto, sera defini automatiquement sur FALSE en phase de production et TRUE en developpement
             //  */
-			// 'strict_variables' => 'auto',
+            // 'strict_variables' => 'auto',
 
             // /**
             //  * Variables globales à passer à Twig
-            //  * 
+            //  *
             //  * @var array<string, mixed>
             //  */
             // 'globals' => [
@@ -339,17 +335,17 @@ return [
             //     'Router' => new Router,
             //     */
             // ],
-          
+
             // /**
             //  * Filtres
-            //  * 
+            //  *
             //  * @var \Twig\TwigFilter[]
             //  */
             // 'filters'   => [],
 
             // /**
             //  * Fonctions
-            //  * 
+            //  *
             //  * * @var \Twig\TwigFunction[]
             //  */
             // 'functions' => [],
@@ -361,6 +357,6 @@ return [
 
             //     return $engine;
             // }
-        ]
-    ]
+        ],
+    ],
 ];

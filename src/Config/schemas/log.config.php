@@ -17,7 +17,7 @@ return Expect::structure([
     'processors'  => Expect::listOf('string')->default(['web', 'introspection', 'hostname', 'psr']),
     'handlers'    => Expect::structure([
         'file' => Expect::structure([
-            'level'          => Expect::string(on_prod() ? \Psr\Log\LogLevel::ERROR : \Psr\Log\LogLevel::DEBUG),
+            'level'          => Expect::string(on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG),
             'extension'      => Expect::string(''),
             'permissions'    => Expect::int(644),
             'path'           => Expect::string(''),

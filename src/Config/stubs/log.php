@@ -11,10 +11,10 @@
 return [
     /**
      * Nom du canal des log
-     * 
+     *
      * @var string
      */
-    'name' => config('app.name'),
+    'name' => config('app.name', 'Application'),
 
     /**
      * ------------------------------------------------- -------------------------
@@ -34,8 +34,8 @@ return [
      * ------------------------------------------------- -------------------------
      *
      * Les processeurs permettent d'ajouter des données supplémentaires pour tous les enregistrements.
-     * 
-     * @var string[]
+     *
+     * @var list<string>
      */
     'processors' => [
         /**
@@ -52,11 +52,11 @@ return [
         'hostname',
         /**
          * Ajoute l'ID de processus à un enregistrement de journal.
-         */ 
+         */
         // 'process_id',
         /**
          * Ajoute un identifiant unique à un enregistrement de journal.
-         */     
+         */
         // 'uid',
         /**
          * Ajoute l'utilisation actuelle de la mémoire à un enregistrement de journal.
@@ -67,7 +67,6 @@ return [
          */
         'psr',
     ],
-    
 
     /**
      * ------------------------------------------------- -------------------------
@@ -93,7 +92,7 @@ return [
      */
     'handlers' => [
         // ------------------ ENREGISTREMENT ------------------------
-        
+
         /*
          * --------------------------------------------------------------------
          * Enregistre les logs dans les fichiers
@@ -102,12 +101,12 @@ return [
         'file' => [
             /**
              * Le niveau de journalisation que ce gestionnaire gérera.
-             * 
+             *
              * Enregistrera un log uniquement si son niveau est inférieur ou égal à ce niveau
-             * 
+             *
              * @var string
              */
-            'level' => on_prod() ? \Psr\Log\LogLevel::ERROR : \Psr\Log\LogLevel::DEBUG,
+            'level' => on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG,
 
             /**
              * L'extension de nom de fichier par défaut pour les fichiers journaux.
@@ -115,14 +114,14 @@ return [
              * scripting, lorsqu'ils doivent être stockés dans un répertoire accessible au public.
              *
              * Remarque : si vous le laissez vide, la valeur par défaut sera '.log'.
-             * 
+             *
              * @var string
              */
             'extension' => '',
 
             /**
              * Les autorisations du système de fichiers à appliquer sur les fichiers journaux nouvellement créés.
-             * 
+             *
              * @var int
              */
             'permissions' => 644,
@@ -132,27 +131,27 @@ return [
              *
              * Par défaut, les journaux sont écrits dans STORAGE_PATH . 'logs/'
              * Spécifiez une destination différente ici, si vous le souhaitez.
-             * 
-             * @var string             
+             *
+             * @var string
              */
             'path' => '',
 
             /**
              * Le format d'ecriture des journaux
-             * 
+             *
              * Les valeurs admissible sont:
              *  - json : Encode un enregistrement de journal en json.
              *  - line : Formate un enregistrement de journal en une chaîne d'une ligne.
              *  - normalizer: Normalise les objets/ressources en chaînes afin qu'un enregistrement puisse facilement être sérialisé/encodé.
              *  - scalar: Utilisé pour formater les enregistrements de journal dans un tableau associatif de valeurs scalaires.
-             * 
+             *
              * @var string
              */
             'format' => 'line',
 
             /**
-             * Specifie si on veut un fichier journal par jour 
-             * 
+             * Specifie si on veut un fichier journal par jour
+             *
              * @var bool
              */
             'dayly_rotation' => true,
@@ -160,7 +159,7 @@ return [
             /**
              * Le nombre maximal de fichiers à conserver (0 signifie illimité)
              * Utilisé uniquement si l'option `dayly_rotation` vaut `true`
-             * 
+             *
              * @var int
              */
             'max_files' => 0,
@@ -179,29 +178,27 @@ return [
 
         //     /**
         //      * Indique où l'erreur doit aller.
-        //      * 
+        //      *
         //      * - 0 : Système
         //      * - 4 : SAPI
-        //      * 
+        //      *
         //      * @var int (0 | 4)
         //      */
         //     'type' => 0,
 
         //      /**
         //      * Le format d'ecriture des journaux
-        //      * 
+        //      *
         //      * Les valeurs admissible sont:
         //      *  - json : Encode un enregistrement de journal en json.
         //      *  - line : Formate un enregistrement de journal en une chaîne d'une ligne.
-        //      * 
+        //      *
         //      * @var string
         //      */
         //     'format' => 'line',
         // ],
 
-        
         // ------------------ NOTIFICATION ------------------------
-
 
         /*
          * --------------------------------------------------------------------
@@ -211,9 +208,9 @@ return [
         // 'email' => [
         //     /**
         //      * Le niveau de journalisation que ce gestionnaire gérera.
-        //      * 
+        //      *
         //      * Enregistrera un log uniquement si son niveau est inférieur ou égal à ce niveau
-        //      * 
+        //      *
         //      * @var string
         //      */
         //      'level' => \Psr\Log\LogLevel::CRITICAL,
@@ -244,15 +241,15 @@ return [
 
         //     /**
         //      * Le format d'ecriture des journaux
-        //      * 
+        //      *
         //      * Les valeurs admissible sont:
         //      *  - html : Utilisé pour formater les enregistrements de journal dans un tableau html lisible par l'homme, principalement adapté aux e-mails.
         //      *  - json : Encode un enregistrement de journal en json.
         //      *  - line : Formate un enregistrement de journal en une chaîne d'une ligne.
-        //      * 
+        //      *
         //      * @var string
         //      */
-        //     'format' => 'line', 
+        //     'format' => 'line',
         // ],
 
         /*
@@ -263,18 +260,18 @@ return [
         // 'telegram' => [
         //     /**
         //      * Le niveau de journalisation que ce gestionnaire gérera.
-        //      * 
+        //      *
         //      * Enregistrera un log uniquement si son niveau est inférieur ou égal à ce niveau
-        //      * 
+        //      *
         //      * @var string
         //      */
         //     'level' => \Psr\Log\LogLevel::CRITICAL,
 
         //     /**
         //      * Jeton d'accès au bot Telegram fourni par BotFather
-        //      * 
+        //      *
         //      * Créez un bot de Telegram avec https://telegram.me/BotFather
-        //      * 
+        //      *
         //      * @var string
         //      * @required
         //      */
@@ -282,7 +279,7 @@ return [
 
         //     /**
         //      * Nom du canal de Telegram
-        //      * 
+        //      *
         //      * @var string
         //      * @required
         //      */
@@ -294,23 +291,21 @@ return [
         //     'format' => 'line',
         // ],
 
-
         // ------------------ DEBOGAGE ------------------------
-
 
         /*
          * --------------------------------------------------------------------
          * Envoi les log dans la console Chrome pour le débogage
-         * 
+         *
          * Nécessite l'extension ChromeLogger installée dans votre navigateur.
          * --------------------------------------------------------------------
          */
         // 'chrome' => [
         //     /**
         //      * Le niveau de journalisation que ce gestionnaire gérera.
-        //      * 
+        //      *
         //      * Enregistrera un log uniquement si son niveau est inférieur ou égal à ce niveau
-        //      * 
+        //      *
         //      * @var string
         //      */
         //     'level' => \Psr\Log\LogLevel::DEBUG,
@@ -324,7 +319,7 @@ return [
         /*
          * --------------------------------------------------------------------
          * Envoi les log dans la console Firebug pour le débogage
-         * 
+         *
          * Nécessite l'extension Firebug installée dans votre navigateur.
          * --------------------------------------------------------------------
          */
@@ -335,6 +330,6 @@ return [
          * Envoi les log dans la console du navigareur pour le débogage
          * --------------------------------------------------------------------
          */
-        //'browser' => [],
-    ]
+        // 'browser' => [],
+    ],
 ];

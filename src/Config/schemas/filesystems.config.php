@@ -13,17 +13,17 @@ use Nette\Schema\Expect;
 
 return Expect::structure([
     'default' => Expect::string(env('FILESYSTEM_DISK', 'local')),
-    'disks' => Expect::structure([
+    'disks'   => Expect::structure([
         'local' => Expect::structure([
             'driver' => Expect::string('local'),
-            'root'   => Expect::string(storage_path('app')),
+            'root'   => Expect::string(storage_path('app/private')),
             'throw'  => Expect::bool(false),
         ])->otherItems(),
 
         'public' => Expect::structure([
             'driver'     => Expect::string('local'),
             'root'       => Expect::string(storage_path('app/public')),
-            'url'        => Expect::string(config('app.base_url').'/storage'),
+            'url'        => Expect::string(config('app.base_url') . '/storage'),
             'visibility' => Expect::anyOf('public', 'private')->default('public'),
             'throw'      => Expect::bool(false),
         ])->otherItems(),

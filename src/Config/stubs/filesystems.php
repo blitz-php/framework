@@ -1,13 +1,13 @@
 <?php
 
-return [    
+return [
     /*
     |--------------------------------------------------------------------------
     | Default Filesystem Disk
     |--------------------------------------------------------------------------
     |
-    | Ici, vous pouvez spécifier le disque du système de fichiers par défaut qui 
-    | doit être utilisé par le framework. Le disque "local", ainsi qu'une variété 
+    | Ici, vous pouvez spécifier le disque du système de fichiers par défaut qui
+    | doit être utilisé par le framework. Le disque "local", ainsi qu'une variété
     | de disques basés sur le cloud sont disponibles pour votre application. Stockez simplement!
     |
     */
@@ -18,8 +18,8 @@ return [
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |
-    | Ici, vous pouvez configurer autant de "disques" de système de fichiers que 
-    | vous le souhaitez, et vous pouvez même configurer plusieurs disques du même pilote. 
+    | Ici, vous pouvez configurer autant de "disques" de système de fichiers que
+    | vous le souhaitez, et vous pouvez même configurer plusieurs disques du même pilote.
     | Des valeurs par défaut ont été définies pour chaque pilote à titre d'exemple des valeurs requises.
     |
     | Pilotes supportes : "local", "ftp", "sftp", "s3"
@@ -28,14 +28,14 @@ return [
     'disks' => [
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
-            'throw' => false,
+            'root'   => storage_path('app/private'),
+            'throw'  => false,
         ],
 
         'public' => [
             'driver'     => 'local',
             'root'       => storage_path('app/public'),
-            'url'        => config('app.base_url').'/storage',
+            'url'        => config('app.base_url') . '/storage',
             'visibility' => 'public',
             'throw'      => false,
         ],
@@ -51,19 +51,5 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw'                   => false,
         ],
-
     ],
-
-    /**
-    *--------------------------------------------------------------------------
-    * Liens symbolique
-    *--------------------------------------------------------------------------
-    * Ici, vous pouvez configurer les liens symboliques qui seront créés lors de 
-    * l'exécution de la commande Klinge `storage:link`. 
-    * Les clés du tableau doivent être les emplacements des liens et les valeurs doivent être leurs cibles.
-    */
-    'links' => [
-        public_path('storage') => storage_path('app/public'),
-    ],
-
 ];

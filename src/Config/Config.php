@@ -244,14 +244,14 @@ class Config
     public static function schema(string $key): ?Schema
     {
         $file = 'schemas' . DS . Helpers::ensureExt($key . '.config', 'php');
-        
+
         if (file_exists($syst_schema = SYST_PATH . 'Config' . DS . $file)) {
             return require $syst_schema;
         }
-        if (file_exists($app_schema  = CONFIG_PATH . $file)) {
+        if (file_exists($app_schema = CONFIG_PATH . $file)) {
             return require $app_schema;
-        } 
-        
+        }
+
         $paths = service('locator')->search('Config/schemas/' . $key);
 
         if (isset($paths[0]) && file_exists($paths[0])) {

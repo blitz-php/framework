@@ -25,25 +25,25 @@ return Expect::structure([
     ]),
 
     'memcached' => Expect::structure([
-		'host' => Expect::string('127.0.0.1'),
-		'port' => Expect::int(11211),
-	]),
+        'host' => Expect::string('127.0.0.1'),
+        'port' => Expect::int(11211),
+    ]),
 
-	'redis' => Expect::structure([
-		'host'     => Expect::string('127.0.0.1'),
-		'password' => Expect::bool(false),
-		'port'     => Expect::int(6379),
-		'timeout'  => Expect::int(0),
-		'database' => Expect::int(0),
-	]),
+    'redis' => Expect::structure([
+        'host'     => Expect::string('127.0.0.1'),
+        'password' => Expect::bool(false),
+        'port'     => Expect::int(6379),
+        'timeout'  => Expect::int(0),
+        'database' => Expect::int(0),
+    ]),
 
     'valid_handlers' => Expect::arrayOf('string', 'string')->default([
-        'apcu'      => \BlitzPHP\Cache\Handlers\Apcu::class,
-        'array'     => \BlitzPHP\Cache\Handlers\ArrayHandler::class,
-        'dummy'     => \BlitzPHP\Cache\Handlers\Dummy::class,
-        'file'      => \BlitzPHP\Cache\Handlers\File::class,
-        'memcached' => \BlitzPHP\Cache\Handlers\Memcached::class,
-        'redis'     => \BlitzPHP\Cache\Handlers\RedisHandler::class,
-        'wincache'  => \BlitzPHP\Cache\Handlers\Wincache::class,
+        'apcu'      => BlitzPHP\Cache\Handlers\Apcu::class,
+        'array'     => BlitzPHP\Cache\Handlers\ArrayHandler::class,
+        'dummy'     => BlitzPHP\Cache\Handlers\Dummy::class,
+        'file'      => BlitzPHP\Cache\Handlers\File::class,
+        'memcached' => BlitzPHP\Cache\Handlers\Memcached::class,
+        'redis'     => BlitzPHP\Cache\Handlers\RedisHandler::class,
+        'wincache'  => BlitzPHP\Cache\Handlers\Wincache::class,
     ]),
 ]);
