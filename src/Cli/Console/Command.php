@@ -630,6 +630,18 @@ abstract class Command
     }
 
     /**
+     * La chaîne de caractères est remplacée par des titres de la même longueur pour que les descriptions soient bien alignées.
+     *
+     * @param int $extra Nombre d'espaces supplémentaires à ajouter à la fin
+     */
+    public function pad(string $item, int $max, int $extra = 2, int $indent = 0): string
+    {
+        $max += $extra + $indent;
+
+        return str_pad(str_repeat(' ', $indent) . $item, $max);
+    }
+
+    /**
      * Facilite l'accès à nos propriétés protégées.
      *
      * @return mixed

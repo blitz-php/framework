@@ -21,13 +21,13 @@ use Ahc\Cli\Output\Color;
 class CheckPhpIni
 {
     /**
-     * @param bool $isCli Set false if you run via Web
+     * @param bool $isCli Defini a `false` s'il est exécuté via le Web
      *
-     * @return array|string HTML string or array in CLI
+     * @return array|string chaine HTML sur le web ou tableau en CLI
      */
-    public static function run(bool $isCli = true)
+    public static function run(bool $isCli = true, ?string $argument = null)
     {
-        $output = static::checkIni();
+        $output = static::checkIni($argument);
 
         $thead = ['Directive', 'Globale', 'Actuelle', 'Recommandation', 'Remarque'];
         $tbody = [];
@@ -116,9 +116,9 @@ class CheckPhpIni
     }
 
     /**
-     * @internal Used for testing purposes only.
+     * @internal Utilisé uniquement à des fins de test.
      */
-    public static function checkIni(): array
+    public static function checkIni(?string $argument = null): array
     {
         $items = [
             'error_reporting'         => ['recommended' => '5111'],
@@ -131,17 +131,36 @@ class CheckPhpIni
             'memory_limit'            => ['remark' => '> post_max_size'],
             'post_max_size'           => ['remark' => '> upload_max_filesize'],
             'upload_max_filesize'     => ['remark' => '< post_max_size'],
-            'max_input_vars'          => ['remark' => 'The default is 1000.'],
+            'max_input_vars'          => ['remark' => 'La valeur par défaut est 1000.'],
             'request_order'           => ['recommended' => 'GP'],
             'variables_order'         => ['recommended' => 'GPCS'],
             'date.timezone'           => ['recommended' => 'UTC'],
             'mbstring.language'       => ['recommended' => 'neutral'],
             'opcache.enable'          => ['recommended' => '1'],
-            'opcache.enable_cli'      => [],
-            'opcache.jit'             => [],
-            'opcache.jit_buffer_size' => [],
+            'opcache.enable_cli'      => ['recommended' => '0', 'remark' => 'Activer lorsque vous utilisez des files d\'attente ou que vous exécutez des tâches CLI répétitives'],
+            'opcache.jit'             => ['recommended' => 'tracing'],
+            'opcache.jit_buffer_size' => ['recommended' => '128', 'remark' => 'Ajustez avec votre espace mémoire libre'],
             'zend.assertions'         => ['recommended' => '-1'],
         ];
+
+        if ($argument === 'opcache') {
+            $items = [
+                'opcache.enable'                  => ['recommended' => '1'],
+                'opcache.enable_cli'              => ['recommended' => '0', 'remark' => 'Activer lorsque vous utilisez des files d\'attente ou que vous exécutez des tâches CLI répétitives'],
+                'opcache.jit'                     => ['recommended' => 'tracing', 'remark' => 'Désactiver lorsque vous utilisez des extensions tierces'],
+                'opcache.jit_buffer_size'         => ['recommended' => '128', 'remark' => 'Ajustez avec votre espace mémoire libre'],
+                'opcache.memory_consumption'      => ['recommended' => '128', 'remark' => 'Ajustez avec votre espace mémoire libre'],
+                'opcache.interned_strings_buffer' => ['recommended' => '16'],
+                'opcache.max_accelerated_files'   => ['remark' => 'Ajuster en fonction du nombre de fichiers PHP dans votre projet (par exemple : find your_project/ -iname \'*.php\'|wc -l)'],
+                'opcache.max_wasted_percentage'   => ['recommended' => '10'],
+                'opcache.validate_timestamps'     => ['recommended' => '0', 'remark' => 'Lorsque vous le désactivez, opcache conserve votre code dans la mémoire partagée. Le redémarrage du serveur web est nécessaire'],
+                'opcache.revalidate_freq'         => [],
+                'opcache.file_cache'              => ['remark' => 'Mise en cache du fichier de localisation, ce qui devrait améliorer les performances lorsque la mémoire du SHM est pleine.'],
+                'opcache.file_cache_only'         => ['remark' => 'Mise en cache du code optique dans la mémoire partagée, désactivée lorsque vous utilisez Windows'],
+                'opcache.file_cache_fallback'     => ['remark' => 'Activer lorsque vous utilisez Windows'],
+                'opcache.save_comments'           => ['recommended' => '0', 'remark' => 'Activé lorsque vous utilisez l\'annotation docblock `package require`'],
+            ];
+        }
 
         $output = [];
         $ini    = ini_get_all();
