@@ -34,8 +34,7 @@ final class PhpIniCheck extends Command
      */
     protected $description = 'Vérifiez les valeurs de votre php.ini dans l\'environnement de production.';
 
-    protected $service = 'Service de configuration';
-
+    protected $service   = 'Service de configuration';
     protected $arguments = [
         'opcache' => 'Vérifier les valeurs détaillées de l\'opcache dans l\'environnement de production.',
     ];
