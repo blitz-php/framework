@@ -46,7 +46,7 @@ final class PhpIniCheck extends Command
     public function execute(array $params)
     {
         unset($params['help'], $params['version'], $params['verbosity']);
-        $params = array_values($params);
+        $params = array_values(array_filter($params));
 
         if (isset($params[0]) && ! in_array($params[0], array_keys($this->arguments), true)) {
             $this->fail('Vous devez indiquer un argument correct.')->eol();
