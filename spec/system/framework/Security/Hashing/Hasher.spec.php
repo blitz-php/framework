@@ -121,7 +121,7 @@ describe('Security / Hashing', function (): void {
 				expect($value)->not->toBe('password');
 				expect($hasher->check('password', $value))->toBeTruthy();
 				expect($hasher->needsRehash($value))->toBeFalsy();
-				expect($hasher->needsRehash($value, ['threads' => 1]))->toBeTruthy();
+				expect($hasher->needsRehash($value, ['threads' => 3]))->toBeTruthy();
 				expect($hasher->info($value)['algoName'])->toBe('argon2i');
 				expect($this->hasher->isHashed($value))->toBeTruthy();
 			} catch (Throwable) {
@@ -137,7 +137,7 @@ describe('Security / Hashing', function (): void {
 				expect($value)->not->toBe('password');
 				expect($hasher->check('password', $value))->toBeTruthy();
 				expect($hasher->needsRehash($value))->toBeFalsy();
-				expect($hasher->needsRehash($value, ['threads' => 1]))->toBeTruthy();
+				expect($hasher->needsRehash($value, ['threads' => 3]))->toBeTruthy();
 				expect($hasher->info($value)['algoName'])->toBe('argon2id');
 				expect($this->hasher->isHashed($value))->toBeTruthy();
 			} catch (Throwable) {
