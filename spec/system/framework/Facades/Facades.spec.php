@@ -29,6 +29,8 @@ use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\View\View as ViewView;
 use DI\NotFoundException;
 
+use function Kahlan\expect;
+
 describe('Facades', function (): void {
 	describe('Facade', function (): void {
 		it('Accessor retourne un objet', function (): void {
@@ -206,7 +208,7 @@ describe('Facades', function (): void {
 			Log::debug('test file ' . __FILE__);
 
 			/** @var SplFileInfo $file */
-   $file = last(Fs::files(storage_path('logs')));
+   			$file = last(Fs::files(storage_path('logs')));
 			expect($file->getContents())->toMatch(fn($actual) => str_contains($actual, 'test file ' . __FILE__));
         });
     });
