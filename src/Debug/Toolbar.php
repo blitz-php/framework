@@ -18,12 +18,12 @@ use BlitzPHP\Debug\Toolbar\Collectors\HistoryCollector;
 use BlitzPHP\Formatter\JsonFormatter;
 use BlitzPHP\Formatter\XmlFormatter;
 use BlitzPHP\Http\Request;
+use BlitzPHP\Http\Response;
 use BlitzPHP\Utilities\Date;
 use BlitzPHP\View\Parser;
 use Exception;
 use GuzzleHttp\Psr7\Utils;
 use Kint\Kint;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use stdClass;
@@ -66,8 +66,8 @@ class Toolbar
         foreach ($this->config->collectors as $collector) {
             if (! class_exists($collector)) {
                 logger()->critical(
-                    'Toolbar collector does not exist (' . $collector . ').'
-                    . ' Please check $collectors in the app/Config/toolbar.php file.'
+                    'Le collecteur de la barre d\'outils n\'existe pas (' . $collector . ').'
+                    . ' Veuillez vérifier $collectors dans le fichier app/Config/toolbar.php.'
                 );
 
                 continue;
@@ -80,7 +80,8 @@ class Toolbar
     /**
      * Renvoie toutes les données requises par la barre de débogage
      *
-     * @param float $startTime Heure de début de l'application
+     * @param float   $startTime Heure de début de l'application
+     * @param Request $request
      *
      * @return string Données encodées en JSON
      */
@@ -88,8 +89,8 @@ class Toolbar
     {
         // Éléments de données utilisés dans la vue.
         $data['url']             = current_url();
-        $data['method']          = strtoupper($request->getMethod());
-        $data['isAJAX']          = service('request')->ajax();
+        $data['method']          = $request->getMethod();
+        $data['isAJAX']          = $request->ajax();
         $data['startTime']       = $startTime;
         $data['totalTime']       = $totalTime * 1000;
         $data['totalMemory']     = number_format(memory_get_peak_usage() / 1024 / 1024, 3);
@@ -134,7 +135,7 @@ class Toolbar
             foreach ($_SESSION as $key => $value) {
                 // Remplacez les données binaires par une chaîne pour éviter l'échec de json_encode.
                 if (is_string($value) && preg_match('~[^\x20-\x7E\t\r\n]~', $value)) {
-                    $value = 'binary data';
+                    $value = 'donnée binaire';
                 }
 
                 $data['vars']['session'][esc($key)] = is_string($value) ? esc($value) : '<pre>' . esc(print_r($value, true)) . '</pre>';
@@ -160,7 +161,7 @@ class Toolbar
             $data['vars']['cookies'][esc($name)] = esc($value);
         }
 
-        $data['vars']['request'] = (service('request')->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
+        $data['vars']['request'] = ($request->is('ssl') ? 'HTTPS' : 'HTTP') . '/' . $request->getProtocolVersion();
 
         $data['vars']['response'] = [
             'statusCode'  => $response->getStatusCode(),
@@ -210,12 +211,12 @@ class Toolbar
             $open = $row['name'] === 'Controller';
 
             if ($hasChildren || $isQuery) {
-                $output .= '<tr class="timeline-parent' . ($open ? ' timeline-parent-open' : '') . '" id="timeline-' . $styleCount . '_parent" onclick="blitzphpDebugBar.toggleChildRows(\'timeline-' . $styleCount . '\');">';
+                $output .= '<tr class="timeline-parent' . ($open ? ' timeline-parent-open' : '') . '" id="timeline-' . $styleCount . '_parent" data-toggle="childrows" data-child="timeline-' . $styleCount . '">';
             } else {
                 $output .= '<tr>';
             }
 
-            $output .= '<td class="' . ($isChild ? 'debug-bar-width30' : '') . '" style="--level: ' . $level . ';">' . ($hasChildren || $isQuery ? '<nav></nav>' : '') . $row['name'] . '</td>';
+            $output .= '<td class="' . ($isChild ? 'debug-bar-width30' : '') . ' debug-bar-level-' . $level . '" >' . ($hasChildren || $isQuery ? '<nav></nav>' : '') . $row['name'] . '</td>';
             $output .= '<td class="' . ($isChild ? 'debug-bar-width10' : '') . '">' . $row['component'] . '</td>';
             $output .= '<td class="' . ($isChild ? 'debug-bar-width10 ' : '') . 'debug-bar-alignRight">' . number_format($row['duration'] * 1000, 2) . ' ms</td>';
             $output .= "<td class='debug-bar-noverflow' colspan='{$segmentCount}'>";
@@ -233,7 +234,7 @@ class Toolbar
 
             // Ajouter des enfants le cas échéant
             if ($hasChildren || $isQuery) {
-                $output .= '<tr class="child-row" id="timeline-' . ($styleCount - 1) . '_children" style="' . ($open ? '' : 'display: none;') . '">';
+                $output .= '<tr class="child-row ' . ($open ? '' : ' debug-bar-ndisplay') . '" id="timeline-' . ($styleCount - 1) . '_children" >';
                 $output .= '<td colspan="' . ($segmentCount + 3) . '" class="child-container">';
                 $output .= '<table class="timeline">';
                 $output .= '<tbody>';
@@ -241,7 +242,7 @@ class Toolbar
                 if ($isQuery) {
                     // Sortie de la chaîne de requête si requête
                     $output .= '<tr>';
-                    $output .= '<td class="query-container" style="--level: ' . ($level + 1) . ';">' . $row['query'] . '</td>';
+                    $output .= '<td class="query-container debug-bar-level-' . ($level + 1) . '" >' . $row['query'] . '</td>';
                     $output .= '</tr>';
                 } else {
                     // Rendre récursivement les enfants
@@ -357,12 +358,33 @@ class Toolbar
     }
 
     /**
+     * Traite la barre d'outils de débogage pour la requête en cours.
+     *
+     * Cette méthode détermine s'il faut afficher la barre d'outils de débogage ou la préparer pour une utilisation ultérieure.
+     *
+     * @param array             $stats    Un tableau contenant des statistiques de performances.
+     * @param Request           $request  La requête serveur en cours.
+     * @param ResponseInterface $response La réponse en cours.
+     *
+     * @return ResponseInterface La réponse traitée, avec la barre d'outils de débogage injectée ou préparée pour une utilisation ultérieure.
+     */
+    public function process(array $stats, ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    {
+        if ($request->hasAny('blitzphp-debugbar', 'debugbar_time')) {
+            return $this->respond($request);
+        }
+
+        return $this->prepare($stats, $request, $response);
+    }
+
+    /**
      * Préparez-vous au débogage..
      */
-    public function prepare(array $stats, ?RequestInterface $request = null, ?ResponseInterface $response = null): ResponseInterface
+    public function prepare(array $stats, ?ServerRequestInterface $request = null, ?ResponseInterface $response = null): ResponseInterface
     {
         /** @var Request $request */
         $request ??= service('request');
+        /** @var Response $response */
         $response ??= service('response');
 
         // Si on est en CLI ou en prod, pas la peine de continuer car la debugbar n'est pas utilisable dans ces environnements
@@ -402,95 +424,88 @@ class Toolbar
                 ->withHeader('Debugbar-Link', site_url("?debugbar_time={$time}"));
         }
 
-        $_SESSION['_blitz_debugbar_'] = array_merge($_SESSION['_blitz_debugbar_'] ?? [], compact('time'));
+        $oldKintMode        = Kint::$mode_default;
+        Kint::$mode_default = Kint::MODE_RICH;
+        $kintScript         = @Kint::dump('');
+        Kint::$mode_default = $oldKintMode;
+        $kintScript         = substr($kintScript, 0, strpos($kintScript, '</style>') + 8);
+        $kintScript         = ($kintScript === '0') ? '' : $kintScript;
 
-        $debugRenderer = $this->respond();
+        $script = PHP_EOL
+            . '<script id="debugbar_loader" '
+            . 'data-time="' . $time . '" '
+            . 'src="' . site_url() . '?blitzphp-debugbar"></script>'
+            . '<script id="debugbar_dynamic_script"></script>'
+            . '<style id="debugbar_dynamic_style"></style>'
+            . $kintScript
+            . PHP_EOL;
 
-        // Extract css
-        preg_match('/<style (?:.+)>(.+)<\/style>/', $debugRenderer, $matches);
-        $style         = $matches[0] ?? '';
-        $debugRenderer = str_replace($style, '', $debugRenderer);
-
-        // Extract js
-        preg_match('/<script (?:.+)>(.+)<\/script>/', $debugRenderer, $matches);
-        $js            = $matches[0] ?? '';
-        $debugRenderer = str_replace($js, '', $debugRenderer);
-
-        $responseContent = $response->getBody()->getContents();
-
-        if (str_contains($responseContent, '<head>')) {
-            $responseContent = preg_replace('/<head>/', '<head>' . $style, $responseContent, 1);
+        if (str_contains($responseContent = (string) $response->getBody(), '<head>')) {
+            $responseContent = preg_replace(
+                '/<head>/',
+                '<head>' . $script,
+                $responseContent,
+                1,
+            );
         } else {
-            $responseContent .= $style;
+            $responseContent .= $script;
         }
 
-        if (str_contains($responseContent, '</body>')) {
-            $responseContent = preg_replace('/<\/body>/', '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>blitzphpDebugBar.init();</script></body>', $responseContent, 1);
-        } else {
-            $responseContent .= '<div id="toolbarContainer">' . trim(preg_replace('/\s+/', ' ', $debugRenderer)) . '</div>' . $js . '<script>blitzphpDebugBar.init();</script>';
-        }
-
-        return $response->withBody(
-            Utils::streamFor($responseContent)
-        );
+        return $response->withBody(Utils::streamFor($responseContent));
     }
 
     /**
      * Injectez la barre d'outils de débogage dans la réponse.
      *
-     * @return string
+     * @param Request $request
      *
      * @codeCoverageIgnore
      */
-    public function respond()
+    public function respond(ServerRequestInterface $request): Response
     {
+        $response = new Response();
+
         if (on_test()) {
-            return '';
+            return $response;
         }
 
-        $request = service('request');
-
-        // Si la requête contient '?debugbar alors nous sommes
+        // Si la requête contient '?blitzphp-debugbar alors nous sommes
         // renvoie simplement le script de chargement
-        if ($request->getQuery('debugbar') !== null) {
-            header('Content-Type: application/javascript');
+        if ($request->getQuery('blitzphp-debugbar') !== null) {
+            $response = $response->withType('application/javascript');
 
             ob_start();
-            include $this->config->view_path . 'toolbarloader.js';
+            include $this->config->view_path . DS . 'toolbarloader.js';
             $output = ob_get_clean();
 
-            return str_replace('{url}', rtrim(site_url(), '/'), $output);
+            return $response->withStringBody(str_replace('{url}', rtrim(site_url(), '/'), $output));
         }
 
         // Sinon, s'il inclut ?debugbar_time, alors
         // nous devrions retourner la barre de débogage entière.
-        $debugbarTime = $_SESSION['_blitz_debugbar_']['time'] ?? $request->getQuery('debugbar_time');
-        if ($debugbarTime) {
+        if (null !== $debugbarTime = $request->getQuery('debugbar_time')) {
             // Négociation du type de contenu pour formater la sortie
-            $format = $request->negotiate('media', ['text/html', 'application/json', 'application/xml']);
-            $format = explode('/', $format)[1];
+            $format   = $request->negotiate('media', ['text/html', 'application/json', 'application/xml']);
+            $response = $response->withType($format);
+            $format   = explode('/', $format)[1];
 
             $filename = 'debugbar_' . $debugbarTime;
             $filename = $this->debugPath . DS . $filename . '.json';
 
             if (is_file($filename)) {
                 // Affiche la barre d'outils si elle existe
-                return $this->format($debugbarTime, file_get_contents($filename), $format);
+                return $response->withStringBody($this->format($debugbarTime, file_get_contents($filename), $format));
             }
-
-            // Nom de fichier introuvable
-            http_response_code(404);
-
-            exit; // Quitter ici est nécessaire pour éviter de charger la page d'index
         }
 
-        return '';
+        // Nom de fichier introuvable
+        return $response->withStatus(404);
     }
 
     /**
      * Formatte la sortie
      *
-     * @param float $debugbar_time
+     * @param mixed $debugbar_time
      */
     protected function format($debugbar_time, string $data, string $format = 'html'): string
     {

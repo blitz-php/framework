@@ -28,6 +28,11 @@ class FrameworkException extends RuntimeException implements ExceptionInterface
         return new static(lang('Core.enabledZlibOutputCompression'));
     }
 
+    public static function invalidDirectory(string $path)
+    {
+        return new static(lang('Core.invalidDirectory', [$path]));
+    }
+
     public static function invalidFile(string $path)
     {
         return new static(lang('Core.invalidFile', [$path]));
