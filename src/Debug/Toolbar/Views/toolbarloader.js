@@ -25,19 +25,19 @@ function loadDoc(time) {
             let dynamicStyle = document.getElementById('debugbar_dynamic_style');
             let dynamicScript = document.getElementById('debugbar_dynamic_script');
 
-            // get the first style block, copy contents to dynamic_style, then remove here
+            // récupérez le premier bloc de style, copiez le contenu dans dynamic_style, puis supprimez-le ici
             let start = responseText.indexOf('>', responseText.indexOf('<style')) + 1;
             let end = responseText.indexOf('</style>', start);
             dynamicStyle.innerHTML = responseText.substr(start, end - start);
             responseText = responseText.substr(end + 8);
 
-            // get the first script after the first style, copy contents to dynamic_script, then remove here
+            // récupérez le premier script après le premier style, copiez le contenu dans dynamic_script, puis supprimez-le ici
             start = responseText.indexOf('>', responseText.indexOf('<script')) + 1;
             end = responseText.indexOf('\<\/script>', start);
             dynamicScript.innerHTML = responseText.substr(start, end - start);
             responseText = responseText.substr(end + 9);
 
-            // check for last style block, append contents to dynamic_style, then remove here
+            // vérifier le dernier bloc de style, ajouter le contenu à dynamic_style, puis supprimer ici
             start = responseText.indexOf('>', responseText.indexOf('<style')) + 1;
             end = responseText.indexOf('</style>', start);
             dynamicStyle.innerHTML += responseText.substr(start, end - start);
@@ -45,11 +45,11 @@ function loadDoc(time) {
 
             toolbar.innerHTML = responseText;
 
-            if (typeof ciDebugBar === 'object') {
-                ciDebugBar.init();
+            if (typeof blitzphpDebugBar === 'object') {
+                blitzphpDebugBar.init();
             }
         } else if (this.readyState === 4 && this.status === 404) {
-            console.log('CodeIgniter DebugBar: File "WRITEPATH/debugbar/debugbar_' + time + '" not found.');
+            console.log('BlitzPHP DebugBar: File "STORAGE_PATH/debugbar/debugbar_' + time + '" not found.');
         }
     };
 
@@ -71,11 +71,14 @@ function newXHR() {
                 let debugbarTime = realXHR.getResponseHeader('Debugbar-Time');
 
                 if (debugbarTime) {
-                    let h2 = document.querySelector('#ci-history > h2');
+                    let h2 = document.querySelector('#blitzphp-history > h2');
 
                     if (h2) {
-                        h2.innerHTML = 'History <small>You have new debug data.</small> <button onclick="loadDoc(' + debugbarTime + ')">Update</button>';
-                        document.querySelector('a[data-tab="ci-history"] > span > .badge').className += ' active';
+                        h2.innerHTML = 'Historique <small>Vous avez de nouvelles données de débogage.</small> <button id="blitzphp-history-update">Mettre à jour</button>';
+                        document.querySelector('a[data-tab="blitzphp-history"] > span > .badge').className += ' active';
+                        document.getElementById('blitzphp-history-update').addEventListener('click', function () {
+                            loadDoc(debugbarTime);
+                        }, false)
                     }
                 }
             }

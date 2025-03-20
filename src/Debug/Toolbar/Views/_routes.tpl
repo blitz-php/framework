@@ -9,7 +9,7 @@
     </tbody>
 </table>
 
-<h3>Route assortis</h3>
+<h3>Route adaptée</h3>
 
 <table>
     <tbody>
