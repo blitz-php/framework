@@ -15,10 +15,11 @@ use function Kahlan\expect;
 
 describe('Security / CheckPhpIni', function (): void {
     beforeAll(function(): void {
-        $ini = ini_get_all();
+        $ini     = ini_get_all();
+        $default = ['global_value' => 'disabled', 'local_value' => 'disabled'];
         
-        $this->display_errors = $ini['display_errors'] ?? ['global_value' => 'disabled', 'local_value' => 'disabled'];
-        $this->opcache        = $ini['opcache'] ?? ['global_value' => 'disabled', 'local_value' => 'disabled'];
+        $this->display_errors = $ini['display_errors'] ?? $default;
+        $this->opcache        = $ini['opcache.save_comments'] ?? $default;
     });
 
     it('Check ini', function (): void {
