@@ -365,7 +365,7 @@ class Dispatcher
         }
 
         // $routes est defini dans app/Config/routes.php
-        $this->router = single_service('router', $routes, $this->request);
+        $this->router = service('router', $routes, $this->request);
 
         $this->outputBufferingStart();
 
@@ -576,7 +576,7 @@ class Dispatcher
     protected function sendResponse()
     {
         if (! $this->isAjaxRequest()) {
-            $this->response = service('toolbar')->prepare(
+            $this->response = service('toolbar')->process(
                 $this->getPerformanceStats(),
                 $this->request,
                 $this->response
@@ -685,6 +685,12 @@ class Dispatcher
         };
     }
 
+    /**
+     * Démarre l'application en configurant la requete et la réponse, 
+     * en exécutant le contrôleur et en gérant les exceptions de validation.
+     *
+     * Cette méthode renvoie un objet callable qui sert de middleware pour le cycle requête-réponse de l'application.
+     */
     private function bootApp(): callable
     {
         return function (ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface {

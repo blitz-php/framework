@@ -53,6 +53,25 @@ class RoutesCollector extends BaseCollector
 
     /**
      * {@inheritDoc}
+     * 
+     * @return array{
+     *      matchedRoute: array<array{
+     *          directory: string,
+     *          controller: string,
+     *          method: string,
+     *          paramCount: int,
+     *          truePCount: int,
+     *          params: list<array{
+     *              name: string,
+     *              value: mixed
+     *          }>
+     *      }>,
+     *      routes: list<array{
+     *          method: string,
+     *          route: string,
+     *          handler: string
+     *      }>
+     * }
      *
      * @throws ReflectionException
      */
@@ -91,8 +110,8 @@ class RoutesCollector extends BaseCollector
         $matchedRoute = [
             [
                 'directory'  => $this->router->directory(),
-                'controller' => $this->router->controllerName(),
-                'method'     => $this->router->methodName(),
+                'controller' => is_string($controller = $this->router->controllerName()) ? $controller : 'Non défini',
+                'method'     => is_string($controller) ? $this->router->methodName() : 'Non définie',
                 'paramCount' => count($this->router->params()),
                 'truePCount' => count($params),
                 'params'     => $params,

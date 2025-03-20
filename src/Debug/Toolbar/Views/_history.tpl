@@ -13,8 +13,8 @@
     <tbody>
     {files}
         <tr data-active="{active}">
-        	<td class="debug-bar-width70p">
-            	<button class="ci-history-load" data-time="{time}">Chargé</button>
+            <td class="debug-bar-width70p">
+            	<button class="blitzphp-history-load" data-time="{time}">Chargé</button>
             </td>
             <td class="debug-bar-width190p">{datetime}</td>
             <td>{status}</td>
