@@ -18,7 +18,7 @@ use RecursiveIterator;
  * @internal
  *
  * @psalm-suppress MissingTemplateParam
- * 
+ *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.6 - CodeIgniter\HotReloader\IteratorFilter</a>
  */
 final class IteratorFilter extends RecursiveFilterIterator implements RecursiveIterator

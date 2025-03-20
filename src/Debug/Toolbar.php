@@ -80,7 +80,7 @@ class Toolbar
     /**
      * Renvoie toutes les données requises par la barre de débogage
      *
-     * @param float $startTime Heure de début de l'application
+     * @param float   $startTime Heure de début de l'application
      * @param Request $request
      *
      * @return string Données encodées en JSON
@@ -362,8 +362,8 @@ class Toolbar
      *
      * Cette méthode détermine s'il faut afficher la barre d'outils de débogage ou la préparer pour une utilisation ultérieure.
      *
-     * @param array $stats Un tableau contenant des statistiques de performances.
-     * @param Request $request La requête serveur en cours.
+     * @param array             $stats    Un tableau contenant des statistiques de performances.
+     * @param Request           $request  La requête serveur en cours.
      * @param ResponseInterface $response La réponse en cours.
      *
      * @return ResponseInterface La réponse traitée, avec la barre d'outils de débogage injectée ou préparée pour une utilisation ultérieure.
@@ -371,7 +371,7 @@ class Toolbar
     public function process(array $stats, ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         if ($request->hasAny('blitzphp-debugbar', 'debugbar_time')) {
-            return $this->respond($request);   
+            return $this->respond($request);
         }
 
         return $this->prepare($stats, $request, $response);
@@ -456,7 +456,7 @@ class Toolbar
 
     /**
      * Injectez la barre d'outils de débogage dans la réponse.
-     * 
+     *
      * @param Request $request
      *
      * @codeCoverageIgnore
@@ -477,7 +477,7 @@ class Toolbar
             ob_start();
             include $this->config->view_path . DS . 'toolbarloader.js';
             $output = ob_get_clean();
-            
+
             return $response->withStringBody(str_replace('{url}', rtrim(site_url(), '/'), $output));
         }
 
@@ -504,6 +504,8 @@ class Toolbar
 
     /**
      * Formatte la sortie
+     *
+     * @param mixed $debugbar_time
      */
     protected function format($debugbar_time, string $data, string $format = 'html'): string
     {

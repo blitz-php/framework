@@ -18,13 +18,13 @@ use RecursiveIteratorIterator;
 
 /**
  * @internal
- * 
+ *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.6 - CodeIgniter\HotReloader\DirectoryHasher</a>
  */
 final class DirectoryHasher
 {
     /**
-     * Génère une valeur MD5 de tous les répertoires surveillés par le rechargeur à chaud, 
+     * Génère une valeur MD5 de tous les répertoires surveillés par le rechargeur à chaud,
      * comme défini dans le fichier app/Config/toolbar.php.
      *
      * Il s'agit de l'empreinte actuelle de l'application.
@@ -35,7 +35,7 @@ final class DirectoryHasher
     }
 
     /**
-     * Génère un tableau de hachages md5 pour tous les répertoires surveillés par le Hot Reloader, 
+     * Génère un tableau de hachages md5 pour tous les répertoires surveillés par le Hot Reloader,
      * comme défini dans app/Config/toolbar.php.
      */
     public function hashApp(): array
@@ -54,7 +54,7 @@ final class DirectoryHasher
     }
 
     /**
-     * Génère un hachage MD5 d'un répertoire donné et de tous ses fichiers * qui correspondent aux extensions surveillées 
+     * Génère un hachage MD5 d'un répertoire donné et de tous ses fichiers * qui correspondent aux extensions surveillées
      * définies dans app/Config/toolbar.php.
      */
     public function hashDirectory(string $path): string

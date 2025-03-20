@@ -13,7 +13,7 @@ namespace BlitzPHP\HotReloader;
 
 /**
  * @internal
- * 
+ *
  * @credit	<a href="https://codeigniter.com">CodeIgniter 4.6 - CodeIgniter\HotReloader\HotReloader</a>
  */
 final class HotReloader

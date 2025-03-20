@@ -53,7 +53,7 @@ class RoutesCollector extends BaseCollector
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @return array{
      *      matchedRoute: array<array{
      *          directory: string,

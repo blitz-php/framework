@@ -686,7 +686,7 @@ class Dispatcher
     }
 
     /**
-     * Démarre l'application en configurant la requete et la réponse, 
+     * Démarre l'application en configurant la requete et la réponse,
      * en exécutant le contrôleur et en gérant les exceptions de validation.
      *
      * Cette méthode renvoie un objet callable qui sert de middleware pour le cycle requête-réponse de l'application.
