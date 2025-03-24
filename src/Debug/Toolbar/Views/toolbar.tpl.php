@@ -111,7 +111,7 @@
                 <div id="blitzphp-<?= $c['key'] ?>" class="tab">
                     <h2><?= $c['title'] ?> <span><?= $c['titleDetails'] ?></span></h2>
 
-                    <?= is_string($c['display']) ? $c['display'] : $parser->setData($c['display'])->render("_{$c['key']}.tpl") ?>
+                    <?= is_string($c['display']) ? $c['display'] : $parser->setData($c['display'])->render($c['view']) ?>
                 </div>
             <?php endif ?>
         <?php endif ?>

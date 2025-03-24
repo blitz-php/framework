@@ -55,6 +55,11 @@ abstract class BaseCollector
     protected string $key = '';
 
     /**
+     * Le fichier de vue à utiliser pour rendre l'onglet du collector
+     */
+    protected string $view = '';
+
+    /**
      * Obtient le titre du collecteur
      */
     public function getTitle(bool $safe = false): string
@@ -76,6 +81,18 @@ abstract class BaseCollector
         }
 
         return str_replace(' ', '-', strtolower($this->key));
+    }
+
+    /**
+     * Obtient le fichier de vue à utiliser pour rendre l'onglet du collector
+     */
+    public function getView(): string
+    {
+        if ($this->view === '') {
+            $this->view = "_{$this->getKey()}.tpl";
+        }
+
+        return $this->view;
     }
 
     /**
@@ -218,6 +235,7 @@ abstract class BaseCollector
             'title'           => $this->getTitle(),
             'titleSafe'       => $this->getTitle(true),
             'key'             => $this->getKey(),
+            'view'            => $this->getView(),
             'titleDetails'    => $this->getTitleDetails(),
             'display'         => $this->display(),
             'badgeValue'      => $this->getBadgeValue(),
