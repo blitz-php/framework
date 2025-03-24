@@ -82,10 +82,12 @@ class Parser extends NativeAdapter
             $saveData = $this->saveData;
         }
 
-        $fileExt = pathinfo($view, PATHINFO_EXTENSION);
-        $view    = empty($fileExt) ? $view . '.php' : $view; // allow Views as .html, .tpl, etc (from CI3)
+        if ('' === $ext = pathinfo($view, PATHINFO_EXTENSION)) {
+            $view .= '.php';
+            $ext = 'php';
+        }
 
-        $cacheName = $options['cache_name'] ?? str_replace('.php', '', $view);
+        $cacheName = $options['cache_name'] ?? str_replace('.' . $ext, '', $view);
 
         // Was it cached?
         if (isset($options['cache']) && ($output = cache($cacheName))) {
@@ -98,7 +100,7 @@ class Parser extends NativeAdapter
 
         if (! is_file($file)) {
             $fileOrig = $file;
-            $file     = $this->locator->locateFile($view, 'Views');
+            $file     = $this->locator->locateFile($view, 'Views', $ext);
 
             // locateFile will return an empty string if the file cannot be found.
             if (empty($file)) {
