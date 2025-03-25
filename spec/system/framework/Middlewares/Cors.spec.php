@@ -216,12 +216,12 @@ describe('Middleware / Cors', function (): void {
 
 		beforeAll(function (): void {
 			config()->ghost('cors')->set('cors', [
-				'allowedOrigins'      => ['http://localhost'],
-				'supportsCredentials' => true,
-				'allowedMethods'      => ['GET', 'POST', 'PUT', 'DELETE'],
-				'allowedHeaders'      => ['x-allowed-header', 'x-other-allowed-header'],
-				'exposedHeaders'      => [],
-				'maxAge'              => 86400,    // 1 day
+				'allowed_origins'      => ['http://localhost'],
+				'supports_credentials' => true,
+				'allowed_methods'      => ['GET', 'POST', 'PUT', 'DELETE'],
+				'allowed_headers'      => ['x-allowed-header', 'x-other-allowed-header'],
+				'exposed_headers'      => [],
+				'max_age'              => 86400,    // 1 day
 			]);
 
 			$this->origin   = 'http://localhost';
