@@ -44,6 +44,7 @@
         "filp/whoops": "^2.15",
         "kahlan/kahlan": "^5.2",
         "mikey179/vfsstream": "^1.6",
+        "paragonie/csp-builder": "^3.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^1.11",
         "phpstan/phpstan-strict-rules": "^1.6",
