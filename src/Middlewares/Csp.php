@@ -49,18 +49,18 @@ class Csp implements MiddlewareInterface
     /**
      * Constructor
      *
-     * @param CSPBuilder|array $csp Objet CSP ou tableau de configuration
+     * @param array|CSPBuilder     $csp    Objet CSP ou tableau de configuration
      * @param array<string, mixed> $config options de configurations.
      */
-    public function __construct(CSPBuilder|array $csp, array $config = [])
+    public function __construct(array|CSPBuilder $csp, array $config = [])
     {
-        if (!class_exists(CSPBuilder::class)) {
+        if (! class_exists(CSPBuilder::class)) {
             throw new FrameworkException('Vous devez installer paragonie/csp-builder pour utiliser le middleware Csp.');
         }
 
         $this->setConfig($config);
 
-        if (!$csp instanceof CSPBuilder) {
+        if (! $csp instanceof CSPBuilder) {
             $csp = new CSPBuilder($csp);
         }
 
