@@ -75,12 +75,13 @@ class Csp implements MiddlewareInterface
         if ($this->getConfig('script_nonce')) {
             $request = $request->withAttribute('cspScriptNonce', $this->csp->nonce('script-src'));
         }
-        if ($this->getconfig('style_nonce')) {
+        if ($this->getConfig('style_nonce')) {
             $request = $request->withAttribute('cspStyleNonce', $this->csp->nonce('style-src'));
         }
 
         $response = $handler->handle($request);
 
+        /** @var ResponseInterface */
         return $this->csp->injectCSPHeader($response);
     }
 }
