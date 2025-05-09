@@ -68,7 +68,7 @@ class Logger implements LoggerInterface
     {
         $this->config = (object) config('log');
 
-        $this->monolog = new MonologLogger($this->config->name ?? 'application');
+        $this->monolog = new MonologLogger(str_replace(' ', '-', $this->config->name ?? 'application'));
 
         foreach (($this->config->handlers ?? []) as $handler => $options) {
             $this->pushHandler($handler, (object) $options);
