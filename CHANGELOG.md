@@ -2,6 +2,27 @@
 
 Toutes les modifications notables apportées à `:package_name` seront documentées dans ce fichier.
 
+## 0.12.1 - 2025-05-09
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+### What's Changed
+
+#### Fixed Bugs
+
+* fix(Parser): rendu de vue de fichier non-php by @dimtrovich in https://github.com/blitz-php/framework/pull/68
+* fix(Session): par defaut, utiliser du gestionnaire `Array` lors des tests by @dimtrovich in https://github.com/blitz-php/framework/pull/70
+
+#### Enhancements
+
+* feat: possibilité pour un collector de definir son fichier de vue by @dimtrovich in https://github.com/blitz-php/framework/pull/67
+* feat: ajout du middleware CSP by @dimtrovich in https://github.com/blitz-php/framework/pull/69
+
+#### Others
+
+* patch: suppression des espaces dans le nom des logs by @dimtrovich in https://github.com/blitz-php/framework/pull/71
+
+**Full Changelog**: https://github.com/blitz-php/framework/compare/0.12.0...0.12.1
+
 ## 0.12.0 - 2025-03-20
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
