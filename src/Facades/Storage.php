@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Facades;
 
+use BlitzPHP\Contracts\Filesystem\FilesystemInterface;
 use BlitzPHP\Filesystem\FilesystemManager;
 use Closure;
 use DateTimeInterface;
@@ -22,25 +23,25 @@ use League\Flysystem\FilesystemOperator;
  * @method static array                                              allDirectories(string|null $directory = null)
  * @method static array                                              allFiles(string|null $directory = null)
  * @method static bool                                               append(string $path, string $data)
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           build(array|string $config)
+ * @method static FilesystemInterface                                build(array|string $config)
  * @method static void                                               buildTemporaryUrlsUsing(Closure $callback)
  * @method static string|false                                       checksum(string $path, array $options = [])
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           cloud()
+ * @method static FilesystemInterface                                cloud()
  * @method static bool                                               copy(string $from, string $to)
  * @method static void                                               createDirectory(string $location, array $config = [])
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           createFtpDriver(array $config)
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           createLocalDriver(array $config)
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           createS3Driver(array $config)
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           createScopedDriver(array $config)
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           createSftpDriver(array $config)
+ * @method static FilesystemInterface                                createFtpDriver(array $config)
+ * @method static FilesystemInterface                                createLocalDriver(array $config)
+ * @method static FilesystemInterface                                createS3Driver(array $config)
+ * @method static FilesystemInterface                                createScopedDriver(array $config)
+ * @method static FilesystemInterface                                createSftpDriver(array $config)
  * @method static bool                                               delete(array|string $paths)
  * @method static bool                                               deleteDirectory(string $directory)
  * @method static array                                              directories(string|null $directory = null, bool $recursive = false)
  * @method static bool                                               directoryExists(string $path)
  * @method static bool                                               directoryMissing(string $path)
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           disk(string|null $name = null)
+ * @method static FilesystemInterface                                disk(string|null $name = null)
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse download(string $path, string|null $name = null, array $headers = [])
- * @method static \BlitzPHP\Filesystem\FilesystemInterface           drive(string|null $name = null)
+ * @method static FilesystemInterface                                drive(string|null $name = null)
  * @method static bool                                               exists(string $path)
  * @method static FilesystemManager                                  extend(string $driver, Closure $callback)
  * @method static bool                                               fileExists(string $path)
@@ -67,7 +68,7 @@ use League\Flysystem\FilesystemOperator;
  * @method static bool                                               missing(string $path)
  * @method static void                                               mixin(object $mixin, bool $replace = true)
  * @method static bool                                               move(string $from, string $to)
- * @method static \BlitzPHP\Filesystem\FilesystemAdapter|mixed       when((Closure | mixed | null) $value = null, (callable | null) $callback = null, (callable | null) $default = null)
+ * @method static FilesystemAdapter|mixed                            when((Closure | mixed | null) $value = null, (callable | null) $callback = null, (callable | null) $default = null)
  * @method static string                                             path(string $path)
  * @method static bool                                               prepend(string $path, string $data)
  * @method static bool                                               providesTemporaryUrls()
@@ -88,7 +89,7 @@ use League\Flysystem\FilesystemOperator;
  * @method static void                                               write(string $location, string $contents, array $config = [])
  * @method static bool                                               writeStream(string $path, resource $resource, array $options = [])
  *
- * @see FilesystemManager
+ * @see \BlitzPHP\Filesystem\FilesystemManager
  */
 final class Storage extends Facade
 {
