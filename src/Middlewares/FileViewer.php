@@ -46,16 +46,20 @@ class FileViewer implements MiddlewareInterface
         }
 
         $path                  = trim(urldecode($request->getPath()), '/');
-        [$prefix, $this->path] = explode('/', $path, 2);
+        [$prefix, $this->path] = explode('/', $path, 2) + [1 => ''];
+        $prefix                = trim($prefix, '/');
+        $this->path            = trim($this->path, '/');
 
         foreach ($config['disks'] as $name => $disk) {
-            if (str_ends_with(trim($disk['url'], '/'), trim($prefix, '/'))) {
+            $url = trim($disk['url'] ?? '', '/');
+
+            if (str_ends_with($url, $prefix)) {
                 $this->disk = $this->filesystem->disk($name); // @phpstan-ignore-line
                 break;
             }
         }
 
-        if (null === $this->disk) {
+        if (null === $this->disk || '' === $this->path) {
             return $handler->handle($request);
         }
 
