@@ -2,6 +2,21 @@
 
 Toutes les modifications notables apportées à `:package_name` seront documentées dans ce fichier.
 
+## 0.12.2 - 2025-05-23
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+### What's Changed
+
+#### New Features
+
+* feat: ajout du middleware `FileViewer` by @dimtrovich in https://github.com/blitz-php/framework/pull/73
+
+#### Enhancements
+
+* fix: fix phpdoc facade Storage by @dimtrovich in https://github.com/blitz-php/framework/pull/72
+
+**Full Changelog**: https://github.com/blitz-php/framework/compare/0.12.1...0.12.2
+
 ## 0.12.1 - 2025-05-09
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
