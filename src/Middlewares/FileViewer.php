@@ -26,11 +26,17 @@ class FileViewer implements MiddlewareInterface
     /**
      * Chemin d'accès du fichier qu'on souhaite affiché
      */
-    private string $path = '';
+    protected string $path = '';
 
-    private ?FilesystemAdapter $disk = null;
+    /**
+     * Specifie si le middleware doit directement renvoyé le fichier au navigateur ou pas.
+     * Ceci peut être utile si une classe fille a besoin de faire quelques traitements sur le fichier avant de le renvoyer
+     */
+    protected bool $render = true;
 
-    public function __construct(private FilesystemManager $filesystem, private Response $response)
+    protected ?FilesystemAdapter $disk = null;
+
+    public function __construct(protected FilesystemManager $filesystem, protected Response $response)
     {
     }
 
@@ -65,6 +71,10 @@ class FileViewer implements MiddlewareInterface
 
         if (! $this->disk->exists($this->path)) {
             throw FileNotFoundException::fileNotFound($this->path);
+        }
+
+        if (! $this->render) {
+            return $this->response;
         }
 
         $path = $this->disk->path($this->path);
