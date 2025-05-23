@@ -41,7 +41,7 @@ class FileViewer implements MiddlewareInterface
     {
         $config = config('filesystems');
 
-        if ([] === $config['viewable'] ?? []) {
+        if ([] === ($config['viewable'] ?? [])) {
             return $handler->handle($request);
         }
 
@@ -50,7 +50,7 @@ class FileViewer implements MiddlewareInterface
 
         foreach ($config['disks'] as $name => $disk) {
             if (str_ends_with(trim($disk['url'], '/'), trim($prefix, '/'))) {
-                $this->disk = $this->filesystem->disk($name);
+                $this->disk = $this->filesystem->disk($name); // @phpstan-ignore-line
                 break;
             }
         }
