@@ -3,7 +3,7 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Default Filesystem Disk
+    | Disque par défaut
     |--------------------------------------------------------------------------
     |
     | Ici, vous pouvez spécifier le disque du système de fichiers par défaut qui
@@ -15,7 +15,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Filesystem Disks
+    | Disques de système de fichiers
     |--------------------------------------------------------------------------
     |
     | Ici, vous pouvez configurer autant de "disques" de système de fichiers que
@@ -51,5 +51,16 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw'                   => false,
         ],
+    ],
+
+    /**
+    *--------------------------------------------------------------------------
+    * Disques dont les fichiers peuvent être visible
+    *--------------------------------------------------------------------------
+    * Ici, vous pouvez renseigner une liste de disques dont les fichiers peuvent être visible sur un navigateur.
+    * Par exemple, les images d'avatar uploadées dans le disque "public" pourront être affichées dans le navigateur
+    */
+    'viewable' => [
+		'public',
     ],
 ];
