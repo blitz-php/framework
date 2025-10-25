@@ -71,6 +71,9 @@ class Logger implements LoggerInterface
         $this->monolog = new MonologLogger(str_replace(' ', '-', $this->config->name ?? 'application'));
 
         foreach (($this->config->handlers ?? []) as $handler => $options) {
+			if (isset($options['active']) && $options['active'] === false) {
+				continue;
+			}
             $this->pushHandler($handler, (object) $options);
         }
 
@@ -187,7 +190,7 @@ class Logger implements LoggerInterface
     private function pushFileHandler(stdClass $options): void
     {
         $directory = rtrim($options->path ?: LOG_PATH, DS) . DS;
-        $filename  = strtolower($this->config->name ?: 'application');
+        $filename  = strtolower(str_replace(' ', '_', $this->config->name ?: 'application'));
         $extension = $options->extension ?: '.log';
 
         if (($options->dayly_rotation ?: true) === true) {
