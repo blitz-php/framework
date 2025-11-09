@@ -68,7 +68,7 @@ describe('Events / Event', function (): void {
 		});
 	});
 
-	define('Execution', function(): void {
+	describe('Execution', function(): void {
 		it('Execute un event', function (): void {
 			$result = null;
 			$this->eventManager->on('foo', static function (EventInterface $event) use (&$result): void {
