@@ -106,6 +106,22 @@ class Timer
     }
 
     /**
+     * Exécute la fonction callable et mesure son temps d'exécution.
+     * Renvoie sa valeur de retour, le cas échéant.
+     *
+     * @param string            $name     Le nom du minuteur.
+     * @param callable(): mixed $callable Fonction callable à exécuter.
+     */
+    public function record(string $name, callable $callable):mixed
+    {
+        $this->start($name);
+        $returnValue = $callable();
+        $this->stop($name);
+
+        return $returnValue;
+    }
+
+    /**
      * Renvoie la durée d'une minuterie enregistrée.
      *
      * @return float Renvoie un nombre flottant représentant le nombre de
