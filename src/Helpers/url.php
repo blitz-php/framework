@@ -532,6 +532,55 @@ if (! function_exists('url_is')) {
     }
 }
 
+if (! function_exists('parse_subdomain')) {
+    /**
+     * Analyse le sous-domaine à partir du nom d'hôte actuel.
+     *
+     * @param string|null $host Le nom d'hôte à analyser. Si null, utilise l'hôte de la requête actuelle.
+     *
+     * @return string Le sous-domaine, ou une chaîne vide s'il n'en existe aucun.
+     */
+    function parse_subdomain(?string $host = null): string
+    {
+        if ($host === null) {
+            $host = service('request')->getUri()->getHost();
+        }
+
+        // Gérer les adresses localhost et IP - elles n'ont pas de sous-domaines
+        if ($host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP)) {
+            return '';
+        }
+
+        $parts     = explode('.', $host);
+        $partCount = count($parts);
+
+        // Il faut au moins 3 éléments pour un sous-domaine (sous-domaine.domaine.tld)
+        // exp: api.example.com
+        if ($partCount < 3) {
+            return '';
+        }
+
+        // Vérifiez si nous avons un TLD en deux parties (par exemple, co.uk, com.au)
+        $lastTwoParts = $parts[$partCount - 2] . '.' . $parts[$partCount - 1];
+
+        if (in_array($lastTwoParts, config('hostnames.two_part_tlds'), true)) {
+            // Pour les TLD en deux parties, il faut au moins 4 parties pour le sous-domaine.
+            // exp: api.example.co.uk (4 parties)
+            if ($partCount < 4) {
+                return ''; // Pas de sous-domaine, juste domaine.co.uk
+            }
+
+            // Supprimer le TLD en deux parties et le nom de domaine (3 dernières parties)
+            // exp: admin.api.example.co.uk -> admin.api
+            return implode('.', array_slice($parts, 0, $partCount - 3));
+        }
+
+        // TLD standard : Supprimer le TLD et le domaine (les deux dernières parties)
+        // exp: admin.api.example.com -> admin.api
+        return implode('.', array_slice($parts, 0, $partCount - 2));
+    }
+}
+
 if (! function_exists('link_active')) {
     /**
      * Lien actif dans la navbar
