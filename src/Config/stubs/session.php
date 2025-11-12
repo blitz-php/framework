@@ -56,7 +56,7 @@ return [
      *
      * @var string
      */
-    'savePath' => env('session.savePath', FRAMEWORK_STORAGE_PATH . 'session'),
+    'save_path' => env('session.savePath', FRAMEWORK_STORAGE_PATH . 'session'),
 
     /**
      * ------------------------------------------------- -------------------------
@@ -70,7 +70,7 @@ return [
      *
      * @var bool
      */
-    'matchIP' => env('session.matchIP', false),
+    'match_ip' => env('session.matchIP', false),
 
     /**
      * ------------------------------------------------- -------------------------
@@ -106,4 +106,32 @@ return [
      * @var ?string
      */
     'group' => null,
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * Intervalle de réessai de verrouillage (microsecondes)
+	 * --------------------------------------------------------------------------
+	 *
+	 * Utilisé pour RedisHandler.
+	 *
+	 * Temps (en microsecondes) à attendre si le verrouillage ne peut être acquis.
+	 * La valeur par défaut est 100 000 microsecondes (= 0,1 seconde).
+	 *
+	 * @var int
+	 */
+	'lock_retry_interval' => 100_000,
+
+	/**
+	 * -------------------------------------------------------------------- ------
+	 * Nombre maximal de tentatives de verrouillage
+	 * --------------------------------------------------------------------------
+	 *
+	 * Utilisé pour RedisHandler.
+	 *
+	 * Nombre maximal de tentatives d'acquisition du verrou.
+	 * La valeur par défaut est 300. Le délai d'expiration du verrou est donc d'environ 30 (0,1 * 300) secondes.
+	 *
+	 * @var int
+	 */
+	'lock_max_retries' => 300,
 ];
