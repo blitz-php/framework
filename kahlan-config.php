@@ -14,6 +14,7 @@ $namespaces = [
     'BlitzPHP'             => __DIR__ . '/src',
     'BlitzPHP\\Autoloader' => __DIR__ . '/vendor/blitz-php/autoloader',
     'BlitzPHP\\Cache'      => __DIR__ . '/vendor/blitz-php/cache',
+    'BlitzPHP\\Session'    => __DIR__ . '/vendor/blitz-php/session',
     'BlitzPHP\\Utilities'  => __DIR__ . '/vendor/blitz-php/utilities',
 ];
 
