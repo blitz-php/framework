@@ -12,6 +12,8 @@
 use BlitzPHP\Filesystem\Files\UploadedFile;
 use BlitzPHP\Http\ServerRequest;
 
+use function Kahlan\expect;
+
 describe('Http / ServerRequest', function (): void {
     describe('Detector', function (): void {
 		it('Custom detector avec des arguments personnalises', function (): void {
@@ -231,14 +233,14 @@ describe('Http / ServerRequest', function (): void {
 			$request = new ServerRequest();
 
 			expect(fn() => $request->withUploadedFiles(['avatar' => 'picture']))
-				->toThrow(new InvalidArgumentException('Fichier invalide à `avatar`'));
+				->toThrow(new InvalidArgumentException('Fichier invalide à `avatar`.'));
 		});
 
 		it("Remplacement de fichiers avec un fichier invalide imbriquer.", function (): void {
 			$request = new ServerRequest();
 
 			expect(fn() => $request->withUploadedFiles(['user' => ['avatar' => 'not a file']]))
-				->toThrow(new InvalidArgumentException('Fichier invalide à `user.avatar`'));
+				->toThrow(new InvalidArgumentException('Fichier invalide à `user.avatar`.'));
 		});
 	});
 });

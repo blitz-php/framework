@@ -15,7 +15,7 @@ return Expect::structure([
     'base_url'                     => Expect::string('auto'),
     'charset'                      => Expect::string('UTF-8'),
     'environment'                  => Expect::string('auto'),
-    'language'                     => Expect::string('en'),
+    'locale'                       => Expect::string('en'),
     'force_global_secure_requests' => Expect::bool(false),
     'url_suffix'                   => Expect::string(''),
     'use_absolute_link'            => Expect::bool(true),

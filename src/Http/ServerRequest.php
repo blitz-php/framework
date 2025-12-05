@@ -76,7 +76,7 @@ class ServerRequest implements ServerRequestInterface
     protected string $base;
 
     /**
-     * segment de chemin webroot pour la demande.
+     * segment de chemin webroot pour la requete.
      */
     protected string $webroot = '/';
 
@@ -113,7 +113,7 @@ class ServerRequest implements ServerRequestInterface
         'ssl'     => ['env' => 'HTTPS', 'options' => [1, 'on']],
         'ajax'    => ['env' => 'HTTP_X_REQUESTED_WITH', 'value' => 'XMLHttpRequest'],
         'json'    => ['accept' => ['application/json'], 'param' => '_ext', 'value' => 'json'],
-        'xml'     => ['accept' => ['application/xml', 'text/xml'], 'param' => '_ext', 'value' => 'xml'],
+        'xml'     => ['accept' => ['application/xml', 'text/xml'], 'exclude' => ['text/html'], 'param' => '_ext', 'value' => 'xml'],
     ];
 
     /**
@@ -154,6 +154,8 @@ class ServerRequest implements ServerRequestInterface
 
     /**
      * Tableau de fichiers.
+	 *
+	 * @var list<UploadedFileInterface>
      */
     protected array $uploadedFiles = [];
 
@@ -232,7 +234,7 @@ class ServerRequest implements ServerRequestInterface
 
         if (isset($config['uri'])) {
             if (! $config['uri'] instanceof UriInterface) {
-                throw new FrameworkException('The `uri` key must be an instance of ' . UriInterface::class);
+                throw new FrameworkException('La clé `uri` doit être une instance de ' . UriInterface::class);
             }
             $uri = $config['uri'];
         } elseif ($config['url'] !== '') {
@@ -282,7 +284,7 @@ class ServerRequest implements ServerRequestInterface
      */
     protected function processUrlOption(array $config): array
     {
-        if ($config['url'][0] !== '/') {
+        if (!str_starts_with($config['url'], '/')) {
             $config['url'] = '/' . $config['url'];
         }
 
@@ -321,6 +323,13 @@ class ServerRequest implements ServerRequestInterface
     {
         if ($this->trustProxy && $this->getEnv('HTTP_X_FORWARDED_FOR')) {
             $addresses = array_map('trim', explode(',', $this->getEnv('HTTP_X_FORWARDED_FOR')));
+			$addresses = array_filter($addresses, fn($ip) => filter_var($ip, FILTER_VALIDATE_IP) !== false);
+
+			if ($addresses === []) {
+				$ip = $this->getEnv('REMOTE_ADDR', '0.0.0.0');
+    			return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
+			}
+
             $trusted   = $this->trustedProxies !== [];
             $n         = count($addresses);
 
@@ -361,6 +370,8 @@ class ServerRequest implements ServerRequestInterface
 
     /**
      * Obtenez les proxys de confiance
+	 *
+	 * @return list<string>
      */
     public function getTrustedProxies(): array
     {
@@ -387,7 +398,7 @@ class ServerRequest implements ServerRequestInterface
             if ($ref === '' || str_starts_with($ref, '//')) {
                 $ref = '/';
             }
-            if ($ref[0] !== '/') {
+            if (!str_starts_with($ref, '/')) {
                 $ref = '/' . $ref;
             }
 
@@ -432,7 +443,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return bool Si la demande est du type que vous vérifiez.
      */
-    public function is($type, ...$args): bool
+    public function is(array|string $type, mixed ...$args): bool
     {
         if (is_array($type)) {
             foreach ($type as $_type) {
@@ -446,7 +457,7 @@ class ServerRequest implements ServerRequestInterface
 
         $type = strtolower($type);
         if (! isset(static::$_detectors[$type])) {
-            return false;
+            throw new InvalidArgumentException(sprintf('Aucun détecteur défini pour le type `%s`.', $type));
         }
         if ($args !== []) {
             return $this->_is($type, $args);
@@ -517,7 +528,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param array $detect Tableau d'options du détecteur.
      *
-     * @return bool Si la demande est du type que vous vérifiez.
+     * @return bool Si la requête est du type que vous vérifiez.
      */
     protected function _headerDetector(array $detect): bool
     {
@@ -540,7 +551,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param array $detect Tableau d'options du détecteur.
      *
-     * @return bool Si la demande est du type que vous vérifiez.
+     * @return bool Si la requête est du type que vous vérifiez.
      */
     protected function _paramDetector(array $detect): bool
     {
@@ -562,7 +573,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param array $detect Tableau d'options du détecteur.
      *
-     * @return bool Si la demande est du type que vous vérifiez.
+     * @return bool Si la requête est du type que vous vérifiez.
      */
     protected function _environmentDetector(array $detect): bool
     {
@@ -687,6 +698,7 @@ class ServerRequest implements ServerRequestInterface
 
             return;
         }
+
         if (isset(static::$_detectors[$name], $detector['options'])) {
             /** @var array $data */
             $data     = static::$_detectors[$name];
@@ -966,10 +978,10 @@ class ServerRequest implements ServerRequestInterface
      *
      * par exemple. 'http' ou 'https'
      */
-    public function scheme(): ?string
+    public function scheme(): string
     {
         if ($this->trustProxy && $this->getEnv('HTTP_X_FORWARDED_PROTO')) {
-            return $this->getEnv('HTTP_X_FORWARDED_PROTO');
+            return (string) $this->getEnv('HTTP_X_FORWARDED_PROTO');
         }
 
         return $this->getEnv('HTTPS') ? 'https' : 'http';
@@ -1174,11 +1186,9 @@ class ServerRequest implements ServerRequestInterface
      * @param string|null $name    Le nom ou le chemin en pointillé vers le paramètre de requête ou null pour tout lire.
      * @param mixed       $default La valeur par défaut si le paramètre nommé n'est pas défini et que $name n'est pas nul.
      *
-     * @return array|string|null Requête de données.
-     *
      * @see ServerRequest::getQueryParams()
      */
-    public function getQuery(?string $name = null, $default = null)
+    public function getQuery(?string $name = null, mixed $default = null): mixed
     {
         if ($name === null) {
             return $this->query;
@@ -1217,10 +1227,8 @@ class ServerRequest implements ServerRequestInterface
      *
      * @param string|null $name    Nom séparé par un point de la valeur à lire. Ou null pour lire toutes les données.
      * @param mixed       $default Les données par défaut.
-     *
-     * @return mixed La valeur en cours de lecture.
      */
-    public function getData(?string $name = null, $default = null)
+    public function getData(?string $name = null, mixed $default = null): mixed
     {
         if ($name === null) {
             return $this->data;
@@ -1240,7 +1248,7 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return array|string|null Soit la valeur du cookie, soit null si la valeur n'existe pas.
      */
-    public function getCookie(string $key, $default = null)
+    public function getCookie(string $key, array|string|null $default = null)
     {
         return Arr::get($this->cookies, $key, $default);
     }
@@ -1283,7 +1291,7 @@ class ServerRequest implements ServerRequestInterface
     /**
      * Obtenez toutes les données de cookie de la requête.
      *
-     * @return array Un tableau de données de cookie.
+     * @return array<string, mixed> Un tableau de données de cookie.
      */
     public function getCookieParams(): array
     {
@@ -1391,6 +1399,10 @@ class ServerRequest implements ServerRequestInterface
             $this->_environment[$key] = env($key, $default);
         }
 
+        if (is_array($this->_environment[$key])) {
+            return implode(', ', $this->_environment[$key]);
+        }
+
         return $this->_environment[$key];
     }
 
@@ -1437,7 +1449,7 @@ class ServerRequest implements ServerRequestInterface
         }
         $allowed = strtoupper(implode(', ', $methods));
 
-        throw HttpException::methodNotAllowed($allowed);
+        throw HttpException::methodNotAllowed($allowed)->setHeader('Allow', $allowed);
     }
 
     /**
@@ -1661,7 +1673,7 @@ class ServerRequest implements ServerRequestInterface
             }
 
             if (! $file instanceof UploadedFileInterface) {
-                throw new InvalidArgumentException("Fichier invalide à `{$path}{$key}`");
+                throw new InvalidArgumentException(sprintf('Fichier invalide à `%s%s`.', $path, $key));
             }
         }
     }
@@ -1757,8 +1769,8 @@ class ServerRequest implements ServerRequestInterface
         }
 
         $target = $this->uri->getPath();
-        if ($this->uri->getQuery() !== '') {
-            $target .= '?' . $this->uri->getQuery();
+        if ('' !== $query = $this->uri->getQuery()) {
+            $target .= '?' . $query;
         }
 
         if ($target === '') {
@@ -1788,18 +1800,26 @@ class ServerRequest implements ServerRequestInterface
      */
     public function negotiate(string $type, array $supported, bool $strictMatch = false): string
     {
-        if (null === $this->negotiator) {
-            $this->negotiator = service('negotiator', $this);
-        }
-
         return match (strtolower($type)) {
-            'media'    => $this->negotiator->media($supported, $strictMatch),
-            'charset'  => $this->negotiator->charset($supported),
-            'encoding' => $this->negotiator->encoding($supported),
-            'language' => $this->negotiator->language($supported),
+            'media'    => $this->negotiator()->media($supported, $strictMatch),
+            'charset'  => $this->negotiator()->charset($supported),
+            'encoding' => $this->negotiator()->encoding($supported),
+            'language' => $this->negotiator()->language($supported),
             default    => throw new HttpException($type . ' is not a valid negotiation type. Must be one of: media, charset, encoding, language.'),
         };
     }
+
+	/**
+	 *
+	 */
+	public function negotiator(): Negotiator
+	{
+		if (null === $this->negotiator) {
+            $this->negotiator = service('negotiator', $this);
+        }
+
+		return $this->negotiator;
+	}
 
     /**
      * Définit la chaîne locale pour cette requête.
@@ -1810,7 +1830,7 @@ class ServerRequest implements ServerRequestInterface
         // S'il ne s'agit pas d'un paramètre régional valide, définissez-le
         // aux paramètres régionaux par défaut du site.
         if (! in_array($locale, $validLocales, true)) {
-            $locale = config('app.language');
+            $locale = config('app.locale') ?? config('app.language'); // @deprecated 0.13 app.language est déprécié
         }
 
         service('translator')->setLocale($locale);
@@ -1828,6 +1848,6 @@ class ServerRequest implements ServerRequestInterface
             $locale = $this->getAttribute('lang');
         }
 
-        return $locale ?? config('app.language');
+        return $locale ?? config('app.locale') ?? config('app.language');
     }
 }

@@ -11,11 +11,13 @@
 
 namespace BlitzPHP\Exceptions;
 
-use RuntimeException;
-
 /**
  * @internal
  */
-final class MethodNotFoundException extends RuntimeException
+final class MethodNotFoundException extends HttpException
 {
+    /**
+     * @inheritDoc
+     */
+    protected int $_defaultCode = 405;
 }
