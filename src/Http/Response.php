@@ -64,259 +64,14 @@ class Response implements ResponseInterface, Stringable
     protected array $_statusCodes = StatusCode::VALID_CODES;
 
     /**
-     * Contient la clé de type pour les mappages de type mime pour les types mime connus.
-     *
-     * @var array<string, mixed>
-     */
-    protected array $_mimeTypes = [
-        'html'    => ['text/html', '*/*'],
-        'json'    => 'application/json',
-        'xml'     => ['application/xml', 'text/xml'],
-        'xhtml'   => ['application/xhtml+xml', 'application/xhtml', 'text/xhtml'],
-        'webp'    => 'image/webp',
-        'rss'     => 'application/rss+xml',
-        'ai'      => 'application/postscript',
-        'bcpio'   => 'application/x-bcpio',
-        'bin'     => 'application/octet-stream',
-        'ccad'    => 'application/clariscad',
-        'cdf'     => 'application/x-netcdf',
-        'class'   => 'application/octet-stream',
-        'cpio'    => 'application/x-cpio',
-        'cpt'     => 'application/mac-compactpro',
-        'csh'     => 'application/x-csh',
-        'csv'     => ['text/csv', 'application/vnd.ms-excel'],
-        'dcr'     => 'application/x-director',
-        'dir'     => 'application/x-director',
-        'dms'     => 'application/octet-stream',
-        'doc'     => 'application/msword',
-        'docx'    => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'drw'     => 'application/drafting',
-        'dvi'     => 'application/x-dvi',
-        'dwg'     => 'application/acad',
-        'dxf'     => 'application/dxf',
-        'dxr'     => 'application/x-director',
-        'eot'     => 'application/vnd.ms-fontobject',
-        'eps'     => 'application/postscript',
-        'exe'     => 'application/octet-stream',
-        'ez'      => 'application/andrew-inset',
-        'flv'     => 'video/x-flv',
-        'gtar'    => 'application/x-gtar',
-        'gz'      => 'application/x-gzip',
-        'bz2'     => 'application/x-bzip',
-        '7z'      => 'application/x-7z-compressed',
-        'hal'     => ['application/hal+xml', 'application/vnd.hal+xml'],
-        'haljson' => ['application/hal+json', 'application/vnd.hal+json'],
-        'halxml'  => ['application/hal+xml', 'application/vnd.hal+xml'],
-        'hdf'     => 'application/x-hdf',
-        'hqx'     => 'application/mac-binhex40',
-        'ico'     => 'image/x-icon',
-        'ips'     => 'application/x-ipscript',
-        'ipx'     => 'application/x-ipix',
-        'js'      => 'application/javascript',
-        'jsonapi' => 'application/vnd.api+json',
-        'latex'   => 'application/x-latex',
-        'jsonld'  => 'application/ld+json',
-        'kml'     => 'application/vnd.google-earth.kml+xml',
-        'kmz'     => 'application/vnd.google-earth.kmz',
-        'lha'     => 'application/octet-stream',
-        'lsp'     => 'application/x-lisp',
-        'lzh'     => 'application/octet-stream',
-        'man'     => 'application/x-troff-man',
-        'me'      => 'application/x-troff-me',
-        'mif'     => 'application/vnd.mif',
-        'ms'      => 'application/x-troff-ms',
-        'nc'      => 'application/x-netcdf',
-        'oda'     => 'application/oda',
-        'otf'     => 'font/otf',
-        'pdf'     => 'application/pdf',
-        'pgn'     => 'application/x-chess-pgn',
-        'pot'     => 'application/vnd.ms-powerpoint',
-        'pps'     => 'application/vnd.ms-powerpoint',
-        'ppt'     => 'application/vnd.ms-powerpoint',
-        'pptx'    => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'ppz'     => 'application/vnd.ms-powerpoint',
-        'pre'     => 'application/x-freelance',
-        'prt'     => 'application/pro_eng',
-        'ps'      => 'application/postscript',
-        'roff'    => 'application/x-troff',
-        'scm'     => 'application/x-lotusscreencam',
-        'set'     => 'application/set',
-        'sh'      => 'application/x-sh',
-        'shar'    => 'application/x-shar',
-        'sit'     => 'application/x-stuffit',
-        'skd'     => 'application/x-koan',
-        'skm'     => 'application/x-koan',
-        'skp'     => 'application/x-koan',
-        'skt'     => 'application/x-koan',
-        'smi'     => 'application/smil',
-        'smil'    => 'application/smil',
-        'sol'     => 'application/solids',
-        'spl'     => 'application/x-futuresplash',
-        'src'     => 'application/x-wais-source',
-        'step'    => 'application/STEP',
-        'stl'     => 'application/SLA',
-        'stp'     => 'application/STEP',
-        'sv4cpio' => 'application/x-sv4cpio',
-        'sv4crc'  => 'application/x-sv4crc',
-        'svg'     => 'image/svg+xml',
-        'svgz'    => 'image/svg+xml',
-        'swf'     => 'application/x-shockwave-flash',
-        't'       => 'application/x-troff',
-        'tar'     => 'application/x-tar',
-        'tcl'     => 'application/x-tcl',
-        'tex'     => 'application/x-tex',
-        'texi'    => 'application/x-texinfo',
-        'texinfo' => 'application/x-texinfo',
-        'tr'      => 'application/x-troff',
-        'tsp'     => 'application/dsptype',
-        'ttc'     => 'font/ttf',
-        'ttf'     => 'font/ttf',
-        'unv'     => 'application/i-deas',
-        'ustar'   => 'application/x-ustar',
-        'vcd'     => 'application/x-cdlink',
-        'vda'     => 'application/vda',
-        'xlc'     => 'application/vnd.ms-excel',
-        'xll'     => 'application/vnd.ms-excel',
-        'xlm'     => 'application/vnd.ms-excel',
-        'xls'     => 'application/vnd.ms-excel',
-        'xlsx'    => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'xlw'     => 'application/vnd.ms-excel',
-        'zip'     => 'application/zip',
-        'aif'     => 'audio/x-aiff',
-        'aifc'    => 'audio/x-aiff',
-        'aiff'    => 'audio/x-aiff',
-        'au'      => 'audio/basic',
-        'kar'     => 'audio/midi',
-        'mid'     => 'audio/midi',
-        'midi'    => 'audio/midi',
-        'mp2'     => 'audio/mpeg',
-        'mp3'     => 'audio/mpeg',
-        'mpga'    => 'audio/mpeg',
-        'ogg'     => 'audio/ogg',
-        'oga'     => 'audio/ogg',
-        'spx'     => 'audio/ogg',
-        'ra'      => 'audio/x-realaudio',
-        'ram'     => 'audio/x-pn-realaudio',
-        'rm'      => 'audio/x-pn-realaudio',
-        'rpm'     => 'audio/x-pn-realaudio-plugin',
-        'snd'     => 'audio/basic',
-        'tsi'     => 'audio/TSP-audio',
-        'wav'     => 'audio/x-wav',
-        'aac'     => 'audio/aac',
-        'asc'     => 'text/plain',
-        'c'       => 'text/plain',
-        'cc'      => 'text/plain',
-        'css'     => 'text/css',
-        'etx'     => 'text/x-setext',
-        'f'       => 'text/plain',
-        'f90'     => 'text/plain',
-        'h'       => 'text/plain',
-        'hh'      => 'text/plain',
-        'htm'     => ['text/html', '*/*'],
-        'ics'     => 'text/calendar',
-        'm'       => 'text/plain',
-        'rtf'     => 'text/rtf',
-        'rtx'     => 'text/richtext',
-        'sgm'     => 'text/sgml',
-        'sgml'    => 'text/sgml',
-        'tsv'     => 'text/tab-separated-values',
-        'tpl'     => 'text/template',
-        'txt'     => 'text/plain',
-        'text'    => 'text/plain',
-        'avi'     => 'video/x-msvideo',
-        'fli'     => 'video/x-fli',
-        'mov'     => 'video/quicktime',
-        'movie'   => 'video/x-sgi-movie',
-        'mpe'     => 'video/mpeg',
-        'mpeg'    => 'video/mpeg',
-        'mpg'     => 'video/mpeg',
-        'qt'      => 'video/quicktime',
-        'viv'     => 'video/vnd.vivo',
-        'vivo'    => 'video/vnd.vivo',
-        'ogv'     => 'video/ogg',
-        'webm'    => 'video/webm',
-        'mp4'     => 'video/mp4',
-        'm4v'     => 'video/mp4',
-        'f4v'     => 'video/mp4',
-        'f4p'     => 'video/mp4',
-        'm4a'     => 'audio/mp4',
-        'f4a'     => 'audio/mp4',
-        'f4b'     => 'audio/mp4',
-        'gif'     => 'image/gif',
-        'ief'     => 'image/ief',
-        'jpg'     => 'image/jpeg',
-        'jpeg'    => 'image/jpeg',
-        'jpe'     => 'image/jpeg',
-        'pbm'     => 'image/x-portable-bitmap',
-        'pgm'     => 'image/x-portable-graymap',
-        'png'     => 'image/png',
-        'pnm'     => 'image/x-portable-anymap',
-        'ppm'     => 'image/x-portable-pixmap',
-        'ras'     => 'image/cmu-raster',
-        'rgb'     => 'image/x-rgb',
-        'tif'     => 'image/tiff',
-        'tiff'    => 'image/tiff',
-        'xbm'     => 'image/x-xbitmap',
-        'xpm'     => 'image/x-xpixmap',
-        'xwd'     => 'image/x-xwindowdump',
-        'psd'     => [
-            'application/photoshop',
-            'application/psd',
-            'image/psd',
-            'image/x-photoshop',
-            'image/photoshop',
-            'zz-application/zz-winassoc-psd',
-        ],
-        'ice'          => 'x-conference/x-cooltalk',
-        'iges'         => 'model/iges',
-        'igs'          => 'model/iges',
-        'mesh'         => 'model/mesh',
-        'msh'          => 'model/mesh',
-        'silo'         => 'model/mesh',
-        'vrml'         => 'model/vrml',
-        'wrl'          => 'model/vrml',
-        'mime'         => 'www/mime',
-        'pdb'          => 'chemical/x-pdb',
-        'xyz'          => 'chemical/x-pdb',
-        'javascript'   => 'application/javascript',
-        'form'         => 'application/x-www-form-urlencoded',
-        'file'         => 'multipart/form-data',
-        'xhtml-mobile' => 'application/vnd.wap.xhtml+xml',
-        'atom'         => 'application/atom+xml',
-        'amf'          => 'application/x-amf',
-        'wap'          => ['text/vnd.wap.wml', 'text/vnd.wap.wmlscript', 'image/vnd.wap.wbmp'],
-        'wml'          => 'text/vnd.wap.wml',
-        'wmlscript'    => 'text/vnd.wap.wmlscript',
-        'wbmp'         => 'image/vnd.wap.wbmp',
-        'woff'         => 'application/x-font-woff',
-        'appcache'     => 'text/cache-manifest',
-        'manifest'     => 'text/cache-manifest',
-        'htc'          => 'text/x-component',
-        'rdf'          => 'application/xml',
-        'crx'          => 'application/x-chrome-extension',
-        'oex'          => 'application/x-opera-extension',
-        'xpi'          => 'application/x-xpinstall',
-        'safariextz'   => 'application/octet-stream',
-        'webapp'       => 'application/x-web-app-manifest+json',
-        'vcf'          => 'text/x-vcard',
-        'vtt'          => 'text/vtt',
-        'mkv'          => 'video/x-matroska',
-        'pkpass'       => 'application/vnd.apple.pkpass',
-        'ajax'         => 'text/html',
-        'bmp'          => 'image/bmp',
-    ];
-
-    /**
      * Code de statut à envoyer au client
      */
     protected int $_status = StatusCode::OK;
 
     /**
      * Objet de fichier pour le fichier à lire comme réponse
-     *
-     * @var SplFileInfo|null
      */
-    protected $_file;
+    protected ?SplFileInfo $_file = null;
 
     /**
      * Gamme de fichiers. Utilisé pour demander des plages de fichiers.
@@ -333,15 +88,15 @@ class Response implements ResponseInterface, Stringable
     /**
      * Contient toutes les directives de cache qui seront converties
      * dans les en-têtes lors de l'envoi de la requête
+     *
+     * @var array<string, mixed>
      */
     protected array $_cacheDirectives = [];
 
     /**
      * Collecte de cookies à envoyer au client
-     *
-     * @var CookieCollection
      */
-    protected $_cookies;
+    protected CookieCollection $_cookies;
 
     /**
      * Phrase de raison
@@ -379,7 +134,7 @@ class Response implements ResponseInterface, Stringable
 
         if (isset($options['stream'])) {
             if (! $options['stream'] instanceof StreamInterface) {
-                throw new InvalidArgumentException('Stream option must be an object that implements StreamInterface');
+                throw new InvalidArgumentException("L'option Stream doit être un objet qui implémente StreamInterface.");
             }
             $this->stream = $options['stream'];
         } else {
@@ -422,7 +177,7 @@ class Response implements ResponseInterface, Stringable
      */
     protected function _setContentType(string $type): void
     {
-        if (in_array($this->_status, [304, 204], true)) {
+        if (in_array($this->_status, [StatusCode::NOT_MODIFIED, StatusCode::NO_CONTENT], true)) {
             $this->_clearHeader('Content-Type');
 
             return;
@@ -600,7 +355,7 @@ class Response implements ResponseInterface, Stringable
         $this->_reasonPhrase = $reasonPhrase;
 
         // Ces codes d'état n'ont pas de corps et ne peuvent pas avoir de types de contenu.
-        if (in_array($code, [304, 204], true)) {
+        if (in_array($code, [StatusCode::NOT_MODIFIED, StatusCode::NO_CONTENT], true)) {
             $this->_clearHeader('Content-Type');
         }
     }
@@ -632,9 +387,9 @@ class Response implements ResponseInterface, Stringable
      * @param string              $type     Type de contenu.
      * @param list<string>|string $mimeType Définition du type mime.
      */
-    public function setTypeMap(string $type, $mimeType): void
+    public function setTypeMap(string $type, array|string $mimeType): void
     {
-        $this->_mimeTypes[$type] = $mimeType;
+		MimeType::setMimeTypes($type, $mimeType);
     }
 
     /**
@@ -678,15 +433,16 @@ class Response implements ResponseInterface, Stringable
      */
     protected function resolveType(string $contentType): string
     {
-        $mapped = $this->getMimeType($contentType);
-        if ($mapped) {
-            return is_array($mapped) ? current($mapped) : $mapped;
+		if (str_contains($contentType, '/')) {
+            return $contentType;
         }
-        if (! str_contains($contentType, '/')) {
+
+		$mimeType = MimeType::getMimeType($contentType);
+		if ($mimeType === null) {
             throw new InvalidArgumentException(sprintf('`%s` est un content type invalide.', $contentType));
         }
 
-        return $contentType;
+        return $mimeType;
     }
 
     /**
@@ -700,7 +456,13 @@ class Response implements ResponseInterface, Stringable
      */
     public function getMimeType(string $alias)
     {
-        return $this->_mimeTypes[$alias] ?? false;
+        $mimeTypes = MimeType::getMimeTypes($alias);
+
+        if ($mimeTypes === null) {
+            return false;
+        }
+
+        return count($mimeTypes) === 1 ? $mimeTypes[0] : $mimeTypes;
     }
 
     /**
@@ -718,13 +480,7 @@ class Response implements ResponseInterface, Stringable
             return array_map($this->mapType(...), $ctype);
         }
 
-        foreach ($this->_mimeTypes as $alias => $types) {
-            if (in_array($ctype, (array) $types, true)) {
-                return $alias;
-            }
-        }
-
-        return null;
+        return MimeType::getExtension($ctype);
     }
 
     /**
@@ -769,17 +525,16 @@ class Response implements ResponseInterface, Stringable
             $time = strtotime($time);
             if ($time === false) {
                 throw new InvalidArgumentException(
-                    'Invalid time parameter. Ensure your time value can be parsed by strtotime'
+                    'Paramètre $time invalide. Assurez-vous que votre valeur peut être analysée par strtotime.'
                 );
             }
         }
 
-        return $this
+        return $this->withHeader('Date', gmdate(DATE_RFC7231, time()))
             ->withModified($since)
             ->withExpires($time)
             ->withSharable(true)
-            ->withMaxAge($time - time())
-            ->withHeader('Date', gmdate(DATE_RFC7231, time()));
+            ->withMaxAge($time - time());
     }
 
     /**
@@ -923,33 +678,6 @@ class Response implements ResponseInterface, Stringable
     }
 
     /**
-     * Définit la réponse comme non modifiée en supprimant tout contenu du corps
-     * définir le code d'état sur "304 Non modifié" et supprimer tous
-     * en-têtes contradictoires
-     *
-     * *Avertissement* Cette méthode modifie la réponse sur place et doit être évitée.
-     */
-    public function notModified(): void
-    {
-        $this->_createStream();
-        $this->_setStatus(StatusCode::NOT_MODIFIED);
-
-        $remove = [
-            'Allow',
-            'Content-Encoding',
-            'Content-Language',
-            'Content-Length',
-            'Content-MD5',
-            'Content-Type',
-            'Last-Modified',
-        ];
-
-        foreach ($remove as $header) {
-            $this->_clearHeader($header);
-        }
-    }
-
-    /**
      * Créer une nouvelle instance comme "non modifiée"
      *
      * Cela supprimera tout contenu du corps défini le code d'état
@@ -1034,7 +762,7 @@ class Response implements ResponseInterface, Stringable
             $result = new DateTime($time ?? 'now');
         }
 
-        /** @psalm-suppress UndefinedInterfaceMethod */
+        /** @phpstan-ignore-next-line */
         return $result->setTimezone(new DateTimeZone('UTC'));
     }
 
@@ -1046,11 +774,10 @@ class Response implements ResponseInterface, Stringable
      */
     public function compress(): bool
     {
-        $compressionEnabled = ini_get('zlib.output_compression') !== '1'
+        return ini_get('zlib.output_compression') !== '1'
             && extension_loaded('zlib')
-            && (str_contains((string) env('HTTP_ACCEPT_ENCODING'), 'gzip'));
-
-        return $compressionEnabled && ob_start('ob_gzhandler');
+            && (str_contains((string) env('HTTP_ACCEPT_ENCODING'), 'gzip'))
+			&& ob_start('ob_gzhandler');
     }
 
     /**
@@ -1134,9 +861,9 @@ class Response implements ResponseInterface, Stringable
      *
      * @return bool Indique si la réponse a été marquée comme non modifiée ou non.
      */
-    public function checkNotModified(ServerRequest $request): bool
+    public function isNotModified(ServerRequest $request): bool
     {
-        $etags       = preg_split('/\s*,\s*/', $request->getHeaderLine('If-None-Match'), 0, PREG_SPLIT_NO_EMPTY);
+        $etags       = preg_split('/\s*,\s*/', $request->getHeaderLine('If-None-Match'), 0, PREG_SPLIT_NO_EMPTY) ?: [];
         $responseTag = $this->getHeaderLine('Etag');
         $etagMatches = null;
         if ($responseTag !== '' && $responseTag !== '0') {
@@ -1151,12 +878,8 @@ class Response implements ResponseInterface, Stringable
         if ($etagMatches === null && $timeMatches === null) {
             return false;
         }
-        $notModified = $etagMatches !== false && $timeMatches !== false;
-        if ($notModified) {
-            $this->notModified();
-        }
 
-        return $notModified;
+		return $etagMatches !== false && $timeMatches !== false;
     }
 
     /**
@@ -1205,20 +928,6 @@ class Response implements ResponseInterface, Stringable
         $new->_cookies = $new->_cookies->add($cookie);
 
         return $new;
-    }
-
-    /**
-     * Expire un cookie lors de l'envoi de la réponse.
-     *
-     * @param CookieInterface|string $cookie
-     */
-    public function withoutCookie($cookie, ?string $path = null, ?string $domain = null)
-    {
-        if (is_string($cookie) && function_exists('cookie')) {
-            $cookie = cookie($cookie, null, -2628000, compact('path', 'domain'));
-        }
-
-        return $this->withExpiredCookie($cookie);
     }
 
     /**
@@ -1320,9 +1029,9 @@ class Response implements ResponseInterface, Stringable
             'download' => null,
         ];
 
-        $extension = strtolower($file->getExtension());
-        $mapped    = $this->getMimeType($extension);
-        if ((! $extension || ! $mapped) && $options['download'] === null) {
+		$extension = strtolower($file->getExtension());
+		$mapped    = MimeType::getMimeTypeForFile($file->getRealPath());
+        if ($extension === '' && $options['download'] === null) {
             $options['download'] = true;
         }
 
@@ -1333,17 +1042,6 @@ class Response implements ResponseInterface, Stringable
 
         $fileSize = $file->getSize();
         if ($options['download']) {
-            $agent = (string) env('HTTP_USER_AGENT');
-
-            if ($agent && preg_match('%Opera([/ ])([0-9].[0-9]{1,2})%', $agent)) {
-                $contentType = 'application/octet-stream';
-            } elseif ($agent && preg_match('/MSIE ([0-9].[0-9]{1,2})/', $agent)) {
-                $contentType = 'application/force-download';
-            }
-
-            if (isset($contentType)) {
-                $new = $new->withType($contentType);
-            }
             $name = $options['name'] ?: $file->getFilename();
             $new  = $new->withDownload($name)
                 ->withHeader('Content-Transfer-Encoding', 'binary');
@@ -1382,7 +1080,7 @@ class Response implements ResponseInterface, Stringable
     protected function validateFile(string $path): SplFileInfo
     {
         if (str_contains($path, '../') || str_contains($path, '..\\')) {
-            throw new LoadException('The requested file contains `..` and will not be read.');
+            throw new LoadException('Le fichier demandé contient `..` et ne sera pas lu.');
         }
         if (! is_file($path)) {
             $path = APP_PATH . $path;
@@ -1391,10 +1089,10 @@ class Response implements ResponseInterface, Stringable
         $file = new SplFileInfo($path);
         if (! $file->isFile() || ! $file->isReadable()) {
             if (on_dev()) {
-                throw new LoadException(sprintf('The requested file %s was not found or not readable', $path));
+                throw new LoadException(sprintf('Le fichier demandé %s est introuvable ou illisible.', $path));
             }
 
-            throw new LoadException('The requested file was not found');
+            throw new LoadException('Le fichier demandé est introuvable.');
         }
 
         return $file;
@@ -1441,16 +1139,15 @@ class Response implements ResponseInterface, Stringable
         }
 
         if ($start > $end || $end > $lastByte || $start > $lastByte) {
-            $this->_setStatus(416);
+            $this->_setStatus(StatusCode::RANGE_NOT_SATISFIABLE);
             $this->_setHeader('Content-Range', 'bytes 0-' . $lastByte . '/' . $fileSize);
 
             return;
         }
 
-        /** @psalm-suppress PossiblyInvalidOperand */
-        $this->_setHeader('Content-Length', (string) ($end - $start + 1));
+        $this->_setHeader('Content-Length', (string) ((int) $end - (int) $start + 1));
         $this->_setHeader('Content-Range', 'bytes ' . $start . '-' . $end . '/' . $fileSize);
-        $this->_setStatus(206);
+        $this->_setStatus(StatusCode::PARTIAL_CONTENT);
         /**
          * @var int $start
          * @var int $end

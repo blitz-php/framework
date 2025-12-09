@@ -11,6 +11,9 @@
 
 namespace BlitzPHP\Http;
 
+use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Contracts\Session\CookieInterface;
+use BlitzPHP\Session\Cookie\Cookie;
 use GuzzleHttp\Psr7\LimitStream;
 use Psr\Http\Message\ResponseInterface;
 
@@ -31,11 +34,28 @@ use Psr\Http\Message\ResponseInterface;
  */
 class ResponseEmitter
 {
-    public function emit(ResponseInterface $response, int $maxBufferLength = 8192)
+	/**
+     * Constructeur
+     *
+     * @param int $maxBufferLength Taille maximale de la mémoire tampon de sortie pour chaque itération.
+     */
+    public function __construct(protected int $maxBufferLength = 8192)
     {
-        $file = $line = null;
+    }
+
+	/**
+     * Émet une réponse.
+     *
+     * Émet une réponse, comprenant la ligne d'état, les en-têtes et le corps du message,
+     * en fonction de l'environnement.
+     */
+    public function emit(ResponseInterface $response): bool
+    {
+        $file = '';
+		$line = 0;
+
         if (headers_sent($file, $line)) {
-            $message = "Unable to emit headers. Headers sent in file={$file} line={$line}";
+            $message = "Impossible d'émettre les en-têtes. En-têtes envoyés dans le fichier={$file} ligne={$line}";
             if (on_dev()) {
                 trigger_error($message, E_USER_WARNING);
             }
@@ -49,15 +69,16 @@ class ResponseEmitter
 
         $range = $this->parseContentRange($response->getHeaderLine('Content-Range'));
         if (is_array($range)) {
-            $this->emitBodyRange($range, $response, $maxBufferLength);
+            $this->emitBodyRange($range, $response);
         } else {
-            $this->emitBody($response, $maxBufferLength);
+            $this->emitBody($response);
         }
 
         if (function_exists('fastcgi_finish_request')) {
-            session_write_close();
             fastcgi_finish_request();
         }
+
+		return true;
     }
 
     /**
@@ -67,14 +88,12 @@ class ResponseEmitter
      * est un tableau avec plusieurs valeurs, garantit que chacune est envoyée
      * de manière à créer des en-têtes agrégés (au lieu de remplacer
      * la précédente).
-     *
-     * @return void
      */
-    public function emitHeaders(ResponseInterface $response)
+    public function emitHeaders(ResponseInterface $response): void
     {
         $cookies = [];
-        if (method_exists($response, 'getCookies')) {
-            $cookies = call_user_func([$response, 'getCookies']);
+        if ($response instanceof Response) {
+			$cookies = iterator_to_array($response->getCookieCollection());
         }
 
         foreach ($response->getHeaders() as $name => $values) {
@@ -99,15 +118,11 @@ class ResponseEmitter
     }
 
     /**
-     * Emet le corps de la requête
-     *
-     * @param int $maxBufferLength La taille du bloc à émettre
-     *
-     * @return void
+     * Emet le corps du message.
      */
-    protected function emitBody(ResponseInterface $response, int $maxBufferLength)
+    protected function emitBody(ResponseInterface $response): void
     {
-        if (in_array($response->getStatusCode(), [204, 304], true)) {
+        if (in_array($response->getStatusCode(), [StatusCode::NO_CONTENT, StatusCode::NOT_MODIFIED], true)) {
             return;
         }
         $body = $response->getBody();
@@ -121,21 +136,18 @@ class ResponseEmitter
         $body->rewind();
 
         while (! $body->eof()) {
-            echo $body->read($maxBufferLength);
+            echo $body->read($this->maxBufferLength);
         }
     }
 
     /**
      * Émettre une plage du corps du message.
      *
-     * @param array $range           La plage de données à émettre
-     * @param int   $maxBufferLength La taille du bloc à émettre
-     *
-     * @return void
+     * @param array $range La plage de données à émettre
      */
-    protected function emitBodyRange(array $range, ResponseInterface $response, int $maxBufferLength)
+    protected function emitBodyRange(array $range, ResponseInterface $response): void
     {
-        [$unit, $first, $last, $length] = $range;
+        [, $first, $last] = $range;
 
         $body = $response->getBody();
 
@@ -149,15 +161,15 @@ class ResponseEmitter
         $body = new LimitStream($body, -1, $first);
         $body->rewind();
         $pos    = 0;
-        $length = $last - $first + 1;
+        $length = $last - $first + 1; /** @var int $length */
 
         while (! $body->eof() && $pos < $length) {
-            if (($pos + $maxBufferLength) > $length) {
+            if ($pos + $this->maxBufferLength > $length) {
                 echo $body->read($length - $pos);
                 break;
             }
 
-            echo $body->read($maxBufferLength);
+            echo $body->read($this->maxBufferLength);
             $pos = $body->tell();
         }
     }
@@ -167,10 +179,8 @@ class ResponseEmitter
      *
      * Émet la ligne d'état en utilisant la version du protocole et le code d'état de
      * la réponse; si une expression de raison est disponible, elle est également émise.
-     *
-     * @return void
      */
-    protected function emitStatusLine(ResponseInterface $response)
+    protected function emitStatusLine(ResponseInterface $response): void
     {
         $reasonPhrase = $response->getReasonPhrase();
         header(sprintf(
@@ -184,61 +194,25 @@ class ResponseEmitter
     /**
      * émettre des cookies en utilisant setcookie()
      *
-     * @param array $cookies Un tableau d'en-têtes Set-Cookie.
-     *
-     * @return void
+     * @param array<CookieInterface|string> $cookies Un tableau d'en-têtes Set-Cookie.
      */
-    protected function emitCookies(array $cookies)
+    protected function emitCookies(array $cookies): void
     {
         foreach ($cookies as $cookie) {
-            if (is_array($cookie)) {
-                setcookie(
-                    $cookie['name'],
-                    $cookie['value'],
-                    ['expires' => $cookie['expires'], 'path' => $cookie['path'], 'domain' => $cookie['domain'], 'secure' => $cookie['secure'], 'httponly' => $cookie['httponly']]
-                );
-
-                continue;
-            }
-
-            if (str_contains($cookie, '";"')) {
-                $cookie = str_replace('";"', '{__cookie_replace__}', $cookie);
-                $parts  = str_replace('{__cookie_replace__}', '";"', explode(';', $cookie));
-            } else {
-                $parts = preg_split('/\;[ \t]*/', $cookie);
-            }
-
-            [$name, $value] = explode('=', array_shift($parts), 2);
-            $data           = [
-                'name'     => urldecode($name),
-                'value'    => urldecode($value),
-                'expires'  => 0,
-                'path'     => '',
-                'domain'   => '',
-                'secure'   => false,
-                'httponly' => false,
-            ];
-
-            foreach ($parts as $part) {
-                if (str_contains($part, '=')) {
-                    [$key, $value] = explode('=', $part);
-                } else {
-                    $key   = $part;
-                    $value = true;
-                }
-
-                $key        = strtolower($key);
-                $data[$key] = $value;
-            }
-            if (! empty($data['expires'])) {
-                $data['expires'] = strtotime($data['expires']);
-            }
-            setcookie(
-                $data['name'],
-                $data['value'],
-                ['expires' => $data['expires'], 'path' => $data['path'], 'domain' => $data['domain'], 'secure' => $data['secure'], 'httponly' => $data['httponly']]
-            );
+            $this->setCookie($cookie);
         }
+    }
+
+    /**
+     * Methode d'aide pour definir le cookie.
+     */
+    protected function setCookie(CookieInterface|string $cookie): bool
+    {
+        if (is_string($cookie)) {
+            $cookie = Cookie::createFromHeaderString($cookie, ['path' => '']);
+        }
+
+        return setcookie($cookie->getName(), $cookie->getScalarValue(), $cookie->getOptions());
     }
 
     /**
@@ -246,14 +220,10 @@ class ResponseEmitter
      * la réponse.
      *
      * @param int|null $maxBufferLevel Vide jusqu'à ce niveau de tampon.
-     *
-     * @return void
      */
-    protected function flush(?int $maxBufferLevel = null)
+    protected function flush(?int $maxBufferLevel = null): void
     {
-        if (null === $maxBufferLevel) {
-            $maxBufferLevel = ob_get_level();
-        }
+        $maxBufferLevel ??= ob_get_level();
 
         while (ob_get_level() > $maxBufferLevel) {
             ob_end_flush();

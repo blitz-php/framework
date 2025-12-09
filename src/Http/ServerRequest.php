@@ -533,7 +533,7 @@ class ServerRequest implements ServerRequestInterface
     protected function _headerDetector(array $detect): bool
     {
         foreach ($detect['header'] as $header => $value) {
-            $header = $this->getEnv('http_' . $header);
+			$header = $this->getEnv($this->normalizeHeaderName($header));
             if ($header !== null) {
                 if ($value instanceof Closure) {
                     return $value($header);
@@ -1383,7 +1383,7 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * Obtenez une valeur à partir des données d'environnement de la demande.
+     * Obtient une valeur à partir des données d'environnement de la requete.
      * Se replier sur env() si la clé n'est pas définie dans la propriété $environment.
      *
      * @param string      $key     La clé à partir de laquelle vous voulez lire.
@@ -1406,13 +1406,39 @@ class ServerRequest implements ServerRequestInterface
         return $this->_environment[$key];
     }
 
+	/**
+	 * Obtient une valeur à partir des données d'environnement de la requete.
+	 *
+	 * @see BlitzPHP\Http\ServerRequest::getEnv()
+	 *
+	 * @return array|string|null
+	 */
+	public function env(?string $key = null, ?string $default = null)
+	{
+		if (null === $key) {
+			return $this->_environment;
+		}
+
+		return $this->getEnv($key, $default);
+	}
+
+	/**
+	 * Determise si une variable d'environnement est presente.
+	 */
+	public function hasEnv(string $key): bool
+	{
+		return $this->env($key) !== null;
+	}
+
     /**
      * Mettez à jour la demande avec un nouvel élément de données d'environnement.
      *
      * Renvoie un objet de requête mis à jour. Cette méthode retourne
      * un *nouvel* objet de requête et ne mute pas la requête sur place.
+	 *
+	 * @param array|string|null $value
      */
-    public function withEnv(string $key, string $value): static
+    public function withEnv(string $key, $value): static
     {
         $new                     = clone $this;
         $new->_environment[$key] = $value;
@@ -1516,6 +1542,11 @@ class ServerRequest implements ServerRequestInterface
         return Arr::get($this->params, $name, $default);
     }
 
+	public function hasParam(string $name): bool
+	{
+		return Arr::has($this->params, $name);
+	}
+
     /**
      * Renvoie une instance avec l'attribut de requête spécifié.
      *
@@ -1560,9 +1591,9 @@ class ServerRequest implements ServerRequestInterface
      *
      * @return array|string|null
      */
-    public function getOldInput(string $key)
+    public function getOldInput(string $key, mixed $default)
     {
-        return $this->session()->getOldInput($key);
+        return $this->session()->getOldInput($key, $default);
     }
 
     /**

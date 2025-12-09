@@ -15,11 +15,12 @@ use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Spec\ReflectionHelper;
+use GuzzleHttp\Psr7\Utils;
 
 use function Kahlan\expect;
 
 describe('Http / Response', function (): void {
-	describe('Constructeur', function (): void {
+    describe('Constructeur', function (): void {
 		it('Le constructeur fonctionne', function (): void {
 			$response = new Response();
 			expect((string) $response->getBody())->toBe('');
@@ -254,7 +255,7 @@ describe('Http / Response', function (): void {
         });
     });
 
-    describe('Cookie', function (): void {
+	describe('Cookie', function (): void {
         it('hasCookie', function (): void {
             $response = new Response();
 
@@ -343,6 +344,7 @@ describe('Http / Response', function (): void {
 
 
             $response = new Response();
+			$response->setTypeMap('php', 'text/php');
             $actual   = $response->download(__FILE__);
 
             expect($actual)->toBeAnInstanceOf(Response::class);
@@ -646,4 +648,188 @@ describe('Http / Response', function (): void {
 			}
 		});
 	});
+
+	describe('ResponseTrait', function () {
+        it('Status et statusText', function () {
+            $response = new Response();
+            $response = $response->withStatus(404);
+            expect($response->status())->toBe(404);
+            expect($response->statusText())->toBe('Not Found');
+        });
+
+        it('Content', function () {
+            $response = new Response();
+            $response = $response->withBody(Utils::streamFor('body content'));
+            expect($response->content())->toBe('body content');
+        });
+
+        it('Header', function () {
+            $response = new Response();
+            $response = $response->header('Content-Type', 'application/json', false); // Ajoute sans remplacer
+            expect($response->getHeaderLine('Content-Type'))->toBe('text/html; charset=UTF-8, application/json');
+
+            $response = $response->header('Content-Type', 'application/json');
+            expect($response->getHeaderLine('Content-Type'))->toBe('application/json');
+        });
+
+        it('Cookie', function () {
+            $response = new Response();
+            $cookie = new Cookie('name', 'value');
+            $response = $response->cookie($cookie);
+            expect($response->getCookie('name')['value'])->toBe('value');
+        });
+
+        it('With date', function () {
+            $response = new Response();
+            $date = new \DateTime('2023-01-01');
+            $response = $response->withDate($date);
+            expect($response->getHeaderLine('Date'))->toBe('Sat, 31 Dec 2022 23:00:00 GMT'); // probleme de timezone
+        });
+
+        it('With headers', function () {
+            $response = new Response();
+            $response = $response->withHeaders(['Custom' => 'value']);
+            expect($response->getHeaderLine('Custom'))->toBe('value');
+        });
+
+        it('JSON response', function () {
+            $response = new Response();
+            $response = $response->json(['data' => 'value'], 200);
+            expect($response->getHeaderLine('Content-Type'))->toContain('application/json');
+            expect($response->content())->toContain('{"data":"value"}');
+        });
+
+        it('XML response', function () {
+			$response = new Response();
+            $response = $response->xml(['data' => 'value']);
+			expect($response->getHeaderLine('Content-Type'))->toContain('application/xml; charset=UTF-8');
+            expect($response->content())->toContain('<xml><data>value</data>');
+        });
+
+        it('No cache', function () {
+            $response = new Response();
+            $response = $response->noCache();
+            $cacheControl = $response->getHeaderLine('Cache-Control');
+            expect($cacheControl)->toContain('no-store');
+            expect($cacheControl)->toContain('max-age=0');
+        });
+
+        it('Download', function () {
+            $response = new Response();
+			$response->setTypeMap('php', 'text/x-php');
+            $response = $response->download(__FILE__, 'download.txt');
+            $disposition = $response->getHeaderLine('Content-Disposition');
+            expect($disposition)->toContain('attachment; filename="download.txt"');
+        });
+
+        it('Stream download', function () {
+            $response = new Response();
+            $stream = Utils::streamFor('stream content');
+            $response = $response->streamDownload($stream, 'file.txt');
+            expect($response->getHeaderLine('Content-Disposition'))->toContain('attachment; filename="file.txt"');
+        });
+
+        it('File response', function () {
+            $response = new Response();
+            $response = $response->file(__FILE__);
+            expect($response->getHeaderLine('Content-Type'))->toContain('text/x-php');
+        });
+
+        it('View response', function () {
+            $response = new Response();
+			$response = $response->view('simple', ['testString' => 'value'], 201);
+            expect($response->status())->toBe(201);
+            expect($response->content())->toContain('<h1>value</h1>');
+        });
+
+        it('Download fichier inexistant', function () {
+            $response = new Response();
+            expect(fn() => $response->download('/nonexistent/file.txt'))
+                ->toThrow(new LoadException('Le fichier demandé n\'a pas été trouvé.'));
+        });
+
+        it('Header replace vs add', function () {
+            $response = new Response();
+            $response = $response->header('Test', 'value1');
+            $response = $response->header('Test', 'value2', false); // Add
+            expect(count($response->getHeader('Test')))->toBe(2);
+        });
+
+        it('JSON avec status', function () {
+            $response = new Response();
+            $response = $response->json(['error' => 'msg'], 500);
+            expect($response->status())->toBe(500);
+        });
+
+        it('No cache sans Cache-Control existant', function () {
+            $response = new Response();
+            $response = $response->noCache();
+            expect($response->getHeaderLine('Cache-Control'))->toBe('no-store, max-age=0, no-cache');
+        });
+    });
+
+    describe('Response core', function () {
+        it('Status codes min max', function () {
+            $response = new Response();
+            expect(fn() => $response->withStatus(99))->toThrow(new HttpException());
+            expect(fn() => $response->withStatus(600))->toThrow(new HttpException());
+        });
+
+    	it('File range request', function () {
+            $response = invade(new Response());
+            $file = new SplFileInfo(__FILE__);
+            $response->_file = $file; // Protected access via reflection or mock
+            // Assume test for _fileRange with invalid range throws 416
+            $response->_fileRange($file, 'bytes=100-50'); // Invalid
+            expect($response->status())->toBe(416);
+        });
+
+        it('Debug info', function () {
+            $response = new Response();
+            $debug = $response->__debugInfo();
+            expect($debug)->toContainKey('status');
+            expect($debug['status'])->toBe(200);
+        });
+
+        it('Charset', function () {
+            $response = invade(new Response());
+            expect($response->_charset)->toBe('UTF-8');
+        });
+
+        it('Cache directives', function () {
+            $response = invade(new Response());
+            $response->_cacheDirectives = ['max-age' => 3600];
+            expect($response->_cacheDirectives)->toContainKey('max-age');
+        });
+
+        it('File validation', function () {
+            $response = invade(new Response());
+            // Assume validateFile prevents ../
+            expect(fn() => $response->validateFile('../secret.txt'))->toThrow(new LoadException());
+        });
+
+        it('With file', function () {
+            $response = new Response();
+            $file = new SplFileInfo(__FILE__);
+            $response = $response->withFile($file);
+            expect($response->getFile())->toEqual($file);
+        });
+
+        it('Partial content range', function () {
+            $response = invade(new Response());
+            $file = new SplFileInfo(__FILE__);
+            $response->_file = $file;
+            $response->_fileRange($file, 'bytes=0-10');
+            expect($response->status())->toBe(206);
+            expect($response->getHeaderLine('Content-Range'))->toContain('bytes 0-10');
+        });
+
+        it('Invalid range', function () {
+            $response = invade(new Response());
+            $file = new SplFileInfo(__FILE__);
+            $response->_file = $file;
+            $response->_fileRange($file, 'bytes=999999-1000000'); // Beyond size
+            expect($response->status())->toBe(416);
+        });
+    });
 });

@@ -38,25 +38,33 @@ describe('JsonFormatter', function() {
         });
 
         it('devrait gérer le rappel JSONP valide', function() {
+			$request = service('request');
+
 			Services::set(
 				Request::class,
-				service('request')->withQueryParams(['callback' => 'maFonction'])
+				$request->withQueryParams(['callback' => 'maFonction'])
 			);
 
             $data = ['nom' => 'Jean'];
             $expected = 'maFonction({"nom":"Jean"});';
             expect($this->formatter->format($data))->toBe($expected);
+
+			Services::set(Request::class, $request);
         });
 
         it('devrait gérer le rappel JSONP invalide', function() {
+			$request = service('request');
+
             Services::set(
 				Request::class,
-				service('request')->withQueryParams(['callback' => 'fonction invalide'])
+				$request->withQueryParams(['callback' => 'fonction invalide'])
 			);
 
 			$data = ['nom' => 'Jean'];
             $expected = '{"nom":"Jean","warning":"INVALID JSONP CALLBACK: fonction invalide"}';
             expect($this->formatter->format($data))->toBe($expected);
+
+			Services::set(Request::class, $request);
         });
     });
 

@@ -54,7 +54,11 @@ trait InteractsWithContentTypes
         $contentTypes = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
-            if (in_array($accept, ['*/*', '*'], true)) {
+            if ($accept && $pos = strpos($accept, ';')) {
+                $accept = trim(substr($accept, 0, $pos));
+            }
+
+			if (in_array($accept, ['*/*', '*'], true)) {
                 return $contentTypes[0];
             }
 
@@ -121,7 +125,7 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Obtenez le format de données attendu dans la réponse.
+     * Obtient le format de données attendu dans la réponse.
      */
     public function format(string $default = 'html'): string
     {

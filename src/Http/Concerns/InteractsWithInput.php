@@ -12,21 +12,28 @@
 namespace BlitzPHP\Http\Concerns;
 
 use BlitzPHP\Filesystem\Files\UploadedFile;
-use BlitzPHP\Utilities\Date;
+use BlitzPHP\Traits\Support\InteractsWithData;
+use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Arr;
-use BlitzPHP\Utilities\Iterable\Collection;
-use BlitzPHP\Utilities\String\Stringable;
-use BlitzPHP\Utilities\String\Text;
+use BlitzPHP\Utilities\Support\Fluent;
 use Kint\Kint;
 use Psr\Http\Message\UploadedFileInterface;
 use SplFileInfo;
-use stdClass;
 
 /**
  * @credit <a href="http://laravel.com/">Laravel - Illuminate\Http\Concerns\InteractsWithInput</a>
  */
 trait InteractsWithInput
 {
+	use InteractsWithData;
+
+	/**
+     * Tableau de données d'environnement.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $_environment = [];
+
     /**
      * Récupérez une variable de serveur à partir de la requête.
      *
@@ -38,7 +45,15 @@ trait InteractsWithInput
     }
 
     /**
-     * Récupérer un en-tête de la requête.
+     * Détermine si un en-tête est défini dans la requête.
+     */
+    public function hasHeader(string $key): bool
+    {
+        return null !== $this->header($key);
+    }
+
+    /**
+     * Récupére un en-tête de la requête.
      *
      * @return array|string|null
      */
@@ -58,7 +73,7 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $position = strrpos($header, 'Bearer ');
+        $position = strripos($header, 'Bearer ');
 
         if ($position !== false) {
             $header = substr($header, $position + 7);
@@ -67,166 +82,6 @@ trait InteractsWithInput
         }
 
         return null;
-    }
-
-    /**
-     * Déterminez si la demande contient une clé d'élément d'entrée donnée.
-     */
-    public function exists(array|string $key): bool
-    {
-        return $this->has($key);
-    }
-
-    /**
-     *Déterminez si la demande contient une clé d'élément d'entrée donnée.
-     */
-    public function has(array|string $key): bool
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        $input = $this->all();
-
-        foreach ($keys as $value) {
-            if (! Arr::has($input, $value)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Déterminez si la demande contient l'une des entrées données.
-     */
-    public function hasAny(array|string $keys): bool
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $input = $this->all();
-
-        return Arr::hasAny($input, $keys);
-    }
-
-    /**
-     * Appliquez le rappel si la demande contient la clé d'élément d'entrée donnée.
-     *
-     * @return mixed|self
-     */
-    public function whenHas(string $key, callable $callback, ?callable $default = null)
-    {
-        if ($this->has($key)) {
-            return $callback(Arr::dataGet($this->all(), $key)) ?: $this;
-        }
-
-        if ($default) {
-            return $default();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Déterminez si la requête contient une valeur non vide pour un élément d'entrée.
-     */
-    public function filled(array|string $key): bool
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        foreach ($keys as $value) {
-            if ($this->isEmptyString($value)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Déterminez si la requête contient une valeur vide pour un élément d'entrée.
-     */
-    public function isNotFilled(array|string $key): bool
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        foreach ($keys as $value) {
-            if (! $this->isEmptyString($value)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Determine if the request contains a non-empty value for any of the given inputs.
-     */
-    public function anyFilled(array|string $keys): bool
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        foreach ($keys as $key) {
-            if ($this->filled($key)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Appliquez le rappel si la requête contient une valeur non vide pour la clé d'élément d'entrée donnée.
-     *
-     * @return mixed|self
-     */
-    public function whenFilled(string $key, callable $callback, ?callable $default = null)
-    {
-        if ($this->filled($key)) {
-            return $callback(Arr::dataGet($this->all(), $key)) ?: $this;
-        }
-
-        if ($default) {
-            return $default();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Déterminez s'il manque une clé d'élément d'entrée donnée dans la requête.
-     */
-    public function missing(array|string $key): bool
-    {
-        $keys = is_array($key) ? $key : func_get_args();
-
-        return ! $this->has($keys);
-    }
-
-    /**
-     * Appliquez le rappel s'il manque à la demande la clé d'élément d'entrée donnée.
-     *
-     * @return mixed|self
-     */
-    public function whenMissing(string $key, callable $callback, ?callable $default = null)
-    {
-        if ($this->missing($key)) {
-            return $callback(Arr::dataGet($this->all(), $key)) ?: $this;
-        }
-
-        if ($default) {
-            return $default();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Déterminez si la clé d'entrée donnée est une chaîne vide pour "remplie".
-     */
-    protected function isEmptyString(string $key): bool
-    {
-        $value = $this->input($key);
-
-        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
     }
 
     /**
@@ -260,11 +115,11 @@ trait InteractsWithInput
     }
 
     /**
-     * Récupérer un élément d'entrée de la requête.
+     * Récupère un élément d'entrée de la requête.
      */
     public function input(?string $key = null, mixed $default = null): mixed
     {
-        return Arr::dataGet(
+        return Helpers::dataGet(
             $this->data + $this->query,
             $key,
             $default
@@ -272,142 +127,17 @@ trait InteractsWithInput
     }
 
     /**
-     * Récupérez l'entrée de la requête en tant qu'instance Stringable.
+     * Récupère les données saisies dans la requête sous forme d'instance d'objet Fluent.
      */
-    public function str(string $key, mixed $default = null): ?Stringable
+    public function fluent(array|string|null $key = null, array $default = [])
     {
-        if (null === $value = $this->string($key, $default)) {
-            return null;
-        }
+        $value = is_array($key) ? $this->only($key) : $this->input($key);
 
-        return Text::of($value);
+        return new Fluent($value ?? $default);
     }
 
     /**
-     * Récupérez l'entrée de la requête en tant que chaine de caractere.
-     */
-    public function string(string $key, mixed $default = null): ?string
-    {
-        if (null === $value = $this->input($key, $default)) {
-            return null;
-        }
-
-        return (string) $value;
-    }
-
-    /**
-     * Récupérer l'entrée sous forme de valeur booléenne.
-     *
-     * Renvoie true lorsque la valeur est "1", "true", "on" et "yes". Sinon, renvoie faux.
-     */
-    public function boolean(?string $key = null, bool $default = false): bool
-    {
-        return filter_var($this->input($key, $default), FILTER_VALIDATE_BOOLEAN);
-    }
-
-    /**
-     * Récupérer l'entrée sous forme de valeur entière.
-     */
-    public function integer(string $key, int $default = 0): int
-    {
-        return (int) ($this->input($key, $default));
-    }
-
-    /**
-     * Récupérer l'entrée sous forme de valeur flottante.
-     */
-    public function float(string $key, float $default = 0.0): float
-    {
-        return (float) ($this->input($key, $default));
-    }
-
-    /**
-     * Récupérez l'entrée de la demande en tant qu'instance Date.
-     */
-    public function date(string $key, ?string $format = null, ?string $tz = null): ?Date
-    {
-        if ($this->isNotFilled($key)) {
-            return null;
-        }
-
-        if (null === $format) {
-            return Date::parse($this->input($key), $tz);
-        }
-
-        return Date::createFromFormat($format, $this->input($key), $tz);
-    }
-
-    /**
-     * Retrieve input from the request as an enum.
-     *
-     * @template TEnum
-     *
-     * @param class-string<TEnum> $enumClass
-     *
-     * @return TEnum|null
-     */
-    public function enum(string $key, $enumClass)
-    {
-        if ($this->isNotFilled($key)
-            || ! function_exists('enum_exists')
-            || ! enum_exists($enumClass)
-            || ! method_exists($enumClass, 'tryFrom')) {
-            return null;
-        }
-
-        return $enumClass::tryFrom($this->input($key));
-    }
-
-    /**
-     * Récupérer l'entrée de la requête sous forme de collection.
-     */
-    public function collect(array|string|null $key = null): Collection
-    {
-        return collect(is_array($key) ? $this->only($key) : $this->input($key));
-    }
-
-    /**
-     * Obtenez un sous-ensemble contenant les clés fournies avec les valeurs des données d'entrée.
-     *
-     * @param array|mixed $keys
-     */
-    public function only($keys): array
-    {
-        $results = [];
-
-        $input = $this->all();
-
-        $placeholder = new stdClass();
-
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = Arr::dataGet($input, $key, $placeholder);
-
-            if ($value !== $placeholder) {
-                Arr::set($results, $key, $value);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Récupère toutes les entrées à l'exception d'un tableau d'éléments spécifié.
-     *
-     * @param array|mixed $keys
-     */
-    public function except($keys): array
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $results = $this->all();
-
-        Arr::forget($results, $keys);
-
-        return $results;
-    }
-
-    /**
-     * Récupérez un élément de chaîne de requête à partir de la demande.
+     * Récupère un élément de chaîne de requête à partir de la requête.
      *
      * @return array|string|null
      */
@@ -417,7 +147,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Récupérer un élément de charge utile de requête à partir de la requête.
+     * Récupère un élément de charge utile de requête à partir de la requête.
      *
      * @return array|string|null
      */
@@ -431,7 +161,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Déterminez si un cookie est défini sur la demande.
+     * Détermine si un cookie est défini sur la requête.
      */
     public function hasCookie(string $key): bool
     {
@@ -439,7 +169,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Récupérer un cookie de la requête.
+     * Récupère un cookie de la requête.
      *
      * @return array|string|null
      */
@@ -453,7 +183,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Obtenez un tableau de tous les fichiers de la requête.
+     * Renvoie un tableau de tous les fichiers de la requête.
      */
     public function allFiles(): array
     {
@@ -461,7 +191,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Déterminez si les données téléchargées contiennent un fichier.
+     * Détermine si les données téléchargées contiennent un fichier.
      */
     public function hasFile(string $key): bool
     {
@@ -479,7 +209,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Vérifiez que le fichier donné est une instance de fichier valide.
+     * Vérifie que le fichier donné est une instance de fichier valide.
      */
     protected function isValidFile(mixed $file): bool
     {
@@ -487,17 +217,25 @@ trait InteractsWithInput
     }
 
     /**
-     * Récupérer un fichier à partir de la requête.
+     * Récupère un fichier à partir de la requête.
      *
-     * @return array|list<UploadedFile>|UploadedFile|null
+     * @return ($key is null ? array<string, UploadedFile|UploadedFile[]> : list<UploadedFile>|UploadedFile|null)
      */
     public function file(?string $key = null, mixed $default = null)
     {
-        return Arr::dataGet($this->allFiles(), $key, $default);
+        return Helpers::dataGet($this->allFiles(), $key, $default);
     }
 
     /**
-     * Videz les éléments de la requête et terminez le script.
+     * Récupère les données de l'instance.
+     */
+    protected function data(?string $key = null, mixed $default = null): mixed
+    {
+        return $this->input($key, $default);
+    }
+
+    /**
+     * Vide les éléments de la requête et terminez le script.
      */
     public function dd(...$keys): never
     {
@@ -507,11 +245,9 @@ trait InteractsWithInput
     }
 
     /**
-     * Videz les elements.
-     *
-     * @param mixed $keys
+     * Vide les elements.
      */
-    public function dump($keys = []): self
+    public function dump(mixed $keys = []): self
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 

@@ -166,7 +166,7 @@ trait ResponseTrait
     public function download(SplFileInfo|string $file, ?string $name = null, array $headers = []): static
     {
         if (is_string($file) && ! is_file($file)) {
-            throw new LoadException('The requested file was not found');
+            throw new LoadException("Le fichier demandé n'a pas été trouvé.");
         }
 
         return $this->withHeaders($headers)->withFile($file, ['download' => true, 'name' => $name]);

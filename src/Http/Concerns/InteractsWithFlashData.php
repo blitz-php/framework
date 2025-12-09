@@ -31,11 +31,7 @@ trait InteractsWithFlashData
             $default = $default->getAttribute($key);
         }
 
-        if (null !== $value = $this->getOldInput($key)) {
-            return $value;
-        }
-
-        return $default;
+        return $this->hasSession() ? $this->getOldInput($key, $default) : $default;
     }
 
     /**

@@ -18,7 +18,10 @@ use BlitzPHP\Http\Concerns\InteractsWithContentTypes;
 use BlitzPHP\Http\Concerns\InteractsWithFlashData;
 use BlitzPHP\Http\Concerns\InteractsWithInput;
 use BlitzPHP\Session\Store;
+use BlitzPHP\Traits\Conditionable;
+use BlitzPHP\Traits\Macroable;
 use BlitzPHP\Utilities\Iterable\Arr;
+use BlitzPHP\Utilities\Iterable\Collection;
 use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\Validation\DataValidation;
 use BlitzPHP\Validation\Validation;
@@ -32,6 +35,8 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     use InteractsWithContentTypes;
     use InteractsWithInput;
     use InteractsWithFlashData;
+	use Conditionable;
+	use Macroable;
 
     /**
      * Validation des donnees de la requete
@@ -78,7 +83,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez la méthode de requête.
+     * Obtient la méthode de requête.
      */
     public function method(): string
     {
@@ -86,7 +91,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez l'URL racine de l'application.
+     * Obtient l'URL racine de l'application.
      */
     public function root(): string
     {
@@ -137,7 +142,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez l'URL (pas de chaîne de requête) pour la demande.
+     * Obtient l'URL (pas de chaîne de requête) pour la demande.
      */
     public function url(): string
     {
@@ -145,11 +150,12 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez l'URL complète de la demande.
+     * Obtient l'URL complète de la demande.
      */
     public function fullUrl(): string
     {
-        if (($query = $this->getEnv('QUERY_STRING')) !== null && ($query = $this->getEnv('QUERY_STRING')) !== '') {
+		$query = $this->getEnv('QUERY_STRING');
+        if ($query !== null && $query !== '') {
             return $this->url() . '?' . $query;
         }
 
@@ -157,7 +163,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez l'URL complète de la demande avec les paramètres de chaîne de requête ajoutés.
+     * Obtient l'URL complète de la demande avec les paramètres de chaîne de requête ajoutés.
      */
     public function fullUrlWithQuery(array $query): string
     {
@@ -169,7 +175,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez l'URL complète de la requête sans les paramètres de chaîne de requête donnés.
+     * Obtient l'URL complète de la requête sans les paramètres de chaîne de requête donnés.
      */
     public function fullUrlWithoutQuery(array|string $keys): string
     {
@@ -181,7 +187,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez les informations de chemin actuelles pour la demande.
+     * Obtient les informations de chemin actuelles pour la demande.
      */
     public function path(): string
     {
@@ -189,7 +195,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez les informations de chemin décodées actuelles pour la demande.
+     * Obtient les informations de chemin décodées actuelles pour la demande.
      */
     public function decodedPath(): string
     {
@@ -205,7 +211,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez tous les segments pour le chemin de la demande.
+     * Obtient tous les segments pour le chemin de la demande.
      */
     public function segments(): array
     {
@@ -215,13 +221,12 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Déterminez si l’URI de la demande actuelle correspond à un modèle.
+     * Détermine si l’URI de la requete actuelle correspond à un modèle.
      */
     public function pathIs(...$patterns): bool
     {
-        $path = $this->decodedPath();
-
-        return collect($patterns)->contains(static fn ($pattern) => Text::is($pattern, $path));
+		return (new Collection($patterns))
+			->contains(fn($pattern) => Text::is($pattern, $this->decodedPath()));
     }
 
     /**
@@ -236,7 +241,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Verifier si la methode de la requete actuelle est l'une envoyee en parametre
+     * Verifie si la methode de la requête actuelle est l'une envoyee en parametre
      */
     public function isMethod(array|string $methods): bool
     {
@@ -256,13 +261,12 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function fullUrlIs(...$patterns): bool
     {
-        $url = $this->fullUrl();
-
-        return collect($patterns)->contains(static fn ($pattern) => Text::is($pattern, $url));
+		return (new Collection($patterns))
+			->contains(fn($pattern) => Text::is($pattern, $this->fullUrl()));
     }
 
     /**
-     * Obtenez l'hôte HTTP demandé.
+     * Obtient l'hôte HTTP demandé.
      */
     public function httpHost(): ?string
     {
@@ -270,7 +274,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Déterminez si la demande est le résultat d'un appel AJAX.
+     * Déterminez si la requête est le résultat d'un appel AJAX.
      */
     public function ajax(): bool
     {
@@ -278,7 +282,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Déterminez si la demande est le résultat d'un appel PJAX.
+     * Déterminez si la requête est le résultat d'un appel PJAX.
      */
     public function pjax(): bool
     {
@@ -286,12 +290,13 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Déterminez si la demande est le résultat d'un appel de prélecture.
+     * Déterminez si la requête est le résultat d'un appel de prélecture.
      */
     public function prefetch(): bool
     {
         return strcasecmp($this->server('HTTP_X_MOZ', ''), 'prefetch') === 0
-               || strcasecmp($this->header('Purpose', ''), 'prefetch') === 0;
+               || strcasecmp($this->header('Purpose', ''), 'prefetch') === 0
+               || strcasecmp($this->header('Sec-Purpose', ''), 'prefetch') === 0;
     }
 
     /**
@@ -303,7 +308,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez l'adresse IP du client.
+     * Obtient l'adresse IP du client.
      */
     public function ip(): ?string
     {
@@ -311,7 +316,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez l'agent utilisateur client.
+     * Obtient l'agent utilisateur client.
      */
     public function userAgent(): ?string
     {
@@ -333,11 +338,14 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function mergeIfMissing(array $input): self
     {
-        return $this->merge(collect($input)->filter(fn ($value, $key) => $this->missing($key))->toArray());
+        return $this->merge((new Collection($input))
+			->filter(fn ($value, $key) => $this->missing($key))
+			->toArray()
+		);
     }
 
     /**
-     * Remplacez l'entrée de la requête en cours.
+     * Remplace l'entrée de la requête en cours.
      */
     public function replace(array $input): self
     {
@@ -363,12 +371,17 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez toutes les entrées et tous les fichiers de la requête.
+     * Obtient toutes les entrées et tous les fichiers de la requête.
      */
     public function toArray(): array
     {
         return $this->all();
     }
+
+	public function getParams(): array
+	{
+		return $this->params ?? [];
+	}
 
     public function getScheme(): string
     {
@@ -426,7 +439,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Vérifiez si un élément d'entrée est défini sur la demande.
+     * Vérifie si un élément d'entrée est défini sur la demande.
      */
     public function __isset(string $key): bool
     {
@@ -434,7 +447,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtenez un élément d'entrée à partir de la requête.
+     * Obtient un élément d'entrée à partir de la requête.
      */
     public function __get(string $key): mixed
     {
