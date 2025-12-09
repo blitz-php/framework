@@ -269,7 +269,7 @@ class Container implements ContainerInterface
 
             $files = [
                 ...$files, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
-                ...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors sont les
+                ...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors
                 ...$appProviders, // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
             ];
 

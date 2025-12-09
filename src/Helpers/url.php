@@ -24,6 +24,59 @@ use BlitzPHP\Utilities\Helpers;
 
 // =================================  ================================= //
 
+if (! function_exists('app_uri')) {
+	/**
+     * Utilisé par les autres fonctions d'URL pour construire un
+     * URI spécifique au framework basé sur la configuration de l'application.
+     *
+     * @internal En dehors du framework, ceci ne doit pas être utilisé directement.
+     *
+     * @param string $relativePath Peut inclure des requêtes ou des fragments
+     *
+     * @throws InvalidArgumentException Pour les chemins ou la configuration non valides
+     */
+    function app_uri(string $relativePath = ''): Uri
+    {
+        $config = (object) config('app');
+
+        if ($config->base_url === '') {
+            throw new InvalidArgumentException(sprintf("%s a besoin d'une baseUrl valide", __FUNCTION__));
+        }
+
+        // Si un URI complet a été passé, convertissez-le
+        if (is_int(strpos($relativePath, '://'))) {
+            $full         = new Uri($relativePath);
+            $relativePath = Uri::createURIString(null, null, $full->getPath(), $full->getQuery(), $full->getFragment());
+        }
+
+        $relativePath = Uri::removeDotSegments($relativePath);
+
+        // Construire l'URL complète basée sur $config et $relativePath
+        $url = rtrim($config->base_url, '/ ') . '/';
+
+        // Recherche une page d'index
+        if ($config->index_page !== '') {
+            $url .= $config->index_page;
+
+            // Vérifie si nous avons besoin d'un séparateur
+            if ($relativePath !== '' && $relativePath[0] !== '/' && $relativePath[0] !== '?') {
+                $url .= '/';
+            }
+        }
+
+        $url .= $relativePath;
+
+        $uri = new Uri($url);
+
+        // Vérifie si le schéma baseURL doit être contraint dans sa version sécurisée
+        if ($config->force_global_secure_requests && $uri->getScheme() === 'http') {
+            $uri->setScheme('https');
+        }
+
+        return $uri;
+    }
+}
+
 if (! function_exists('url')) {
     /**
      * Générer une url pour l'application.
@@ -55,7 +108,7 @@ if (! function_exists('site_url')) {
             $relativePath = implode('/', $relativePath);
         }
 
-        $uri = App::getUri($relativePath);
+        $uri = app_uri($relativePath);
 
         return Uri::createURIString(
             $scheme ?? $uri->getScheme(),
@@ -107,7 +160,7 @@ if (! function_exists('current_url')) {
             $path .= '#' . $fragment;
         }
 
-        $uri = App::getUri($path);
+        $uri = app_uri($path);
 
         return $returnObject ? $uri : Uri::createURIString($uri->getScheme(), $uri->getAuthority(), $uri->getPath());
     }
