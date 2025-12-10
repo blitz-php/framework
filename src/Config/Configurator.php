@@ -24,29 +24,36 @@ use Nette\Schema\ValidationException;
 use stdClass;
 
 /**
+ * Configurateur pour validation et merger de configurations.
+ *
+ * Utilise DotAccessData pour dot notation et Nette\Schema pour validation.
+ * Supporte deep merge et cache.
+ *
  * @credit league/config (c) Colin O'Dell <colinodell@gmail.com>
  */
 final class Configurator
 {
     /**
-     * @psalm-readonly
+     * Configuration utilisateur.
      */
     private readonly Data $userConfig;
 
     /**
-     * @psalm-allow-private-mutation
+     * Configuration finale (mutable).
      */
     private Data $finalConfig;
 
     /**
-     * @var array<string, mixed>
+     * Cache des accès (clé → valeur).
      *
-     * @psalm-allow-private-mutation
+     * @var array<string, mixed>
      */
     private array $cache = [];
 
     /**
-     * @param array<string, Schema> $configSchemas
+     * Constructeur.
+     *
+     * @param array<string, Schema> $configSchemas Schémas initiaux.
      */
     public function __construct(private array $configSchemas = [])
     {
@@ -55,9 +62,9 @@ final class Configurator
     }
 
     /**
-     * Enregistre un nouveau schéma de configuration à la clé de niveau supérieur donnée
+     * Enregistre un schéma pour une clé top-level.
      *
-     * @psalm-allow-private-mutation
+     * Invalide le cache.
      */
     public function addSchema(string $key, Schema $schema): void
     {
@@ -77,11 +84,11 @@ final class Configurator
     }
 
     /**
-     * @psalm-allow-private-mutation
-     *
-     * @param mixed $value
+     * Définit une valeur.
+	 *
+	 * @throws UnknownOptionException
      */
-    public function set(string $key, $value): void
+    public function set(string $key, mixed $value): void
     {
         $this->invalidate();
 
@@ -93,11 +100,15 @@ final class Configurator
     }
 
     /**
-     * @psalm-external-mutation-free
+     * Obtient une valeur via dot notation.
+     *
+     * Valide et cache.
+     *
+     * @throws ConfigException Si validation échoue.
      */
     public function get(string $key)
     {
-        if (array_key_exists($key, $this->cache)) {
+        if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
 
@@ -111,7 +122,7 @@ final class Configurator
     }
 
     /**
-     * @psalm-external-mutation-free
+     * Vérifie l'existence d'une clé.
      */
     public function exists(string $key): bool
     {
@@ -129,7 +140,7 @@ final class Configurator
     }
 
     /**
-     * @psalm-external-mutation-free
+     * Invalide le cache.
      */
     private function invalidate(): void
     {
@@ -161,27 +172,35 @@ final class Configurator
         }
 
         try {
-            $schema    = $this->configSchemas[$topLevelKey];
-            $processor = new Processor();
-            $processed = $processor->process(Expect::structure([$topLevelKey => $schema]), $userData);
+            $processed = $this->process($topLevelKey, $userData);
 
-            $this->raiseAnyDeprecationNotices($processor->getWarnings());
-
-            $this->finalConfig->import((array) self::convertStdClassesToArrays($processed));
+            $this->finalConfig->import(self::convertStdClassesToArrays($processed));
         } catch (ValidationException $ex) {
             throw new ConfigException($ex->getMessage(), $ex->getCode());
         }
     }
 
+	/**
+	 * Normalise et valide les données. Le résultat est une donnée complète et propre.
+	 */
+	private function process(string $topLevelKey, array $userData): mixed
+	{
+		$schema    = $this->configSchemas[$topLevelKey];
+		$processor = new Processor();
+		$processed = $processor->process(Expect::structure([$topLevelKey => $schema]), $userData);
+
+		$this->raiseAnyDeprecationNotices($processor->getWarnings());
+
+		return $processed;
+	}
+
     /**
-     * Convertit récursivement les instances stdClass en tableaux
+     * Convertit récursivement les instances stdClass en tableaux.
      *
-     * @phpstan-template T
-     *
-     * @param T $data
-     *
-     * @return         mixed
-     * @phpstan-return ($data is stdClass ? array<string, mixed> : T)
+     * @template T
+     * @param T $data Données.
+	 *
+     * @return ($data is stdClass ? array<string, mixed> : T)
      */
     private static function convertStdClassesToArrays($data)
     {
@@ -199,7 +218,9 @@ final class Configurator
     }
 
     /**
-     * @param list<string> $warnings
+     * Émet des notices de dépréciation.
+     *
+     * @param list<string> $warnings Avertissements.
      */
     private function raiseAnyDeprecationNotices(array $warnings): void
     {
@@ -209,15 +230,20 @@ final class Configurator
     }
 
     /**
-     * @throws InvalidPathException
+     * Extrait la clé top-level d'un path.
+     *
+     * Gère . et /.
+     *
+     * @throws InvalidPathException Si path vide.
      */
-    private static function getTopLevelKey(string $path): string
+    public static function getTopLevelKey(string $path): string
     {
-        if ($path === '') {
-            throw new InvalidPathException('$path ne peut pas être une chaîne vide');
+		if ('' === $path = trim($path)) {
+            throw new InvalidPathException('Le chemin ne peut pas être une chaîne vide.');
         }
 
-        $path = str_replace(['.', '/'], '.', $path);
+        // Normalise / et . en .
+        $path = str_replace(['.', '/'], '.', trim($path, '. '));
 
         $firstDelimiter = strpos($path, '.');
         if ($firstDelimiter === false) {

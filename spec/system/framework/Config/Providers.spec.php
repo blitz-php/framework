@@ -13,6 +13,8 @@ use BlitzPHP\Autoloader\Autoloader;
 use BlitzPHP\Config\Providers;
 use BlitzPHP\Spec\ReflectionHelper;
 
+use function Kahlan\expect;
+
 describe('Config / Providers', function (): void {
 	it('Providers', function (): void {
 		$definitions = Providers::definitions();

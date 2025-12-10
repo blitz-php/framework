@@ -21,24 +21,35 @@ use Nette\Schema\Schema;
 use ReflectionClass;
 use ReflectionMethod;
 
+/**
+ * Gestionnaire central de configuration pour le framework.
+ *
+ * Charge, valide et accède aux configurations via fichiers ou schémas.
+ */
 class Config
 {
     /**
-     * Fichier de configuration déjà chargé
+     * Fichiers de configuration déjà chargés (cache).
+     *
+     * @var array<string, mixed>
      */
     private static array $loaded = [];
 
     /**
-     * Configurations originales issues des fichiers de configuration
+     * Configurations originales issues des fichiers de configuration.
      *
-     * Permet de réinitialiser les configuration par défaut au cas où on aurrait fait des modifications à la volée
+     * Permet de réinitialiser les configuration par défaut au cas où on aurrait fait des modifications à la volée.
+     *
+     * @var array<string, mixed>
      */
     private static array $originals = [];
 
     /**
      * Different registrars decouverts.
      *
-     * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
+     * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration.
+     *
+     * @var array<string, mixed[]>
      */
     private static array $registrars = [];
 
@@ -62,6 +73,9 @@ class Config
      */
     private static bool $initialized = false;
 
+    /**
+     * Instance du configurateur pour validation.
+     */
     private readonly Configurator $configurator;
 
     public function __construct()
@@ -76,10 +90,13 @@ class Config
     public function exists(string $key): bool
     {
         if (! $this->configurator->exists($key)) {
-            $config = explode('.', $key);
-            $this->load($config[0]);
+            $topLevelKey = $this->configurator->getTopLevelKey($key);
 
-            return $this->configurator->exists(implode('.', $config));
+            if (! isset(static::$loaded[$topLevelKey])) {
+                $this->load($topLevelKey);
+            }
+
+            return $this->configurator->exists($key);
         }
 
         return true;
@@ -102,11 +119,9 @@ class Config
     }
 
     /**
-     * Renvoyer une configuration de l'application
-     *
-     * @return mixed
+     * Obtient une valeur de configuration.
      */
-    public function get(string $key, mixed $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if ($this->exists($key)) {
             return $this->configurator->get($key);
@@ -116,22 +131,22 @@ class Config
             return $default;
         }
 
-        $path = explode('.', $key);
-
-        throw ConfigException::notFound(implode(' » ', $path));
+        throw ConfigException::notFound(str_replace(['.', '/'], ' » ', $key));
     }
 
     /**
-     * Définir une configuration de l'application
-     *
-     * @param mixed $value
+     * Définit une valeur de configuration.
      */
-    public function set(string $key, $value)
+    public function set(string $key, mixed $value): self
     {
-        $path = explode('.', $key);
-        $this->load($path[0]);
+        $topLevelKey = $this->configurator->getTopLevelKey($key);
+        if (! isset(static::$loaded[$topLevelKey])) {
+            $this->load($topLevelKey);
+        }
 
         $this->configurator->set($key, $value);
+
+		return $this;
     }
 
     /**
@@ -142,7 +157,7 @@ class Config
         $keys = null !== $keys ? (array) $keys : array_keys(self::$originals);
 
         foreach ($keys as $key) {
-            $this->set($key, Arr::dataGet(self::$originals, $key));
+            $this->set($key, Helpers::dataGet(self::$originals, $key));
 
             if (str_starts_with($key, 'app')) {
                 $this->initializeAutoDetect();
@@ -164,66 +179,92 @@ class Config
     }
 
     /**
-     * Charger la configuration spécifique dans le scoope
+     * Charge une configuration
      *
      * @param list<string>|string $config
      */
-    public function load($config, ?string $file = null, ?Schema $schema = null, bool $allow_empty = false)
+    public function load($config, ?string $file = null, ?Schema $schema = null, bool $allow_empty = false): void
     {
         if (is_array($config)) {
-            foreach ($config as $key => $value) {
-                [$file, $conf] = is_string($key) ? [$value, $key] : [null, $value];
+            $this->loadMultiple($config, $allow_empty);
+            return;
+        }
 
-                $this->load($conf, $file, null, $allow_empty);
+        $this->loadSingle($config, $file, $schema, $allow_empty);
+    }
+
+    /**
+     * Charge plusieurs configurations
+     *
+     * @param list<string> $configs
+     */
+    private function loadMultiple(array $configs, bool $allow_empty = false): void
+    {
+        foreach ($configs as $key => $value) {
+            if (is_string($key)) {
+                // Cas: ['config_key' => 'file_path']
+                $this->loadSingle($key, $value, null, $allow_empty);
+            } else {
+                // Cas: ['config_key']
+                $this->loadSingle($value, null, null, $allow_empty);
             }
+        }
+    }
 
+    /**
+     * Charge une configuration unique
+     */
+    private function loadSingle(string $topLevelKey, ?string $file, ?Schema $schema, bool $allow_empty): void
+    {
+        // Vérifier si déjà chargé
+        if (isset(self::$loaded[$topLevelKey])) {
             return;
         }
 
-        if (isset(self::$loaded[$config])) {
-            return;
+        $file   ??= self::file($topLevelKey);
+        $schema ??= self::schema($topLevelKey);
+
+        $configurations = $this->loadConfigurationsFromFile($file);
+
+        if (!empty(self::$registrars[$topLevelKey])) {
+            $configurations = Arr::merge(self::$registrars[$topLevelKey], $configurations);
         }
-
-        $file ??= self::path($config);
-        $schema ??= self::schema($config);
-
-        if (file_exists($file) && ! in_array($file, get_included_files(), true)) {
-            $configurations = (array) require $file;
-        }
-
-        $configurations = Arr::merge(self::$registrars[$config] ?? [], $configurations ?? []);
 
         if ($configurations === [] && ! $allow_empty && ! is_a($schema, Schema::class, true)) {
             return;
         }
 
-        $this->configurator->addSchema($config, $schema ?: Expect::mixed());
-        $this->configurator->merge([$config => $configurations]);
+        $this->configurator->addSchema($topLevelKey, $schema ?? Expect::mixed());
+        $this->configurator->merge([$topLevelKey => $configurations]);
 
-        self::$loaded[$config]    = $file;
-        self::$originals[$config] = $this->configurator->get($config);
+        self::$loaded[$topLevelKey]    = $file;
+        self::$originals[$topLevelKey] = $this->configurator->get($topLevelKey);
     }
 
     /**
-     * Affiche l'exception dû à la mauvaise definition d'une configuration
-     *
-     * @param string $group (app, data, database, etc.)
+     * Charge les configurations depuis un fichier
      */
-    public static function exceptBadConfigValue(string $config_key, array|string $accepts_values, string $group)
+    private function loadConfigurationsFromFile(string $file): array
     {
-        if (is_array($accepts_values)) {
-            $accepts_values = '(Accept values: ' . implode('/', $accepts_values) . ')';
+        if (empty($file) || !file_exists($file)) {
+            return [];
         }
 
-        throw new ConfigException("The '{$group}.{$config_key} configuration is not set correctly. {$accepts_values} \n Please edit '{" . self::path($group) . "}' file to correct it");
+        if (in_array($file, get_included_files(), true)) {
+			return []; // Le fichier est déjà inclus, on ne peut pas le requirer à nouveau
+        }
+
+        $configurations = require $file;
+
+        return is_array($configurations) ? $configurations : [];
     }
 
     /**
      * Renvoie le chemin du fichier d'un groupe de configuration donné
      */
-    public static function path(string $path): string
+    public static function file(string $topLevelKey): string
     {
-        $path = preg_replace('#\.php$#', '', $path);
+        $path = preg_replace('#\.php$#', '', $topLevelKey);
 
         if (file_exists($file = CONFIG_PATH . $path . '.php')) {
             return $file;
@@ -231,7 +272,7 @@ class Config
 
         $paths = service('locator')->search('Config/' . $path);
 
-        if (isset($paths[0]) && file_exists($path[0])) {
+        if (!empty($paths[0]) && file_exists($paths[0])) {
             return $paths[0];
         }
 
@@ -241,9 +282,9 @@ class Config
     /**
      * Retrouve le schema de configuration d'un groupe
      */
-    public static function schema(string $key): ?Schema
+    public static function schema(string $topLevelKey): ?Schema
     {
-        $file = 'schemas' . DS . Helpers::ensureExt($key . '.config', 'php');
+        $file = 'schemas' . DS . Helpers::ensureExt($topLevelKey . '.config', 'php');
 
         if (file_exists($syst_schema = SYST_PATH . 'Config' . DS . $file)) {
             return require $syst_schema;
@@ -252,9 +293,9 @@ class Config
             return require $app_schema;
         }
 
-        $paths = service('locator')->search('Config/schemas/' . $key);
+        $paths = service('locator')->search('Config/schemas/' . $topLevelKey);
 
-        if (isset($paths[0]) && file_exists($paths[0])) {
+        if (! empty($paths[0]) && file_exists($paths[0])) {
             return require $paths[0];
         }
 
@@ -264,7 +305,7 @@ class Config
     /**
      * Initialiser la configuration du système avec les données des fichier de configuration
      */
-    private function initialize()
+    private function initialize(): void
     {
         if (self::$initialized) {
             return;
@@ -285,13 +326,13 @@ class Config
      * Charges les registrars disponible pour l'application.
      * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration
      */
-    private function loadRegistrar()
+    private function loadRegistrar(): void
     {
         if (static::$didDiscovery) {
             return;
         }
 
-        // La decouverte doit etre complete pres la premiere initalisation de la classe.
+        // La decouverte doit etre complete apres la premiere initalisation de la classe.
         if (static::$discovering) {
             throw new ConfigException(
                 'Pendant la découverte automatique des Registrars,'
@@ -308,28 +349,7 @@ class Config
         $registrarsFiles = $locator->search('Config/Registrar.php');
 
         foreach ($registrarsFiles as $file) {
-            // Enregistre le fichier pour le message d'erreur.
-            static::$registrarFile = $file;
-
-            if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
-                continue;
-            }
-
-            $class   = new ReflectionClass($classname);
-            $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
-
-            foreach ($methods as $method) {
-                if (! ($method->isPublic() && $method->isStatic())) {
-                    continue;
-                }
-
-                if (! is_array($result = $method->invoke(null))) {
-                    continue;
-                }
-
-                $name                    = $method->getName();
-                self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
-            }
+            $this->processRegistrarFile($locator, $file);
         }
 
         static::$didDiscovery = true;
@@ -337,9 +357,37 @@ class Config
     }
 
     /**
+     * Traite un fichier Registrar
+     */
+    private function processRegistrarFile(Locator $locator, string $file): void
+    {
+        static::$registrarFile = $file;
+
+        if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
+            return;
+        }
+
+        $class   = new ReflectionClass($classname);
+        $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
+
+        foreach ($methods as $method) {
+            if (! ($method->isPublic() && $method->isStatic())) {
+                continue;
+            }
+
+                if (! is_array($result = $method->invoke(null))) {
+                    continue;
+                }
+
+            $name = $method->getName();
+            self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
+        }
+    }
+
+    /**
      * Initialise l'URL
      */
-    private function initializeURL()
+    private function initializeURL(): void
     {
         $config = $this->get('app.base_url', 'auto');
 
@@ -353,23 +401,31 @@ class Config
     /**
      * Initialise l'environnement d'execution de l'application
      */
-    private function initializeEnvironment()
+    private function initializeEnvironment(): void
     {
-        $environment = $config = $this->get('app.environment');
+        $environment = $config = $this->get('app.environment', 'auto');
 
-        $config = match ($config) {
+        $config = match (strtolower($config)) {
             'auto'  => is_online() ? 'production' : 'development',
-            'dev'   => 'development',
-            'prod'  => 'production',
-            'test'  => 'testing',
-            default => $config,
+            'dev', 'development' => 'development',
+            'prod', 'production' => 'production',
+            'test', 'testing'    => 'testing',
+            default => throw new ConfigException("Environnement invalide : {$config}"),
         };
 
         if ($config !== $environment) {
             $this->set('app.environment', $config);
         }
 
-        switch ($config) {
+        $this->configureErrorReporting($config);
+    }
+
+    /**
+     * Configure le reporting d'erreurs selon l'environnement
+     */
+    private function configureErrorReporting(string $environment): void
+    {
+        switch ($environment) {
             case 'development':
                 error_reporting(-1);
                 ini_set('display_errors', 1);
@@ -380,28 +436,9 @@ class Config
                 ini_set('display_errors', 0);
                 error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
                 break;
+		}
 
-            default:
-                self::exceptBadConfigValue('environment', ['development', 'production', 'testing', 'auto'], 'app');
-        }
-
-        defined('BLITZ_DEBUG') || define('BLITZ_DEBUG', $config !== 'production');
-    }
-
-    /**
-     * Initialise les paramètres de la bar de debug
-     */
-    private function initializeDebugbar()
-    {
-        $config = $this->get('app.show_debugbar', 'auto');
-
-        if (! in_array($config, ['auto', true, false], true)) {
-            self::exceptBadConfigValue('show_debugbar', ['auto', true, false], 'app');
-        }
-
-        if ($config === 'auto') {
-            $this->set('app.show_debugbar', ! is_online());
-        }
+        defined('BLITZ_DEBUG') || define('BLITZ_DEBUG', $environment !== 'production');
     }
 
     /**
@@ -411,6 +448,5 @@ class Config
     {
         $this->initializeURL();
         $this->initializeEnvironment();
-        $this->initializeDebugbar();
     }
 }

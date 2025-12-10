@@ -40,9 +40,21 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
+use Closure;
 
+/**
+ * Fournisseur de services principal pour le framework.
+ *
+ * Enregistre les bindings pour interfaces et classes concrètes.
+ * Supporte lazy loading et boot post-resolution.
+ */
 class Providers extends AbstractProvider
 {
+    /**
+     * Définitions des bindings.
+     *
+     * @return array<string, Closure|mixed> Les bindings pour le container.
+     */
     public static function definitions(): array
     {
         return array_merge(
@@ -52,7 +64,9 @@ class Providers extends AbstractProvider
     }
 
     /**
-     * Enregistre les interfaces
+     * Enregistre les interfaces avec leurs implémentations.
+     *
+     * @return array<string, Closure>
      */
     private static function interfaces(): array
     {
@@ -75,7 +89,9 @@ class Providers extends AbstractProvider
     }
 
     /**
-     * Enregistre les classes concretes definies comme services
+     * Enregistre les classes concrètes comme services.
+     *
+     * @return array<string, Closure>
      */
     private static function classes(): array
     {

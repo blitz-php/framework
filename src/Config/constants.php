@@ -9,139 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-defined('DS') || define('DS', DIRECTORY_SEPARATOR);
-
-defined('COMPOSER_PATH') || define('COMPOSER_PATH', VENDOR_PATH . 'autoload.php');
-
-defined('BASEPATH') || define('BASEPATH', dirname(VENDOR_PATH) . DS);
-
-defined('ROOTPATH') || define('ROOTPATH', dirname(WEBROOT) . DS);
-
-/**
- * Chemin  vers le dossier des configurations
- */
-defined('CONFIG_PATH') || define('CONFIG_PATH', APP_PATH . 'Config' . DS);
-
-/**
- * Chemin  vers le dossier des controllers
- */
-defined('CONTROLLER_PATH') || define('CONTROLLER_PATH', APP_PATH . 'Controllers' . DS);
-
-/**
- * Chemin  vers le dossier des migrations de la base de donnees
- */
-defined('DB_MIGRATION_PATH') || define('DB_MIGRATION_PATH', APP_PATH . 'Database' . DS . 'Migrations' . DS);
-
-/**
- * Chemin  vers le dossier des entités
- */
-defined('ENTITY_PATH') || define('ENTITY_PATH', APP_PATH . 'Entities' . DS);
-
-/**
- * Chemin vers le dossier des helpers de l'application
- */
-defined('HELPER_PATH') || define('HELPER_PATH', APP_PATH . 'Helpers' . DS);
-
-/**
- * Chemin vers le dossier des helpers de l'application
- */
-defined('LIBRARY_PATH') || define('LIBRARY_PATH', APP_PATH . 'Libraries' . DS);
-
-/**
- * Chemin  vers le dossier des middlewares
- */
-defined('MIDDLEWARE_PATH') || define('MIDDLEWARE_PATH', APP_PATH . 'Middlewares' . DS);
-
-/**
- * Chemin  vers le dossier des modeles
- */
-defined('MODEL_PATH') || define('MODEL_PATH', APP_PATH . 'Models' . DS);
-
-/**
- * Chemin  vers le dossier des ressources applicative
- */
-defined('APP_RESOURCE_PATH') || define('APP_RESOURCE_PATH', APP_PATH . 'Resources' . DS);
-
-/**
- * Chemin  vers le dossier des ressources de base
- */
-defined('RESOURCE_PATH') || define('RESOURCE_PATH', BASEPATH . 'resources' . DS);
-
-/**
- * Chemin vers le dossier des vues
- */
-defined('VIEW_PATH') || define('VIEW_PATH', APP_PATH . 'Views' . DS);
-
-/**
- * Chemin vers le dossier de stockage des fichiers du framework
- */
-defined('FRAMEWORK_STORAGE_PATH') || define('FRAMEWORK_STORAGE_PATH', STORAGE_PATH . 'framework' . DS);
-
-/**
- * Chemin vers le dossier de stockage des fichiers de l'application
- */
-defined('APP_STORAGE_PATH') || define('APP_STORAGE_PATH', STORAGE_PATH . 'app' . DS);
-
-/**
- * Chemin vers le dossier de stockage des fichiers temporaires
- */
-defined('TEMP_PATH') || define('TEMP_PATH', FRAMEWORK_STORAGE_PATH . 'temp' . DS);
-
-/**
- * Chemin vers le dossier de cache des vues
- */
-defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', FRAMEWORK_STORAGE_PATH . 'cache' . DS);
-
-/**
- * Chemin vers le dossier des traductions
- */
-defined('LANG_PATH') || define('LANG_PATH', APP_RESOURCE_PATH . 'lang' . DS);
-
-/**
- * Chemin vers le dossier des logs
- */
-defined('LOG_PATH') || define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
-
-/**
- * Chemin vers le dossier des layouts
- */
-defined('LAYOUT_PATH') || define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
-
-if (! defined('SERVICE_PATH')) {
-    /**
-     * Services directory path
-     */
-    define('SERVICE_PATH', APP_PATH . 'services' . DS);
-}
-
-if (! defined('DATABASE_PATH')) {
-    /**
-     * Database storage directory path
-     */
-    define('DATABASE_PATH', STORAGE_PATH . 'database' . DS);
-}
-
-if (! defined('DB_SEED_PATH')) {
-    /**
-     * Database seeds storage path
-     */
-    define('DB_SEED_PATH', APP_RESOURCE_PATH . 'database' . DS . 'seeds' . DS);
-}
-
-if (! defined('DB_DUMP_PATH')) {
-    /**
-     * Database backup storage path
-     */
-    define('DB_DUMP_PATH', DATABASE_PATH . 'dump' . DS);
-}
-
-if (! defined('DB_CACHE_PATH')) {
-    /**
-     * Database cache directory path
-     */
-    define('DB_CACHE_PATH', DATABASE_PATH . 'cache' . DS);
-}
-
 /**
  * Cela définit l'espace de noms par défaut qui est utilisé dans BlitzPHP pour faire référence au répertoire de l'application.
  * Modifiez cette constante pour modifier l'espace de noms que toutes les classes d'application doivent utiliser.
@@ -150,19 +17,152 @@ if (! defined('DB_CACHE_PATH')) {
  */
 defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
 
+// Séparateur de répertoire du système d'exploitation.
 /**
- * Constantes de temps
+ * @var string Le séparateur de répertoire (e.g., '/' sur Unix, '\' sur Windows).
+ */
+defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+
+// Chemin vers l'autoloader Composer.
+/**
+ * @var string Chemin vers l'autoloader Composer.
+ */
+defined('COMPOSER_PATH') || define('COMPOSER_PATH', defined('VENDOR_PATH') ? VENDOR_PATH . 'autoload.php' : __DIR__ . '/../vendor/autoload.php');
+
+// Chemin racine du projet.
+/**
+ * @var string Chemin de base du projet.
+ */
+defined('BASEPATH') || define('BASEPATH', defined('VENDOR_PATH') ? dirname(VENDOR_PATH) . DS : __DIR__ . '/../');
+
+// Chemin racine de l'application (hors webroot).
+/**
+ * @var string Chemin racine de l'application.
+ */
+defined('ROOTPATH') || define('ROOTPATH', defined('WEBROOT') ? dirname(WEBROOT) . DS : BASEPATH);
+
+// Chemin vers le dossier public (exposé via web server).
+/**
+ * @var string Chemin vers le dossier public pour la sécurité.
+ */
+defined('PUBLIC_PATH') || define('PUBLIC_PATH', ROOTPATH . 'public' . DS);
+
+/**
+ * @var string Chemin vers le dossier des configurations
+ */
+defined('CONFIG_PATH') || define('CONFIG_PATH', APP_PATH . 'Config' . DS);
+
+/**
+ * @var string Chemin vers le dossier des controllers
+ */
+defined('CONTROLLER_PATH') || define('CONTROLLER_PATH', APP_PATH . 'Controllers' . DS);
+
+/**
+ * @var string Chemin vers le dossier des helpers de l'application
+ */
+defined('HELPER_PATH') || define('HELPER_PATH', APP_PATH . 'Helpers' . DS);
+
+/**
+ * @var string Chemin vers le dossier des middlewares
+ */
+defined('MIDDLEWARE_PATH') || define('MIDDLEWARE_PATH', APP_PATH . 'Middlewares' . DS);
+
+/**
+ * @var string Chemin  vers le dossier des ressources de base
+ */
+defined('RESOURCE_PATH') || define('RESOURCE_PATH', BASEPATH . 'resources' . DS);
+
+/**
+ * @var string Chemin vers le dossier des vues
+ */
+defined('VIEW_PATH') || define('VIEW_PATH', APP_PATH . 'Views' . DS);
+
+/**
+ * @var string Chemin vers le dossier des layouts
+ */
+defined('LAYOUT_PATH') || define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
+
+/**
+ * @var string Chemin vers le dossier de stockage des fichiers du framework
+ */
+defined('FRAMEWORK_STORAGE_PATH') || define('FRAMEWORK_STORAGE_PATH', STORAGE_PATH . 'framework' . DS);
+
+/**
+ * @var string Chemin vers le dossier de stockage des fichiers de l'application
+ */
+defined('APP_STORAGE_PATH') || define('APP_STORAGE_PATH', STORAGE_PATH . 'app' . DS);
+
+/**
+ * @var string Chemin vers le dossier de stockage des fichiers temporaires
+ */
+defined('TEMP_PATH') || define('TEMP_PATH', FRAMEWORK_STORAGE_PATH . 'temp' . DS);
+
+/**
+ * @var string Chemin vers le dossier de cache des vues
+ */
+defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', FRAMEWORK_STORAGE_PATH . 'cache' . DS);
+
+/**
+ * @var string Chemin vers le dossier des tests
+ */
+defined('TEST_PATH') || define('TEST_PATH', ROOTPATH . 'specs' . DS);
+
+/**
+ * @var string Chemin vers le dossier des logs
+ */
+defined('LOG_PATH') || define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
+
+/**
+ * Constantes de temps pour cache/sessions (en secondes)
  *
  * Fournissez des moyens simples de travailler avec la myriade de fonctions PHP qui nécessitent des informations en quelques secondes.
  */
+
+/**
+ * @var int Une seconde
+ */
 defined('SECOND') || define('SECOND', 1);
+
+/**
+ * @var int Une minute
+ */
 defined('MINUTE') || define('MINUTE', 60);
-defined('HOUR')   || define('HOUR', 3600);
-defined('DAY')    || define('DAY', 86400);
-defined('WEEK')   || define('WEEK', 604800);
-defined('MONTH')  || define('MONTH', 2592000);
-defined('YEAR')   || define('YEAR', 31536000);
+
+/**
+ * @var int Une heure
+ */
+defined('HOUR') || define('HOUR', 60 * MINUTE);
+
+/**
+ * @var int Un jour
+ */
+defined('DAY') || define('DAY', 24 * HOUR);
+
+/**
+ * @var int Une semaine
+ */
+defined('WEEK') || define('WEEK', 7 * DAY);
+
+/**
+ * @var int Un mois (30 jours)
+ */
+defined('MONTH') || define('MONTH', 30 * DAY);
+
+/**
+ * @var int Un trimestre (90 jours)
+ */
+defined('QUARTER') || define('QUARTER', 90 * DAY);
+
+/**
+ * @var int Un an
+ */
+defined('YEAR') || define('YEAR', 365 * DAY);
+
+/**
+ * @var int
+ */
 defined('DECADE') || define('DECADE', 315360000);
+
 
 /**
  * --------------------------------------------------------------------------
@@ -182,13 +182,53 @@ defined('DECADE') || define('DECADE', 315360000);
  * - BSD sysexits.h: http://www.gsp.com/cgi-bin/man.cgi?section=3&topic=sysexits
  * - Bash scripting: http://tldp.org/LDP/abs/html/exitcodes.html
  */
-defined('EXIT_SUCCESS')        || define('EXIT_SUCCESS', 0); // pas d'erreurs
-defined('EXIT_ERROR')          || define('EXIT_ERROR', 1); // erreur generique
-defined('EXIT_CONFIG')         || define('EXIT_CONFIG', 3); // erreur de configuration
-defined('EXIT_UNKNOWN_FILE')   || define('EXIT_UNKNOWN_FILE', 4); // fichier non trouvé
-defined('EXIT_UNKNOWN_CLASS')  || define('EXIT_UNKNOWN_CLASS', 5); // classe inconnue
-defined('EXIT_UNKNOWN_METHOD') || define('EXIT_UNKNOWN_METHOD', 6); // membre de classe inconnu
-defined('EXIT_USER_INPUT')     || define('EXIT_USER_INPUT', 7); // saisie utilisateur invalide
-defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8); // erreur de base de données
-defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9); // code d'erreur attribué automatiquement le plus bas
-defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // code d'erreur attribué automatiquement le plus élevé
+
+/**
+ * @var int Succès : pas d'erreurs
+ */
+defined('EXIT_SUCCESS') || define('EXIT_SUCCESS', 0);
+
+/**
+ * @var int Erreur générique
+ */
+defined('EXIT_ERROR') || define('EXIT_ERROR', 1);
+
+/**
+ * @var int Erreur de configuration
+ */
+defined('EXIT_CONFIG') || define('EXIT_CONFIG', 3);
+
+/**
+ * @var int Fichier non trouvé
+ */
+defined('EXIT_UNKNOWN_FILE') || define('EXIT_UNKNOWN_FILE', 4);
+
+/**
+ * @var int Classe inconnue
+ */
+defined('EXIT_UNKNOWN_CLASS') || define('EXIT_UNKNOWN_CLASS', 5);
+
+/**
+ * @var int Méthode inconnue
+ */
+defined('EXIT_UNKNOWN_METHOD') || define('EXIT_UNKNOWN_METHOD', 6);
+
+/**
+ * @var int Saisie utilisateur invalide
+ */
+defined('EXIT_USER_INPUT') || define('EXIT_USER_INPUT', 7);
+
+/**
+ * @var int Erreur de base de données
+ */
+defined('EXIT_DATABASE') || define('EXIT_DATABASE', 8);
+
+/**
+ * @var int Code d'erreur automatique minimum
+ */
+defined('EXIT__AUTO_MIN') || define('EXIT__AUTO_MIN', 9);
+
+/**
+ * @var int Code d'erreur automatique maximum
+ */
+defined('EXIT__AUTO_MAX') || define('EXIT__AUTO_MAX', 125);
