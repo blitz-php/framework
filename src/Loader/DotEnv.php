@@ -11,298 +11,398 @@
 
 namespace BlitzPHP\Loader;
 
+use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Traits\SingletonTrait;
 use InvalidArgumentException;
 
 /**
- * Environment-specific configuration
+ * Chargeur de variables d'environnement depuis fichiers .env.
+ *
+ * Supporte parsing avancé (nested, quotes, multiline), validation, et multi-files.
+ * Inspiré de phpdotenv.
  */
 class DotEnv
 {
     use SingletonTrait;
 
     /**
-     * Le répertoire où se trouve le fichier .env.
+     * Variables parsées (cache interne).
+     *
+     * @var array<string, string>
+     */
+    protected array $env = [];
+
+    /**
+     * Chemin du fichier principal.
      *
      * @var string
      */
-    protected $path;
+    protected string $path;
 
     /**
-     * Construit le chemin vers notre fichier.
+     * Cache TTL (secondes, 0=infini).
+     *
+     * @var int
+     */
+    protected int $cacheTtl = 300; // 5 min par défaut
+
+    /**
+     * Timestamp dernier load.
+     *
+     * @var int|null
+     */
+    protected ?int $lastLoad = null;
+
+    /**
+     * Constructeur privé (singleton).
+     *
+     * @param string $path Répertoire .env.
+     * @param string $file Nom fichier (défaut '.env').
      */
     private function __construct(string $path, string $file = '.env')
     {
         $this->path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
+        $this->env = []; // Init vide
     }
 
-    public static function init(string $path, string $file = '.env')
+    /**
+     * Initialise et charge (singleton).
+     *
+     * @param array<string> $overrides Fichiers supplémentaires (.env.local, etc.).
+     *
+	 * @throws LoadException Si fichiers illisibles.
+     */
+    public static function init(string $path, string $file = '.env', array $overrides = []): bool
     {
-        return self::instance($path, $file)->load();
+        return self::instance($path, $file)->load($overrides);
     }
 
     /**
      * Le point d'entrée principal chargera le fichier .env et le traitera
      * pour que nous nous retrouvions avec tous les paramètres dans l'environnement PHP vars
      * (c'est-à-dire getenv(), $_ENV et $_SERVER)
+     *
+     * @param array<string> $overrides Fichiers extra.
      */
-    public function load(): bool
+    public function load(array $overrides = []): bool
     {
-        return $this->parse() !== null;
+        if ($this->isCached()) {
+            return true; // Cache hit
+        }
+
+        $this->env = []; // Reset
+
+        // Charge principal
+        if (!$this->parseFile($this->path)) {
+            return false;
+        }
+
+        // Overrides (merge, last wins)
+        foreach ($overrides as $overrideFile) {
+            $overridePath = dirname($this->path) . DIRECTORY_SEPARATOR . $overrideFile;
+            $this->parseFile($overridePath);
+        }
+
+        $this->syncEnv(); // Sync globals
+        $this->lastLoad = time();
+
+        return true;
     }
 
     /**
+     * Recharge (ignore cache).
+     *
+     * @param list<string> $overrides Fichiers extra
+     */
+    public function reload(array $overrides = []): bool
+    {
+        $this->lastLoad = null;
+
+        return $this->load($overrides);
+    }
+
+	/**
      * Remplace les valeurs dans le fichiers .env
      *
      * Si une valeur n'existe pas, elle est ajoutée au fichier
+     *
+     * @deprecated use self::update() instead
      */
     public function replace(array $data, bool $reload = true): bool
     {
-        $oldFileContents = (string) file_get_contents($this->path);
-
-        foreach ($data as $key => $value) {
-            $replacementKey = "\n{$key} = {$value}";
-            if (! str_contains($oldFileContents, $key)) {
-                if (file_put_contents($this->path, $replacementKey, FILE_APPEND) === false) {
-                    return false;
-                }
-                unset($data[$key]);
-            }
-        }
-
-        if ($data === []) {
-            if ($reload) {
-                return $this->load();
-            }
-
-            return true;
-        }
-
+        // OPTIM: Délégue à update pour cohérence et robustesse
         return $this->update($data, $reload);
     }
 
     /**
-     * Modifie les valeurs dans le fichiers .env
+     * Modifie les valeurs dans le fichier .env
+     *
+     * @param array<string, string> $data Données à updater
      */
-    public function update(array $data = [], bool $reload = true): bool
+    public function update(array $data, bool $reload = true): bool
     {
-        foreach ($data as $key => $value) {
-            if (env($key) === $value) {
-                unset($data[$key]);
-            }
-        }
-
         if ($data === []) {
             return false;
         }
 
-        // ecrit seulement si il y'a des changements dans le contenu
+        $content = file_get_contents($this->path);
+        if ($content === false) {
+            return false;
+        }
 
-        $env = file_get_contents($this->path);
-        $env = explode("\n", $env);
+        $lines   = explode("\n", $content);
+        $updated = false;
 
-        foreach ((array) $data as $key => $value) {
-            foreach ($env as $env_key => $env_value) {
-                $entry = explode('=', $env_value, 2);
-                $entry = array_map('trim', $entry);
-                if ($entry[0] === $key || $entry[0] === '# ' . $key) {
-                    $env[$env_key] = $key . '=' . (is_string($value) ? '"' . $value . '"' : $value);
-                } else {
-                    $env[$env_key] = $env_value;
-                }
+        $keyMap = [];
+        foreach ($lines as $i => $line) {
+            $trimmed = trim($line);
+            if (empty($trimmed) || str_starts_with($trimmed, '#')) {
+                continue;
+            }
+            if (preg_match('/^\s*([A-Za-z0-9_.-]+)\s*=\s*(.*)$/u', $trimmed, $matches)) {
+                $key          = $matches[1];
+                $keyMap[$key] = $i; // Index pour update
             }
         }
 
-        $env = implode("\n", $env);
-        file_put_contents($this->path, $env);
+        // Update ou add
+        foreach ($data as $key => $value) {
+            $entry = $key . '=' . (is_string($value) ? '"' . $value . '"' : $value);
+            if (isset($keyMap[$key])) {
+                // Update ligne existante (gère comments)
+                $lineIndex = $keyMap[$key];
+                $lines[$lineIndex] = $entry;
+                $updated = true;
+            } else {
+                // Add à la fin
+                $lines[] = $entry;
+                $updated = true;
+            }
+        }
+
+        if ($updated) {
+            $content = implode("\n", $lines) . "\n"; // Ajout \n final
+            if (file_put_contents($this->path, $content, LOCK_EX) === false) { // LOCK_EX pour atomicité
+                return false;
+            }
+
+            chmod($this->path, 0600); // chmod pour sécurité
+        }
 
         if ($reload) {
-            return $this->load();
+            return $this->reload();
         }
 
         return true;
     }
 
     /**
-     * Parse le fichier .env file dans un tableau de cle => valeur
+     * Parse un fichier .env.
+     *
+     * @throws LoadException Si illisible/malformed.
      */
-    public function parse(): ?array
+    protected function parseFile(string $filePath): bool
     {
-        // Nous ne voulons pas imposer la présence d'un fichier .env, ils devraient être facultatifs.
-        if (! is_file($this->path)) {
-            return null;
+        if (!is_readable($filePath)) {
+            if (!file_exists($filePath)) {
+                return false; // Optionnel
+            }
+            throw new LoadException("Fichier .env '{$filePath}' non lisible.");
         }
 
-        // Assurez-vous que le fichier est lisible
-        if (! is_readable($this->path)) {
-            throw new InvalidArgumentException("Le fichier `.env` est n'est pas lisible: {$this->path}");
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new LoadException("Impossible de lire '{$filePath}'.");
         }
 
-        $vars = [];
+        $lines     = explode("\n", $content);
+        $parsed    = $this->parseLines($lines); //Two-pass : d'abord parse, puis resolve nested après tout collecté
+        $this->env = array_merge($this->env, $parsed);
 
-        $lines = file($this->path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        // Resolve nested après tout parsing (pour deep nesting)
+        foreach ($this->env as $key => $value) {
+            $this->env[$key] = $this->resolveNestedVariables($value, true); // true pour itératif
+        }
+
+        return true;
+    }
+
+    /**
+     * Parse lignes en vars.
+     *
+     * @param list<string> $lines Lignes du fichier
+	 *
+     * @return array<string, string>
+	 *
+     * @throws InvalidArgumentException Si malformed (e.g., unclosed quote).
+     */
+    protected function parseLines(array $lines): array
+    {
+        $result         = [];
+        $inMultiline    = false;
+        $multilineKey   = '';
+        $multilineValue = '';
 
         foreach ($lines as $line) {
-            // C'est un commentaire?
-            if (str_starts_with(trim($line), '#')) {
+            $line = trim($line);
+            if (empty($line) || str_starts_with($line, '#')) {
+                continue; // Skip empty/comments
+            }
+
+            if ($inMultiline) {
+                // Fin multiline ? Multiline standard dotenv : utilise quotes ou indent ; ici, fin sur ligne vide ou # après |
+                if (empty($line) || str_starts_with($line, '#') || str_starts_with($line, 'END')) {
+                    $result[$multilineKey] = trim($multilineValue);
+                    $inMultiline = false;
+                    continue;
+                }
+                $multilineValue .= "\n" . $line;
                 continue;
             }
 
-            // S'il y a un signe égal, alors nous savons que nous affectons une variable.
-            if (str_contains($line, '=')) {
-                [$name, $value] = $this->normaliseVariable($line);
-                $vars[$name]    = $value;
-                $this->setVariable($name, $value);
+            // Regex pour = dans value et comments
+            if (preg_match('/^\s*([A-Za-z0-9_.-]+)\s*=\s*(.*)$/u', $line, $matches)) {
+                $key = $matches[1];
+                $value = $matches[2];
+
+                // Trim quotes si présentes (gère escaped quotes)
+                if (preg_match('/^"(.*)"$/s', $value, $q)) {
+                    $value = str_replace('\\"', '"', $q[1]); // Unescape
+                } elseif (preg_match("/^'(.*)'$/s", $value, $q)) {
+                    $value = str_replace("\\'", "'", $q[1]);
+                }
+
+                // Escaped chars
+                $value = str_replace(['\\n', '\\t', '\\\\'], ["\n", "\t", '\\'], $value);
+
+                // Multiline : si value starts with | (folded) ou > (literal)
+                if (str_starts_with(rtrim($value), '|') || str_starts_with(rtrim($value), '>')) {
+                    $multilineKey = $key;
+                    $multilineValue = substr(rtrim($value), 1); // Enlève | ou >
+                    $inMultiline = true;
+                    continue;
+                }
+
+                $result[$key] = $value;
+            } else {
+                throw new InvalidArgumentException("Ligne malformée : {$line}");
             }
         }
 
-        return $vars;
+        // Fermeture multiline si pending
+        if ($inMultiline) {
+            $result[$multilineKey] = trim($multilineValue);
+        }
+
+        return $result;
     }
 
     /**
-     * Définit la variable dans l'environnement. Analysera la chaîne
-     * premier à rechercher le modèle {name}={value}, assurez-vous que imbriqué
-     * les variables sont gérées et débarrassées des guillemets simples et doubles.
-     */
-    protected function setVariable(string $name, string $value = '')
-    {
-        if (! getenv($name, true)) {
-            putenv("{$name}={$value}");
-        }
-        if (empty($_ENV[$name])) {
-            $_ENV[$name] = $value;
-        }
-        if (empty($_SERVER[$name])) {
-            $_SERVER[$name] = $value;
-        }
-    }
-
-    /**
-     * Analyse l'affectation, nettoie le $name et la $value, et s'assure
-     * que les variables imbriquées sont gérées.
-     */
-    public function normaliseVariable(string $name, string $value = ''): array
-    {
-        // Divisez notre chaîne composée en ses parties.
-        if (str_contains($name, '=')) {
-            [$name, $value] = explode('=', $name, 2);
-        }
-
-        $name  = trim($name);
-        $value = trim($value);
-
-        // Assainir le nom
-        $name = preg_replace('/^export[ \t]++(\S+)/', '$1', $name);
-        $name = str_replace(['\'', '"'], '', $name);
-
-        // Assainir la valeur
-        $value = $this->sanitizeValue($value);
-        $value = $this->resolveNestedVariables($value);
-
-        return [$name, $value];
-    }
-
-    /**
-     * Supprime les guillemets de la valeur de la variable d'environnement.
+     * Résout variables nested (${VAR}). Itératif pour deep nesting.
      *
-     * Ceci a été emprunté à l'excellent phpdotenv avec très peu de modifications.
-     * https://github.com/vlucas/phpdotenv
-     *
-     * @throws InvalidArgumentException
+     * @param string $value Valeur à résoudre
+     * @param bool $iterative Itératif ?
+	 *
+     * @return string Résolue
      */
-    protected function sanitizeValue(string $value): string
+    protected function resolveNestedVariables(string $value, bool $iterative = false): string
     {
-        if ($value === '' || $value === '0') {
+        if (!str_contains($value, '${')) {
             return $value;
         }
 
-        // Commence-t-il par une citation ?
-        if (strpbrk($value[0], '"\'') !== false) {
-            // la valeur commence par un guillemet
-            $quote = $value[0];
-
-            $regexPattern = sprintf(
-                '/^
-                %1$s          # match a quote at the start of the value
-                (             # capturing sub-pattern used
-                 (?:          # we do not need to capture this
-                 [^%1$s\\\\] # any character other than a quote or backslash
-                 |\\\\\\\\   # or two backslashes together
-                 |\\\\%1$s   # or an escaped quote e.g \"
-                 )*           # as many characters that match the previous rules
-                )             # end of the capturing sub-pattern
-                %1$s          # and the closing quote
-                .*$           # and discard any string after the closing quote
-                /mx',
-                $quote,
-            );
-
-            $value = preg_replace($regexPattern, '$1', $value);
-            $value = str_replace("\\{$quote}", $quote, $value);
-            $value = str_replace('\\\\', '\\', $value);
-        } else {
-            $parts = explode(' #', $value, 2);
-            $value = trim($parts[0]);
-
-            // Les valeurs sans guillemets ne peuvent pas contenir d'espaces
-            if (preg_match('/\s+/', $value) > 0) {
-                throw new InvalidArgumentException('Les valeurs du fichier `.env` contenant des espaces doivent être entourées de guillemets.');
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * Résolvez les variables imbriquées.
-     *
-     * Recherchez les modèles ${varname} dans la valeur de la variable et remplacez-les par un existant
-     * variables d'environnement.
-     *
-     * Ceci a été emprunté à l'excellent phpdotenv avec très peu de modifications.
-     * https://github.com/vlucas/phpdotenv
-     */
-    protected function resolveNestedVariables(string $value): string
-    {
-        if (str_contains($value, '$')) {
+        $original = $value;
+        do {
             $value = preg_replace_callback(
-                '/\${([a-zA-Z0-9_\.]+)}/',
-                function ($matchedPatterns) {
-                    $nestedVariable = $this->getVariable($matchedPatterns[1]);
-
-                    if ($nestedVariable === null) {
-                        return $matchedPatterns[0];
-                    }
-
-                    return $nestedVariable;
+                '/\$\{([a-zA-Z0-9_\.-]+)\}/', // Non-greedy, . autorisé
+                function ($matches) {
+                    $var = $this->getVariable($matches[1]);
+                    return $var ?? $matches[0]; // Garde literal si null
                 },
-                $value,
+                $value
             );
-        }
+        } while ($iterative && $value !== $original && str_contains($value, '${'));
 
         return $value;
     }
 
     /**
-     * Rechercher les différents endroits pour les variables d'environnement et renvoyer la première valeur trouvée.
-     *
-     * Ceci a été emprunté à l'excellent phpdotenv avec très peu de modifications.
-     * https://github.com/vlucas/phpdotenv
+     * Obtient variable depuis sources.
      */
     protected function getVariable(string $name): ?string
     {
-        switch (true) {
-            case array_key_exists($name, $_ENV):
-                return $_ENV[$name];
+		$value = $_ENV[$name] ?? $_SERVER[$name] ?? $this->env[$name] ?? null;
 
-            case array_key_exists($name, $_SERVER):
-                return $_SERVER[$name];
+		// getenv() retourne false si la variable n'existe pas, donc il faut la traiter differement
+    	if (null === $value && false !== $envValue = getenv($name)) {
+			$value = $envValue;
+		}
 
-            default:
-                $value = getenv($name);
+    	return $value !== null ? $value : null;
+    }
 
-                // passe la valeur par défaut de getenv à null
-                return $value === false ? null : $value;
+    /**
+     * Sync parsed vers globals.
+     */
+    protected function syncEnv(): void
+    {
+        foreach ($this->env as $name => $value) {
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
+            putenv("{$name}={$value}");
         }
+    }
+
+    /**
+     * Définit/override variable (résout nested).
+     *
+     * @param string $name Nom valide (A-Z0-9_.-).
+	 *
+     * @throws InvalidArgumentException Si name invalide.
+     */
+    public function setValue(string $name, string $value): void
+    {
+        if (!preg_match('/^[A-Za-z0-9_.-]+$/', $name)) {
+            throw new InvalidArgumentException("Nom invalide : {$name}");
+        }
+
+        $value = $this->resolveNestedVariables($value, true);
+        $this->env[$name] = $value;
+        $this->syncEnv(); // Sync immédiat
+        $this->lastLoad = null; // Invalide cache
+    }
+
+    /**
+     * Valide required vars.
+     *
+     * @param array<string> $required Vars requises
+	 *
+     * @throws LoadException Si manquante.
+     */
+    public function validate(array $required): void
+    {
+        foreach ($required as $var) {
+            if (!isset($this->env[$var]) || $this->env[$var] === '') {
+                throw new LoadException("Variable requise manquante : {$var}");
+            }
+        }
+    }
+
+    /**
+     * Cache valide ?
+     */
+    protected function isCached(): bool
+    {
+        return $this->lastLoad !== null && (time() - $this->lastLoad) < $this->cacheTtl;
+    }
+
+    /**
+     * Export vars parsées.
+     *
+     * @return array<string, string>
+     */
+    public function export(): array
+    {
+        return $this->env;
     }
 }

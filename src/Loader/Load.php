@@ -11,100 +11,148 @@
 
 namespace BlitzPHP\Loader;
 
-use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Exceptions\LoadException;
 
+/**
+ * Facade pour chargement de ressources (helpers, models, etc.).
+ *
+ * Gère cache statique par module.
+ */
 class Load
 {
     /**
-     * Liste des elements deja chargés,
+     * Éléments déjà chargés (module → [element → value]).
      * Si un element est deja chargé, on le renvoie simplement sans avoir besoin de le construire à nouveau
+     *
+     * @var array<string, array<string, bool|array|string>>
      */
-    private static array $loads = [
-        'controllers' => [],
-        'helpers'     => [],
-        'langs'       => [],
-        'libraries'   => [],
-        'models'      => [],
-    ];
+    private static array $loaded = [];
 
     /**
-     * Charge un fichier d'aide
+     * Charge helpers
      *
-     * @throws LoadException
+     * @param list<string>|string $helpers Noms.
+	 *
+     * @throws LoadException Si empty/invalide.
      */
-    public static function helper(array|string $helpers)
+    public static function helper(array|string $helpers): void
     {
         if ($helpers === '' || $helpers === '0' || $helpers === []) {
-            throw new LoadException('Veuillez specifier le helper à charger');
+            throw new LoadException('Veuillez spécifier le helper à charger.');
         }
 
-        $helpers = (array) $helpers;
-
-        foreach ($helpers as $helper) {
-            FileLocator::helper($helper);
-        }
-    }
-
-    /**
-     * Charge un modele
-     *
-     * @return list<object>|object
-     *
-     * @throws LoadException
-     */
-    public static function model(array|string $model, ?ConnectionInterface $connection = null)
-    {
-        if ($model === '' || $model === '0' || $model === []) {
-            throw new LoadException('Veuillez specifier le modele à charger');
-        }
-
-        if (is_array($model)) {
-            $models = [];
-
-            foreach ($model as $value) {
-                $models[] = self::model($value, $connection);
+       foreach ((array) $helpers as $helper) {
+            $helper = trim($helper);
+            if (empty($helper)) {
+                continue;
             }
-
-            return $models;
+            if (! self::isLoaded('helper', $helper)) {
+                FileLocator::helper($helper);
+                self::loaded('helper', $helper, true);
+            }
         }
-
-        if (! self::isLoaded('models', $model)) {
-            self::loaded('models', $model, FileLocator::model($model, $connection));
-        }
-
-        return self::getLoaded('models', $model);
     }
 
     /**
-     * Verifie si un element est chargé dans la liste des modules
+     * Charge config (wrap FileLocator, cache result)
+     *
+     * @return array<string, mixed>
      */
-    private static function isLoaded(string $module, string $element): bool
+    public static function config(string $name): array
     {
-        if (! isset(self::$loads[$module]) || ! is_array(self::$loads[$module])) {
+        if (! self::isLoaded('config', $name)) {
+            $config = FileLocator::config($name);
+            self::loaded('config', $name, $config);
+        }
+
+        return self::getLoaded('config', $name);
+    }
+
+    /**
+     * Charge view (wrap, cache path)
+     *
+     * @return string|false
+	 *
+     * @throws \BlitzPHP\Exceptions\ViewException
+     */
+    public static function view(string $name)
+    {
+        if (! self::isLoaded('view', $name)) {
+            $path = FileLocator::view($name);
+            self::loaded('view', $name, $path);
+        }
+
+        return self::getLoaded('view', $name);
+    }
+
+    /**
+     * Décharge élément.
+     */
+    public static function unload(string $module, string|object $element): void
+    {
+        $key = is_object($element) ? get_class($element) : $element;
+
+        unset(self::$loaded[$module][$key]);
+    }
+
+    /**
+     * Décharge tout pour un module.
+     *
+     * @param string $module Module optionnel (all si vide)
+     */
+    public static function unloadAll(?string $module = null): void
+    {
+		if ($module && isset(self::$loaded[$module])) {
+            self::$loaded[$module] = [];
+        } else {
+            self::$loaded = [];
+        }
+    }
+
+    /**
+     * Vérifie si un élément est chargé dans la liste des modules.
+     * Gère objects comme string keys.
+     */
+    protected static function isLoaded(string $module, string|object $element): bool
+    {
+        if (!isset(self::$loaded[$module]) || !is_array(self::$loaded[$module])) {
             return false;
         }
 
-        return in_array($element, self::$loads[$module], true);
+        $key = is_object($element) ? get_class($element) : $element;
+
+        return isset(self::$loaded[$module][$key]);
     }
 
     /**
-     * Ajoute un element aux elements chargés
+     * Ajoute un element aux elements chargés.
      *
-     * @param mixed $value
+     * @param bool|array|string $value Valeur (ou true pour helpers)
      */
-    private static function loaded(string $module, string $element, $value = null): void
+    protected static function loaded(string $module, string|object $element, bool|array|string $value): void
     {
-        self::$loads[$module][$element] = $value;
+        $key = is_object($element) ? get_class($element) : $element;
+
+        if (! isset(self::$loaded[$module])) {
+            self::$loaded[$module] = [];
+        }
+
+        self::$loaded[$module][$key] = $value;
     }
 
     /**
-     * Renvoie un element chargé
+     * Renvoie un élément chargé.
      *
-     * @return mixed
+     * @return bool|array|string|null
      */
-    private static function getLoaded(string $module, string $element)
+    protected static function getLoaded(string $module, string|object $element): mixed
     {
-        return self::$loads[$module][$element] ?? null;
+        $key = is_object($element) ? get_class($element) : $element;
+
+        if (! isset(self::$loaded[$module])) {
+            self::$loaded[$module] = [];
+        }
+
+        return self::$loaded[$module][$key] ?? null;
     }
 }

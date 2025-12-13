@@ -99,7 +99,7 @@ describe('Commandes / GenerateKey', function (): void {
         command('key:generate');
 
         expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
-        expect(file_get_contents($this->envPath))->toBe("\nencryption.key = " . env('encryption.key'));
+        expect(file_get_contents($this->envPath))->toBe("\nencryption.key=\"" . env('encryption.key') . "\"\n");
     });
 
     it(': Clé générée lorsque la nouvelle clé hexadécimale est ensuite commentée', function (): void {
@@ -107,8 +107,8 @@ describe('Commandes / GenerateKey', function (): void {
         $key = env('encryption.key', '');
 
         file_put_contents($this->envPath, str_replace(
-            'encryption.key = ' . $key,
-            '# encryption.key = ' . $key,
+            'encryption.key="' . $key . '"',
+            '# encryption.key="' . $key . '"',
             file_get_contents($this->envPath),
             $count
         ));
@@ -126,8 +126,8 @@ describe('Commandes / GenerateKey', function (): void {
         $key = env('encryption.key', '');
 
         file_put_contents($this->envPath, str_replace(
-            'encryption.key = ' . $key,
-            '# encryption.key = ' . $key,
+            'encryption.key="' . $key . '"',
+            '# encryption.key="' . $key . '"',
             file_get_contents($this->envPath),
             $count
         ));
