@@ -21,7 +21,6 @@ use BlitzPHP\Config\Config;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Contracts\Container\ContainerInterface;
-use BlitzPHP\Contracts\Database\ConnectionResolverInterface;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Mail\MailerInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
@@ -52,13 +51,9 @@ use BlitzPHP\Security\Encryption\Encryption;
 use BlitzPHP\Security\Hashing\Hasher;
 use BlitzPHP\Session\Cookie\Cookie;
 use BlitzPHP\Session\Cookie\CookieManager;
-use BlitzPHP\Session\Handlers\Database as DatabaseSessionHandler;
-use BlitzPHP\Session\Handlers\Database\MySQL as MySQLSessionHandler;
-use BlitzPHP\Session\Handlers\Database\Postgre as PostgreSessionHandler;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Helpers;
-use BlitzPHP\Utilities\String\Text;
 use BlitzPHP\View\Components\ComponentLoader;
 use BlitzPHP\View\View;
 use Psr\Http\Message\UriInterface;
@@ -79,51 +74,8 @@ use stdClass;
  * est que les IDE sont capables de déterminer quelle classe vous appelez
  * alors qu'avec les conteneurs DI, il n'y a généralement aucun moyen pour eux de le faire.
  */
-class Services
+class Services extends BaseServices
 {
-    /**
-     * Cache des instances des services demander comme instance "partagee".
-     * La cle est le FQCN du service.
-     */
-    protected static array $instances = [];
-
-    /**
-     * Objets simulés à tester qui sont renvoyés s'ils existent.
-     */
-    protected static array $mocks = [];
-
-    /**
-     * Cache d'autres classe de que nous avons trouver via la methode cacheService.
-     */
-    protected static array $services = [];
-
-    /**
-     * Avons-nous déjà découvert d'autres Services ?
-     */
-    protected static bool $discovered = false;
-
-    /**
-     * Un cache des noms de classes de services trouvés.
-     *
-     * @var list<string>
-     */
-    private static array $serviceNames = [];
-
-    /**
-     * La classe Autoloader permet de charger les fichiers simplement.
-     */
-    public static function autoloader(bool $shared = true): Autoloader
-    {
-        if (true === $shared && isset(static::$instances[Autoloader::class])) {
-            return static::$instances[Autoloader::class];
-        }
-
-        $config  = static::config()->get('autoload');
-        $helpers = array_merge(['url'], ($config['helpers'] ?? []));
-
-        return static::$instances[Autoloader::class] = new Autoloader(/** @scrutinizer ignore-type */ $config, $helpers);
-    }
-
     /**
      * La classe de cache fournit un moyen simple de stocker et de récupérer
      * données complexes pour plus tard
@@ -132,20 +84,15 @@ class Services
      */
     public static function cache(?array $config = null, bool $shared = true): CacheInterface
     {
+		if ($shared) {
+			return static::sharedInstance('cache', $config);
+		}
+
         if ($config === null || $config === []) {
-            $config = static::config()->get('cache');
+            $config = static::get('config')->get('cache');
         }
 
-        if (true === $shared && isset(static::$instances[Cache::class])) {
-            $instance = static::$instances[Cache::class];
-            if (empty(func_get_args()[0])) {
-                return $instance;
-            }
-
-            return $instance->setConfig($config);
-        }
-
-        return static::$instances[Cache::class] = new Cache($config);
+		return new Cache($config);
     }
 
     /**
@@ -154,11 +101,11 @@ class Services
      */
     public static function componentLoader(bool $shared = true): ComponentLoader
     {
-        if (true === $shared && isset(static::$instances[ComponentLoader::class])) {
-            return static::$instances[ComponentLoader::class];
-        }
+		if ($shared) {
+			return static::sharedInstance('componentLoader');
+		}
 
-        return static::$instances[ComponentLoader::class] = new ComponentLoader(static::cache());
+        return new ComponentLoader(static::get('cache'));
     }
 
     /**
@@ -166,11 +113,11 @@ class Services
      */
     public static function config(bool $shared = true): Config
     {
-        if (true === $shared && isset(static::$instances[Config::class])) {
-            return static::$instances[Config::class];
+        if ($shared) {
+            return static::sharedInstance('config');
         }
 
-        return static::$instances[Config::class] = new Config();
+        return new Config();
     }
 
     /**
@@ -180,11 +127,11 @@ class Services
      */
     public static function container(bool $shared = true): ContainerInterface
     {
-        if (true === $shared && isset(static::$instances[Container::class])) {
-            return static::$instances[Container::class];
-        }
+        if ($shared) {
+			return static::sharedInstance('container');
+		}
 
-        return static::$instances[Container::class] = new Container();
+        return new Container();
     }
 
     /**
@@ -194,13 +141,13 @@ class Services
      */
     public static function cookie(bool $shared = true): CookieManagerInterface
     {
-        if (true === $shared && isset(static::$instances[CookieManager::class])) {
-            return static::$instances[CookieManager::class];
+        if ($shared) {
+            return static::sharedInstance('cookie');
         }
 
-        $config = (object) static::config()->get('cookie');
+        $config = (object) static::get('config')->get('cookie');
 
-        return static::$instances[CookieManager::class] = (new CookieManager())->setDefaultPathAndDomain(
+        return (new CookieManager())->setDefaultPathAndDomain(
             $config->path ?: '/',
             $config->domain ?: '',
             $config->secure ?: false,
@@ -214,11 +161,11 @@ class Services
      */
     public static function emitter(bool $shared = true): ResponseEmitter
     {
-        if (true === $shared && isset(static::$instances[ResponseEmitter::class])) {
-            return static::$instances[ResponseEmitter::class];
+        if ($shared) {
+            return static::sharedInstance('emitter');
         }
 
-        return static::$instances[ResponseEmitter::class] = new ResponseEmitter();
+        return new ResponseEmitter();
     }
 
     /**
@@ -228,16 +175,19 @@ class Services
      */
     public static function encrypter(?array $config = null, bool $shared = false): EncrypterInterface
     {
-        if (true === $shared && isset(static::$instances[Encryption::class])) {
-            return static::$instances[Encryption::class];
+		if ($shared) {
+			return static::sharedInstance('encrypter', $config);
+		}
+
+		if ($config === null || $config === []) {
+            $config = static::get('config')->get('encryption');
         }
 
-        $config ??= config('encryption');
         $config     = (object) $config;
         $encryption = new Encryption($config);
         $encryption->initialize($config);
 
-        return static::$instances[Encryption::class] = $encryption;
+        return $encryption;
     }
 
     /**
@@ -247,11 +197,11 @@ class Services
      */
     public static function event(bool $shared = true): EventManagerInterface
     {
-        if (true === $shared && isset(static::$instances[EventManager::class])) {
-            return static::$instances[EventManager::class];
-        }
+		if ($shared) {
+			return static::sharedInstance('event');
+		}
 
-        return static::$instances[EventManager::class] = new EventManager();
+		return new EventManager();
     }
 
     /**
@@ -259,11 +209,11 @@ class Services
      */
     public static function fs(bool $shared = true): Filesystem
     {
-        if (true === $shared && isset(static::$instances[Filesystem::class])) {
-            return static::$instances[Filesystem::class];
-        }
+		if ($shared) {
+			return static::sharedInstance('fs');
+		}
 
-        return static::$instances[Filesystem::class] = new Filesystem();
+		return new Filesystem();
     }
 
     /**
@@ -273,48 +223,19 @@ class Services
      */
     public static function hashing(?array $config = null, bool $shared = true): HasherInterface
     {
-        if (true === $shared && isset(static::$instances[Hasher::class])) {
-            return static::$instances[Hasher::class];
+		if ($shared) {
+			return static::sharedInstance('hashing', $config);
+		}
+
+		if ($config === null || $config === []) {
+            $config = static::get('config')->get('hashing');
         }
 
-        $config ??= config('hashing');
         $config = (object) $config;
         $hasher = new Hasher($config);
         $hasher->initialize($config);
 
-        return static::$instances[Hasher::class] = $hasher;
-    }
-
-    /**
-     * Responsable du chargement des traductions des chaînes de langue.
-     *
-     * @deprecated 0.9 use translators instead
-     */
-    public static function language(?string $locale = null, bool $shared = true): Translate
-    {
-        return static::translator($locale, $shared);
-    }
-
-    /**
-     * Le file locator fournit des methodes utilitaire pour chercher les fichiers non-classes dans les dossiers de namespace.
-     * C'est une excelente methode pour charger les 'vues', 'helpers', et 'libraries'.
-     */
-    public static function locator(bool $shared = true): LocatorInterface
-    {
-        if ($shared) {
-            if (! isset(static::$instances[Locator::class])) {
-                $locator = new Locator(static::autoloader());
-                if (true === config('optimize.locator_cache_enabled', false)) {
-                    static::$instances[Locator::class] = new LocatorCached($locator, new FileVarExportHandler(FRAMEWORK_STORAGE_PATH . 'cache'));
-                } else {
-                    static::$instances[Locator::class] = $locator;
-                }
-            }
-
-            return static::$instances[Locator::class];
-        }
-
-        return static::$instances[Locator::class] = new Locator(static::autoloader());
+        return $hasher;
     }
 
     /**
@@ -325,11 +246,11 @@ class Services
      */
     public static function logger(bool $shared = true): LoggerInterface
     {
-        if ($shared && isset(static::$instances[Logger::class])) {
-            return static::$instances[Logger::class];
+        if ($shared) {
+            return static::sharedInstance('logger');
         }
 
-        return static::$instances[Logger::class] = new Logger();
+        return new Logger();
     }
 
     /**
@@ -339,42 +260,30 @@ class Services
      */
     public static function mail(?array $config = null, bool $shared = true): MailerInterface
     {
+		if ($shared) {
+			return static::sharedInstance('mail', $config);
+		}
+
         if ($config === null || $config === []) {
-            $config = static::config()->get('mail');
+            $config = static::get('config')->get('mail');
         }
 
-        if (true === $shared && isset(static::$instances[Mail::class])) {
-            /** @var Mail $instance */
-            $instance = static::$instances[Mail::class];
-            if (empty(func_get_args()[0])) {
-                return $instance;
-            }
-
-            return $instance->merge($config);
-        }
-
-        return static::$instances[Mail::class] = new Mail($config);
+		return new Mail($config);
     }
 
     /**
-     * La classe Input générale modélise une requête HTTP.
+     * La classe Negotiator fournit les fonctionnalités de négociation de contenu permettant de traiter
+	 * la requête afin de déterminer la langue, l'encodage, le jeu de caractères et d'autres éléments appropriés.
      */
     public static function negotiator(?ServerRequest $request = null, bool $shared = true): Negotiator
     {
-        if ($request === null) {
-            $request = static::request(true);
-        }
+		if ($shared) {
+			return static::sharedInstance('negotiator', $request);
+		}
 
-        if (true === $shared && isset(static::$instances[Negotiator::class])) {
-            $instance = static::$instances[Negotiator::class];
-            if (empty(func_get_args()[0])) {
-                return $instance;
-            }
+		$request ??= static::get('request');
 
-            return $instance->setRequest($request);
-        }
-
-        return static::$instances[Negotiator::class] = new Negotiator($request);
+        return new Negotiator($request);
     }
 
     /**
@@ -382,11 +291,11 @@ class Services
      */
     public static function redirection(bool $shared = true): Redirection
     {
-        if (true === $shared && isset(static::$instances[Redirection::class])) {
-            return static::$instances[Redirection::class];
-        }
+		if ($shared) {
+			return static::sharedInstance('redirection');
+		}
 
-        return static::$instances[Redirection::class] = new Redirection(static::factory(UrlGenerator::class));
+        return new Redirection(static::factory(UrlGenerator::class));
     }
 
     /**
@@ -394,11 +303,11 @@ class Services
      */
     public static function request(bool $shared = true): Request
     {
-        if (true === $shared && isset(static::$instances[Request::class])) {
-            return static::$instances[Request::class];
+        if ($shared) {
+            return static::sharedInstance('request');
         }
 
-        return static::$instances[Request::class] = ServerRequestFactory::fromGlobals();
+        return ServerRequestFactory::fromGlobals();
     }
 
     /**
@@ -406,23 +315,26 @@ class Services
      */
     public static function response(bool $shared = true): Response
     {
-        if (true === $shared && isset(static::$instances[Response::class])) {
-            return static::$instances[Response::class];
+        if ($shared) {
+            return static::sharedInstance('response');
         }
 
-        return static::$instances[Response::class] = new Response();
+        return new Response();
     }
 
     /**
      * CacheResponse
      */
-    public static function responsecache(bool $shared = true): ResponseCache
+    public static function responsecache(?CacheInterface $cache = null, array|bool $cacheQueryString = false, bool $shared = true): ResponseCache
     {
-        if (true === $shared && isset(static::$instances[ResponseCache::class])) {
-            return static::$instances[ResponseCache::class];
+        if ($shared) {
+            return static::sharedInstance('responsecache', $cache, $cacheQueryString);
         }
 
-        return static::$instances[ResponseCache::class] = new ResponseCache(static::cache(), /** @scrutinizer ignore-type */ static::config()->get('cache.cache_query_string'));
+		$cache ??= static::get('cache');
+		$cacheQueryString ??= static::get('config')->get('cache.cache_query_string');
+
+        return new ResponseCache($cache, /** @scrutinizer ignore-type */ $cacheQueryString);
     }
 
     /**
@@ -432,11 +344,11 @@ class Services
      */
     public static function routes(bool $shared = true): RouteCollectionInterface
     {
-        if (true === $shared && isset(static::$instances[RouteCollection::class])) {
-            return static::$instances[RouteCollection::class];
+        if ($shared) {
+            return static::sharedInstance('routes');
         }
 
-        return static::$instances[RouteCollection::class] = new RouteCollection(static::locator(), (object) static::config()->get('routing'));
+        return new RouteCollection(static::get('locator'), (object) static::get('config')->get('routing'));
     }
 
     /**
@@ -447,18 +359,14 @@ class Services
      */
     public static function router(?RouteCollection $routes = null, ?ServerRequest $request = null, bool $shared = true): RouterInterface
     {
-        if (true === $shared && isset(static::$instances[Router::class])) {
-            return static::$instances[Router::class];
-        }
+        if ($shared) {
+            return static::sharedInstance('router', $routes, $request);
+		}
 
-        if ($routes === null) {
-            $routes = static::routes(true);
-        }
-        if ($request === null) {
-            $request = static::request(true);
-        }
+		$routes ??= static::get('routes');
+		$request ??= static::get('request');
 
-        return static::$instances[Router::class] = new Router($routes, $request);
+        return new Router($routes, $request);
     }
 
     /**
@@ -468,36 +376,21 @@ class Services
      */
     public static function session(bool $shared = true): SessionInterface
     {
-        if (true === $shared && isset(static::$instances[Store::class])) {
-            return static::$instances[Store::class];
+        if ($shared) {
+            return static::sharedInstance('session');
         }
 
-        $config = static::config()->get('session');
-        $db     = null;
+        $config = static::get('config')->get('session');
 
-        if (Text::contains($config['handler'], [DatabaseSessionHandler::class, 'database'])) {
-            $group = $config['group'] ?? static::config()->get('database.connection');
-            $db    = static::singleton(ConnectionResolverInterface::class)->connection($group);
-
-            $driver = $db->getPlatform();
-
-            if (Text::contains($driver, ['mysql', MySQLSessionHandler::class])) {
-                $config['handler'] = MySQLSessionHandler::class;
-            } elseif (Text::contains($driver, ['postgre', PostgreSessionHandler::class])) {
-                $config['handler'] = PostgreSessionHandler::class;
-            }
-        }
-
-        Cookie::setDefaults($cookies = /** @scrutinizer ignore-type */ static::config()->get('cookie'));
+        Cookie::setDefaults($cookies = /** @scrutinizer ignore-type */ static::get('config')->get('cookie'));
         $session = new Store((array) $config, (array) $cookies, Helpers::ipAddress());
-        $session->setLogger(static::logger());
-        $session->setDatabase($db);
+        $session->setLogger(static::get('logger'));
 
         if (session_status() === PHP_SESSION_NONE) {
             $session->start();
         }
 
-        return static::$instances[Store::class] = $session;
+        return $session;
     }
 
     /**
@@ -505,11 +398,11 @@ class Services
      */
     public static function storage(bool $shared = true): FilesystemManager
     {
-        if ($shared && isset(static::$instances[FilesystemManager::class])) {
-            return static::$instances[FilesystemManager::class];
+        if ($shared) {
+            return static::sharedInstance('storage');
         }
 
-        return static::$instances[FilesystemManager::class] = new FilesystemManager(/** @scrutinizer ignore-type */ static::config()->get('filesystems'));
+        return new FilesystemManager(/** @scrutinizer ignore-type */ static::get('config')->get('filesystems'));
     }
 
     /**
@@ -517,11 +410,11 @@ class Services
      */
     public static function timer(bool $shared = true): Timer
     {
-        if (true === $shared && isset(static::$instances[Timer::class])) {
-            return static::$instances[Timer::class];
+        if ($shared) {
+            return static::sharedInstance('timer');
         }
 
-        return static::$instances[Timer::class] = new Timer();
+        return new Timer();
     }
 
     /**
@@ -529,13 +422,13 @@ class Services
      */
     public static function toolbar(?stdClass $config = null, bool $shared = true): Toolbar
     {
-        if ($shared && isset(static::$instances[Toolbar::class])) {
-            return static::$instances[Toolbar::class];
+        if ($shared) {
+            return static::sharedInstance('toolbar', $config);
         }
 
-        $config ??= (object) static::config()->get('toolbar');
+        $config ??= (object) static::get('config')->get('toolbar');
 
-        return static::$instances[Toolbar::class] = new Toolbar($config);
+        return new Toolbar($config);
     }
 
     /**
@@ -543,15 +436,15 @@ class Services
      */
     public static function translator(?string $locale = null, bool $shared = true): Translate
     {
-        if (null === $locale || $locale === '' || $locale === '0') {
-            $locale = is_cli() ? static::config()->get('app.language') : static::request()->getLocale();
+        if ($shared) {
+            return static::sharedInstance('translator', $locale);
         }
 
-        if (true === $shared && isset(static::$instances[Translate::class])) {
-            return static::$instances[Translate::class]->setLocale($locale);
+		if (null === $locale || $locale === '' || $locale === '0') {
+            $locale = is_cli() ? static::get('config')->get('app.locale') : static::get('request')->getLocale();
         }
 
-        return static::$instances[Translate::class] = new Translate($locale, static::locator());
+        return new Translate($locale, static::get('locator'));
     }
 
     /**
@@ -561,11 +454,11 @@ class Services
      */
     public static function uri(?string $uri = null, bool $shared = true): UriInterface
     {
-        if (true === $shared && isset(static::$instances[Uri::class])) {
-            return static::$instances[Uri::class]->setURI($uri);
-        }
+        if ($shared) {
+            return static::sharedInstance('uri', $uri);
+		}
 
-        return static::$instances[Uri::class] = new Uri($uri);
+        return new Uri($uri);
     }
 
     /**
@@ -575,156 +468,10 @@ class Services
      */
     public static function viewer(bool $shared = true): View
     {
-        if (true === $shared && isset(static::$instances[View::class])) {
-            return static::$instances[View::class];
+        if ($shared) {
+            return static::sharedInstance('viewer');
         }
 
-        return static::$instances[View::class] = new View();
-    }
-
-    /**
-     * Offre la possibilité d'effectuer des appels insensibles à la casse des noms de service.
-     *
-     * @return mixed
-     */
-    public static function __callStatic(string $name, array $arguments)
-    {
-        if (null === $service = static::serviceExists($name)) {
-            return static::discoverServices($name, $arguments);
-        }
-
-        return $service::$name(...$arguments);
-    }
-
-    /**
-     * Vérifiez si le service demandé est défini et renvoyez la classe déclarante.
-     * Renvoie null s'il n'est pas trouvé.
-     */
-    public static function serviceExists(string $name): ?string
-    {
-        static::cacheServices();
-        $services = array_merge(self::$serviceNames, [self::class]);
-        $name     = strtolower($name);
-
-        foreach ($services as $service) {
-            if (method_exists($service, $name)) {
-                return $service;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Essaie d'obtenir un service à partir du conteneur
-     *
-     * @return mixed
-     */
-    protected static function discoverServices(string $name, array $arguments)
-    {
-        if (true !== array_pop($arguments)) {
-            return static::factory($name, $arguments);
-        }
-
-        return static::singleton($name, ...$arguments);
-    }
-
-    protected static function cacheServices(): void
-    {
-        if (! static::$discovered) {
-            $locator = static::locator();
-            $files   = $locator->search('Config/Services');
-
-            // Obtenez des instances de toutes les classes de service et mettez-les en cache localement.
-            foreach ($files as $file) {
-                if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
-                    continue;
-                }
-                if (self::class !== $classname) {
-                    self::$serviceNames[] = $classname;
-                    static::$services[]   = new $classname();
-                }
-            }
-
-            static::$discovered = true;
-        }
-    }
-
-    /**
-     * Injecter une seule instance de la classe donnée
-     *
-     * @return mixed
-     */
-    public static function singleton(string $name)
-    {
-        $arguments = func_get_args();
-        $name      = array_shift($arguments);
-
-        if (empty(static::$instances[$name])) {
-            static::$instances[$name] = $arguments !== [] ? static::factory($name, $arguments) : static::container()->get($name);
-        }
-
-        return static::$instances[$name];
-    }
-
-    /**
-     * Injecter une nouvelle instance de la classe donnée
-     *
-     * @return mixed
-     */
-    public static function factory(string $name, array $arguments = [])
-    {
-        return static::container()->make($name, $arguments);
-    }
-
-    /**
-     * Définissez un objet ou une valeur dans le conteneur.
-     *
-     * @param string $name  Nom de l'entrée
-     * @param mixed  $value utilisez les aides à la définition pour définir les objets
-     */
-    public static function set(string $name, $value)
-    {
-        static::$instances[$name] = $value;
-        static::container()->set($name, $value);
-    }
-
-    /**
-     * Injectez un objet fictif pour les tests.
-     *
-     * @testTag disponible uniquement pour le code de test
-     */
-    public static function injectMock(string $name, object $mock): void
-    {
-        static::$mocks[strtolower($name)] = $mock;
-    }
-
-    /**
-     * Réinitialisez les instances partagées et les simulations pour les tests.
-     *
-     * @testTag disponible uniquement pour le code de test
-     */
-    public static function reset(bool $initAutoloader = true): void
-    {
-        static::$mocks     = [];
-        static::$instances = [];
-
-        if ($initAutoloader) {
-            static::autoloader()->initialize();
-        }
-    }
-
-    /**
-     * Réinitialise toutes les instances fictives et partagées pour un seul service.
-     *
-     * @testTag disponible uniquement pour le code de test
-     */
-    public static function resetSingle(string ...$name)
-    {
-        foreach ($name as $n) {
-            unset(static::$mocks[$n], static::$instances[$n]);
-            $n = strtolower($n);
-            unset(static::$mocks[$n], static::$instances[$n]);
-        }
+        return new View();
     }
 }

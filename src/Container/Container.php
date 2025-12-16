@@ -12,41 +12,30 @@
 namespace BlitzPHP\Container;
 
 use BadMethodCallException;
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Container\ContainerInterface;
 use Closure;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * Conteneur d’injection de dépendances.
+ * Conteneur d'injection de dépendances basé sur PHP-DI.
  *
- * @method string debugEntry(string $name)        Obtenir les informations de débogage de l'entrée.
- * @method array  getKnownEntryNames()            Obtenez des entrées de conteneur définies.
- * @method object injectOn(object $instance)      Injectez toutes les dépendances sur une instance existante.
- * @method void   set(string $name, mixed $value) Définissez un objet ou une valeur dans le conteneur.
+ * Supporte discovery automatique de providers, lazy init, et delegation.
+ *
+ * @method string debugEntry(string $name)        Obtient les informations de débogage de l'entrée.
+ * @method array  getKnownEntryNames()            Obtient des entrées de conteneur définies.
+ * @method object injectOn(object $instance)      Injecte toutes les dépendances sur une instance existante.
+ * @method void   set(string $name, mixed $value) Définit un objet ou une valeur dans le conteneur.
  */
 class Container implements ContainerInterface
 {
+    /**
+     * Instance DI sous-jacente.
+     */
     protected DIContainer $container;
-
-    /**
-     * Providers deja charges (cache)
-     *
-     * @var list<AbstractProvider>
-     */
-    private static array $providers = [];
-
-    /**
-     * Noms des providers deja charges (cache)
-     *
-     * @var list<class-string<AbstractProvider>>
-     */
-    private static array $providerNames = [];
-
-    /**
-     * Avons-nous déjà découvert les fournisseurs ?
-     */
-    private static bool $discovered = false;
 
     /**
      * Drapeau pour determiner si le conteneur est deja initialiser
@@ -54,21 +43,73 @@ class Container implements ContainerInterface
     private bool $initialized = false;
 
     /**
-     * Renvoie une entrée du conteneur par son nom.
+     * Noms des providers deja chargés (cache)
      *
-     * @param string $name Nom de l’entrée ou nom de classe.
-     *
-     * @return mixed
+     * @var list<class-string<AbstractProvider>>
      */
-    public function get(string $name)
+    private static array $providerNames = [];
+
+    /**
+     * Découverte déjà effectuée ?
+     */
+    private static bool $discovered = false;
+
+    /**
+     * Initialise le conteneur et injecte les services providers.
+     *
+     * @internal
+     */
+    public function initialize()
+    {
+        if ($this->initialized) {
+            return;
+        }
+
+        $builder = new ContainerBuilder();
+        $builder->useAttributes(true); // Support annotations
+        $builder->useAutowiring(true);
+
+        // cache activé uniquement en production
+        if (on_prod(true)) {
+            if (extension_loaded('apcu')) {
+                $builder->enableDefinitionCache(str_replace([' ', '/', '\\', '.'], '', APP_PATH));
+            }
+
+            $builder->enableCompilation(FRAMEWORK_STORAGE_PATH . 'cache');
+        }
+
+        $this->discoverProviders();
+
+        foreach (self::$providerNames as $provider) {
+            $builder->addDefinitions($provider::definitions());
+        }
+
+        $this->container = $builder->build();
+
+        $this->registerProviders();
+
+        $this->initialized = true;
+    }
+
+    /**
+     * Résout une entrée.
+     *
+     * @template T
+	 *
+     * @param string $name Nom de l’entrée ou nom de classe.
+	 *
+     * @return T
+     *
+	 * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
+    public function get(string $name): mixed
     {
         return $this->container->get($name);
     }
 
     /**
-     * Testez si le conteneur peut fournir quelque chose pour le nom donné.
-     *
-     * @param string $name Nom d'entrée ou nom de classe
+     * Vérifie si entrée existe dans le conteneur.
      */
     public function has(string $name): bool
     {
@@ -174,113 +215,78 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Methode magique pour acceder aux methodes de php-di
+     * Delegation magique vers PHP-DI.
      *
-     * @param mixed $name
-     * @param mixed $arguments
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     * @throws BadMethodCallException Si méthode inconnue.
      */
-    public function __call($name, $arguments)
+    public function __call(string $method, array $parameters): mixed
     {
-        if (method_exists($this->container, $name)) {
-            return call_user_func_array([$this->container, $name], $arguments);
+        if (! method_exists($this->container, $method)) {
+            throw new BadMethodCallException("Méthode '{$method}' inconnue sur DIContainer.");
         }
 
-        throw new BadMethodCallException('Methode "' . $name . '" non definie');
+        return $this->container->$method(...$parameters);
     }
 
     /**
-     * Initialise le conteneur et injecte les services providers.
-     *
-     * @internal
+     * Découvre les providers (vendor > system > app).
      */
-    public function initialize()
+    private function discoverProviders(): void
     {
-        if ($this->initialized) {
+        if (self::$discovered) {
             return;
         }
 
-        $builder = new ContainerBuilder();
-        $builder->useAutowiring(true);
-        $builder->useAttributes(true);
+        /** @var LocatorInterface */
+        $locator = service('locator');
 
-        if (on_prod(true)) {
-            if (extension_loaded('apcu')) {
-                $builder->enableDefinitionCache(str_replace([' ', '/', '\\', '.'], '', APP_PATH));
+        $files = array_merge(
+			$locator->search('Config/Providers'), // Providers systemes
+			$locator->listFiles('Providers/'), // Autres providers (vendors, app)
+		);
+
+        if ($files === []) {
+            self::$discovered = true;
+            return;
+        }
+
+        // Ordre : vendor > system > app (last wins)
+        $appProviders  = array_filter($files, static fn ($name) => str_starts_with($name, APP_PATH));
+        $systProviders = array_filter($files, static fn ($name) => str_starts_with($name, SYST_PATH));
+        $vendorFiles   = array_diff($files, $appProviders, $systProviders);
+
+        $orderedFiles = [
+			...$vendorFiles, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
+			...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors
+			...$appProviders, // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
+		];
+
+        foreach ($orderedFiles as $file) {
+            $classname = $locator->getClassname($file);
+            if ($classname && is_subclass_of($classname, AbstractProvider::class)) {
+                self::$providerNames[] = $classname;
             }
-
-            $builder->enableCompilation(FRAMEWORK_STORAGE_PATH . 'cache');
         }
 
-        $this->discoveProviders();
-
-        foreach (self::$providerNames as $provider) {
-            $builder->addDefinitions($provider::definitions());
-        }
-
-        $this->container = $builder->build();
-
-        $this->registryProviders();
-
-        $this->initialized = true;
+        self::$discovered = true;
     }
 
     /**
-     * Listes des providers chargés par le framework
-     *
-     * @return array<class-string<AbstractProvider>, AbstractProvider>
+     * Enregistre les providers.
      */
-    public static function providers(): array
-    {
-        return array_combine(self::$providerNames, self::$providers);
-    }
-
-    /**
-     * Enregistre les provider dans le conteneur
-     */
-    private function registryProviders(): void
+    private function registerProviders(): void
     {
         foreach (self::$providerNames as $classname) {
-            $provider = $this->container->make($classname, [
-                'container' => $this,
-            ]);
-            $this->container->call([$provider, 'register']);
-            self::$providers[] = $provider;
+            /** @var AbstractProvider $provider */
+            $provider = $this->container->make($classname, ['container' => $this]);
+
+            $provider->register();
         }
 
         $this->set(self::class, $this);
         $this->set(ContainerInterface::class, $this);
-    }
-
-    /**
-     * Recherche tous les fournisseurs disponibles et les charge en cache
-     */
-    private function discoveProviders(): void
-    {
-        if (! self::$discovered) {
-            $locator = service('locator');
-            $files   = array_merge(
-                $locator->search('Config/Providers'),
-                $locator->listFiles('Providers/'),
-            );
-
-            $appProviders  = array_filter($files, static fn ($name) => str_starts_with($name, APP_PATH));
-            $systProviders = array_filter($files, static fn ($name) => str_starts_with($name, SYST_PATH));
-            $files         = array_diff($files, $appProviders, $systProviders);
-
-            $files = [
-                ...$files, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
-                ...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors
-                ...$appProviders, // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
-            ];
-
-            // Obtenez des instances de toutes les classes de providers et mettez-les en cache localement.
-            foreach ($files as $file) {
-                if (is_a($classname = $locator->getClassname($file), AbstractProvider::class, true)) {
-                    self::$providerNames[] = $classname;
-                }
-            }
-
-            self::$discovered = true;
-        }
     }
 }

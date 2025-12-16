@@ -11,12 +11,29 @@
 
 namespace BlitzPHP\Container;
 
+/**
+ * Classe abstraite pour les fournisseurs de services.
+ *
+ * Les providers définissent les bindings et peuvent avoir un boot post-resolution.
+ */
 abstract class AbstractProvider
 {
+    /**
+     * Constructeur.
+     *
+     * @param Container $container Le conteneur d'injection.
+     */
     public function __construct(protected Container $container)
     {
     }
 
+    /**
+     * Retourne les définitions de bindings.
+     *
+     * Format : ['abstract' => $concrete|Closure]
+     *
+     * @return array<string, mixed>
+     */
     public static function definitions(): array
     {
         // a implementer par les classes filles
@@ -24,8 +41,22 @@ abstract class AbstractProvider
         return [];
     }
 
-    public function register(): void
-    {
+    /**
+     * Enregistre les bindings dans le conteneur.
+     */
+	public function register(): void
+	{
         // à implementer par les classes filles
+
+	}
+
+    /**
+     * Liste les services fournis (pour introspection).
+     *
+     * @return list<string>
+     */
+    public function provides(): array
+    {
+        return array_keys(static::definitions());
     }
 }
