@@ -79,7 +79,7 @@ describe('Loader / FileLocator', function (): void {
         $this->recursiveDelete($this->tempDir['system']);
         $this->recursiveDelete($this->tempDir['module']);
 
-		Services::set(Locator::class, $this->trueLocator);
+		Services::override(Locator::class, $this->trueLocator);
     });
 
     describe('locateFiles', function () {
@@ -174,7 +174,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             expect(fn() => FileLocator::helper('app_helper'))->not->toThrow();
         });
@@ -187,7 +187,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             expect(fn() => FileLocator::helper('nonexistent'))->toThrow(new LoadException);
         });
@@ -207,7 +207,7 @@ describe('Loader / FileLocator', function (): void {
             $this->putFileContent($this->tempDir['app'] . '/Helpers/helper1.php', '<?php');
             $this->putFileContent($this->tempDir['app'] . '/Helpers/helper2.php', '<?php');
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             expect(fn() => FileLocator::helper(['helper1', 'helper2']))->not->toThrow();
         });
@@ -223,7 +223,7 @@ describe('Loader / FileLocator', function (): void {
 
             $this->putFileContent($this->tempDir['app'] . '/Helpers/cached_helper.php', '<?php');
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             // Premier chargement
             FileLocator::helper('cached_helper');
@@ -249,7 +249,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $schema = FileLocator::schema('nonexistent');
             expect($schema)->toBeAnInstanceOf(Nette\Schema\Schema::class);
@@ -267,7 +267,7 @@ describe('Loader / FileLocator', function (): void {
 				],
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $schema = FileLocator::schema('database');
             expect($schema)->toBeAnInstanceOf(Nette\Schema\Schema::class);
@@ -282,7 +282,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $schema1 = FileLocator::schema('database');
             $schema2 = FileLocator::schema('database');
@@ -300,7 +300,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $config = FileLocator::config('nonexistent');
             expect($config)->toBe([]);
@@ -319,7 +319,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $config = FileLocator::config('database');
 
@@ -338,7 +338,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $config1 = FileLocator::config('database');
             $config2 = FileLocator::config('database');
@@ -357,7 +357,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $config = FileLocator::config('invalid');
             expect($config)->toBe([]);
@@ -374,7 +374,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $path = FileLocator::view('home');
             expect($path)->toBe(str_replace(['/', '\\'], DS, $this->tempDir['app'] . '/Views/home.php'));
@@ -391,7 +391,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             expect(fn() => FileLocator::view('nonexistent'))
 				->toThrow();
@@ -409,7 +409,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $path = FileLocator::view('home');
             expect($path)->toBe(str_replace(['/', '\\'], DS, $this->tempDir['app'] . '/Views/home.php'));
@@ -424,7 +424,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $path1 = FileLocator::view('home');
             $path2 = FileLocator::view('home');
@@ -442,7 +442,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $translations = FileLocator::translation('nonexistent');
             expect($translations)->toBe([]);
@@ -461,7 +461,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $translations = FileLocator::translation('messages', 'en');
 
@@ -480,7 +480,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             // Mock config('app.locale')
             $translations = FileLocator::translation('messages');
@@ -498,7 +498,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $translations = FileLocator::translation('invalid', 'en');
             expect($translations)->toBe([]);
@@ -513,7 +513,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $t1 = FileLocator::translation('messages', 'en');
             $t2 = FileLocator::translation('messages', 'en');
@@ -613,7 +613,7 @@ describe('Loader / FileLocator', function (): void {
                 ]
             ]);
 
-            Services::set(Locator::class, $locator);
+            Services::override(Locator::class, $locator);
 
             $this->putFileContent($this->tempDir['app'] . '/Helpers/test.php', '<?php');
 
@@ -711,7 +711,7 @@ describe('Loader / FileLocator', function (): void {
 				]
 			]);
 
-			Services::set(Locator::class, $locator);
+			Services::override(Locator::class, $locator);
 			$this->putFileContent($this->tempDir['app'] . '/Helpers/performance.php', '<?php');
 
 			// Premier appel
@@ -736,7 +736,7 @@ describe('Loader / FileLocator', function (): void {
 				]
 			]);
 
-			Services::set(Locator::class, $locator);
+			Services::override(Locator::class, $locator);
 			$this->putFileContent($this->tempDir['app'] . '/Helpers/test1.php', '<?php');
 			$this->putFileContent($this->tempDir['app'] . '/Helpers/test2.php', '<?php');
 
@@ -767,7 +767,7 @@ describe('Loader / FileLocator', function (): void {
 				]
 			]);
 
-			Services::set(Locator::class, $locator);
+			Services::override(Locator::class, $locator);
 
 			$config = FileLocator::config('merge');
 

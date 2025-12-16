@@ -39,7 +39,7 @@ function getCollector(string $verb = Method::GET, array $config = [], array $fil
 
 function setRequestMethod(string $method): void
 {
-    Services::set(Request::class, service('request')->withMethod($method));
+    Services::override(Request::class, service('request')->withMethod($method));
 }
 
 describe('RouteCollection', function (): void {

@@ -180,7 +180,7 @@ class Router implements RouterInterface
 
             // met a jour le routeur dans le conteneur car permet notament de recupere les bonnes
             // info du routing (route actuelle, controleur et methode mappés)
-            Services::set(static::class, $this);
+            Services::override(static::class, $this);
 
             return $this->controllerName();
         }
@@ -196,7 +196,7 @@ class Router implements RouterInterface
 
         // met a jour le routeur dans le conteneur car permet notament de recupere les bonnes
         // info du routing (route actuelle, controleur et methode mappés)
-        Services::set(static::class, $this);
+        Services::override(static::class, $this);
 
         return $this->controllerName();
     }

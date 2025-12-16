@@ -99,7 +99,7 @@ describe('Security / Encryption', function (): void {
             $config['driver'] = 'OpenSSL';
             $config['key']    = 'anything';
 
-            $encrypter = service('encrypter', $config);
+            $encrypter = service('encrypter', $config, true);
 
             $config['key'] = 'Abracadabra';
             $encrypter     = service('encrypter', $config, true);

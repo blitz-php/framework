@@ -165,7 +165,7 @@ describe('Redirection', function (): void {
         });
 
         it('WithCookies', function (): void {
-            Services::set(
+            Services::override(
                 Response::class,
                 service('response')->cookie('foo', 'bar')
             );
@@ -183,7 +183,7 @@ describe('Redirection', function (): void {
             $response = service('response');
 
             ReflectionHelper::setPrivateProperty($response, '_cookies', new CookieCollection());
-            Services::set(Response::class, $response);
+            Services::override(Response::class, $response);
         });
         it('WithCookies vides', function (): void {
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
@@ -194,7 +194,7 @@ describe('Redirection', function (): void {
         });
 
         it('WithHeaders', function (): void {
-            Services::set(
+            Services::override(
                 Response::class,
                 $baseResponse = service('response')->header('foo', 'bar')
             );
@@ -217,7 +217,7 @@ describe('Redirection', function (): void {
             foreach (array_keys($baseResponse->getHeaders()) as $key) {
                 $baseResponse = $baseResponse->withoutHeader($key);
             }
-            Services::set(Response::class, $baseResponse);
+            Services::override(Response::class, $baseResponse);
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 

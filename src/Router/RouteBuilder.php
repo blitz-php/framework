@@ -127,7 +127,7 @@ final class RouteBuilder
             $collection = $this->collection->{$method}(...$parameters);
 
             if ($collection instanceof RouteCollection) {
-                Services::set(RouteCollection::class, $collection);
+                Services::override(RouteCollection::class, $collection);
                 $this->collection = $collection;
             }
 
