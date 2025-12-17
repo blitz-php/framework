@@ -16,6 +16,7 @@ use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Container\AbstractProvider;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Container\ContainerInterface;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
@@ -36,11 +37,13 @@ use BlitzPHP\Router\Router;
 use BlitzPHP\Session\Cookie\CookieManager;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
+use BlitzPHP\Utilities\Reflection\ReflectionClass;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Closure;
+use ReflectionMethod;
 
 /**
  * Fournisseur de services principal pour le framework.
@@ -60,6 +63,7 @@ class Providers extends AbstractProvider
         return array_merge(
             self::interfaces(),
             self::classes(),
+			self::services(),
         );
     }
 
@@ -113,4 +117,30 @@ class Providers extends AbstractProvider
             Translate::class         => static fn () => service('translator'),
         ];
     }
+
+	/**
+     * Enregistre les services.
+     *
+     * @return array<string, Closure>
+     */
+	private static function services(): array
+	{
+		$services   = [];
+		$reflection = new ReflectionClass(Services::class);
+
+		$internal = [
+			'get', 'set', 'override',
+			'singleton', 'factory',
+			'injectMock', 'reset', 'resetSingle',
+			'serviceExists', 'getRegistryServices', '__callStatic',
+		];
+
+		foreach ($reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC) as $method) {
+			if (! in_array($method->getName(), $internal, true)) {
+				$services[$method->getName()] = static fn () => service($method->getName());
+			}
+		}
+
+		return $services;
+	}
 }

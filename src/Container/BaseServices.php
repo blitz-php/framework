@@ -160,6 +160,12 @@ class BaseServices
 
     /**
      * Injecter une seule instance de la classe donnée
+     *
+     * @template T
+     *
+     * @param string|class-string<T> $name
+     *
+     * @return mixed|T
      */
     public static function singleton(string $name): mixed
     {
@@ -178,6 +184,12 @@ class BaseServices
 
     /**
      * Injecter une nouvelle instance de la classe donnée
+     *
+     * @template T
+     *
+     * @param string|class-string<T> $name
+     *
+     * @return object|T
      */
     public static function factory(string $name, array $arguments = []): mixed
     {

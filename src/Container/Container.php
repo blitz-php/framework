@@ -266,7 +266,7 @@ class Container implements ContainerInterface
 
         foreach ($orderedFiles as $file) {
             $classname = $locator->getClassname($file);
-            if ($classname && is_subclass_of($classname, AbstractProvider::class)) {
+            if ($classname && is_subclass_of($classname, AbstractProvider::class, true)) {
                 self::$providerNames[] = $classname;
             }
         }
