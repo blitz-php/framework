@@ -28,7 +28,6 @@ use Psr\Container\NotFoundExceptionInterface;
  * @method string debugEntry(string $name)        Obtient les informations de débogage de l'entrée.
  * @method array  getKnownEntryNames()            Obtient des entrées de conteneur définies.
  * @method object injectOn(object $instance)      Injecte toutes les dépendances sur une instance existante.
- * @method void   set(string $name, mixed $value) Définit un objet ou une valeur dans le conteneur.
  */
 class Container implements ContainerInterface
 {
@@ -115,6 +114,18 @@ class Container implements ContainerInterface
     {
         return $this->container->has($name);
     }
+
+	/**
+	 * Définit un objet ou une valeur dans le conteneur.
+	 */
+	public function set(string $name, mixed $value): void
+	{
+		$keys = BaseServices::resolveServiceAliases($name);
+
+		foreach ($keys as $key) {
+			$this->container->set($key, $value);
+		}
+	}
 
     /**
      * Construire une entrée du conteneur par son nom.

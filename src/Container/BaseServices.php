@@ -67,11 +67,18 @@ class BaseServices
     private static array $serviceNames = [];
 
 	/**
+     * Cache des noms canoniques des services.
+     *
+     * @var list<string>
+     */
+    private static array $nameCache = [];
+
+	/**
      * Mapping alias → nom canonique.
      *
      * @var array<string, list<string>>
      */
-	private static array $alias = [
+	private static array $aliases = [
 		'locator'  => [Locator::class, LocatorInterface::class],
 		'request'  => [Request::class, ServerRequest::class, ServerRequestInterface::class],
 		'response' => [Response::class, ResponseInterface::class],
@@ -149,8 +156,8 @@ class BaseServices
     {
         static::$instances[$name = self::serviceName($key)] = $value;
 
-		if (isset(static::$alias[$name])) {
-			foreach (self::$alias[$name] ?? [] as $item) {
+		if (isset(static::$aliases[$name])) {
+			foreach (static::$aliases[$name] ?? [] as $item) {
 				static::container()->set($item, $value);
 			}
 		} else {
@@ -259,6 +266,61 @@ class BaseServices
     }
 
 	/**
+     * Normalise le nom de service via mapping.
+     *
+     * @param string $name Nom original.
+	 *
+     * @return string Nom canonique.
+     */
+	public static function serviceName(string $name): string
+	{
+		if (isset(self::$nameCache[$name])) {
+			return self::$nameCache[$name];
+		}
+
+		if (array_key_exists($n = strtolower($name), static::$aliases)) {
+			return self::$nameCache[$name] = $n;
+		}
+
+		foreach (static::$aliases as $k => $v) {
+			if (in_array($name, $v)) {
+				return self::$nameCache[$name] = $k;
+			}
+		}
+
+		return self::$nameCache[$name] = $name;
+	}
+
+	/**
+	 * Résout tous les aliases pour un nom donné.
+	 * Inclut le nom original du service et tous ses aliases
+     *
+     * @param string $name Nom original.
+	 *
+     * @return list<string> Liste de tous les alias du service
+	 */
+	public static function resolveServiceAliases(string $name): array
+	{
+		$keys = [$name];
+
+		foreach (static::$aliases as $canonical => $aliases) {
+			// Si le nom est le nom canonique
+			if ($canonical === $n = strtolower($name)) {
+				$keys = array_merge([$n], $aliases);
+				break;
+			}
+
+			// Si le nom est dans les aliases
+			if (in_array($name, $aliases, true)) {
+				$keys = array_merge($keys, [$canonical], $aliases);
+				break;
+			}
+		}
+
+		return array_unique($keys);
+	}
+
+	/**
      * Offre la possibilité d'effectuer des appels insensibles à la casse des noms de service.
      *
      * @return object|null
@@ -340,25 +402,4 @@ class BaseServices
 
 		static::$discovered = true;
     }
-
-	/**
-     * Normalise le nom de service via mapping.
-     *
-     * @param string $name Nom original.
-     * @return string Nom canonique.
-     */
-	protected static function serviceName(string $name): string
-	{
-		if (array_key_exists($n = strtolower($name), self::$alias)) {
-			return $n;
-		}
-
-		foreach (static::$alias as $k => $v) {
-			if (in_array($name, $v)) {
-				return $k;
-			}
-		}
-
-		return $name;
-	}
 }

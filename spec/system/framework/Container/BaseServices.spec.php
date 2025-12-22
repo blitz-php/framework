@@ -188,20 +188,14 @@ describe('Container / BaseServices', function (): void {
 
     describe('Alias et noms de service', function () {
         it('serviceName normalise via alias', function () {
-            $method = new ReflectionMethod(BaseServices::class, 'serviceName');
-            $method->setAccessible(true);
-
-            expect($method->invoke(null, 'locator'))->toBe('locator');
-            expect($method->invoke(null, LocatorInterface::class))->toBe('locator');
-            expect($method->invoke(null, 'request'))->toBe('request');
-            expect($method->invoke(null, ServerRequestInterface::class))->toBe('request');
+            expect(BaseServices::serviceName('locator'))->toBe('locator');
+            expect(BaseServices::serviceName(LocatorInterface::class))->toBe('locator');
+            expect(BaseServices::serviceName('request'))->toBe('request');
+            expect(BaseServices::serviceName(ServerRequestInterface::class))->toBe('request');
         });
 
         it('serviceName retourne nom original si pas d\'alias', function () {
-            $method = new ReflectionMethod(BaseServices::class, 'serviceName');
-            $method->setAccessible(true);
-
-            expect($method->invoke(null, 'custom'))->toBe('custom');
+            expect(BaseServices::serviceName('custom'))->toBe('custom');
         });
     });
 
@@ -224,4 +218,117 @@ describe('Container / BaseServices', function (): void {
 			expect(ReflectionHelper::getPrivateProperty(BaseServices::class, 'discovered'))->toBeTruthy();
         });
     });
+
+	describe('Méthode resolveServiceAliases', function () {
+		it('resolveServiceAliases pour nom canonique retourne tous les aliases', function () {
+			$aliases = BaseServices::resolveServiceAliases('locator');
+
+			expect($aliases)->toBeAn('array');
+			expect($aliases)->toHaveLength(3); // locator + Locator::class + LocatorInterface::class
+			expect($aliases)->toContain('locator');
+			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
+			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+		});
+
+		it('resolveServiceAliases pour alias FQCN retourne tous les aliases', function () {
+			$aliases = BaseServices::resolveServiceAliases('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+
+			expect($aliases)->toBeAn('array');
+			expect($aliases)->toHaveLength(3);
+			expect($aliases)->toContain('locator'); // Le nom canonique
+			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
+			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+		});
+
+		it('resolveServiceAliases pour service sans alias retourne uniquement le nom', function () {
+			$aliases = BaseServices::resolveServiceAliases('service_sans_alias');
+
+			expect($aliases)->toBeAn('array');
+			expect($aliases)->toHaveLength(1);
+			expect($aliases)->toContain('service_sans_alias');
+		});
+
+		it('resolveServiceAliases pour request retourne tous les aliases', function () {
+			$aliases = BaseServices::resolveServiceAliases('request');
+
+			expect($aliases)->toBeAn('array');
+			expect($aliases)->toHaveLength(4); // request + 3 aliases
+			expect($aliases)->toContain('request');
+			expect($aliases)->toContain('BlitzPHP\Http\Request');
+			expect($aliases)->toContain('BlitzPHP\Http\ServerRequest');
+			expect($aliases)->toContain('Psr\Http\Message\ServerRequestInterface');
+		});
+
+		it('resolveServiceAliases élimine les doublons', function () {
+			// Tester avec le nom canonique et vérifier qu'il n'y a pas de doublons
+			$aliases = BaseServices::resolveServiceAliases('locator');
+
+			$uniqueAliases = array_unique($aliases);
+			expect($aliases)->toHaveLength(count($uniqueAliases));
+		});
+
+		it('resolveServiceAliases conserve l\'ordre original', function () {
+			$aliases = BaseServices::resolveServiceAliases('locator');
+
+			// Le premier élément doit être le nom passé
+			expect($aliases[0])->toBe('locator');
+
+			// Les suivants doivent être les aliases
+			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
+			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+		});
+
+		it('resolveServiceAliases pour alias intermédiaire retourne tous les aliases', function () {
+			// Utilise un alias qui n'est pas le canonique
+			$aliases = BaseServices::resolveServiceAliases('BlitzPHP\Http\ServerRequest');
+
+			expect($aliases)->toBeAn('array');
+			expect($aliases)->toHaveLength(4);
+			expect($aliases)->toContain('request'); // Le nom canonique
+			expect($aliases)->toContain('BlitzPHP\Http\Request');
+			expect($aliases)->toContain('BlitzPHP\Http\ServerRequest');
+			expect($aliases)->toContain('Psr\Http\Message\ServerRequestInterface');
+		});
+
+		it('resolveServiceAliases pour différents services', function () {
+			// Test router
+			$routerAliases = BaseServices::resolveServiceAliases('router');
+			expect($routerAliases)->toContain('router');
+			expect($routerAliases)->toContain('BlitzPHP\Router\Router');
+			expect($routerAliases)->toContain('BlitzPHP\Contracts\Router\RouterInterface');
+
+			// Test response
+			$responseAliases = BaseServices::resolveServiceAliases('response');
+			expect($responseAliases)->toContain('response');
+			expect($responseAliases)->toContain('BlitzPHP\Http\Response');
+			expect($responseAliases)->toContain('Psr\Http\Message\ResponseInterface');
+
+			// Test routes
+			$routesAliases = BaseServices::resolveServiceAliases('routes');
+			expect($routesAliases)->toContain('routes');
+			expect($routesAliases)->toContain('BlitzPHP\Router\RouteCollection');
+			expect($routesAliases)->toContain('BlitzPHP\Contracts\Router\RouteCollectionInterface');
+		});
+
+		it('resolveServiceAliases avec cache intégration', function () {
+			// Test l'intégration avec le cache de serviceName
+			// Premier appel
+			$aliases1 =  BaseServices::resolveServiceAliases('locator');
+
+			// Deuxième appel (devrait utiliser le cache de serviceName)
+			$aliases2 =  BaseServices::resolveServiceAliases('locator');
+
+			expect($aliases1)->toBe($aliases2);
+			expect($aliases1)->toHaveLength(3);
+		});
+
+		it('resolveServiceAliases insensible à la casse pour noms canoniques', function () {
+			// serviceName() convertit en lowercase, donc "LOCATOR" devrait devenir "locator"
+			$aliases =  BaseServices::resolveServiceAliases('LOCATOR');
+
+			expect($aliases)->toContain('locator');
+			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
+			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+		});
+	});
 });

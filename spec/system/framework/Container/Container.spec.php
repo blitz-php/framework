@@ -442,4 +442,142 @@ describe('Container / Container', function (): void {
             expect($container->get('test.service'))->toBe('test value');
         });
     });
+
+	describe('Méthode set avec aliases', function () {
+		beforeEach(function () {
+			$this->container = new Container();
+			$initialize = ReflectionHelper::getPrivateMethodInvoker($this->container, 'initialize');
+			$initialize();
+		});
+
+		it('set définit une valeur pour une clé simple', function () {
+			$value = new stdClass();
+			$value->name = 'test';
+
+			$this->container->set('test', $value);
+
+			expect($this->container->has('test'))->toBe(true);
+			expect($this->container->get('test'))->toBe($value);
+		});
+
+		it('set avec alias canonique définit tous les aliases', function () {
+			$value = new stdClass();
+			$value->name = 'locator';
+
+			$this->container->set('locator', $value);
+
+			// Vérifie tous les aliases
+			expect($this->container->has('locator'))->toBe(true);
+			expect($this->container->has('BlitzPHP\Autoloader\Locator'))->toBe(true);
+			expect($this->container->has('BlitzPHP\Contracts\Autoloader\LocatorInterface'))->toBe(true);
+
+			// Vérifie que tous pointent vers la même instance
+			expect($this->container->get('locator'))->toBe($value);
+			expect($this->container->get('BlitzPHP\Autoloader\Locator'))->toBe($value);
+			expect($this->container->get('BlitzPHP\Contracts\Autoloader\LocatorInterface'))->toBe($value);
+		});
+
+		it('set avec alias FQCN définit tous les aliases', function () {
+			$value = new stdClass();
+			$value->name = 'via-fqcn';
+
+			// Utilise le FQCN d'un alias
+			$this->container->set('BlitzPHP\Contracts\Autoloader\LocatorInterface', $value);
+
+			// Vérifie tous les aliases
+			expect($this->container->has('locator'))->toBe(true);
+			expect($this->container->has('BlitzPHP\Autoloader\Locator'))->toBe(true);
+			expect($this->container->has('BlitzPHP\Contracts\Autoloader\LocatorInterface'))->toBe(true);
+
+			// Tous pointent vers la même instance
+			expect($this->container->get('locator'))->toBe($value);
+			expect($this->container->get('BlitzPHP\Contracts\Autoloader\LocatorInterface'))->toBe($value);
+		});
+
+		it('set avec alias remplace toutes les entrées précédentes', function () {
+			// Première valeur pour locator
+			$value1 = new stdClass();
+			$value1->name = 'first';
+			$this->container->set('locator', $value1);
+
+			// Deuxième valeur via un alias différent
+			$value2 = new stdClass();
+			$value2->name = 'second';
+			$this->container->set('BlitzPHP\Autoloader\Locator', $value2);
+
+			// Tous les aliases doivent pointer vers la deuxième valeur
+			expect($this->container->get('locator'))->toBe($value2);
+			expect($this->container->get('BlitzPHP\Autoloader\Locator'))->toBe($value2);
+			expect($this->container->get('BlitzPHP\Contracts\Autoloader\LocatorInterface'))->toBe($value2);
+		});
+
+		it('set sans alias fonctionne normalement', function () {
+			$value = new stdClass();
+			$value->name = 'custom';
+
+			$this->container->set('custom_service', $value);
+
+			expect($this->container->has('custom_service'))->toBe(true);
+			expect($this->container->get('custom_service'))->toBe($value);
+
+			// Vérifie qu'aucun alias n'a été créé
+			expect($this->container->has('custom_service_alias'))->toBe(false);
+		});
+
+		it('set avec multiple aliases pour un même service', function () {
+			$value = new stdClass();
+			$value->name = 'request';
+
+			$this->container->set('request', $value);
+
+			// Vérifie tous les aliases pour request
+			expect($this->container->has('request'))->toBe(true);
+			expect($this->container->has('BlitzPHP\Http\Request'))->toBe(true);
+			expect($this->container->has('BlitzPHP\Http\ServerRequest'))->toBe(true);
+			expect($this->container->has('Psr\Http\Message\ServerRequestInterface'))->toBe(true);
+
+			// Tous pointent vers la même instance
+			expect($this->container->get('request'))->toBe($value);
+			expect($this->container->get('BlitzPHP\Http\Request'))->toBe($value);
+			expect($this->container->get('Psr\Http\Message\ServerRequestInterface'))->toBe($value);
+		});
+
+		it('set gère les valeurs non-objets', function () {
+			$stringValue = 'string value';
+			$arrayValue = ['key' => 'value'];
+			$intValue = 123;
+			$boolValue = true;
+
+			$this->container->set('string_key', $stringValue);
+			$this->container->set('array_key', $arrayValue);
+			$this->container->set('int_key', $intValue);
+			$this->container->set('bool_key', $boolValue);
+
+			expect($this->container->get('string_key'))->toBe($stringValue);
+			expect($this->container->get('array_key'))->toBe($arrayValue);
+			expect($this->container->get('int_key'))->toBe($intValue);
+			expect($this->container->get('bool_key'))->toBe($boolValue);
+		});
+
+		it('set via différents points d\'entrée donne même résultat', function () {
+			$value = new stdClass();
+			$value->id = 'test';
+
+			// Test via différents alias
+			$this->container->set('locator', $value);
+			$result1 = $this->container->get('locator');
+
+			$this->container->set('BlitzPHP\Autoloader\Locator', $value);
+			$result2 = $this->container->get('BlitzPHP\Autoloader\Locator');
+
+			$this->container->set('BlitzPHP\Contracts\Autoloader\LocatorInterface', $value);
+			$result3 = $this->container->get('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+
+			expect($result1)->toBe($value);
+			expect($result2)->toBe($value);
+			expect($result3)->toBe($value);
+			expect($result1)->toBe($result2);
+			expect($result2)->toBe($result3);
+		});
+	});
 });
