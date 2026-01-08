@@ -694,8 +694,8 @@ class Dispatcher
     private function bootApp(): callable
     {
         return function (ServerRequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface {
-            Services::set(Request::class, $request);
-            Services::set(Response::class, $response);
+            Services::override(Request::class, $request);
+            Services::override(Response::class, $response);
 
             try {
                 $returned = $this->startController();

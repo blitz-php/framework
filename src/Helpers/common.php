@@ -25,8 +25,9 @@ use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Loader\Load;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
+use BlitzPHP\Utilities\Invade\Invader;
+use BlitzPHP\Utilities\Invade\StaticInvader;
 use BlitzPHP\Utilities\Iterable\Collection;
-use BlitzPHP\Utilities\Support\Invader;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\StreamInterface;
 
@@ -65,22 +66,6 @@ if (! function_exists('helper')) {
     function helper(array|string $filenames): void
     {
         Load::helper($filenames);
-    }
-}
-
-if (! function_exists('model')) {
-    /**
-     * Simple maniere d'obtenir un modele.
-     *
-     * @template T
-     *
-     * @param class-string<T>|list<class-string<T>> $name
-     *
-     * @return T
-     */
-    function model(array|string $name, ?ConnectionInterface &$conn = null)
-    {
-        return Load::model($name, $conn);
     }
 }
 
@@ -1121,12 +1106,16 @@ if (! function_exists('invade')) {
      * Cette classe offre une fonction d'invasion qui vous permettra de lire / écrire des propriétés privées d'un objet.
      * Il vous permettra également de définir, obtenir et appeler des méthodes privées.
      *
-     * @return Invader
+     * @template T of object
+     *
+     * @param class-string|T $objectOrClass L'objet ou le nom de classe à envahir
+     *
+     * @return Invader<T>|StaticInvader L'instance d'envahisseur
      *
      * @see https://github.com/spatie/invade/blob/main/src/Invader.php
      */
-    function invade(object $object)
+    function invade(object|string $objectOrClass)
     {
-        return Invader::make($object);
+		return Helpers::invade($objectOrClass);
     }
 }
