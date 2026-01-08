@@ -11,126 +11,144 @@
 
 namespace BlitzPHP\Controllers;
 
-use BlitzPHP\Annotations\AnnotationReader;
-use BlitzPHP\Annotations\Http\AjaxOnlyAnnotation;
-use BlitzPHP\Annotations\Http\RequestMappingAnnotation;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Traits\Http\ApiResponseTrait;
-use BlitzPHP\Utilities\Jwt;
-use Exception;
-use mindplay\annotations\IAnnotation;
 use Psr\Http\Message\ResponseInterface;
-use stdClass;
 use Throwable;
 
 /**
- * Le contrôleur de base pour les API REST
+ * Contrôleur de base pour les API REST
+ *
+ * Cette classe fournit une base complète pour créer des API RESTful avec :
+ * - Gestion des formats de réponse (JSON, XML, CSV, etc.)
+ * - Validation des requêtes
+ * - Gestion centralisée des erreurs
+ * - Hooks avant/après l'exécution
+ * - Configuration fluide
  */
 class RestController extends BaseController
 {
     use ApiResponseTrait;
 
     /**
-     * Configurations
+     * Configuration REST chargée depuis le fichier de configuration
      *
-     * @var stdClass
+     * @var array{
+     *     locale: string,
+     *     force_https: bool,
+     *     format: string,
+     *     strict: bool,
+     *     field: array{status: string, message: string, code: string, errors: string, result: string},
+     *     ip_blacklist: array<string>,
+     *     ip_whitelist: array<string>,
+     *     ajax_only: bool
+     * }
      */
-    protected $config;
+    protected array $restConfig = [];
 
     /**
-     * Langue à utiliser
-     *
-     * @var string
+     * Locale à utiliser pour les messages de l'API
      */
-    private $locale;
+    protected string $locale;
 
     /**
-     * Type mime associé à chaque format de sortie
+     * Mapping des types MIME pour chaque format de sortie
      *
-     * Répertoriez tous les formats pris en charge, le première sera le format par défaut.
+     * @var array<string, string>
      */
-    protected $mimes = [
-        'json' => 'application/json',
-        'csv'  => 'application/csv',
-        // 'html'       => 'text/html',
+    protected array $mimes = [
+        'json'       => 'application/json',
+        'csv'        => 'application/csv',
         'jsonp'      => 'application/javascript',
         'php'        => 'text/plain',
         'serialized' => 'application/vnd.php.serialized',
         'xml'        => 'application/xml',
-
-        'array' => 'php/array',
+        'array'      => 'php/array',
     ];
 
     /**
-     * @var array|object Payload provenant du token jwt
+     * Constructeur
      */
-    protected $payload;
-
     public function __construct()
     {
-        $this->config = (object) config('rest');
-
-        $locale       = $this->config->language ?? null;
-        $this->locale = ! empty($locale) ? $locale : $this->request->getLocale();
+        $this->restConfig = config('rest');
+        $this->locale     = $this->restConfig['locale'] ?? $this->request->getLocale();
     }
 
-    public function _remap(string $method, array $params = [])
+    /**
+     * Point d'entrée principal pour toutes les requêtes API
+     *
+     * Cette méthode est appelée automatiquement par le routeur et gère :
+     * 1. Vérification de l'existence de la méthode
+     * 2. Exécution des hooks "before"
+     * 3. Validation de la requête
+     * 4. Exécution de la méthode du contrôleur
+     * 5. Gestion des exceptions
+     * 6. Exécution des hooks "after"
+     *
+     * @param string $method Nom de la méthode à exécuter
+     * @param array $params Paramètres à passer à la méthode
+     *
+     * @return ResponseInterface Réponse HTTP formatée
+     */
+    public function _remap(string $method, array $params = []): ResponseInterface
     {
-        $class = static::class;
-
-        // Bien sûr qu'il existe, mais peuvent-ils en faire quelque chose ?
-        if (! method_exists($class, $method)) {
-            return $this->respondNotImplemented($this->_translate('notImplemented', [$class, $method]));
+        if (!method_exists($this, $method)) {
+            return $this->respondNotImplemented($this->_translate('notImplemented', [static::class, $method]));
         }
 
-        // Appel de la méthode du contrôleur et passage des arguments
         try {
-            $instance = service('container')->get($class);
-            $instance->initialize($this->request, $this->response, $this->logger);
-
-            $instance = $this->_execAnnotations($instance, AnnotationReader::fromClass($instance));
-            $instance = $this->_execAnnotations($instance, AnnotationReader::fromMethod($instance, $method));
-
-            $checkProcess = $this->checkProcess();
-            if ($checkProcess instanceof ResponseInterface) {
-                return $checkProcess;
+            // Hook before
+            if (method_exists($this, 'before')) {
+                $before = $this->before($method, $params);
+                if ($before instanceof ResponseInterface) {
+                    return $before;
+                }
             }
 
-            $instance->payload = $this->payload;
-
-            $response = service('container')->call([$instance, $method], $params);
-
-            if ($response instanceof ResponseInterface) {
-                return $response;
+            // Validation de la requête
+            if (($check = $this->validateRequest()) instanceof ResponseInterface) {
+                return $check;
             }
 
-            return $this->respondOk($response);
+            // Exécution de la méthode
+			$returned = service('container')->call([$this, $method], $params);
+			$response = $returned instanceof ResponseInterface ? $returned : $this->respond($returned);
+
+            // Hook after
+            if (method_exists($this, 'after')) {
+                $this->after($method, $params, $response);
+            }
+
+            return $response;
         } catch (Throwable $ex) {
-            return $this->manageException($ex);
+            return $this->handleException($ex);
         }
     }
 
     /**
-     * Gestionnaire des exceptions
+     * Gestion centralisée des exceptions
      *
-     * Ceci permet aux classes filles de specifier comment elles doivent gerer les exceptions lors de la methode remap
+     * Transforme les exceptions en réponses API formatées
      *
-     * @return ResponseInterface
+     * @param Throwable $ex Exception à gérer
+     *
+     * @return ResponseInterface Réponse d'erreur formatée
      */
-    protected function manageException(Throwable $ex)
+    protected function handleException(Throwable $ex): ResponseInterface
     {
         if ($ex instanceof ValidationException) {
-            $message = 'Validation failed';
-            $errors  = $ex->getErrors()->all();
-
-            return $this->respondBadRequest($message, $ex->getCode(), $errors);
+            return $this->respondBadRequest(
+                'Validation failed',
+                $ex->getCode(),
+                $ex->getErrors()->all()
+            );
         }
 
-        if (! on_dev()) {
+        if (!on_dev()) {
             $url = explode('?', $this->request->getRequestTarget())[0];
-
             return $this->respondBadRequest($this->_translate('badUsed', [$url]));
         }
 
@@ -144,54 +162,220 @@ class RestController extends BaseController
     }
 
     /**
-     * Fournit une méthode simple et unique pour renvoyer une réponse d'API, formatée
-     * pour correspondre au format demandé, avec le type de contenu et le code d'état appropriés.
+     * Validation complète de la requête
      *
-     * @param mixed    $data   Les donnees a renvoyer
-     * @param int|null $status Le statut de la reponse
+     * Exécute une série de validateurs dans l'ordre :
+     * 1. Restriction AJAX
+     * 2. Vérification HTTPS
+     * 3. Liste noire d'IP
+     * 4. Liste blanche d'IP
+     *
+     * @return bool|ResponseInterface true si la validation réussit, sinon une réponse d'erreur
      */
-    final protected function respond($data, ?int $status = StatusCode::OK)
+    protected function validateRequest(): bool|ResponseInterface
     {
-        // Si les données sont NULL et qu'aucun code d'état HTTP n'est fourni, affichage, erreur et sortie
-        if ($data === null && $status === null) {
-            $status = StatusCode::NOT_FOUND;
+        $validators = [
+            'validateAjaxOnly',
+            'validateHttps',
+            'validateIpBlacklist',
+            'validateIpWhitelist',
+        ];
+
+        foreach ($validators as $validator) {
+            if (($result = $this->{$validator}()) instanceof ResponseInterface) {
+                return $result;
+            }
         }
 
-        $this->response = $this->response->withStatus($status)->withCharset(strtolower(config('app.charset') ?? 'utf-8'));
+        return true;
+    }
 
-        $this->_parseResponse($data);
+    /**
+     * Vérifie si seules les requêtes AJAX sont autorisées
+     *
+     * @return bool|ResponseInterface true si la requête est AJAX ou si la restriction est désactivée
+     */
+    protected function validateAjaxOnly(): bool|ResponseInterface
+    {
+        if ($this->restConfig['ajax_only'] && !$this->request->is('ajax')) {
+            return $this->respondNotAcceptable($this->_translate('ajaxOnly'));
+        }
+        return true;
+    }
+
+    /**
+     * Vérifie si HTTPS est requis
+     *
+     * @return bool|ResponseInterface true si la requête utilise HTTPS ou si HTTPS n'est pas requis
+     */
+    protected function validateHttps(): bool|ResponseInterface
+    {
+        if ($this->restConfig['force_https'] && !$this->request->is('https')) {
+            return $this->respondForbidden($this->_translate('unsupported'));
+        }
+        return true;
+    }
+
+    /**
+     * Vérifie la liste noire d'IP
+     *
+     * @return bool|ResponseInterface true si l'IP du client n'est pas dans la liste noire
+     */
+    protected function validateIpBlacklist(): bool|ResponseInterface
+    {
+        $blacklist = $this->restConfig['ip_blacklist'];
+        if (!empty($blacklist) && in_array($this->request->clientIp(), $blacklist, true)) {
+            return $this->respondUnauthorized($this->_translate('ipDenied'));
+        }
+        return true;
+    }
+
+    /**
+     * Vérifie la liste blanche d'IP
+     *
+     * @return bool|ResponseInterface true si l'IP du client est dans la liste blanche
+     */
+    protected function validateIpWhitelist(): bool|ResponseInterface
+    {
+        $whitelist = $this->restConfig['ip_whitelist'];
+        if (!empty($whitelist)) {
+            $whitelist = array_merge($whitelist, ['127.0.0.1', '0.0.0.0']);
+            if (!in_array($this->request->clientIp(), $whitelist, true)) {
+                return $this->respondUnauthorized($this->_translate('ipUnauthorized'));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * --------------------------------------------------------------------------
+     * MÉTHODES DE CONFIGURATION (Fluent Interface)
+     * --------------------------------------------------------------------------
+     */
+
+    /**
+     * Restreint l'accès aux requêtes AJAX uniquement
+     *
+     * @return self
+     */
+    public function ajaxOnly(): self
+    {
+        $this->restConfig['ajax_only'] = true;
+        return $this;
+    }
+
+    /**
+     * Définit le format de réponse
+     *
+     * @param string $format Format de réponse (json, xml, csv, etc.)
+     *
+     * @return self
+     */
+    public function returnFormat(string $format): self
+    {
+        if (array_key_exists($format, $this->mimes) || in_array($format, $this->mimes, true)) {
+            $this->restConfig['format'] = $format;
+        }
+        return $this;
+    }
+
+    /**
+     * Force l'utilisation de HTTPS
+     *
+     * @return self
+     */
+    public function requireHttps(): self
+    {
+        $this->restConfig['force_https'] = true;
+        return $this;
+    }
+
+    /**
+     * Définit la liste noire d'adresses IP
+     *
+     * @param string ...$ips Liste des adresses IP à bloquer
+     *
+     * @return self
+     */
+    public function ipBlacklist(string ...$ips): self
+    {
+        $this->restConfig['ip_blacklist'] = $ips;
+        return $this;
+    }
+
+    /**
+     * Définit la liste blanche d'adresses IP
+     *
+     * @param string ...$ips Liste des adresses IP autorisées
+     *
+     * @return self
+     */
+    public function ipWhitelist(string ...$ips): self
+    {
+        $this->restConfig['ip_whitelist'] = $ips;
+        return $this;
+    }
+
+    /**
+     * --------------------------------------------------------------------------
+     * MÉTHODES DU TRAIT ApiResponseTrait
+     * --------------------------------------------------------------------------
+     */
+
+    /**
+     * Formate et envoie une réponse HTTP
+     *
+     * @param mixed $data Données à envoyer dans la réponse
+     * @param int $status Code de statut HTTP (200 par défaut)
+     *
+     * @return ResponseInterface Réponse HTTP formatée
+     */
+    protected function respond($data, ?int $status = StatusCode::OK): ResponseInterface
+    {
+        $this->response = $this->response
+            ->withStatus($status ?? StatusCode::OK)
+            ->withCharset(strtolower(config('app.charset') ?? 'utf-8'));
+
+        $this->formatResponse($data);
 
         return $this->response;
     }
 
     /**
-     * Utilisé pour les échecs génériques pour lesquels aucune méthode personnalisée n'existe.
+     * Réponse d'erreur générique
      *
-     * @param string          $message Le message décrivant l'erreur
-     * @param int|string|null $code    Code d'erreur personnalisé, spécifique à l'API
-     * @param array           $errors  La liste des erreurs rencontrées
+     * @param string|null $message Message d'erreur
+     * @param int|null $status Code de statut HTTP
+     * @param int|string|null $code Code d'erreur personnalisé
+     * @param array $errors Liste détaillée des erreurs
      *
-     * @return ResponseInterface
+     * @return ResponseInterface Réponse d'erreur formatée
      */
-    final protected function respondFail(?string $message = "Une erreur s'est produite", ?int $status = StatusCode::INTERNAL_ERROR, int|string|null $code = null, array $errors = [])
-    {
+    protected function respondFail(
+        ?string $message = "Une erreur s'est produite",
+        ?int $status = StatusCode::INTERNAL_ERROR,
+        int|string|null $code = null,
+        array $errors = []
+    ): ResponseInterface {
         $message = $message ?: "Une erreur s'est produite";
-        $code    = ($code !== 0 && $code !== '' && $code !== '0') ? $code : $status;
+        $code = ! in_array($code, [0, '', '0', null], true) ? $code : $status;
 
         $response = [
-            $this->config->field['message'] ?? 'message' => $message,
+            $this->restConfig['field']['message'] => $message,
         ];
-        if (! empty($this->config->field['status'])) {
-            $response[$this->config->field['status']] = false;
+
+        if (!empty($this->restConfig['field']['status'])) {
+            $response[$this->restConfig['field']['status']] = false;
         }
-        if (! empty($this->config->field['code'])) {
-            $response[$this->config->field['code']] = $code;
+        if (!empty($this->restConfig['field']['code'])) {
+            $response[$this->restConfig['field']['code']] = $code;
         }
-        if ($errors !== []) {
-            $response[$this->config->field['errors'] ?? 'errors'] = $errors;
+        if (!empty($errors)) {
+            $response[$this->restConfig['field']['errors']] = $errors;
         }
 
-        if ($this->config->strict !== true) {
+        // Mode non strict : toujours retourner 200 avec le statut dans le body
+        if (!$this->restConfig['strict']) {
             $status = StatusCode::OK;
         }
 
@@ -199,341 +383,183 @@ class RestController extends BaseController
     }
 
     /**
-     * Utilisé pour les succès génériques pour lesquels aucune méthode personnalisée n'existe.
+     * Réponse de succès générique
      *
-     * @param mixed|null $result Les données renvoyées par l'API
+     * @param string|null $message Message de succès
+     * @param mixed $result Données résultantes
+     * @param int|null $status Code de statut HTTP
      *
-     * @return ResponseInterface
+     * @return ResponseInterface Réponse de succès formatée
      */
-    final protected function respondSuccess(?string $message = 'Resultat', $result = null, ?int $status = StatusCode::OK)
-    {
+    protected function respondSuccess(
+        ?string $message = 'Resultat',
+        $result = null,
+        ?int $status = StatusCode::OK
+    ): ResponseInterface {
         $message = $message ?: 'Resultat';
-        $status  = $status !== null && $status !== 0 ? $status : StatusCode::OK;
+        $status = $status ?? StatusCode::OK;
 
         $response = [
-            $this->config->field['message'] ?? 'message' => $message,
+            $this->restConfig['field']['message'] => $message,
         ];
-        if (! empty($this->config->field['status'])) {
-            $response[$this->config->field['status']] = true;
-        }
-        if (is_array($result)) {
-            $result = array_map(fn ($element) => $this->formatEntity($element), $result);
+
+        if (!empty($this->restConfig['field']['status'])) {
+            $response[$this->restConfig['field']['status']] = true;
         }
 
-        $response[$this->config->field['result'] ?? 'result'] = $this->formatEntity($result);
+        $response[$this->restConfig['field']['result']] = $this->formatResult($result);
 
         return $this->respond($response, $status);
     }
 
     /**
-     * Formatte les données à renvoyer lorsqu'il s'agit des objets de la classe Entity
+     * Formate les données de résultat
      *
-     * @param mixed $element
+     * Applique formatEntity() à chaque élément si c'est un tableau
      *
-     * @return mixed
+     * @param mixed $result Données à formater
+     *
+     * @return mixed Données formatées
+     */
+    protected function formatResult($result)
+    {
+        if (is_array($result)) {
+            return array_map([$this, 'formatEntity'], $result);
+        }
+
+        return $this->formatEntity($result);
+    }
+
+    /**
+     * Formate une entité individuelle
+     *
+     * Tente d'appeler toArray() ou jsonSerialize() sur les objets
+     *
+     * @param mixed $element Élément à formater
+     *
+     * @return mixed Élément formaté
      */
     protected function formatEntity($element)
     {
-        /*
-        if ($element instanceof Entity) {
-            if (method_exists($element, 'format')) {
-                return service('container')->call([$element, 'format']);
+        if (is_object($element)) {
+            if (method_exists($element, 'toArray')) {
+                return $element->toArray();
             }
-
-            return call_user_func([$element, 'toArray']);
+            if ($element instanceof \JsonSerializable) {
+                return $element->jsonSerialize();
+            }
         }
-        */
+
         return $element;
     }
 
     /**
-     * Genere un token d'authentification
-     */
-    protected function generateToken(array $data = [], array $config = []): string
-    {
-        $config = array_merge(['base_url' => base_url()], $this->config->jwt ?? [], $config);
-
-        return Jwt::encode($data, $config);
-    }
-
-    /**
-     * Decode un token d'autorisation
+     * Formate la réponse finale selon le format configuré
      *
-     * @return mixed
-     */
-    protected function decodeToken(string $token, string $authType = 'bearer', array $config = [])
-    {
-        $config = array_merge(['base_url' => base_url()], $this->config->jwt ?? [], $config);
-
-        if ('bearer' === $authType) {
-            return Jwt::decode($token, $config);
-        }
-
-        return null;
-    }
-
-    /**
-     * Recupere le token d'acces a partier des headers
-     */
-    protected function getBearerToken(): ?string
-    {
-        return Jwt::getToken();
-    }
-
-    /**
-     * Recupere le header "Authorization"
-     */
-    protected function getAuthorizationHeader(): ?string
-    {
-        return Jwt::getAuthorization();
-    }
-
-    /**
-     * Une méthode pratique pour traduire une chaîne ou un tableau d'entrées et
-     * formater le résultat avec le MessageFormatter de l'extension intl.
-     */
-    protected function lang(string $line, ?array $args = null): string
-    {
-        return lang($line, $args, $this->locale);
-    }
-
-    /**
-     * @internal Ne pas censé être utilisé par le developpeur
-     */
-    protected function _translate(string $line, ?array $args = null): string
-    {
-        return $this->lang('Rest.' . $line, $args);
-    }
-
-    /**
-     * Specifie que seules les requetes ajax sont acceptees
-     */
-    final protected function ajaxOnly(): self
-    {
-        $this->config->ajax_only = true;
-
-        return $this;
-    }
-
-    /**
-     * Definit les methodes authorisees par le web service
-     */
-    final protected function allowedMethods(string ...$methods): self
-    {
-        if ($methods !== []) {
-            $this->config->allowed_methods = array_map(static fn ($str) => strtoupper($str), $methods);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Definit le format de donnees a renvoyer au client
-     */
-    final protected function returnFormat(string $format): self
-    {
-        $this->config->format = $format;
-
-        return $this;
-    }
-
-    /**
-     * N'autorise que les acces pas https
-     */
-    final protected function requireHttps(): self
-    {
-        $this->config->force_https = true;
-
-        return $this;
-    }
-
-    /**
-     * auth
+     * @param mixed $data Données à formater
      *
-     * @param false|string $type
+     * @return void
      */
-    final protected function auth($type): self
+    protected function formatResponse($data): void
     {
-        $this->config->auth = $type;
+        $format = strtolower($this->restConfig['format']);
+        $mime = $this->mimes[$format] ?? null;
 
-        return $this;
-    }
-
-    /**
-     * Definit la liste des adresses IP a bannir
-     * Si le premier argument vaut "false", la suite ne sert plus a rien
-     */
-    final protected function ipBlacklist(...$params): self
-    {
-        $params = func_get_args();
-        $enable = array_shift($params);
-
-        if (false === $enable) {
-            $params = [];
-        } else {
-            array_unshift($params, $enable);
-            $params = array_merge($this->config->ip_blacklist ?? [], $params);
-        }
-
-        $this->config->ip_blacklist = $params;
-
-        return $this;
-    }
-
-    /**
-     * Definit la liste des adresses IP qui sont autorisees a acceder a la ressources
-     * Si le premier argument vaut "false", la suite ne sert plus a rien
-     */
-    final protected function ipWhitelist(...$params): self
-    {
-        $params = func_get_args();
-        $enable = array_shift($params);
-
-        if (false === $enable) {
-            $params = [];
-        } else {
-            array_unshift($params, $enable);
-            $params = array_merge($this->config->ip_whitelist ?? [], $params);
-        }
-
-        $this->config->ip_whitelist = $params;
-
-        return $this;
-    }
-
-    /**
-     * Formatte les donnees a envoyer au bon format
-     *
-     * @param mixed $data Les donnees a envoyer
-     */
-    private function _parseResponse($data)
-    {
-        $format = strtolower($this->config->format);
-        $mime   = null;
-
-        if (array_key_exists($format, $this->mimes)) {
-            $mime = $this->mimes[$format];
-        } elseif (in_array($format, $this->mimes, true)) {
+        if (!$mime && in_array($format, $this->mimes, true)) {
             $mime = $format;
         }
 
-        // Si la méthode de format existe, appelle et renvoie la sortie dans ce format
-        if (! empty($mime)) {
+        if ($mime) {
             $output = Formatter::type($mime)->format($data);
 
-            // Définit l'en-tête du format
-            // Ensuite, vérifiez si le client a demandé un rappel, et si la sortie contient ce rappel :
-            $callback = $this->request->getQuery('callback');
-            if (! empty($callback) && $mime === $this->mimes['json'] && preg_match('/^' . $callback . '/', $output)) {
-                $this->response = $this->response->withType($this->mimes['jsonp']);
-            } else {
-                $this->response = $this->response->withType($mime === $this->mimes['array'] ? $this->mimes['json'] : $mime);
+            // Gestion JSONP
+            if ($mime === $this->mimes['json']) {
+                $callback = $this->request->getQuery('callback');
+                if (!empty($callback) && str_starts_with(trim($output), $callback . '(')) {
+                    $mime   = $this->mimes['jsonp'];
+                    $output = $callback . '(' . trim($output) . ');';
+                }
             }
 
-            // Un tableau doit être analysé comme une chaîne, afin de ne pas provoquer d'erreur de tableau en chaîne
-            // Json est la forme la plus appropriée pour un tel type de données
+            $this->response = $this->response->withType(
+                $mime === $this->mimes['array'] ? $this->mimes['json'] : $mime
+            );
+
             if ($mime === $this->mimes['array']) {
                 $output = Formatter::type($this->mimes['json'])->format($output);
             }
         } else {
-            // S'il s'agit d'un tableau ou d'un objet, analysez-le comme un json, de manière à être une 'chaîne'
-            if (is_array($data) || is_object($data)) {
-                $data = Formatter::type($this->mimes['json'])->format($data);
-            }
-            // Le format n'est pas pris en charge, sortez les données brutes sous forme de chaîne
-            $output = $data;
+            // Format non supporté
+            $output = is_array($data) || is_object($data)
+                ? Formatter::type($this->mimes['json'])->format($data)
+                : (string) $data;
         }
 
         $this->response = $this->response->withStringBody($output);
     }
 
     /**
-     * Execute les annotations definies dans le contrôleur
-     *
-     * @param list<IAnnotation> $annotations Liste des annotations d'un contrôleur/méthode
+     * --------------------------------------------------------------------------
+     * INTERNATIONALISATION
+     * --------------------------------------------------------------------------
      */
-    protected function _execAnnotations(self $instance, array $annotations): self
+
+    /**
+     * Traduit une chaîne de caractères
+     *
+     * @param string $line Clé de traduction
+     * @param array $args Arguments à injecter dans la traduction
+     *
+     * @return string Chaîne traduite
+     */
+    protected function lang(string $line, array $args = []): string
     {
-        foreach ($annotations as $annotation) {
-            switch (get_type_name($annotation)) {
-                case RequestMappingAnnotation::class:
-                    $this->allowedMethods(...(array) $annotation->method);
-                    break;
-
-                case AjaxOnlyAnnotation::class:
-                    $this->ajaxOnly();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        return $instance;
+        return lang($line, $args, $this->locale);
     }
 
     /**
-     * Verifie si les informations fournis par le client du ws sont conforme aux attentes du developpeur
+     * Traduit une chaîne spécifique à l'API REST
      *
-     * @throws Exception
+     * @param string $line Clé de traduction (préfixée par 'Rest.')
+     * @param array $args Arguments à injecter
+     *
+     * @return string Chaîne traduite
      */
-    private function checkProcess(): bool|ResponseInterface
+    protected function _translate(string $line, array $args = []): string
     {
-        // Verifie si la requete est en ajax
-        if (! $this->request->is('ajax') && $this->config->ajax_only) {
-            return $this->respondNotAcceptable($this->_translate('ajaxOnly'));
-        }
+        return $this->lang('Rest.' . $line, $args);
+    }
 
-        // Verifie si la requete est en https
-        if (! $this->request->is('https') && $this->config->force_https) {
-            return $this->respondForbidden($this->_translate('unsupported'));
-        }
+    /**
+     * --------------------------------------------------------------------------
+     * HOOKS (peuvent être surchargés)
+     * --------------------------------------------------------------------------
+     */
 
-        // Verifie si la methode utilisee pour la requete est autorisee
-        if (! in_array(strtoupper($this->request->getMethod()), $this->config->allowed_methods, true)) {
-            return $this->respondNotAcceptable($this->_translate('unknownMethod'));
-        }
+    /**
+     * Hook exécuté avant l'appel de la méthode du contrôleur
+     *
+     * @param string $method Nom de la méthode qui sera exécutée
+     * @param array $params Paramètres qui seront passés à la méthode
+     *
+     * @return ResponseInterface|null Si une réponse est retournée, elle interrompt l'exécution
+     */
+    protected function before(string $method, array $params): ?ResponseInterface
+    {
+        return null;
+    }
 
-        // Verifie que l'ip qui emet la requete n'est pas dans la blacklist
-        if (! empty($this->config->ip_blacklis)) {
-            $this->config->ip_blacklist = implode(',', $this->config->ip_blacklist);
-
-            // Correspond à une adresse IP dans une liste noire, par ex. 127.0.0.0, 0.0.0.0
-            $pattern = sprintf('/(?:,\s*|^)\Q%s\E(?=,\s*|$)/m', $this->request->clientIp());
-
-            // Renvoie 1, 0 ou FALSE (en cas d'erreur uniquement). Donc convertir implicitement 1 en TRUE
-            if (preg_match($pattern, $this->config->ip_blacklist)) {
-                return $this->respondUnauthorized($this->_translate('ipDenied'));
-            }
-        }
-
-        // Verifie que l'ip qui emet la requete est dans la whitelist
-        if (! empty($this->config->ip_whitelist)) {
-            $whitelist   = $this->config->ip_whitelist;
-            $whitelist[] = '127.0.0.1';
-            $whitelist[] = '0.0.0.0';
-
-            // coupez les espaces de début et de fin des ip
-            $whitelist = array_map('trim', $whitelist);
-
-            if (! in_array($this->request->clientIp(), $whitelist, true)) {
-                return $this->respondUnauthorized($this->_translate('ipUnauthorized'));
-            }
-        }
-
-        // Verifie l'authentification du client
-        if (false !== $this->config->auth && ! $this->request->is('options') && 'bearer' === strtolower($this->config->auth)) {
-            $token = $this->getBearerToken();
-            if ($token === null || $token === '' || $token === '0') {
-                return $this->respondInvalidToken($this->_translate('tokenNotFound'));
-            }
-            $payload = $this->decodeToken($token, 'bearer');
-            if ($payload instanceof Throwable) {
-                return $this->respondInvalidToken($payload->getMessage());
-            }
-            $this->payload = $payload;
-        }
-
-        return true;
+    /**
+     * Hook exécuté après l'appel de la méthode du contrôleur
+     *
+     * @param string $method Nom de la méthode qui a été exécutée
+     * @param array $params Paramètres qui ont été passés à la méthode
+     * @param ResponseInterface $response Réponse générée par la méthode
+     *
+     * @return void
+     */
+    protected function after(string $method, array $params, ResponseInterface $response): void
+    {
+        // Par défaut, ne fait rien
     }
 }

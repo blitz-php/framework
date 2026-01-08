@@ -12,14 +12,18 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'force_https'     => Expect::bool()->default(false),
-    'allowed_methods' => Expect::listOf('string')->default(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
-    'format'          => Expect::string()->default('json'),
-    'strict'          => Expect::bool()->default(true),
-    'field'           => Expect::arrayOf('string', 'string'),
+    'locale'      => Expect::string('en'),
+    'force_https' => Expect::bool()->default(false),
+    'format'      => Expect::string()->default('json'),
+    'strict'      => Expect::bool()->default(true),
+    'field'       => Expect::arrayOf('string', 'string')->default([
+        'status'  => 'status',
+        'message' => 'message',
+        'code'    => 'code',
+        'errors'  => 'errors',
+        'result'  => 'result',
+    ]),
     'ip_blacklist'    => Expect::listOf('string'),
     'ip_whitelist'    => Expect::listOf('string'),
     'ajax_only'       => Expect::bool()->default(false),
-    'auth '           => Expect::anyOf('jwt', 'session')->default('jwt'),
-    'jwt'             => Expect::arrayOf('mixed', 'string'),
 ])->otherItems();

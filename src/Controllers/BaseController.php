@@ -23,7 +23,6 @@ use Dimtrovich\Validation\ValidatedInput;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
 
 /**
  * Contrôleur de base pour toute application BlitzPHP
@@ -32,24 +31,8 @@ abstract class BaseController
 {
     /**
      * Helpers qui seront automatiquement chargés lors de l'instanciation de la classe.
-     *
-     * @var array
      */
-    protected $helpers = [];
-
-    /**
-     * Le modèle qui contient les données de cette ressource
-     *
-     * @var string|null
-     */
-    protected $modelName;
-
-    /**
-     * Le modèle qui contient les données de cette ressource
-     *
-     * @var object|null
-     */
-    protected $model;
+    protected array $helpers = [];
 
     /**
      * Instance de l'objet Request principal.
@@ -100,8 +83,6 @@ abstract class BaseController
             $this->forceHTTPS($this->forceHTTPS);
         }
 
-        $this->getModel();
-
         if ($this->helpers !== []) {
             helper($this->helpers);
         }
@@ -149,28 +130,6 @@ abstract class BaseController
     }
 
     /**
-     * Définissez ou modifiez le modèle auquel ce contrôleur est lié.
-     * Étant donné le nom ou l'objet, déterminer l'autre.
-     *
-     * @param object|string|null $which
-     */
-    protected function setModel($which = null)
-    {
-        if ($which) {
-            $this->model     = is_object($which) ? $which : null;
-            $this->modelName = is_object($which) ? null : $which;
-        }
-
-        if (empty($this->model) && ! empty($this->modelName) && class_exists($this->modelName)) {
-            $this->model = model($this->modelName);
-        }
-
-        if (! empty($this->model) && empty($this->modelName)) {
-            $this->modelName = $this->model::class;
-        }
-    }
-
-    /**
      * Une méthode pratique à utiliser lorsque vous devez vous assurer qu'un seul
      * La méthode est accessible uniquement via HTTPS. Si ce n'est pas le cas, alors une redirection
      * reviendra à cette méthode et l'en-tête HSTS sera envoyé
@@ -191,22 +150,8 @@ abstract class BaseController
      * Fournit un moyen simple de se lier à la classe principale de BlitzPHP
      * et de lui indiquer la durée de mise en cache de la page actuelle.
      */
-    protected function cachePage(int $time)
+    protected function cachePage(int $time): void
     {
         service('responsecache')->setTtl($time);
-    }
-
-    /**
-     * Recherche le model par defaut (à base de son nom) du controleur
-     *
-     * @throws ReflectionException
-     */
-    private function getModel()
-    {
-        $model = ! empty($this->modelName) ? $this->modelName : str_replace('Controller', 'Model', static::class);
-
-        if (class_exists($model)) {
-            $this->setModel($model);
-        }
     }
 }

@@ -37,64 +37,52 @@ class ApplicationController extends BaseController
      *
      * @throws ReflectionException
      */
-    protected function view(string $view, ?array $data = [], ?array $options = []): View
+    protected function view(string $view, array $data = [], array $options = []): View
     {
-        $path    = '';
-        $data    = (array) $data;
-        $options = (array) $options;
+        /**
+         * @var array<class-string<self>, string>
+         */
+        static $cachedPaths = [];
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du controleur
-        if (! str_contains($view, '\\')) {
-            $reflection                                      = new ReflectionClass(static::class);
-            ['dirname' => $dirname, 'filename' => $filename] = pathinfo($reflection->getFileName());
-            $dirname                                         = str_ireplace('Controllers', 'Views', $dirname);
-            $filename                                        = strtolower(str_ireplace('Controller', '', $filename));
+        if (! str_contains($view, '\\') && ! str_starts_with($view, '/')) {
+            if (! isset($cachedPaths[static::class])) {
+                $reflection = new ReflectionClass(static::class);
+                ['dirname' => $dirname, 'filename' => $filename] = pathinfo($reflection->getFileName());
 
-            $parts = explode('Views', $dirname);
-            $base  = array_shift($parts);
-            $parts = array_map('strtolower', $parts);
-            $parts = [$base, ...$parts];
+                [$dirname, $filename] = str_ireplace(['Controllers', 'Controller'], ['Views', ''], [$dirname, $filename]);
 
-            $dirname = implode('Views', $parts);
-            $path    = implode(DS, [$dirname, $filename]) . DS;
+                $fullpath = $dirname . DS . strtolower($filename) . DS;
 
-            if (! is_dir($path)) {
-                $path = implode(DS, [$dirname]) . DS;
+                $cachedPaths[static::class] = is_dir($fullpath) ? $fullpath : $dirname . DS;
             }
+
+            $view = $cachedPaths[static::class] . $view;
         }
 
         /** @var View */
         $viewer = service('viewer');
 
-        $viewer->setData($data)->options($options);
+        $viewer->setData($data + $this->viewDatas)->options($options);
 
         if ($this->layout !== '') {
             $viewer->layout($this->layout);
         }
 
-        if ($this->viewDatas !== [] && is_array($this->viewDatas)) {
-            $viewer->addData($this->viewDatas);
-        }
-
         if (empty($data['title'])) {
-            if (! is_string($controllerName = Dispatcher::getController(false))) {
-                $controllerName = static::class;
-            }
-            $controllerName = str_ireplace(['App\Controllers', 'Controller'], '', $controllerName);
-
-            $dbt  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-            $func = $dbt[1]['function'] ?? Dispatcher::getMethod();
+            $controllerName = str_ireplace(['App\Controllers', 'Controller'], '', static::class);
+            $func           = Dispatcher::getMethod();
 
             $viewer->setVar('title', $controllerName . ' - ' . $func);
         }
 
-        return $viewer->display($path . $view);
+        return $viewer->display($view);
     }
 
     /**
      * Charge et rend directement une vue
      */
-    final protected function render(array|string $view = '', ?array $data = [], ?array $options = []): ResponseInterface
+    protected function render(array|string $view = '', ?array $data = [], ?array $options = []): ResponseInterface
     {
         if (is_array($view)) {
             $data    = $view;
