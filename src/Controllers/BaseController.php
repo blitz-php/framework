@@ -143,7 +143,7 @@ abstract class BaseController
      */
     protected function forceHTTPS(int $duration = 31536000)
     {
-        force_https($duration, $this->request, $this->response);
+        force_https($duration, $this->request);
     }
 
     /**

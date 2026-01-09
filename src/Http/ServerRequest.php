@@ -109,8 +109,8 @@ class ServerRequest implements ServerRequestInterface
         'delete'  => ['env' => 'REQUEST_METHOD', 'value' => 'DELETE'],
         'head'    => ['env' => 'REQUEST_METHOD', 'value' => 'HEAD'],
         'options' => ['env' => 'REQUEST_METHOD', 'value' => 'OPTIONS'],
-        'https'   => ['env' => 'HTTPS', 'options' => [1, 'on']],
-        'ssl'     => ['env' => 'HTTPS', 'options' => [1, 'on']],
+        'https'   => ['env' => 'HTTPS', 'value' => true],
+        'ssl'     => ['env' => 'HTTPS', 'value' => true],
         'ajax'    => ['env' => 'HTTP_X_REQUESTED_WITH', 'value' => 'XMLHttpRequest'],
         'json'    => ['accept' => ['application/json'], 'param' => '_ext', 'value' => 'json'],
         'xml'     => ['accept' => ['application/xml', 'text/xml'], 'exclude' => ['text/html'], 'param' => '_ext', 'value' => 'xml'],
@@ -1390,9 +1390,9 @@ class ServerRequest implements ServerRequestInterface
      * @param string|null $default Valeur par défaut lors de la tentative de récupération d'un environnement
      *                             valeur de la variable qui n'existe pas.
      *
-     * @return string|null Soit la valeur de l'environnement, soit null si la valeur n'existe pas.
+     * @return bool|int|string|null Soit la valeur de l'environnement, soit null si la valeur n'existe pas.
      */
-    public function getEnv(string $key, ?string $default = null): ?string
+    public function getEnv(string $key, ?string $default = null)
     {
         $key = strtoupper($key);
         if (! array_key_exists($key, $this->_environment) || null === $this->_environment[$key]) {
