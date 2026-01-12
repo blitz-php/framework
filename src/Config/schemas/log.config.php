@@ -19,7 +19,7 @@ return Expect::structure([
         'file' => Expect::structure([
             'level'          => Expect::string(on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG),
             'extension'      => Expect::string(''),
-            'permissions'    => Expect::int(644),
+            'permissions'    => Expect::int(0644),
             'path'           => Expect::string(''),
             'format'         => Expect::anyOf('json', 'line', 'normalizer', 'scalar')->default('line'),
             'dayly_rotation' => Expect::bool(true),

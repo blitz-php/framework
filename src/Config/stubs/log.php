@@ -124,7 +124,7 @@ return [
              *
              * @var int
              */
-            'permissions' => 644,
+            'permissions' => 0644,
 
             /**
              * Chemin du répertoire de journalisation

@@ -34,12 +34,15 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\Processor\UidProcessor;
 use Monolog\Processor\WebProcessor;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use stdClass;
 use Stringable;
 
 class Logger implements LoggerInterface
 {
+	use LoggerTrait;
+
     /**
      * Options de configuration provenant de app/Config/log.php
      *
@@ -90,70 +93,6 @@ class Logger implements LoggerInterface
     /**
      * {@inheritDoc}
      */
-    public function emergency(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::EMERGENCY, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function alert(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::ALERT, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function critical(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::CRITICAL, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function error(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::ERROR, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function warning(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::WARNING, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function notice(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::NOTICE, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function info(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::INFO, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function debug(string|Stringable $message, array $context = []): void
-    {
-        $this->log(LogLevel::DEBUG, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function log($level, string|Stringable $message, array $context = []): void
     {
         $this->monolog->log($level, $message, $context);
@@ -194,9 +133,9 @@ class Logger implements LoggerInterface
         $extension = $options->extension ?: '.log';
 
         if (($options->dayly_rotation ?: true) === true) {
-            $handler = new RotatingFileHandler($directory . $filename . $extension, $options->max_files ?: 0, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);
+            $handler = new RotatingFileHandler($directory . $filename . $extension, $options->max_files ?: 0, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 0644);
         } else {
-            $handler = new StreamHandler($directory . $filename . $extension, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 644);
+            $handler = new StreamHandler($directory . $filename . $extension, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 0644);
         }
 
         $this->monolog->pushHandler(
