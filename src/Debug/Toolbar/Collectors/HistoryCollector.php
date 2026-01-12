@@ -74,7 +74,7 @@ class HistoryCollector extends BaseCollector
             $contents = @json_decode($contents);
             if (json_last_error() === JSON_ERROR_NONE) {
                 preg_match('/debugbar_(.*)\.json$/s', $filename, $time);
-                $time = sprintf('%.6f', $time[1] ?? 0);
+                $time = sprintf('%.6F', $time[1] ?? 0);
 
                 // Fichiers de la barre de débogage affichés dans History Collector
                 $files[] = [

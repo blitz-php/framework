@@ -164,7 +164,7 @@ abstract class BaseCollector
      *      ],
      *  ];
      */
-    public function getVarData()
+    public function getVarData(): ?array
     {
         return null;
     }
@@ -200,7 +200,7 @@ abstract class BaseCollector
     /**
      * Obtient la valeur "badge" pour le bouton.
      */
-    public function getBadgeValue()
+    public function getBadgeValue(): ?int
     {
         return null;
     }

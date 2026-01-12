@@ -19,7 +19,7 @@ use BlitzPHP\Formatter\JsonFormatter;
 use BlitzPHP\Formatter\XmlFormatter;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
-use BlitzPHP\Utilities\Date;
+use BlitzPHP\Utilities\DateTime\Date;
 use BlitzPHP\View\Parser;
 use Exception;
 use GuzzleHttp\Psr7\Utils;
@@ -49,7 +49,7 @@ class Toolbar
      *
      * @var list<BaseCollector>
      */
-    protected $collectors = [];
+    protected array $collectors = [];
 
     /**
      * Dossier de sauvegarde des information de debogage
@@ -294,7 +294,7 @@ class Toolbar
         // Le grouper
         $data = $this->structureTimelineData($data);
 
-        return $data;
+        return array_filter($data);
     }
 
     /**
@@ -341,7 +341,7 @@ class Toolbar
                 continue;
             }
 
-            $data = array_merge($data, $collector->getVarData());
+            $data = array_merge($data, $collector->getVarData() ?? []);
         }
 
         return $data;
@@ -392,6 +392,11 @@ class Toolbar
             return $response;
         }
 
+		// S'il y'a conflit avec les entete native de php, on s'arrete
+		if ($this->hasNativeHeaderConflict()) {
+			return $response;
+		}
+
         // Si on a desactiver le debogage ou l'affichage de la debugbar, on s'arrete
         if (! BLITZ_DEBUG || ! $this->config->show_debugbar) {
             return $response;
@@ -418,7 +423,7 @@ class Toolbar
 
         // Les formats non HTML ne doivent pas inclure la barre de débogage,
         // puis nous envoyons des en-têtes indiquant où trouver les données de débogage pour cette réponse
-        if ($request->ajax() || ! str_contains($format, 'html')) {
+        if ($this->shouldDisableToolbar($request)|| ! str_contains($format, 'html')) {
             return $response
                 ->withHeader('Debugbar-Time', "{$time}")
                 ->withHeader('Debugbar-Link', site_url("?debugbar_time={$time}"));
@@ -511,7 +516,7 @@ class Toolbar
     {
         $data = json_decode($data, true);
 
-        if ($this->config->max_history !== 0 && preg_match('/\d+\.\d{6}/s', (string) $debugbar_time, $debugbarTime)) {
+        if (preg_match('/\d+\.\d{6}/s', (string) $debugbar_time, $debugbarTime)) {
             $history = new HistoryCollector();
             $history->setFiles(
                 $debugbarTime[0],
@@ -544,6 +549,61 @@ class Toolbar
         }
 
         return $output;
+    }
+
+    /**
+     * Vérifie si les en-têtes PHP natifs indiquent une réponse non HTML ou si les en-têtes ont déjà été envoyés.
+     */
+    protected function hasNativeHeaderConflict(): bool
+    {
+        // Si des en-têtes sont envoyés, nous ne pouvons pas injecter de code HTML.
+        if (headers_sent()) {
+            return true;
+        }
+
+        // Inspection des en-têtes natifs
+        foreach (headers_list() as $header) {
+            $lowerHeader = strtolower($header);
+
+            $isNonHtmlContent = str_starts_with($lowerHeader, 'content-type:') && ! str_contains($lowerHeader, 'text/html');
+            $isAttachment     = str_starts_with($lowerHeader, 'content-disposition:') && str_contains($lowerHeader, 'attachment');
+
+            if ($isNonHtmlContent || $isAttachment) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Détermine si la barre d'outils doit être désactivée en fonction des en-têtes de requête.
+     *
+     * Cette méthode permet de vérifier à la fois la présence des en-têtes et leurs valeurs attendues.
+     * Utile pour AJAX, HTMX, Unpoly, Turbo, etc., où des réponses HTML partielles sont attendues.
+     *
+     * @return bool Vrai si une condition d'en-tête correspond ; faux dans le cas contraire.
+     */
+    private function shouldDisableToolbar(Request $request): bool
+    {
+        foreach ($this->config->disable_on_headers as $headerName => $expectedValue) {
+            if (! $request->hasHeader($headerName)) {
+                continue; // header not present, skip
+            }
+
+            // Si expectedValue est nul, seule la présence suffit.
+            if ($expectedValue === null) {
+                return true;
+            }
+
+            $headerValue = strtolower($request->getHeaderLine($headerName));
+
+            if ($headerValue === strtolower($expectedValue)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

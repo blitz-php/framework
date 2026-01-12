@@ -17,10 +17,8 @@ class Timer
 {
     /**
      * Liste de toutes les minuteries.
-     *
-     * @var array
      */
-    protected $timers = [];
+    protected array $timers = [];
 
     /**
      * Démarre une minuterie en cours d'exécution.

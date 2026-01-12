@@ -40,7 +40,7 @@ class TimersCollector extends BaseCollector
     {
         $data = [];
 
-        $benchmark = single_service('timer');
+        $benchmark = service('timer');
         $rows      = $benchmark->getTimers(6);
 
         foreach ($rows as $name => $info) {

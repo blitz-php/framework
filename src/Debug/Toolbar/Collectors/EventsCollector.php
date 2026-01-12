@@ -38,7 +38,7 @@ class EventsCollector extends BaseCollector
     /**
      * {@inheritDoc}
      */
-    protected string $title = 'Evenements';
+    protected string $title = 'Evénements';
 
     /**
      * {@inheritDoc}
@@ -51,7 +51,7 @@ class EventsCollector extends BaseCollector
 
         foreach ($rows as $info) {
             $data[] = [
-                'name'      => 'Evenement: ' . $info['event'],
+                'name'      => 'Evénement: ' . $info['event'],
                 'component' => 'Events',
                 'start'     => $info['start'],
                 'duration'  => $info['end'] - $info['start'],

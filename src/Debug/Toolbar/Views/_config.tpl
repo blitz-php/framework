@@ -1,5 +1,5 @@
 <p class="debug-bar-alignRight">
-	<a href="https://github.com/blitz-php/framework" target="_blank" >Lisez la docs de BlitzPHP...</a>
+	<a href="https://blitz-php.byethost14.com/docs" target="_blank" >Lisez la docs de BlitzPHP...</a>
 </p>
 
 <table>

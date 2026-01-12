@@ -34,12 +34,16 @@ class LogsCollector extends BaseCollector
     protected string $title = 'Logs';
 
     /**
-     * Nos données collectées
+     * Nos données collectées.
+     *
+     * @var list<array{level: string, msg: string}>
      */
     protected array $data = [];
 
     /**
      * {@inheritDoc}
+     *
+     * @return array{logs: list<array{level: string, msg: string}>}
      */
     public function display(): array
     {
@@ -70,13 +74,15 @@ class LogsCollector extends BaseCollector
 
     /**
      * S'assure que les données ont été collectées.
+     *
+     * @return list<array{level: string, msg: string}>
      */
-    protected function collectLogs()
+    protected function collectLogs(): array
     {
         if ($this->data !== []) {
             return $this->data;
         }
 
-        return $this->data = single_service('logger')->logCache;
+        return $this->data = service('logger')->logCache ?? [];
     }
 }

@@ -27,22 +27,24 @@ var blitzphpDebugBar = {
             .getElementById("debug-icon-link")
             .addEventListener("click", blitzphpDebugBar.toggleToolbar, true);
 
-        // Permet de mettre en évidence la ligne d'historique de la requete en cours
-        var btn = this.toolbar.querySelector(
-            'button[data-time="' + localStorage.getItem("debugbar-time") + '"]'
-        );
-        blitzphpDebugBar.addClass(btn.parentNode.parentNode, "current");
-
         historyLoad = this.toolbar.getElementsByClassName("blitzphp-history-load");
 
-        for (var i = 0; i < historyLoad.length; i++) {
-            historyLoad[i].addEventListener(
-                "click",
-                function () {
-                    loadDoc(this.getAttribute("data-time"));
-                },
-                true
+        if (historyLoad.length) {
+            // Permet de mettre en surbrillance la ligne de la requête d'historique actuelle.
+            var btn = this.toolbar.querySelector(
+                'button[data-time="' + localStorage.getItem("debugbar-time-new") + '"]'
             );
+            blitzphpDebugBar.addClass(btn.parentNode.parentNode, "current");
+
+            for (var i = 0; i < historyLoad.length; i++) {
+				historyLoad[i].addEventListener(
+					"click",
+					function () {
+						loadDoc(this.getAttribute("data-time"));
+					},
+					true
+				);
+			}
         }
 
         // Afficher l'onglet actif au chargement de la page
@@ -77,14 +79,14 @@ var blitzphpDebugBar = {
                 links[i].addEventListener("click", function() {
                     blitzphpDebugBar.toggleDataTable(datatable)
                 }, true);
-               
+
             } else if (toggleData === "childrows") {
 
                 let child = links[i].getAttribute("data-child");
                 links[i].addEventListener("click", function() {
                     blitzphpDebugBar.toggleChildRows(child)
                 }, true);
-                
+
             } else {
                 links[i].addEventListener("click", blitzphpDebugBar.toggleRows, true);
             }
@@ -173,10 +175,10 @@ var blitzphpDebugBar = {
             );
 
             if (target.classList.contains("debug-bar-ndisplay")) {
-                blitzphpDebugBar.switchClass(target, "debug-bar-ndisplay", "debug-bar-dtableRow");   
+                blitzphpDebugBar.switchClass(target, "debug-bar-ndisplay", "debug-bar-dtableRow");
             } else {
                 blitzphpDebugBar.switchClass(target, "debug-bar-dtableRow", "debug-bar-ndisplay");
-            } 
+            }
         }
     },
 
@@ -248,7 +250,7 @@ var blitzphpDebugBar = {
     },
 
     /**
-     * Définit l'état initial de la barre d'outils (ouverte ou réduite) lorsque la page est chargée 
+     * Définit l'état initial de la barre d'outils (ouverte ou réduite) lorsque la page est chargée
      * pour la première fois pour lui permettre de mémoriser l'état entre les actualisations.
      */
     setToolbarState: function () {
@@ -260,7 +262,7 @@ var blitzphpDebugBar = {
         } else {
             blitzphpDebugBar.switchClass(blitzphpDebugBar.icon, "debug-bar-dinlineBlock", "debug-bar-ndisplay");
             blitzphpDebugBar.switchClass(blitzphpDebugBar.toolbar, "debug-bar-ndisplay", "debug-bar-dinlineBlock");
-        } 
+        }
     },
 
     toggleViewsHints: function () {
@@ -614,7 +616,7 @@ var blitzphpDebugBar = {
                     ! theme &&
                     window.matchMedia("(prefers-color-scheme: dark)").matches
                 ) {
-                    // S'il n'y a pas de cookie et que « prefers-color-scheme » est défini sur « dark », 
+                    // S'il n'y a pas de cookie et que « prefers-color-scheme » est défini sur « dark »,
                     // cela signifie que l'utilisateur souhaite passer en mode clair.
                     blitzphpDebugBar.createCookie("debug-bar-theme", "light", 365);
                     blitzphpDebugBar.removeClass(blitzphpDebugBar.toolbarContainer, "dark");
@@ -635,7 +637,7 @@ var blitzphpDebugBar = {
                             "light"
                         );
                     } else {
-                        // Dans tous les autres cas : s'il n'y a pas de cookie, ou si le cookie est réglé sur 
+                        // Dans tous les autres cas : s'il n'y a pas de cookie, ou si le cookie est réglé sur
                         // « light », ou si le « prefers-color-scheme » est « light »...
                         blitzphpDebugBar.createCookie("debug-bar-theme", "dark", 365);
                         blitzphpDebugBar.removeClass(
