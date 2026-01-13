@@ -19,5 +19,5 @@ return Expect::structure([
     'editor'          => Expect::type('string|closure')->default('vscode'),
     'blacklist'       => Expect::listOf('string')->default([]),
     'data'            => Expect::arrayOf(Expect::type('array|closure'), 'string')->default([]),
-    'handlers'        => Expect::listOf('string')->default([]),
+    'handlers'        => Expect::listOf('string|closure')->default([]),
 ])->otherItems();

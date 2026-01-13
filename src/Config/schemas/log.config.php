@@ -17,13 +17,14 @@ return Expect::structure([
     'processors'  => Expect::listOf('string')->default(['web', 'introspection', 'hostname', 'psr']),
     'handlers'    => Expect::structure([
         'file' => Expect::structure([
-            'level'          => Expect::string(on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG),
-            'extension'      => Expect::string(''),
-            'permissions'    => Expect::int(0644),
-            'path'           => Expect::string(''),
-            'format'         => Expect::anyOf('json', 'line', 'normalizer', 'scalar')->default('line'),
-            'dayly_rotation' => Expect::bool(true),
-            'max_files'      => Expect::int(0),
+			'active'         => Expect::bool(true)->nullable(),
+			'level'          => Expect::string(on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG),
+			'extension'      => Expect::string(''),
+			'permissions'    => Expect::int(0644),
+			'path'           => Expect::string(''),
+			'format'         => Expect::anyOf('json', 'line', 'normalizer', 'scalar')->default('line'),
+			'dayly_rotation' => Expect::bool(true),
+			'max_files'      => Expect::int(0),
         ]),
     ])->otherItems(),
 ])->otherItems();

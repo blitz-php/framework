@@ -13,11 +13,11 @@ use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cli\Console\Console;
 use BlitzPHP\Config\Config;
 use BlitzPHP\Container\Services;
-use BlitzPHP\Contracts\Database\ConnectionInterface;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
 use BlitzPHP\Debug\Logger;
+use BlitzPHP\Debug\Timer;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Http\Redirection;
@@ -977,6 +977,39 @@ if (! function_exists('component')) {
         }
 
         return service('componentLoader')->render($library, $params, $ttl, $cacheName);
+    }
+}
+
+if (! function_exists('timer')) {
+    /**
+     * Une méthode pratique pour utiliser le minuteur.
+     * Si aucun paramètre n'est passé, elle renvoie l'instance du minuteur.
+     * Si callable est passé, elle mesure la durée de callable et renvoie sa valeur de retour, le cas échéant.
+     * Sinon, elle démarre ou arrête le minuteur de manière intelligente.
+     *
+     * @param non-empty-string|null    $name
+     * @param (callable(): mixed)|null $callable
+     *
+     * @return ($name is null ? Timer : ($callable is (callable(): mixed) ? mixed : Timer))
+     */
+    function timer(?string $name = null, ?callable $callable = null)
+    {
+		/** @var Timer */
+        $timer = service('timer');
+
+        if ($name === null) {
+            return $timer;
+        }
+
+        if ($callable !== null) {
+            return $timer->record($name, $callable);
+        }
+
+        if ($timer->has($name)) {
+            return $timer->stop($name);
+        }
+
+        return $timer->start($name);
     }
 }
 

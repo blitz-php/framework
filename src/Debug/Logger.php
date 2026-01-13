@@ -71,7 +71,7 @@ class Logger implements LoggerInterface
     {
         $this->config = (object) config('log');
 
-        $this->monolog = new MonologLogger(str_replace(' ', '-', $this->config->name ?? 'application'));
+        $this->monolog = new MonologLogger(strtolower(str_replace(' ', '-', $this->config->name ?? 'application')));
 
         foreach (($this->config->handlers ?? []) as $handler => $options) {
 			if (isset($options['active']) && $options['active'] === false) {
@@ -128,14 +128,14 @@ class Logger implements LoggerInterface
      */
     private function pushFileHandler(stdClass $options): void
     {
-        $directory = rtrim($options->path ?: LOG_PATH, DS) . DS;
-        $filename  = strtolower(str_replace(' ', '_', $this->config->name ?: 'application'));
-        $extension = $options->extension ?: '.log';
+        $directory = rtrim($options->path ?? LOG_PATH, DS) . DS;
+        $filename  = strtolower(str_replace(' ', '_', $this->config->name ?? 'application'));
+        $extension = $options->extension ?? '.log';
 
-        if (($options->dayly_rotation ?: true) === true) {
-            $handler = new RotatingFileHandler($directory . $filename . $extension, $options->max_files ?: 0, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 0644);
+        if (($options->dayly_rotation ?? true) === true) {
+            $handler = new RotatingFileHandler($directory . $filename . $extension, $options->max_files ?? 0, $options->level ?? LogLevel::DEBUG, true, $options->permissions ?? 0644);
         } else {
-            $handler = new StreamHandler($directory . $filename . $extension, $options->level ?: LogLevel::DEBUG, true, $options->permissions ?: 0644);
+            $handler = new StreamHandler($directory . $filename . $extension, $options->level ?? LogLevel::DEBUG, true, $options->permissions ?? 0644);
         }
 
         $this->monolog->pushHandler(
@@ -256,7 +256,7 @@ class Logger implements LoggerInterface
             $format = 'json';
         }
         if ($allowed !== [] && ! in_array($format, $allowed, true)) {
-            throw new InvalidArgumentException('Invalid formatter for log file handler. Accepts values: ' . implode('/', $allowed));
+            throw new InvalidArgumentException('Formatage non valide pour le gestionnaire de fichiers de log. Valeurs acceptées : ' . implode('/', $allowed));
         }
 
         switch ($format) {

@@ -11,14 +11,9 @@
 
 namespace BlitzPHP\Container;
 
-use BlitzPHP\Autoloader\Autoloader;
-use BlitzPHP\Autoloader\Locator;
-use BlitzPHP\Autoloader\LocatorCached;
 use BlitzPHP\Cache\Cache;
-use BlitzPHP\Cache\Handlers\FileVarExportHandler;
 use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Config\Config;
-use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Contracts\Container\ContainerInterface;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
