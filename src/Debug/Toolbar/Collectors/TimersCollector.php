@@ -44,7 +44,7 @@ class TimersCollector extends BaseCollector
         $rows      = $benchmark->getTimers(6);
 
         foreach ($rows as $name => $info) {
-            if ($name === 'total_execution') {
+            if ($name === 'total_execution' || ! isset($info['start'], $info['end'])) {
                 continue;
             }
 

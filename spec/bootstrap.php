@@ -46,6 +46,8 @@ if (! isset($_SERVER['app.baseURL'])) {
 }
 define('BASE_URL', $_SERVER['app.baseURL']);
 
+require_once SYST_PATH . 'Spec/Mock/MockCommon.php';
+
 /**
  * Chargement du fichier responsable du demarrage du systeme
  */
