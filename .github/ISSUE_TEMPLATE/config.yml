@@ -4,10 +4,10 @@ contact_links:
     url: https://github.com/blitz-php/framework/discussions/new?category=q-a
     about: Demandez de l'aide à la communauté
 
-	- name: Demander une fonctionnalité
+  - name: Demander une fonctionnalité
     url: https://github.com/blitz-php/framework/discussions/new?category=ideas
     about: Partagez des idées de nouvelles fonctionnalités
 
-	- name: Signaler un problème de sécurité
+  - name: Signaler un problème de sécurité
     url: https://github.com/blitz-php/framework/security/policy
     about: Découvrez comment nous signaler les bugs sensibles
