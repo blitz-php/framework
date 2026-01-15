@@ -117,7 +117,7 @@ return [
              *
              * @var string
              */
-            'extension' => '',
+            'extension' => '.log',
 
             /**
              * Les autorisations du système de fichiers à appliquer sur les fichiers journaux nouvellement créés.
@@ -134,7 +134,7 @@ return [
              *
              * @var string
              */
-            'path' => '',
+            'path' => LOG_PATH,
 
             /**
              * Le format d'ecriture des journaux
@@ -162,7 +162,7 @@ return [
              *
              * @var int
              */
-            'max_files' => 0,
+            'max_files' => 30,
         ],
 
         /*

@@ -19,12 +19,12 @@ return Expect::structure([
         'file' => Expect::structure([
 			'active'         => Expect::bool(true)->nullable(),
 			'level'          => Expect::string(on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG),
-			'extension'      => Expect::string(''),
+			'extension'      => Expect::string('.log'),
 			'permissions'    => Expect::int(0644),
-			'path'           => Expect::string(''),
+			'path'           => Expect::string(LOG_PATH),
 			'format'         => Expect::anyOf('json', 'line', 'normalizer', 'scalar')->default('line'),
 			'dayly_rotation' => Expect::bool(true),
-			'max_files'      => Expect::int(0),
+			'max_files'      => Expect::int(30),
         ]),
     ])->otherItems(),
 ])->otherItems();

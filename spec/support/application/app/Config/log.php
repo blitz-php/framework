@@ -16,9 +16,9 @@ return [
     'handlers'    => [
         'file' => [
             'level'          => LogLevel::DEBUG,
-            'extension'      => '',
-            'permissions'    => 644,
-            'path'           => '',
+            'extension'      => '.log',
+            'permissions'    => 0644,
+            'path'           => LOG_PATH,
             'format'         => 'line',
             'dayly_rotation' => true,
             'max_files'      => 0,
