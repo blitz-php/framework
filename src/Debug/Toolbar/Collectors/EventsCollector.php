@@ -40,6 +40,13 @@ class EventsCollector extends BaseCollector
      */
     protected string $title = 'Evénements';
 
+	private EventManager $eventManager;
+
+	public function __construct(?EventManager $eventManager = null)
+	{
+		$this->eventManager = $eventManager ?? service('event');
+	}
+
     /**
      * {@inheritDoc}
      */
@@ -47,7 +54,7 @@ class EventsCollector extends BaseCollector
     {
         $data = [];
 
-        $rows = EventManager::getPerformanceLogs();
+        $rows = $this->eventManager->getPerformanceLogs();
 
         foreach ($rows as $info) {
             $data[] = [
@@ -70,7 +77,7 @@ class EventsCollector extends BaseCollector
             'events' => [],
         ];
 
-        foreach (EventManager::getPerformanceLogs() as $row) {
+        foreach ($this->eventManager->getPerformanceLogs() as $row) {
             $key = $row['event'];
 
             if (! array_key_exists($key, $data['events'])) {
@@ -99,7 +106,7 @@ class EventsCollector extends BaseCollector
      */
     public function getBadgeValue(): int
     {
-        return count(EventManager::getPerformanceLogs());
+        return count($this->eventManager->getPerformanceLogs());
     }
 
     /**

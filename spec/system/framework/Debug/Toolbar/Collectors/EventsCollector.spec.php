@@ -44,9 +44,8 @@ describe('Debug / Toolbar / Collectors / EventsCollector', function (): void {
             ],
         ];
 
-		$reflection = new ReflectionClass(EventManager::class);
-
-		$reflection->setValue('performanceLog', $mockLogs);
+		ReflectionClass::make($eventManager = new EventManager())->setValue('performanceLog', $mockLogs);
+		ReflectionClass::make($this->collector)->setValue('eventManager', $eventManager);
 
         $timelineData = $this->collector->timelineData();
 
@@ -58,9 +57,7 @@ describe('Debug / Toolbar / Collectors / EventsCollector', function (): void {
         expect($timelineData[0]['name'])->toBe('Evénement: pre_system');
         expect($timelineData[0]['component'])->toBe('Events');
         expect($timelineData[0]['duration'])->toBe(0.001);
-
-		$reflection->setValue('performanceLog', []);
-    });
+	});
 
     it('affiche les données correctement formatées', function (): void {
         $mockLogs = [
@@ -81,9 +78,8 @@ describe('Debug / Toolbar / Collectors / EventsCollector', function (): void {
             ],
         ];
 
-		$reflection = new ReflectionClass(EventManager::class);
-
-		$reflection->setValue('performanceLog', $mockLogs);
+		ReflectionClass::make($eventManager = new EventManager())->setValue('performanceLog', $mockLogs);
+		ReflectionClass::make($this->collector)->setValue('eventManager', $eventManager);
 
         $display = $this->collector->display();
 
@@ -97,9 +93,7 @@ describe('Debug / Toolbar / Collectors / EventsCollector', function (): void {
         expect($display['events']['pre_system']['duration'])->toBe('2.00'); // (0.001 + 0.001) * 1000
         expect($display['events']['post_controller']['count'])->toBe(1);
         expect($display['events']['post_controller']['duration'])->toBe('2.00'); // 0.002 * 1000
-
-		$reflection->setValue('performanceLog', []);
-    });
+	});
 
     it('retourne la valeur correcte du badge', function (): void {
         $mockLogs = [
@@ -108,19 +102,15 @@ describe('Debug / Toolbar / Collectors / EventsCollector', function (): void {
             ['event' => 'event3', 'start' => 2, 'end' => 3],
         ];
 
-        $reflection = new ReflectionClass(EventManager::class);
-
-		$reflection->setValue('performanceLog', $mockLogs);
+        ReflectionClass::make($eventManager = new EventManager())->setValue('performanceLog', $mockLogs);
+		ReflectionClass::make($this->collector)->setValue('eventManager', $eventManager);
 
         expect($this->collector->getBadgeValue())->toBe(3);
-
-		$reflection->setValue('performanceLog', []);
     });
 
     it('retourne 0 pour le badge quand il n\'y a pas d\'événements', function (): void {
-        $reflection = new ReflectionClass(EventManager::class);
-
-		$reflection->setValue('performanceLog', []);
+        ReflectionClass::make($eventManager = new EventManager())->setValue('performanceLog', []);
+		ReflectionClass::make($this->collector)->setValue('eventManager', $eventManager);
 
         expect($this->collector->getBadgeValue())->toBe(0);
     });
@@ -133,9 +123,8 @@ describe('Debug / Toolbar / Collectors / EventsCollector', function (): void {
     });
 
     it('retourne un tableau complet avec getAsArray', function (): void {
-		$reflection = new ReflectionClass(EventManager::class);
-
-		$reflection->setValue('performanceLog', []);
+		ReflectionClass::make($eventManager = new EventManager())->setValue('performanceLog', []);
+		ReflectionClass::make($this->collector)->setValue('eventManager', $eventManager);
 
         $array = $this->collector->getAsArray();
 

@@ -42,12 +42,12 @@ describe('Debug / Iterator', function (): void {
 
     it('exécute les tests et génère des résultats', function (): void {
         $this->iterator->add('fast_test', function () {
-            usleep(100); // 0.1 ms
+            sleep(1); // 1 s
             return 'fast';
         });
 
         $this->iterator->add('slow_test', function () {
-            usleep(500); // 0.5 ms
+            sleep(2); // 2s
             return 'slow';
         });
 
