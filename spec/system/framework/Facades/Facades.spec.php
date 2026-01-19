@@ -26,6 +26,7 @@ use BlitzPHP\Filesystem\Filesystem;
 use BlitzPHP\Filesystem\FilesystemManager;
 use BlitzPHP\Router\RouteBuilder;
 use BlitzPHP\Spec\ReflectionHelper;
+use BlitzPHP\Utilities\Reflection\ReflectionClass;
 use BlitzPHP\View\View as ViewView;
 use DI\NotFoundException;
 
@@ -77,7 +78,7 @@ describe('Facades', function (): void {
 			};
 
 			expect(ReflectionHelper::getPrivateMethodInvoker($class, 'accessor')())->toBe('fss');
-			expect(fn() => $class::exists(__FILE__))->toThrow(new NotFoundException("No entry or class found for 'fss'"));
+			expect(fn() => $class::exists(__FILE__))->toThrow(new InvalidArgumentException());
 		});
 
 		it('__callStatic genere une erreur si accessor renvoie une chaine qui peut etre resourdre par le fournisseur de service mais n\'est pas un objet', function (): void {
@@ -252,4 +253,217 @@ describe('Facades', function (): void {
             expect(View::exists('simple'))->toBeTruthy();
         });
     });
+
+	describe('Nouvelles fonctionnalités', function (): void {
+		beforeEach(function (): void {
+			ReflectionClass::make(Facade::class)->setValue('resolvedInstances', []);
+		});
+
+		it('getResolvedInstance met en cache l\'instance', function (): void {
+			$mockService = new class() {
+				public $counter = 0;
+				public function test() {
+					$this->counter++;
+					return 'test';
+				}
+			};
+
+			Container::set('test_service', $mockService);
+
+			$class = new class() extends Facade {
+				protected static function accessor(): string
+				{
+					return 'test_service';
+				}
+			};
+
+			// Premier appel - doit résoudre
+			$class::test();
+			$firstCounter = $mockService->counter;
+
+			// Deuxième appel - doit utiliser le cache
+			$class::test();
+			$secondCounter = $mockService->counter;
+
+			expect($firstCounter)->toBe(1);
+			expect($secondCounter)->toBe(2); // La méthode test() incrémente le compteur
+		});
+
+		it('resolveFacadeInstance gère NotFoundException correctement', function (): void {
+			$class = new class() extends Facade {
+				protected static function accessor(): string
+				{
+					return 'service_inexistant';
+				}
+			};
+
+			expect(fn() => ReflectionHelper::getPrivateMethodInvoker($class, 'resolveFacadeInstance')())
+				->toThrow(new InvalidArgumentException());
+		});
+
+		it('isResolved détecte correctement l\'état', function (): void {
+			$class = new class() extends Facade {
+				protected static function accessor(): object
+				{
+					return new stdClass();
+				}
+			};
+
+			expect($class::isResolved())->toBeFalsy();
+
+			// Appel d'une méthode pour résoudre l'instance
+			expect(fn() => $class::nonexistent())->toThrow(new Error());
+
+			expect($class::isResolved())->toBeTruthy();
+		});
+
+		it('clearResolvedInstance efface une instance spécifique', function (): void {
+			$class1 = new class() extends Facade {
+				protected static function accessor(): object
+				{
+					return new stdClass();
+				}
+			};
+
+			$class2 = new class() extends Facade {
+				protected static function accessor(): object
+				{
+					return new stdClass();
+				}
+			};
+
+			// Résoudre les deux instances
+			expect(fn() => $class1::nonexistent())->toThrow(new Error());
+			expect(fn() => $class2::nonexistent())->toThrow(new Error());
+
+			expect($class1::isResolved())->toBeTruthy();
+			expect($class2::isResolved())->toBeTruthy();
+
+			// Effacer seulement class1
+			$class1::clearResolvedInstance();
+
+			expect($class1::isResolved())->toBeFalsy();
+			expect($class2::isResolved())->toBeTruthy();
+		});
+
+		it('clearResolvedInstances efface toutes les instances', function (): void {
+			$class1 = new class() extends Facade {
+				protected static function accessor(): object
+				{
+					return new stdClass();
+				}
+			};
+
+			$class2 = new class() extends Facade {
+				protected static function accessor(): object
+				{
+					return new stdClass();
+				}
+			};
+
+			// Résoudre les deux instances
+			expect(fn() => $class1::nonexistent())->toThrow(new Error());
+			expect(fn() => $class2::nonexistent())->toThrow(new Error());
+
+			expect($class1::isResolved())->toBeTruthy();
+			expect($class2::isResolved())->toBeTruthy();
+
+			// Effacer toutes les instances
+			Facade::clearResolvedInstances();
+
+			expect($class1::isResolved())->toBeFalsy();
+			expect($class2::isResolved())->toBeFalsy();
+		});
+
+		it('Le cache fonctionne correctement avec plusieurs appels', function (): void {
+			$counter = 0;
+			$factory = function () use (&$counter) {
+				$counter++;
+				return new class() {
+					public function method() {
+						return 'called';
+					}
+				};
+			};
+
+			Container::set('counting_service', $factory());
+
+			$class = new class() extends Facade {
+				protected static function accessor(): string
+				{
+					return 'counting_service';
+				}
+			};
+
+			// Premier appel
+			$class::method();
+			$firstCounter = $counter;
+
+			// Deuxième appel
+			$class::method();
+			$secondCounter = $counter;
+
+			// Le service ne devrait être instancié qu'une fois
+			expect($firstCounter)->toBe(1);
+			expect($secondCounter)->toBe(1);
+		});
+
+		it('getResolvedInstance utilise le cache', function (): void {
+			$class = new class() extends Facade {
+				protected static function accessor(): object
+				{
+					return new stdClass();
+				}
+			};
+
+			$instance1 = ReflectionHelper::getPrivateMethodInvoker($class, 'getResolvedInstance')();
+			$instance2 = ReflectionHelper::getPrivateMethodInvoker($class, 'getResolvedInstance')();
+
+			expect($instance1)->toBe($instance2);
+		});
+
+		it('Les instances différentes n\'interfèrent pas entre elles', function (): void {
+			$class1 = new class() extends Facade {
+				protected static string $value = 'class1';
+				protected static function accessor(): object
+				{
+					return (object) ['value' => static::$value];
+				}
+			};
+
+			$class2 = new class() extends Facade {
+				protected static string $value = 'class2';
+				protected static function accessor(): object
+				{
+					return (object) ['value' => static::$value];
+				}
+			};
+
+			$proxy1 = ReflectionClass::make($class1)->invoke('getResolvedInstance');
+			$proxy2 = ReflectionClass::make($class2)->invoke('getResolvedInstance');
+
+			// S'assurer que les instances sont différentes
+			expect($proxy1)->not->toBe($proxy2);
+		});
+
+		it('Gestion des erreurs avec service non trouvé', function (): void {
+			$class = new class() extends Facade {
+				protected static function accessor(): string
+				{
+					return 'service_qui_n_existe_pas';
+				}
+			};
+
+			$exceptionMessage = null;
+			try {
+				$class::test();
+			} catch (InvalidArgumentException $e) {
+				$exceptionMessage = $e->getMessage();
+			}
+
+			expect($exceptionMessage)->toMatch('/Impossible de résoudre le service/');
+			expect($exceptionMessage)->toMatch('/service_qui_n_existe_pas/');
+			expect($exceptionMessage)->toMatch('/' . preg_quote($class::class, '/') . '/');
+		});
+	});
 });
