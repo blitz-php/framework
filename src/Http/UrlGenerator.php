@@ -21,6 +21,8 @@ use BlitzPHP\Utilities\String\Text;
 use Closure;
 
 /**
+ * Générateur d'URL
+ *
  * @credit <a href="http://laravel.com">Laravel - \Illuminate\Routing\UrlGenerator</a>
  */
 class UrlGenerator
@@ -28,64 +30,64 @@ class UrlGenerator
     use Macroable;
 
     /**
-     * The forced URL root.
+     * Racine forcée de l'URL.
      */
     protected string $forcedRoot = '';
 
     /**
-     * The forced scheme for URLs.
+     * Schéma forcé pour les URLs.
      */
     protected string $forceScheme = '';
 
     /**
-     * A cached copy of the URL root for the current request.
+     * Copie mise en cache de la racine de l'URL pour la requête actuelle.
      */
     protected ?string $cachedRoot = null;
 
     /**
-     * A cached copy of the URL scheme for the current request.
+     * Copie mise en cache du schéma de l'URL pour la requête actuelle.
      */
     protected ?string $cachedScheme = null;
 
     /**
-     * The root namespace being applied to controller actions.
+     * Espace de noms racine appliqué aux actions des contrôleurs.
      */
     protected string $rootNamespace = '';
 
     /**
-     * The session resolver callable.
+     * Fonction de résolution de session.
      *
      * @var callable
      */
     protected $sessionResolver;
 
     /**
-     * The encryption key resolver callable.
+     * Fonction de résolution de clé de chiffrement.
      *
      * @var callable
      */
     protected $keyResolver;
 
     /**
-     * The callback to use to format hosts.
+     * Callback utilisé pour formater les hôtes.
      *
      * @var Closure
      */
     protected $formatHostUsing;
 
     /**
-     * The callback to use to format paths.
+     * Callback utilisé pour formater les chemins.
      *
      * @var Closure
      */
     protected $formatPathUsing;
 
     /**
-     * Create a new URL Generator instance.
+     * Crée une nouvelle instance du générateur d'URL.
      *
-     * @param RouteCollectionInterface $routes    The route collection.
-     * @param Request                  $request   The request instance.
-     * @param string|null              $assetRoot The asset root URL.
+     * @param RouteCollectionInterface $routes    Collection des routes.
+     * @param Request                  $request   Instance de la requête.
+     * @param string|null              $assetRoot URL racine des assets.
      *
      * @return void
      */
@@ -95,7 +97,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the full URL for the current request.
+     * Obtient l'URL complète pour la requête actuelle.
      */
     public function full(): string
     {
@@ -103,7 +105,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the current URL for the request.
+     * Obtient l'URL actuelle pour la requête.
      */
     public function current(): string
     {
@@ -111,9 +113,9 @@ class UrlGenerator
     }
 
     /**
-     * Get the URL for the previous request.
+     * Obtient l'URL de la requête précédente.
      *
-     * @param mixed $fallback
+     * @param mixed $fallback URL de secours.
      */
     public function previous($fallback = false): string
     {
@@ -132,7 +134,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the previous URL from the session if possible.
+     * Obtient l'URL précédente depuis la session si possible.
      */
     protected function getPreviousUrlFromSession(): ?string
     {
@@ -140,13 +142,14 @@ class UrlGenerator
     }
 
     /**
-     * Generate an absolute URL to the given path.
+     * Génère une URL absolue vers le chemin donné.
      */
     public function to(string $path, mixed $extra = [], ?bool $secure = null): string
     {
-        // First we will check if the URL is already a valid URL. If it is we will not
-        // try to generate a new one but will simply return the URL as is, which is
-        // convenient since developers do not always have to check if it's valid.
+        // D'abord, nous vérifions si l'URL est déjà une URL valide. Si c'est le cas,
+        // nous n'essaierons pas d'en générer une nouvelle mais retournerons simplement
+        // l'URL telle quelle, ce qui est pratique car les développeurs n'ont pas toujours
+        // à vérifier si elle est valide.
         if ($this->isValidUrl($path)) {
             return $path;
         }
@@ -159,9 +162,9 @@ class UrlGenerator
             )
         );
 
-        // Once we have the scheme we will compile the "tail" by collapsing the values
-        // into a single string delimited by slashes. This just makes it convenient
-        // for passing the array of parameters to this URL as a list of segments.
+        // Une fois que nous avons le schéma, nous compilons la "queue" en rassemblant les valeurs
+        // en une seule chaîne délimitée par des barres obliques. Cela rend simplement pratique
+        // le passage du tableau de paramètres à cette URL sous forme de liste de segments.
         $root = $this->formatRoot($this->formatScheme($secure));
 
         [$path, $query] = $this->extractQueryString($path);
@@ -173,7 +176,7 @@ class UrlGenerator
     }
 
     /**
-     * Generate a secure, absolute URL to the given path.
+     * Génère une URL sécurisée absolue vers le chemin donné.
      */
     public function secure(string $path, array $parameters = []): string
     {
@@ -181,7 +184,7 @@ class UrlGenerator
     }
 
     /**
-     * Generate the URL to an application asset.
+     * Génère l'URL vers un asset de l'application.
      */
     public function asset(string $path, ?bool $secure = null): string
     {
@@ -189,16 +192,16 @@ class UrlGenerator
             return $path;
         }
 
-        // Once we get the root URL, we will check to see if it contains an index.php
-        // file in the paths. If it does, we will remove it since it is not needed
-        // for asset paths, but only for routes to endpoints in the application.
+        // Une fois que nous obtenons l'URL racine, nous vérifions si elle contient un fichier index.php
+        // dans les chemins. Si c'est le cas, nous le supprimerons car il n'est pas nécessaire
+        // pour les chemins d'assets, mais uniquement pour les routes vers les points de terminaison de l'application.
         $root = $this->assetRoot ?: $this->formatRoot($this->formatScheme($secure));
 
         return $this->removeIndex($root) . '/' . trim($path, '/');
     }
 
     /**
-     * Generate the URL to a secure asset.
+     * Génère l'URL vers un asset sécurisé.
      */
     public function secureAsset(string $path): string
     {
@@ -206,20 +209,20 @@ class UrlGenerator
     }
 
     /**
-     * Generate the URL to an asset from a custom root domain such as CDN, etc.
+     * Génère l'URL vers un asset depuis une racine de domaine personnalisée telle qu'un CDN, etc.
      */
     public function assetFrom(string $root, string $path, ?bool $secure = null): string
     {
-        // Once we get the root URL, we will check to see if it contains an index.php
-        // file in the paths. If it does, we will remove it since it is not needed
-        // for asset paths, but only for routes to endpoints in the application.
+        // Une fois que nous obtenons l'URL racine, nous vérifions si elle contient un fichier index.php
+        // dans les chemins. Si c'est le cas, nous le supprimerons car il n'est pas nécessaire
+        // pour les chemins d'assets, mais uniquement pour les routes vers les points de terminaison de l'application.
         $root = $this->formatRoot($this->formatScheme($secure), $root);
 
         return $this->removeIndex($root) . '/' . trim($path, '/');
     }
 
     /**
-     * Remove the index.php file from a path.
+     * Supprime le fichier index.php d'un chemin.
      */
     protected function removeIndex(string $root): string
     {
@@ -229,7 +232,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the default scheme for a raw URL.
+     * Obtient le schéma par défaut pour une URL brute.
      */
     public function formatScheme(?bool $secure = null): string
     {
@@ -245,7 +248,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the URL to a named route.
+     * Obtient l'URL vers une route nommée.
      */
     public function route(string $name, array $parameters = [], bool $absolute = true): string
     {
@@ -257,7 +260,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the URL to a controller action.
+     * Obtient l'URL vers une action de contrôleur.
      *
      * @return false|string
      */
@@ -277,7 +280,7 @@ class UrlGenerator
     }
 
     /**
-     * Format the array of URL parameters.
+     * Formate le tableau des paramètres d'URL.
      */
     public function formatParameters(mixed $parameters): array
     {
@@ -285,7 +288,7 @@ class UrlGenerator
     }
 
     /**
-     * Extract the query string from the given path.
+     * Extrait la chaîne de requête du chemin donné.
      */
     protected function extractQueryString(string $path): array
     {
@@ -300,7 +303,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the base URL for the request.
+     * Obtient l'URL de base pour la requête.
      */
     public function formatRoot(string $scheme, ?string $root = null): string
     {
@@ -318,7 +321,7 @@ class UrlGenerator
     }
 
     /**
-     * Format the given URL segments into a single URL.
+     * Formate les segments d'URL donnés en une seule URL.
      */
     public function format(string $root, string $path, mixed $route = null): string
     {
@@ -336,7 +339,7 @@ class UrlGenerator
     }
 
     /**
-     * Determine if the given path is a valid URL.
+     * Détermine si le chemin donné est une URL valide.
      */
     public function isValidUrl(string $path): bool
     {
@@ -348,7 +351,7 @@ class UrlGenerator
     }
 
     /**
-     * Force the scheme for URLs.
+     * Force le schéma pour les URLs.
      */
     public function forceScheme(?string $scheme): void
     {
@@ -358,7 +361,7 @@ class UrlGenerator
     }
 
     /**
-     * Set the forced root URL.
+     * Définit l'URL racine forcée.
      */
     public function forceRootUrl(?string $root): void
     {
@@ -368,7 +371,7 @@ class UrlGenerator
     }
 
     /**
-     * Set a callback to be used to format the host of generated URLs.
+     * Définit un callback à utiliser pour formater l'hôte des URLs générées.
      *
      * @return $this
      */
@@ -380,7 +383,7 @@ class UrlGenerator
     }
 
     /**
-     * Set a callback to be used to format the path of generated URLs.
+     * Définit un callback à utiliser pour formater le chemin des URLs générées.
      *
      * @return $this
      */
@@ -392,7 +395,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the path formatter being used by the URL generator.
+     * Obtient le formateur de chemin utilisé par le générateur d'URL.
      *
      * @return Closure
      */
@@ -402,7 +405,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the request instance.
+     * Obtient l'instance de la requête.
      */
     public function getRequest(): Request
     {
@@ -410,7 +413,7 @@ class UrlGenerator
     }
 
     /**
-     * Set the current request instance.
+     * Définit l'instance de la requête actuelle.
      */
     public function setRequest(Request $request): self
     {
@@ -423,7 +426,7 @@ class UrlGenerator
     }
 
     /**
-     * Set the route collection.
+     * Définit la collection des routes.
      */
     public function setRoutes(RouteCollectionInterface $routes): self
     {
@@ -433,7 +436,7 @@ class UrlGenerator
     }
 
     /**
-     * Get the session implementation from the resolver.
+     * Obtient l'implémentation de la session depuis le résolveur.
      */
     protected function getSession(): ?Store
     {
@@ -445,7 +448,7 @@ class UrlGenerator
     }
 
     /**
-     * Set the session resolver for the generator.
+     * Définit le résolveur de session pour le générateur.
      *
      * @return $this
      */
@@ -457,7 +460,7 @@ class UrlGenerator
     }
 
     /**
-     * Set the encryption key resolver.
+     * Définit le résolveur de clé de chiffrement.
      *
      * @return $this
      */
@@ -469,13 +472,11 @@ class UrlGenerator
     }
 
     /**
-     * Set the root controller namespace.
-     *
-     * @param string $rootNamespace
+     * Définit l'espace de noms racine des contrôleurs.
      *
      * @return $this
      */
-    public function setRootControllerNamespace($rootNamespace)
+    public function setRootControllerNamespace(string $rootNamespace)
     {
         $this->rootNamespace = $rootNamespace;
 
