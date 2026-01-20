@@ -46,10 +46,12 @@
         "mikey179/vfsstream": "^1.6",
         "mockery/mockery": "^1.6",
         "paragonie/csp-builder": "^3.0",
+        "phpmailer/phpmailer": "^7.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^1.11",
         "phpstan/phpstan-strict-rules": "^1.6",
-        "rector/rector": "^1.2"
+        "rector/rector": "^1.2",
+        "symfony/mailer": "^7.4"
     },
     "autoload": {
         "psr-4": {

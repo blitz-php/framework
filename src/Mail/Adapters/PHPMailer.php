@@ -11,6 +11,8 @@
 
 namespace BlitzPHP\Mail\Adapters;
 
+use Exception;
+use InvalidArgumentException;
 use PHPMailer\PHPMailer\PHPMailer as Mailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -194,26 +196,12 @@ class PHPMailer extends AbstractAdapter
      *
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
-    {
-        if (is_string($path)) {
-            $path = [$path => $name];
-        }
-
-        foreach ($path as $key => $value) {
-            $this->mailer->addAttachment($key, $value, $encoding, $type, $disposition);
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws \PHPMailer\PHPMailer\Exception
-     */
     public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
+        if (!$this->isValidMimeType($type)) {
+            throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
+        }
+
         $this->mailer->addStringAttachment($binary, $name, $encoding, $type, $disposition);
 
         return $this;
@@ -382,7 +370,12 @@ class PHPMailer extends AbstractAdapter
      */
     public function send(): bool
     {
-        return $this->mailer->send();
+		try {
+			return $this->mailer->send();
+		} catch (Exception $e) {
+			$this->lastError = $e->getMessage();
+			return false;
+		}
     }
 
     /**
@@ -430,6 +423,20 @@ class PHPMailer extends AbstractAdapter
 
         foreach ($addresses as $address) {
             $this->mailer->addAddress(...$address);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \PHPMailer\PHPMailer\Exception
+     */
+    protected function doAttach(array $path, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
+    {
+        foreach ($path as $key => $value) {
+            $this->mailer->addAttachment($key, $value, $encoding, $type, $disposition);
         }
 
         return $this;

@@ -17,6 +17,7 @@ return [
      * Le nom du gestionnaire a utiliser pour l'envoi des mail.
      *
      * Valeurs admissibles
+     *  - log: Uniquement pour la phase de dev ou les tests. Veuillez utiliser `phpmailer` ou `symfony` en production
      *  - phpmailer: Necessite l'installation de phpmailer (`composer require phpmailer/phpmailer`)
      *  - symfony: Necessite l'installation de symfony mailer (`composer require symfony/mailer`)
      *
@@ -24,7 +25,7 @@ return [
      *
      * @var class-string<BlitzPHP\Mail\Adapters\AbstractAdapter>|string
      */
-    'handler' => 'phpmailer',
+    'handler' => env('mail.handler', 'log'),
 
     /**
      * Dossier de base dans lequel sera pris les vues des emails
@@ -124,4 +125,11 @@ return [
      * @var int
      */
     'priority' => BlitzPHP\Mail\Mail::PRIORITY_NORMAL,
+
+	/**
+	 * Taille maximal des pieces jointes
+	 *
+	 * @var int
+	 */
+	'max_attachment_size' => 10 * 1024 * 1024,
 ];

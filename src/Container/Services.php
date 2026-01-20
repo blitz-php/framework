@@ -263,7 +263,7 @@ class Services extends BaseServices
             $config = static::get('config')->get('mail');
         }
 
-		return new Mail($config);
+		return new Mail($config, static::event());
     }
 
     /**
