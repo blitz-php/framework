@@ -1,34 +1,43 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\Http;
 
 use finfo;
 
 /**
- * MimeType Class
+ * Classe de gestion des types MIME
  *
- * Handles MIME type operations and provides functionality for working with
- * Multipurpose Internet Mail Extensions (MIME) types in the application.
- * This class is responsible for MIME type detection and mapping file extensions
- * to their corresponding MIME types.
+ * Gère les opérations relatives aux types MIME et fournit des fonctionnalités
+ * pour travailler avec les types MIME (Multipurpose Internet Mail Extensions)
+ * dans l'application. Cette classe est responsable de la détection des types MIME
+ * et de l'association des extensions de fichier avec leurs types MIME correspondants.
  */
 class MimeType
 {
     /**
-     * Array of MIME type mappings.
+     * Tableau des associations de types MIME
      *
-     * Associates file extensions with their corresponding MIME type(s).
-     * Each key is a file extension (without the dot) and the value is an array
-     * of one or more valid MIME types for that extension.
+     * Associe les extensions de fichier avec leur(s) type(s) MIME correspondant(s).
+     * Chaque clé est une extension de fichier (sans le point) et la valeur est un tableau
+     * d'un ou plusieurs types MIME valides pour cette extension.
      *
-     * Common MIME types included:
-     * - Web formats (html, json, xml)
-     * - Image formats (webp)
-     * - Feed formats (rss)
-     * - Application formats (ai, bin, csv, etc.)
+     * Types MIME communs inclus :
+     * - Formats web (html, json, xml)
+     * - Formats d'image (webp)
+     * - Formats de flux (rss)
+     * - Formats d'application (ai, bin, csv, etc.)
      *
-     * Some extensions may map to multiple MIME types, with the first type in the array
-     * being the preferred/default type.
+     * Certaines extensions peuvent correspondre à plusieurs types MIME, le premier type
+     * du tableau étant le type préféré/par défaut.
      *
      * @var array<string, array<string>>
      */
@@ -273,10 +282,11 @@ class MimeType
     ];
 
     /**
-     * Get the MIME types associated with a given file extension.
+     * Récupère les types MIME associés à une extension de fichier donnée
      *
-     * @param string $ext The file extension to look up.
-     * @return array|null An array of MIME types if found, or null if no MIME types are associated with the extension.
+     * @param string $ext Extension de fichier à rechercher
+	 *
+     * @return array|null Tableau des types MIME si trouvé, null si aucun type MIME n'est associé à l'extension
      */
     public static function getMimeTypes(string $ext): ?array
     {
@@ -284,11 +294,12 @@ class MimeType
     }
 
     /**
-     * Get the MIME type based on the file extension.
+     * Récupère le type MIME principal basé sur l'extension de fichier
      *
-     * @param string $ext The file extension.
-     * @param string|null $default The default MIME type to return if the extension is not found. Defaults to null.
-     * @return string|null The MIME type corresponding to the file extension, or the default MIME type if not found.
+     * @param string $ext Extension de fichier
+     * @param string|null $default Type MIME par défaut à retourner si l'extension n'est pas trouvée
+	 *
+     * @return string|null Type MIME correspondant à l'extension de fichier, ou le type MIME par défaut si non trouvé
      */
     public static function getMimeType(string $ext, ?string $default = null): ?string
     {
@@ -296,13 +307,13 @@ class MimeType
     }
 
     /**
-     * Add new mime types for a given file extension.
+     * Ajoute de nouveaux types MIME pour une extension de fichier donnée
      *
-     * If the file extension already exists, the new mime types will be merged with the existing ones.
+     * Si l'extension de fichier existe déjà, les nouveaux types MIME seront fusionnés
+     * avec les types existants
      *
-     * @param string $ext The file extension to associate with the mime types.
-     * @param array|string $mimeTypes The mime types to associate with the file extension.
-     * @return void
+     * @param string $ext Extension de fichier à associer avec les types MIME
+     * @param array|string $mimeTypes Types MIME à associer avec l'extension de fichier
      */
     public static function addMimeTypes(string $ext, array|string $mimeTypes): void
     {
@@ -316,13 +327,12 @@ class MimeType
     }
 
     /**
-     * Set MIME types for a given file extension.
+     * Définit les types MIME pour une extension de fichier donnée
      *
-     * This will overwrite any existing MIME types for the file extension.
+     * Cela écrasera tous les types MIME existants pour l'extension de fichier
      *
-     * @param string $ext The file extension.
-     * @param array|string $mimeTypes The MIME types to associate with the file extension.
-     * @return void
+     * @param string $ext Extension de fichier
+     * @param array|string $mimeTypes Types MIME à associer avec l'extension de fichier
      */
     public static function setMimeTypes(string $ext, array|string $mimeTypes): void
     {
@@ -330,10 +340,11 @@ class MimeType
     }
 
     /**
-     * Get the file extension associated with a given MIME type.
+     * Récupère l'extension de fichier associée à un type MIME donné
      *
-     * @param string $mimeType The MIME type for which to get the file extension.
-     * @return string|null The file extension associated with the MIME type, or null if no association is found.
+     * @param string $mimeType Type MIME pour lequel récupérer l'extension de fichier
+	 *
+     * @return string|null Extension de fichier associée au type MIME, ou null si aucune association n'est trouvée
      */
     public static function getExtension(string $mimeType): ?string
     {
@@ -347,14 +358,15 @@ class MimeType
     }
 
     /**
-     * Get the MIME type for a given file path.
+     * Récupère le type MIME pour un chemin de fichier donné
      *
-     * If the MIME type is not mapped to an extension then it will attempt to determine the MIME type of the file using
-     * the fileinfo extension.
+     * Si le type MIME n'est pas mappé à une extension, la méthode tentera de déterminer
+     * le type MIME du fichier en utilisant l'extension fileinfo
      *
-     * @param string $path The file path for which to get the MIME type.
-     * @param string $default The default MIME type to return if the MIME type cannot be determined.
-     * @return string The MIME type of the file, or the default MIME type if it cannot be determined.
+     * @param string $path Chemin du fichier pour lequel récupérer le type MIME
+     * @param string $default Type MIME par défaut à retourner si le type MIME ne peut être déterminé
+	 *
+     * @return string Type MIME du fichier, ou le type MIME par défaut s'il ne peut être déterminé
      */
     public static function getMimeTypeForFile(string $path, string $default = 'application/octet-stream'): string
     {

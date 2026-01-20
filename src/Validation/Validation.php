@@ -19,7 +19,7 @@ class Validation extends BaseValidation
 {
     public function __construct()
     {
-        parent::__construct(config('app.language'));
+        parent::__construct(config('app.locale'));
 
         $this->discoverRules();
     }
@@ -39,6 +39,8 @@ class Validation extends BaseValidation
      */
     protected function registerRules(array $rules): void
     {
+		$container = service('container');
+
         foreach ($rules as $key => $value) {
             if (is_int($key)) {
                 $name = $value::name();
@@ -48,7 +50,7 @@ class Validation extends BaseValidation
                 $rule = $key;
             }
 
-            $this->addValidator($name, service('container')->get($rule));
+            $this->addValidator($name, $container->get($rule));
         }
     }
 

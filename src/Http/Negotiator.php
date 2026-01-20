@@ -13,17 +13,26 @@ namespace BlitzPHP\Http;
 
 use BlitzPHP\Exceptions\HttpException;
 
+/**
+ * Classe de négociation de contenu HTTP
+ *
+ * Cette classe gère la négociation de contenu HTTP selon les spécifications RFC 7231.
+ * Elle permet de déterminer le meilleur type de contenu, jeu de caractères, encodage
+ * ou langue en fonction des préférences du client et des capacités du serveur.
+ */
 class Negotiator
 {
     /**
-     * Request
+     * Instance de la requête serveur
      *
      * @var ServerRequest
      */
     protected $request;
 
     /**
-     * Constructor
+     * Constructeur de la classe Negotiator
+     *
+     * @param ServerRequest|null $request Instance optionnelle de la requête serveur
      */
     public function __construct(?ServerRequest $request = null)
     {
@@ -33,7 +42,9 @@ class Negotiator
     }
 
     /**
-     * Stores the request instance to grab the headers from.
+     * Définit l'instance de requête pour récupérer les en-têtes
+     *
+     * @param ServerRequest $request Instance de la requête serveur
      */
     public function setRequest(ServerRequest $request): self
     {
@@ -43,15 +54,16 @@ class Negotiator
     }
 
     /**
-     * Determines the best content-type to use based on the $supported
-     * types the application says it supports, and the types requested
-     * by the client.
+     * Détermine le meilleur type de média (Content-Type) à utiliser
      *
-     * If no match is found, the first, highest-ranking client requested
-     * type is returned.
+     * Compare les types supportés par l'application avec les types demandés
+     * par le client dans l'en-tête Accept.
      *
-     * @param bool $strictMatch If TRUE, will return an empty string when no match found.
-     *                          If FALSE, will return the first supported element.
+     * @param array $supported Tableau des types de média supportés par l'application
+     * @param bool $strictMatch Si true, retourne une chaîne vide quand aucun match n'est trouvé.
+     *                         Si false, retourne le premier élément supporté.
+	 *
+     * @return string Le meilleur type de média correspondant
      */
     public function media(array $supported, bool $strictMatch = false): string
     {
@@ -59,19 +71,21 @@ class Negotiator
     }
 
     /**
-     * Determines the best charset to use based on the $supported
-     * types the application says it supports, and the types requested
-     * by the client.
+     * Détermine le meilleur jeu de caractères à utiliser
      *
-     * If no match is found, the first, highest-ranking client requested
-     * type is returned.
+     * Compare les jeux de caractères supportés par l'application avec ceux demandés
+     * par le client dans l'en-tête Accept-Charset.
+     *
+     * @param array $supported Tableau des jeux de caractères supportés par l'application
+	 *
+     * @return string Le meilleur jeu de caractères correspondant
      */
     public function charset(array $supported): string
     {
         $match = $this->getBestMatch($supported, $this->request->getHeaderLine('accept-charset'), false, true);
 
-        // If no charset is shown as a match, ignore the directive
-        // as allowed by the RFC, and tell it a default value.
+        // Si aucun jeu de caractères n'est trouvé, on utilise la valeur par défaut utf-8
+        // comme autorisé par la RFC
         if ($match === '' || $match === '0') {
             return 'utf-8';
         }
@@ -80,12 +94,14 @@ class Negotiator
     }
 
     /**
-     * Determines the best encoding type to use based on the $supported
-     * types the application says it supports, and the types requested
-     * by the client.
+     * Détermine le meilleur type d'encodage à utiliser
      *
-     * If no match is found, the first, highest-ranking client requested
-     * type is returned.
+     * Compare les encodages supportés par l'application avec ceux demandés
+     * par le client dans l'en-tête Accept-Encoding.
+     *
+     * @param array $supported Tableau des encodages supportés par l'application
+	 *
+     * @return string Le meilleur encodage correspondant
      */
     public function encoding(array $supported = []): string
     {
@@ -95,12 +111,14 @@ class Negotiator
     }
 
     /**
-     * Determines the best language to use based on the $supported
-     * types the application says it supports, and the types requested
-     * by the client.
+     * Détermine la meilleure langue à utiliser
      *
-     * If no match is found, the first, highest-ranking client requested
-     * type is returned.
+     * Compare les langues supportées par l'application avec celles demandées
+     * par le client dans l'en-tête Accept-Language.
+     *
+     * @param array $supported Tableau des langues supportées par l'application
+	 *
+     * @return string La meilleure langue correspondante
      */
     public function language(array $supported): string
     {
@@ -108,27 +126,29 @@ class Negotiator
     }
 
     // --------------------------------------------------------------------
-    // Utility Methods
+    // Méthodes utilitaires
     // --------------------------------------------------------------------
 
     /**
-     * Does the grunt work of comparing any of the app-supported values
-     * against a given Accept* header string.
+     * Effectue la comparaison entre les valeurs supportées par l'application
+     * et les valeurs demandées dans un en-tête Accept* spécifique
      *
-     * Portions of this code base on Aura.Accept library.
+     * Portions de ce code basées sur la bibliothèque Aura.Accept.
      *
-     * @param array  $supported    App-supported values
-     * @param string $header       header string
-     * @param bool   $enforceTypes If TRUE, will compare media types and sub-types.
-     * @param bool   $strictMatch  If TRUE, will return empty string on no match.
-     *                             If FALSE, will return the first supported element.
-     *
-     * @return string Best match
+     * @param array $supported Tableau des valeurs supportées par l'application
+     * @param string|null $header Chaîne de l'en-tête Accept* à analyser
+     * @param bool $enforceTypes Si true, compare les types et sous-types de média
+     * @param bool $strictMatch Si true, retourne une chaîne vide si aucun match n'est trouvé.
+     *                         Si false, retourne le premier élément supporté.
+	 *
+     * @return string La meilleure correspondance
+	 *
+     * @throws HttpException Si le tableau des valeurs supportées est vide
      */
     protected function getBestMatch(array $supported, ?string $header = null, bool $enforceTypes = false, bool $strictMatch = false): string
     {
         if ($supported === []) {
-            throw new HttpException('You must provide an array of supported values to all Negotiations.');
+            throw new HttpException('Vous devez fournir un tableau de valeurs supportées pour toutes les négociations.');
         }
 
         if ($header === null || $header === '' || $header === '0') {
@@ -138,17 +158,17 @@ class Negotiator
         $acceptable = $this->parseHeader($header);
 
         foreach ($acceptable as $accept) {
-            // if acceptable quality is zero, skip it.
+            // Si la qualité acceptable est zéro, on passe
             if ($accept['q'] === 0.0) {
                 continue;
             }
 
-            // if acceptable value is "anything", return the first available
+            // Si la valeur acceptable est "n'importe quoi", on retourne le premier disponible
             if ($accept['value'] === '*' || $accept['value'] === '*/*') {
                 return $supported[0];
             }
 
-            // If an acceptable value is supported, return it
+            // Si une valeur acceptable est supportée, on la retourne
             foreach ($supported as $available) {
                 if ($this->match($accept, $available, $enforceTypes)) {
                     return $available;
@@ -156,14 +176,18 @@ class Negotiator
             }
         }
 
-        // No matches? Return the first supported element.
+        // Aucune correspondance ? On retourne le premier élément supporté
         return $strictMatch ? '' : $supported[0];
     }
 
     /**
-     * Parses an Accept* header into it's multiple values.
+     * Analyse un en-tête Accept* en ses multiples valeurs
      *
-     * This is based on code from Aura.Accept library.
+     * Ce code est basé sur la bibliothèque Aura.Accept.
+     *
+     * @param string $header Chaîne de l'en-tête à analyser
+	 *
+     * @return array Tableau structuré des valeurs acceptables avec leurs paramètres
      */
     public function parseHeader(string $header): array
     {
@@ -203,28 +227,28 @@ class Negotiator
             ];
         }
 
-        // Sort to get the highest results first
+        // Tri pour obtenir les résultats de plus haute qualité en premier
         usort($results, static function ($a, $b): int {
             if ($a['q'] === $b['q']) {
                 $a_ast = substr_count($a['value'], '*');
                 $b_ast = substr_count($b['value'], '*');
 
-                // '*/*' has lower precedence than 'text/*',
-                // and 'text/*' has lower priority than 'text/plain'
+                // '*/*' a une priorité inférieure à 'text/*',
+                // et 'text/*' a une priorité inférieure à 'text/plain'
                 //
-                // This seems backwards, but needs to be that way
-                // due to the way PHP7 handles ordering or array
-                // elements created by reference.
+                // Cela semble inversé, mais nécessaire en raison de la façon
+                // dont PHP7 gère l'ordonnancement des éléments de tableau
+                // créés par référence.
                 if ($a_ast > $b_ast) {
                     return 1;
                 }
 
-                // If the counts are the same, but one element
-                // has more params than another, it has higher precedence.
+                // Si les comptes sont identiques, mais qu'un élément
+                // a plus de paramètres qu'un autre, il a une priorité supérieure.
                 //
-                // This seems backwards, but needs to be that way
-                // due to the way PHP7 handles ordering or array
-                // elements created by reference.
+                // Cela semble inversé, mais nécessaire en raison de la façon
+                // dont PHP7 gère l'ordonnancement des éléments de tableau
+                // créés par référence.
                 if ($a_ast === $b_ast) {
                     return count($b['params']) - count($a['params']);
                 }
@@ -232,7 +256,7 @@ class Negotiator
                 return 0;
             }
 
-            // Still here? Higher q values have precedence.
+            // Toujours là ? Les valeurs q plus élevées ont la priorité.
             return ($a['q'] > $b['q']) ? -1 : 1;
         });
 
@@ -240,7 +264,9 @@ class Negotiator
     }
 
     /**
-     * Match-maker
+     * Compare une valeur acceptable avec une valeur supportée
+     *
+     * @param bool $enforceTypes Si true, compare les types et sous-types
      */
     protected function match(array $acceptable, string $supported, bool $enforceTypes = false): bool
     {
@@ -249,13 +275,13 @@ class Negotiator
             $supported = $supported[0];
         }
 
-        // Is it an exact match?
+        // Correspondance exacte ?
         if ($acceptable['value'] === $supported['value']) {
             return $this->matchParameters($acceptable, $supported);
         }
 
-        // Do we need to compare types/sub-types? Only used
-        // by negotiateMedia().
+        // Doit-on comparer les types/sous-types ? Utilisé uniquement
+        // par negotiateMedia().
         if ($enforceTypes) {
             return $this->matchTypes($acceptable, $supported);
         }
@@ -264,8 +290,8 @@ class Negotiator
     }
 
     /**
-     * Checks two Accept values with matching 'values' to see if their
-     * 'params' are the same.
+     * Vérifie si deux valeurs Accept avec des 'values' correspondantes
+     * ont les mêmes paramètres
      */
     protected function matchParameters(array $acceptable, array $supported): bool
     {
@@ -283,25 +309,25 @@ class Negotiator
     }
 
     /**
-     * Compares the types/subtypes of an acceptable Media type and
-     * the supported string.
+     * Compare les types/sous-types d'un type de média acceptable
+     * avec la chaîne supportée
      */
     public function matchTypes(array $acceptable, array $supported): bool
     {
         [$aType, $aSubType] = explode('/', $acceptable['value']);
         [$sType, $sSubType] = explode('/', $supported['value']);
 
-        // If the types don't match, we're done.
+        // Si les types ne correspondent pas, on s'arrête
         if ($aType !== $sType) {
             return false;
         }
 
-        // If there's an asterisk, we're cool
+        // S'il y a un astérisque, c'est bon
         if ($aSubType === '*') {
             return true;
         }
 
-        // Otherwise, subtypes must match also.
+        // Sinon, les sous-types doivent correspondre aussi
         return $aSubType === $sSubType;
     }
 }

@@ -19,21 +19,31 @@ use BlitzPHP\Validation\Validation;
 use GuzzleHttp\Psr7\UploadedFile;
 
 /**
- * Gérer une réponse de redirection
+ * Gestionnaire de réponse de redirection
+ *
+ * Cette classe étend la classe Response pour fournir des fonctionnalités spécifiques
+ * aux redirections HTTP, incluant la gestion des sessions, des messages flash,
+ * et des données d'entrée.
  *
  * @credit CodeIgniter 4 <a href="https://codeigniter.com">CodeIgniter\HTTP\RedirectResponse</a>
  */
 class Redirection extends Response
 {
     /**
-     * The session store instance.
+     * Instance du stockage de session
      */
     protected Store $session;
 
+    /**
+     * Instance de la requête
+     */
     protected Request $request;
 
     /**
-     * @param UrlGenerator $generator The URL generator instance.
+     * Constructeur de la classe Redirection
+     *
+     * @param UrlGenerator $generator Instance du générateur d'URL
+     * @param array $options Options de configuration pour la réponse
      */
     public function __construct(protected UrlGenerator $generator, array $options = [])
     {
@@ -43,7 +53,9 @@ class Redirection extends Response
     }
 
     /**
-     * Creer une redirection vers la route nommee "home" ou vers la page d'accueil.
+     * Crée une redirection vers la route nommée "home" ou vers la page d'accueil
+     *
+     * @param int $status Code d'état HTTP pour la redirection
      */
     public function home(int $status = StatusCode::FOUND): static
     {
@@ -55,18 +67,20 @@ class Redirection extends Response
     }
 
     /**
-     * Définit l'URI vers lequel rediriger et, éventuellement, le code d'état HTTP à utiliser.
-     * Si aucun code n'est fourni, il sera automatiquement déterminé.
+     * Définit l'URI vers lequel rediriger
      *
-     * @param string   $uri  L'URI vers laquelle rediriger
-     * @param int|null $code Code d'état HTTP
+     * @param string $uri URI vers laquelle rediriger
+     * @param int|null $code Code d'état HTTP (si null, déterminé automatiquement)
+     * @param array $headers En-têtes HTTP supplémentaires
+     * @param bool|null $secure Si true, force l'utilisation de HTTPS
+     * @param string $method Méthode de redirection ('auto', 'refresh', etc.)
      */
     public function to(string $uri, ?int $code = null, array $headers = [], ?bool $secure = null, string $method = 'auto'): static
     {
         $uri = $this->generator->to($uri, [], $secure);
 
-        // Si cela semble être une URL relative, alors convertissez-la en URL complète
-        // pour une meilleure sécurité.
+        // Si cela semble être une URL relative, on la convertit en URL complète
+        // pour une meilleure sécurité
         if (! str_starts_with($uri, 'http')) {
             $uri = site_url($uri);
         }
@@ -75,7 +89,11 @@ class Redirection extends Response
     }
 
     /**
-     * Create a new redirect response to an external URL (no validation).
+     * Crée une nouvelle réponse de redirection vers une URL externe (sans validation)
+     *
+     * @param string $path Chemin ou URL vers lequel rediriger
+     * @param int $status Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
      */
     public function away(string $path, int $status = StatusCode::FOUND, array $headers = []): static
     {
@@ -83,7 +101,11 @@ class Redirection extends Response
     }
 
     /**
-     * Create a new redirect response to the given HTTPS path.
+     * Crée une nouvelle réponse de redirection vers un chemin HTTPS
+     *
+     * @param string $path Chemin vers lequel rediriger
+     * @param int $status Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
      */
     public function secure(string $path, int $status = StatusCode::FOUND, array $headers = []): static
     {
@@ -91,8 +113,12 @@ class Redirection extends Response
     }
 
     /**
-     * Sets the URI to redirect to but as a reverse-routed or named route
-     * instead of a raw URI.
+     * Définit l'URI de redirection en utilisant une route nommée
+     *
+     * @param string $route Nom de la route
+     * @param array $params Paramètres de la route
+     * @param int $code Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
      */
     public function route(string $route, array $params = [], int $code = StatusCode::FOUND, array $headers = []): static
     {
@@ -100,7 +126,12 @@ class Redirection extends Response
     }
 
     /**
-     * Sets the URI to redirect to but as a controller action.
+     * Définit l'URI de redirection en utilisant une action de contrôleur
+     *
+     * @param array|string $action Action du contrôleur (format: 'Controller::method' ou ['Controller', 'method'])
+     * @param array $params Paramètres pour l'action
+     * @param int $code Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
      */
     public function action(array|string $action, array $params = [], int $code = StatusCode::FOUND, array $headers = []): static
     {
@@ -108,13 +139,14 @@ class Redirection extends Response
     }
 
     /**
-     * Helper function to return to previous page.
+     * Fonction helper pour rediriger vers la page précédente
      *
-     * Example:
+     * Exemple:
      *  return redirect()->back();
      *
-     * @param mixed $status
-     * @param mixed $fallback
+     * @param mixed $status Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
+     * @param mixed $fallback URL de secours si aucune page précédente n'est disponible
      */
     public function back($status = StatusCode::FOUND, array $headers = [], $fallback = false): static
     {
@@ -122,7 +154,10 @@ class Redirection extends Response
     }
 
     /**
-     * Create a new redirect response to the current URI.
+     * Crée une nouvelle réponse de redirection vers l'URI courante
+     *
+     * @param int $status Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
      */
     public function refresh(int $status = StatusCode::FOUND, array $headers = []): static
     {
@@ -130,7 +165,12 @@ class Redirection extends Response
     }
 
     /**
-     * Create a new redirect response, while putting the current URL in the session.
+     * Crée une nouvelle réponse de redirection, tout en stockant l'URL courante dans la session
+     *
+     * @param string $path Chemin vers lequel rediriger
+     * @param int $status Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
+     * @param bool|null $secure Si true, force l'utilisation de HTTPS
      */
     public function guest(string $path, int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): static
     {
@@ -148,7 +188,12 @@ class Redirection extends Response
     }
 
     /**
-     * Create a new redirect response.
+     * Crée une réponse de redirection
+     *
+     * @param string $uri URI vers laquelle rediriger
+     * @param int|null $code Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
+     * @param string $method Méthode de redirection
      */
     protected function createRedirect(string $uri, ?int $code = null, array $headers = [], string $method = 'auto'): static
     {
@@ -162,7 +207,12 @@ class Redirection extends Response
     }
 
     /**
-     * Create a new redirect response to the previously intended location.
+     * Crée une nouvelle réponse de redirection vers l'emplacement précédemment intenté
+     *
+     * @param string $default URL par défaut si aucune URL intentée n'est stockée
+     * @param int $status Code d'état HTTP
+     * @param array $headers En-têtes HTTP supplémentaires
+     * @param bool|null $secure Si true, force l'utilisation de HTTPS
      */
     public function intended(string $default = '/', int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): static
     {
@@ -172,7 +222,9 @@ class Redirection extends Response
     }
 
     /**
-     * Set the intended url.
+     * Définit l'URL intentée dans la session
+     *
+     * @param string $url URL à stocker comme intentée
      */
     public function setIntendedUrl(string $url): void
     {
@@ -180,7 +232,10 @@ class Redirection extends Response
     }
 
     /**
-     * Ajoute des erreurs à la session en tant que Flashdata.
+     * Ajoute des erreurs à la session en tant que données flash
+     *
+     * @param array|ErrorBag|string|Validation $errors Erreurs à stocker
+     * @param string $key Clé pour stocker les erreurs dans la session
      */
     public function withErrors(array|ErrorBag|string|Validation $errors, string $key = 'default'): static
     {
@@ -201,10 +256,8 @@ class Redirection extends Response
     }
 
     /**
-     * Spécifie que les tableaux $_GET et $_POST actuels doivent être
-     * emballé avec la réponse.
-     *
-     * Il sera alors disponible via la fonction d'assistance 'old()'.
+     * Spécifie que les données $_GET et $_POST actuelles doivent être
+     * conservées avec la réponse pour être disponibles via la fonction helper 'old()'
      */
     public function withInput(): static
     {
@@ -215,7 +268,10 @@ class Redirection extends Response
     }
 
     /**
-     * Ajoute une clé et un message à la session en tant que Flashdata.
+     * Ajoute une clé et une valeur à la session en tant que données flash
+     *
+     * @param array|string $key Clé ou tableau associatif clé/valeur
+     * @param mixed $value Valeur si $key est une chaîne
      */
     public function with(array|string $key, mixed $value = null): static
     {
@@ -229,8 +285,10 @@ class Redirection extends Response
     }
 
     /**
-     * Copie tous les cookies de l’instance de réponse globale dans cette RedirectResponse.
-     * Utile lorsque vous venez de définir un cookie mais que vous devez vous assurer qu'il est réellement envoyé avec la réponse au lieu d'être perdu.
+     * Copie tous les cookies de l'instance de réponse globale dans cette RedirectResponse
+     *
+     * Utile lorsque vous venez de définir un cookie mais que vous devez vous assurer
+     * qu'il est réellement envoyé avec la réponse au lieu d'être perdu
      */
     public function withCookies(): static
     {
@@ -238,7 +296,11 @@ class Redirection extends Response
     }
 
     /**
-     * Supprimez tous les fichiers téléchargés du tableau d’entrée donné.
+     * Supprime tous les fichiers téléchargés du tableau d'entrée donné
+     *
+     * @param array $input Tableau d'entrée à nettoyer
+	 *
+     * @return array Tableau d'entrée sans les fichiers téléchargés
      */
     protected function removeFilesFromInput(array $input): array
     {
