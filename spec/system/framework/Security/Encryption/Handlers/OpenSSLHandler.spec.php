@@ -13,6 +13,8 @@ use BlitzPHP\Exceptions\EncryptionException;
 use BlitzPHP\Security\Encryption\Encryption;
 use BlitzPHP\Security\Encryption\Handlers\OpenSSLHandler;
 
+use function Kahlan\expect;
+
 describe('Security / Encryption / OpenSSL', function (): void {
     beforeEach(function (): void {
         skipIf(! extension_loaded('openssl'));
@@ -103,4 +105,26 @@ describe('Security / Encryption / OpenSSL', function (): void {
             expect($message1)->not->toBe($encrypter->decrypt($encoded, ['key' => $key2]));
         })->toThrow(new EncryptionException());
     });
+
+	it('La clé interne n\'est pas modifiée par le paramètre', function() {
+		$params           = config('encryption');
+		$params['driver'] = 'OpenSSL';
+		$params['key']    = 'original-key-value';
+
+        $encrypter = $this->encryption->initialize((object) $params);
+
+		expect($encrypter->key)->toBe('original-key-value');
+
+        $message      = 'This is a plain-text message.';
+        $differentKey = 'temporary-param-key';
+        $encoded      = $encrypter->encrypt($message, ['key' => $differentKey]);
+
+        expect($encrypter->key)->toBe('original-key-value');
+
+        $message2 = 'Another message.';
+        $encoded2 = $encrypter->encrypt($message2);
+        expect($encrypter->decrypt($encoded2))->toBe($message2);
+
+        expect($encrypter->decrypt($encoded, ['key' => $differentKey]))->toBe($message);
+	});
 });

@@ -65,21 +65,21 @@ class OpenSSLHandler extends BaseHandler
     public function encrypt(string $data, array|string|null $params = null): string
     {
         // Autoriser le remplacement de clé
-        if ($params) {
-            $this->key = is_array($params) && isset($params['key']) ? $params['key'] : $params;
-        }
+        $key = $params !== null
+            ? (is_array($params) && isset($params['key']) ? $params['key'] : $params)
+            : $this->key;
 
-        if ($this->key === '' || $this->key === '0') {
+        if ($key === '' || $key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 
         // derive a secret key
-        $encryptKey = \hash_hkdf($this->digest, $this->key, 0, $this->encryptKeyInfo);
+        $encryptKey = hash_hkdf($this->digest, $key, 0, $this->encryptKeyInfo);
 
         // cryptage de base
-        $iv = ($ivSize = \openssl_cipher_iv_length($this->cipher)) ? \openssl_random_pseudo_bytes($ivSize) : null;
+        $iv = ($ivSize = openssl_cipher_iv_length($this->cipher)) ? openssl_random_pseudo_bytes($ivSize) : null;
 
-        $data = \openssl_encrypt($data, $this->cipher, $encryptKey, OPENSSL_RAW_DATA, $iv);
+        $data = openssl_encrypt($data, $this->cipher, $encryptKey, OPENSSL_RAW_DATA, $iv);
 
         if ($data === false) {
             throw EncryptionException::encryptionFailed();
@@ -88,9 +88,9 @@ class OpenSSLHandler extends BaseHandler
         $result = $this->rawData ? $iv . $data : base64_encode($iv . $data);
 
         // dériver une clé secrète
-        $authKey = \hash_hkdf($this->digest, $this->key, 0, $this->authKeyInfo);
+        $authKey = hash_hkdf($this->digest, $key, 0, $this->authKeyInfo);
 
-        $hmacKey = \hash_hmac($this->digest, $result, $authKey, $this->rawData);
+        $hmacKey = hash_hmac($this->digest, $result, $authKey, $this->rawData);
 
         return $hmacKey . $result;
     }
@@ -101,16 +101,16 @@ class OpenSSLHandler extends BaseHandler
     public function decrypt(string $data, array|string|null $params = null): string
     {
         // Autoriser le remplacement de clé
-        if ($params) {
-            $this->key = is_array($params) && isset($params['key']) ? $params['key'] : $params;
-        }
+        $key = $params !== null
+            ? (is_array($params) && isset($params['key']) ? $params['key'] : $params)
+            : $this->key;
 
-        if ($this->key === '' || $this->key === '0') {
+        if ($key === '' || $key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 
         // dériver une clé secrète
-        $authKey = \hash_hkdf($this->digest, $this->key, 0, $this->authKeyInfo);
+        $authKey = hash_hkdf($this->digest, $key, 0, $this->authKeyInfo);
 
         $hmacLength = $this->rawData
             ? $this->digestSize[$this->digest]
@@ -118,7 +118,7 @@ class OpenSSLHandler extends BaseHandler
 
         $hmacKey  = self::substr($data, 0, $hmacLength);
         $data     = self::substr($data, $hmacLength);
-        $hmacCalc = \hash_hmac($this->digest, $data, $authKey, $this->rawData);
+        $hmacCalc = hash_hmac($this->digest, $data, $authKey, $this->rawData);
 
         if (! hash_equals($hmacKey, $hmacCalc)) {
             throw EncryptionException::authenticationFailed();
@@ -126,7 +126,7 @@ class OpenSSLHandler extends BaseHandler
 
         $data = $this->rawData ? $data : base64_decode($data, true);
 
-        if ($ivSize = \openssl_cipher_iv_length($this->cipher)) {
+        if ($ivSize = openssl_cipher_iv_length($this->cipher)) {
             $iv   = self::substr($data, 0, $ivSize);
             $data = self::substr($data, $ivSize);
         } else {
@@ -134,8 +134,14 @@ class OpenSSLHandler extends BaseHandler
         }
 
         // dériver une clé secrète
-        $encryptKey = \hash_hkdf($this->digest, $this->key, 0, $this->encryptKeyInfo);
+        $encryptKey = hash_hkdf($this->digest, $key, 0, $this->encryptKeyInfo);
 
-        return \openssl_decrypt($data, $this->cipher, $encryptKey, OPENSSL_RAW_DATA, $iv);
+        $result = openssl_decrypt($data, $this->cipher, $encryptKey, OPENSSL_RAW_DATA, $iv);
+
+        if ($result === false) {
+            throw EncryptionException::authenticationFailed();
+        }
+
+        return $result;
     }
 }

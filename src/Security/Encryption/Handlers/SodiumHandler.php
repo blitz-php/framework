@@ -31,9 +31,17 @@ class SodiumHandler extends BaseHandler
      */
     public function encrypt(string $data, array|string|null $params = null): string
     {
-        $this->parseParams($params);
+        // Autoriser le remplacement de clé
+        $key = $params !== null
+            ? (is_array($params) && isset($params['key']) ? $params['key'] : $params)
+            : $this->key;
 
-        if ($this->key === '' || $this->key === '0') {
+        // Autoriser le remplacement de blockSize
+        $blockSize = (is_array($params) && isset($params['block_size']))
+            ? $params['block_size']
+            : $this->blockSize;
+
+        if ($key === '' || $key === '0') {
             throw EncryptionException::needsStarterKey();
         }
 
@@ -41,18 +49,18 @@ class SodiumHandler extends BaseHandler
         $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES); // 24 bytes
 
         // ajouter du remplissage avant de chiffrer les données
-        if ($this->blockSize <= 0) {
+        if ($blockSize <= 0) {
             throw EncryptionException::encryptionFailed();
         }
 
-        $data = sodium_pad($data, $this->blockSize);
+        $data = sodium_pad($data, $blockSize);
 
         // chiffrer le message et combiner avec occasionnel
-        $ciphertext = $nonce . sodium_crypto_secretbox($data, $nonce, $this->key);
+        $ciphertext = $nonce . sodium_crypto_secretbox($data, $nonce, $key);
 
         // tampons de nettoyage
         sodium_memzero($data);
-        sodium_memzero($this->key);
+        sodium_memzero($key);
 
         return $ciphertext;
     }
@@ -62,9 +70,17 @@ class SodiumHandler extends BaseHandler
      */
     public function decrypt(string $data, array|string|null $params = null): string
     {
-        $this->parseParams($params);
+        // Autoriser le remplacement de clé
+        $key = $params !== null
+            ? (is_array($params) && isset($params['key']) ? $params['key'] : $params)
+            : $this->key;
 
-        if (empty($this->key)) {
+        // Autoriser le remplacement du blockSize
+        $blockSize = (is_array($params) && isset($params['block_size']))
+            ? $params['block_size']
+            : $this->blockSize;
+
+        if (empty($key)) {
             throw EncryptionException::needsStarterKey();
         }
 
@@ -78,7 +94,7 @@ class SodiumHandler extends BaseHandler
         $ciphertext = self::substr($data, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
 
         // décrypter les données
-        $data = sodium_crypto_secretbox_open($ciphertext, $nonce, $this->key);
+        $data = sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
 
         if ($data === false) {
             // le message a été falsifié pendant le transit
@@ -86,42 +102,16 @@ class SodiumHandler extends BaseHandler
         }
 
         // supprimer le remplissage supplémentaire pendant le cryptage
-        if ($this->blockSize <= 0) {
+        if ($blockSize <= 0) {
             throw EncryptionException::authenticationFailed();
         }
 
-        $data = sodium_unpad($data, $this->blockSize);
+        $data = sodium_unpad($data, $blockSize);
 
         // tampons de nettoyage
         sodium_memzero($ciphertext);
-        sodium_memzero($this->key);
+        sodium_memzero($key);
 
         return $data;
-    }
-
-    /**
-     * Analysez les $params avant de faire l'affectation.
-     *
-     * @throws EncryptionException si la cle est vide
-     */
-    protected function parseParams(array|string|null $params): void
-    {
-        if ($params === null) {
-            return;
-        }
-
-        if (is_array($params)) {
-            if (isset($params['key'])) {
-                $this->key = $params['key'];
-            }
-
-            if (isset($params['block_size']) || isset($params['blockSize'])) {
-                $this->blockSize = $params['block_size'] ?? $params['blockSize'];
-            }
-
-            return;
-        }
-
-        $this->key = $params;
     }
 }
