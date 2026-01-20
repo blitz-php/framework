@@ -35,7 +35,7 @@ class Encryption implements EncrypterInterface
     protected string $driver = '';
 
     /**
-     * The key/seed being used
+     * La clé/graine utilisée
      */
     protected string $key = '';
 
@@ -45,12 +45,12 @@ class Encryption implements EncrypterInterface
     protected string $hmacKey;
 
     /**
-     * HMAC digest à utiliser
+     * Digest HMAC à utiliser
      */
     protected string $digest = 'SHA512';
 
     /**
-     * Pilotes aux classes de gestionnaires, par ordre de préférence
+     * Pilotes vers les classes de gestionnaires, par ordre de préférence
      */
     protected array $drivers = [
         'OpenSSL',
@@ -65,14 +65,18 @@ class Encryption implements EncrypterInterface
     protected array $handlers = [];
 
     /**
-     * @throws EncryptionException
+     * Constructeur
+     *
+     * @param object|null $config Configuration de chiffrement
+     *
+	 * @throws EncryptionException
      */
     public function __construct(protected ?object $config = null)
     {
         $config ??= (object) config('encryption');
 
         $this->config = $config;
-        $this->key    = $config->key;
+        $this->key    = $this->parseEncryptionKey($config->key);
         $this->driver = $config->driver;
         $this->digest = $config->digest ?? 'SHA512';
 
@@ -116,14 +120,35 @@ class Encryption implements EncrypterInterface
     }
 
     /**
+     * Crée un nouveau chiffreur avec rotation de clés activée
+     *
+     * @param string $currentKey   Clé actuelle de chiffrement
+     * @param array  $previousKeys Clés précédentes pour le fallback
+     * @param array  $config 	   Configuration supplémentaire
+	 *
+     * @return self Instance de chiffrement avec rotation de clés
+     */
+	public static function withKeyRotation(string $currentKey, array $previousKeys, array $config = []): self
+	{
+		$config                = (object) array_merge(config('encryption'), $config);
+		$config->key           = $currentKey;
+		$config->previous_keys = $previousKeys;
+
+		return new self($config);
+	}
+
+    /**
      * Initialiser ou réinitialiser un chiffreur
      *
+     * @param object|null $config Configuration de chiffrement
+     * @return EncrypterInterface Le chiffreur initialisé
+	 *
      * @throws EncryptionException
      */
     public function initialize(?object $config = null): EncrypterInterface
     {
         if ($config) {
-            $this->key    = $config->key;
+            $this->key    = $this->parseEncryptionKey($config->key);
             $this->driver = $config->driver;
             $this->digest = $config->digest ?? 'SHA512';
         }
@@ -140,16 +165,26 @@ class Encryption implements EncrypterInterface
             throw EncryptionException::needsStarterKey();
         }
 
-        $this->hmacKey = bin2hex(\hash_hkdf($this->digest, $this->key));
+        $this->hmacKey = bin2hex(hash_hkdf($this->digest, $this->key));
 
         $handlerName     = 'BlitzPHP\\Security\\Encryption\\Handlers\\' . $this->driver . 'Handler';
         $this->encrypter = new $handlerName($config);
+
+		if (property_exists($config, 'previous_keys')) {
+			if ([] !== $parsedKeys = $this->parsePreviousKeys($config->previous_keys)) {
+				$this->encrypter = new KeyRotationDecorator($this->encrypter, $parsedKeys);
+			}
+		}
 
         return $this->encrypter;
     }
 
     /**
      * Créer une clé aléatoire
+     *
+     * @param int $length Longueur de la clé en octets
+	 *
+     * @return string Clé générée aléatoirement
      */
     public static function createKey(int $length = 32): string
     {
@@ -159,9 +194,9 @@ class Encryption implements EncrypterInterface
     /**
      * Fourni un accès en lecture seule à certaines de nos propriétés
      *
-     * @param string $key Nom de la propriete
-     *
-     * @return array|bool|int|string|null
+     * @param string $key Nom de la propriété
+	 *
+     * @return array|bool|int|string|null Valeur de la propriété ou null
      */
     public function __get($key)
     {
@@ -175,13 +210,20 @@ class Encryption implements EncrypterInterface
     /**
      * Assure la vérification de certaines de nos propriétés
      *
-     * @param string $key Nom de la propriete
+     * @param string $key Nom de la propriété
      */
     public function __isset($key): bool
     {
         return in_array($key, ['key', 'digest', 'driver', 'drivers'], true);
     }
 
+    /**
+     * Récupère ou initialise le chiffreur interne
+     *
+     * @return EncrypterInterface Le chiffreur
+	 *
+     * @throws EncryptionException
+     */
     private function encrypter(): EncrypterInterface
     {
         if (null === $this->encrypter) {
@@ -189,5 +231,48 @@ class Encryption implements EncrypterInterface
         }
 
         return $this->encrypter;
+    }
+
+    /**
+     * Parse les clés précédentes en un tableau formaté
+     *
+     * @param array|string $previous_keys Clés précédentes
+	 *
+     * @return array Tableau des clés parsées
+     */
+	private function parsePreviousKeys(array|string $previous_keys): array
+	{
+		$keysArray = is_string($previous_keys)
+			? array_map('trim', explode(',', $previous_keys))
+			: (array) $previous_keys;
+
+		$parsedKeys = [];
+		foreach ($keysArray as $key) {
+			if (!empty($key)) {
+				$parsedKeys[] = $this->parseEncryptionKey($key);
+			}
+		}
+
+		return $parsedKeys;
+	}
+
+    /**
+     * Parse une clé de chiffrement avec préfixe hex2bin: ou base64:
+     *
+     * @param string $key Clé à parser
+	 *
+     * @return string Clé décodée
+     */
+    private function parseEncryptionKey(string $key): string
+    {
+        if (str_starts_with($key, 'hex2bin:')) {
+            return hex2bin(substr($key, 8));
+        }
+
+        if (str_starts_with($key, 'base64:')) {
+            return base64_decode(substr($key, 7), true);
+        }
+
+        return $key;
     }
 }

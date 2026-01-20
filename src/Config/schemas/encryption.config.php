@@ -13,6 +13,7 @@ use Nette\Schema\Expect;
 
 return Expect::structure([
     'key'              => Expect::string(env('encryption.key', '')),
+    'previous_keys'    => Expect::anyOf(Expect::string(), Expect::listOf('string'))->default(''),
     'driver'           => Expect::anyOf('OpenSSL', 'Sodium')->default(env('encryption.driver', 'OpenSSL')),
     'block_size'       => Expect::int((int) env('encryption.blockSize', 16)),
     'digest'           => Expect::string(env('encryption.digest', 'SHA512')),
