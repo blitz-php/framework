@@ -783,7 +783,7 @@ var blitzphpDebugBar = {
                     '">' +
                     row.innerText.replace(
                         patt,
-                        '<input type="text" placeholder="$1">'
+                        '<input id="debugbar-route-id-' + i + '" type="text" placeholder="$1">'
                     ) +
                     '<input type="submit" value="Go" class="debug-bar-mleft4">' +
                     "</form>";
