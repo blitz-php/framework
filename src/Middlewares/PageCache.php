@@ -20,8 +20,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class PageCache implements MiddlewareInterface
 {
-    public function __construct(private readonly ResponseCache $pageCache)
+	/**
+     * @var list<int>
+     */
+    private readonly array $cacheStatusCodes;
+
+    public function __construct(private readonly ResponseCache $pageCache, array $cacheStatusCodes = [])
     {
+		$this->cacheStatusCodes = $cacheStatusCodes === [] ? config('cache.cache_status_codes') : $cacheStatusCodes;
     }
 
     /**
@@ -36,7 +42,7 @@ class PageCache implements MiddlewareInterface
         $response = $handler->handle($request);
         $content  = $response->getBody()->getContents();
 
-        if (! $response instanceof Redirection) {
+        if (! $response instanceof Redirection && ($this->cacheStatusCodes === [] || in_array($response->getStatusCode(), $this->cacheStatusCodes, true))) {
             // Mettez-le en cache sans remplacer les mesures de performances afin que nous puissions avoir des mises à jour de vitesse en direct en cours de route.
             // Doit être exécuté après les filtres pour conserver les en-têtes de réponse.
             $this->pageCache->make($request, $response->withBody(to_stream($content)));

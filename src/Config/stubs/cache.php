@@ -51,6 +51,30 @@ return [
      */
     'cache_query_string' => false,
 
+	/**
+     * --------------------------------------------------------------------------
+     * Mise en cache des pages Web : codes d'état du cache
+     * --------------------------------------------------------------------------
+     *
+     * Codes d'état HTTP autorisés à être mis en cache. Seules les réponses avec
+     * ces codes d'état seront mises en cache par le filtre PageCache.
+     *
+     * Par défaut : [] - Mettre en cache tous les codes d'état (rétrocompatible)
+     *
+     * Recommandé : [200] - Mettre en cache uniquement les réponses réussies
+     *
+     * Vous pouvez également utiliser des codes d'état tels que :
+     *   [200, 404, 410] - Mettre en cache les réponses réussies et les codes d'erreur spécifiques
+     *   [200, 201, 202, 203, 204] - Toutes les réponses réussies 2xx
+     *
+     * AVERTISSEMENT : l'utilisation de [] peut mettre en cache des pages d'erreur temporaires (404, 500, etc.).
+     * Envisagez de limiter à [200] pour les applications de production afin d'éviter
+     * la mise en cache d'erreurs qui devraient être temporaires.
+     *
+     * @var list<int>
+     */
+	'cache_status_codes' => [],
+
     /**
      * --------------------------------------------------------------------------
      * Prefixe des clés
