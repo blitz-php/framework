@@ -35,12 +35,6 @@ defined('COMPOSER_PATH') || define('COMPOSER_PATH', defined('VENDOR_PATH') ? VEN
  */
 defined('BASEPATH') || define('BASEPATH', defined('VENDOR_PATH') ? dirname(VENDOR_PATH) . DS : __DIR__ . '/../');
 
-// Chemin racine de l'application (hors webroot).
-/**
- * @var string Chemin racine de l'application.
- */
-defined('ROOTPATH') || define('ROOTPATH', defined('WEBROOT') ? dirname(WEBROOT) . DS : BASEPATH);
-
 // Chemin vers le dossier public (exposé via web server).
 /**
  * @var string Chemin vers le dossier public pour la sécurité.
@@ -101,11 +95,6 @@ defined('TEMP_PATH') || define('TEMP_PATH', FRAMEWORK_STORAGE_PATH . 'temp' . DS
  * @var string Chemin vers le dossier de cache des vues
  */
 defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', FRAMEWORK_STORAGE_PATH . 'cache' . DS);
-
-/**
- * @var string Chemin vers le dossier des tests
- */
-defined('TEST_PATH') || define('TEST_PATH', ROOTPATH . 'specs' . DS);
 
 /**
  * @var string Chemin vers le dossier des logs

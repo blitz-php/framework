@@ -9,6 +9,8 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Initializer\Boot;
+
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -16,48 +18,36 @@ ini_set('display_startup_errors', '1');
 // Assurez-vous qu'il reconnaisse que nous testons.
 $_SERVER['ENVIRONMENT'] = 'testing';
 define('ENVIRONMENT', 'testing');
-defined('DEBUG') || define('DEBUG', true);
-defined('DS')    || define('DS', DIRECTORY_SEPARATOR);
+define('DEBUG', true);
 
 // Souvent, ces constantes sont prédéfinis, mais interroger la structure actuelle du répertoire comme un repli
-defined('HOME_PATH')     || define('HOME_PATH', realpath(rtrim(getcwd(), '\\/ ')) . DS);
-defined('VENDOR_PATH')   || define('VENDOR_PATH', realpath(HOME_PATH . 'vendor') . DS);
-defined('COMPOSER_PATH') || define('COMPOSER_PATH', realpath(VENDOR_PATH . 'autoload.php'));
-if (! is_file(COMPOSER_PATH)) {
+defined('HOME_PATH')     || define('HOME_PATH', realpath(rtrim(getcwd(), '\\/ ')) . DIRECTORY_SEPARATOR);
+defined('VENDOR_PATH')   || define('VENDOR_PATH', realpath(HOME_PATH . 'vendor') . DIRECTORY_SEPARATOR);
+
+if (! is_file($autoload_file = realpath(VENDOR_PATH . 'autoload.php')) ?: '') {
     echo 'Votre fichier autoload de Composer ne semble pas être défini correctement. ';
     echo 'Veuillez ouvrir le fichier suivant et pour corriger: "' . __FILE__ . '"';
 
     exit(3); // EXIT_CONFIG
 }
-require_once COMPOSER_PATH;
 
 // Définir les constantes nécessaires au framework
-defined('SYST_PATH')        || define('SYST_PATH', realpath(HOME_PATH . 'src') . DS);
-defined('TEST_PATH')        || define('TEST_PATH', realpath(HOME_PATH . 'spec') . DS);
-defined('SUPPORT_PATH')     || define('SUPPORT_PATH', TEST_PATH . 'support' . DS);
-defined('APPLICATION_PATH') || define('APPLICATION_PATH', SUPPORT_PATH . 'application' . DS);
-defined('APP_PATH')         || define('APP_PATH', APPLICATION_PATH . 'app' . DS);
-defined('STORAGE_PATH')     || define('STORAGE_PATH', APPLICATION_PATH . 'storage' . DS);
-defined('WEBROOT')          || define('WEBROOT', APPLICATION_PATH . 'public' . DS);
+defined('SYST_PATH')        || define('SYST_PATH', realpath(HOME_PATH . 'src') . DIRECTORY_SEPARATOR);
+defined('TEST_PATH')        || define('TEST_PATH', realpath(HOME_PATH . 'spec') . DIRECTORY_SEPARATOR);
+defined('SUPPORT_PATH')     || define('SUPPORT_PATH', TEST_PATH . 'support' . DIRECTORY_SEPARATOR);
+defined('APPLICATION_PATH') || define('APPLICATION_PATH', SUPPORT_PATH . 'application' . DIRECTORY_SEPARATOR);
+defined('WEBROOT')          || define('WEBROOT', APPLICATION_PATH . 'public' . DIRECTORY_SEPARATOR);
 
-// Définissez des valeurs d'environnement qui empêcheraient autrement le cadre de fonctionner pendant les tests.
+// Définissez des valeurs d'environnement qui empêcheraient autrement le framework de fonctionner pendant les tests.
 if (! isset($_SERVER['app.baseURL'])) {
     $_SERVER['app.baseURL'] = 'http://example.com/';
 }
 define('BASE_URL', $_SERVER['app.baseURL']);
 
-require_once SYST_PATH . 'Spec/Mock/MockCommon.php';
+require_once $autoload_file;
+require_once SYST_PATH . 'Initializer' . DIRECTORY_SEPARATOR. 'Boot.php';
 
-/**
- * Chargement du fichier responsable du demarrage du systeme
- */
-$bootstrap = require_once SYST_PATH . 'Initializer' . DS . 'bootstrap.php';
-
-/**
- * Lancement de l'application
- *
- * Maintenant que tout est ok, on peut exeecuter l'application
- */
-$bootstrap(['app' => APP_PATH, 'storage' => STORAGE_PATH], __FILE__, true);
+$paths = ['app' => APPLICATION_PATH . 'app', 'storage' => APPLICATION_PATH . 'storage', 'test' => TEST_PATH, 'composer' => VENDOR_PATH];
+Boot::test($paths, __FILE__);
 
 service('routes')->loadRoutes();

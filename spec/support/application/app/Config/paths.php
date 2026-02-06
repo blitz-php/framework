@@ -10,8 +10,9 @@
  */
 
 return [
-    'app'      => __DIR__ . '/../',
-    'storage'  => __DIR__ . '/../../storage/',
-    'upload'   => __DIR__ . '/../../uploads/',
-    'composer' => __DIR__ . '/../../vendor/',
+    'app'           => __DIR__ . '/../',
+    'storage'       => __DIR__ . '/../../storage/',
+    'test'          => __DIR__ . '/../../../../',
+    'composer'      => __DIR__ . '/../../../../../vendor/',
+    'env_directory' => __DIR__ . '/../../',
 ];
