@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Core\Application;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Http\Request;
 use Mockery;
@@ -65,7 +64,7 @@ describe('Debug / Toolbar / Collectors / Config', function (): void {
         expect($result)->toContainKey('locale');
 
         // Vérifier les valeurs
-        expect($result['blitzVersion'])->toBe(Application::VERSION);
+        expect($result['blitzVersion'])->toBe(BLITZ_CORE_VERSION);
         expect($result['serverVersion'])->toBe('Apache/2.4.41');
         expect($result['phpVersion'])->toBe(PHP_VERSION);
         expect($result['os'])->toBe(PHP_OS_FAMILY);

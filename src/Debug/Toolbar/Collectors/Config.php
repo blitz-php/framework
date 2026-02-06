@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Debug\Toolbar\Collectors;
 
-use BlitzPHP\Core\Application;
-
 /**
  * Configuration de la barre d'outils de débogage
  *
@@ -28,7 +26,7 @@ class Config
         $config = (object) config('app');
 
         return [
-            'blitzVersion'  => Application::VERSION,
+            'blitzVersion'  => BLITZ_CORE_VERSION,
             'serverVersion' => $_SERVER['SERVER_SOFTWARE'] ?? '',
             'phpVersion'    => PHP_VERSION,
             'os'            => PHP_OS_FAMILY,

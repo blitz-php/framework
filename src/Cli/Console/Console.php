@@ -31,7 +31,7 @@ class Console extends Application
     use SingletonTrait;
 
     protected const APP_NAME        = 'BlitzPHP';
-    protected const APP_VERSION     = \BlitzPHP\Core\Application::VERSION;
+    protected const APP_VERSION     = BLITZ_CORE_VERSION;
     protected const CONSOLE_NAME    = 'klinge';
     protected const CONSOLE_VERSION = '1.0';
 

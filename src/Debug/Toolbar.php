@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Debug;
 
-use BlitzPHP\Core\Application;
 use BlitzPHP\Debug\Toolbar\Collectors\BaseCollector;
 use BlitzPHP\Debug\Toolbar\Collectors\Config;
 use BlitzPHP\Debug\Toolbar\Collectors\HistoryCollector;
@@ -96,7 +95,7 @@ class Toolbar
         $data['totalMemory']     = number_format(memory_get_peak_usage() / 1024 / 1024, 3);
         $data['segmentDuration'] = $this->roundTo($data['totalTime'] / 7);
         $data['segmentCount']    = (int) ceil($data['totalTime'] / $data['segmentDuration']);
-        $data['blitzVersion']    = Application::VERSION;
+        $data['blitzVersion']    = BLITZ_CORE_VERSION;
         $data['collectors']      = [];
 
         foreach ($this->collectors as $collector) {

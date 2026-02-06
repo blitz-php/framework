@@ -302,7 +302,7 @@ class Boot
         // Constante du chemin des tests
         if (! defined('TEST_PATH')) {
             if (false === $testPath = realpath(rtrim($this->paths['test'], '\\/ '))) {
-                $testPath = ROOTPATH . 'specs';
+                $testPath = ROOTPATH . 'spec';
             }
 
             define('TEST_PATH', $testPath . DIRECTORY_SEPARATOR);

@@ -17,8 +17,8 @@
     "minimum-stability": "dev",
     "require": {
         "php": "^8.1",
+        "ext-intl": "*",
         "ext-mbstring": "*",
-        "ext-openssl": "*",
         "adhocore/cli": "^1.7",
         "blitz-php/annotations": "^1.0",
         "blitz-php/autoloader": "^1.1",
@@ -32,7 +32,6 @@
         "guzzlehttp/psr7": "^2.5",
         "jawira/case-converter": "^3.5",
         "kint-php/kint": "^6.0",
-        "mirazmac/php-requirements-checker": "^0.2.0",
         "monolog/monolog": "^3.0",
         "nette/schema": "^1.2",
         "php-di/php-di": "^7.0",
