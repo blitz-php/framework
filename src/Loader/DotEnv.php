@@ -59,7 +59,7 @@ class DotEnv
      * @param string $path Répertoire .env.
      * @param string $file Nom fichier (défaut '.env').
      */
-    private function __construct(string $path, string $file = '.env')
+    public function __construct(string $path, string $file = '.env')
     {
         $this->path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
         $this->env = []; // Init vide

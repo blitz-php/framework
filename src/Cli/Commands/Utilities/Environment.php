@@ -101,7 +101,7 @@ final class Environment extends Command
     private function writeNewEnvironmentToEnvFile(string $newEnv): bool
     {
         $baseEnv = ROOTPATH . '.env.example';
-        $envFile = ROOTPATH . '.env';
+        $envFile = rtrim($envPath = config('paths.env_directory', ROOTPATH), '/\\') . DS . '.env';
 
         if (! is_file($envFile)) {
             if (! is_file($baseEnv)) {
@@ -115,6 +115,6 @@ final class Environment extends Command
             copy($baseEnv, $envFile);
         }
 
-        return DotEnv::instance()->replace(['ENVIRONMENT' => $newEnv]);
+		return DotEnv::instance($envPath)->update(['ENVIRONMENT' => $newEnv]);
     }
 }

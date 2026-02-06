@@ -131,7 +131,7 @@ class GenerateKey extends Command
     protected function writeNewEncryptionKeyToFile(string $key): bool
     {
         $baseEnv = ROOTPATH . '.env.example';
-        $envFile = ROOTPATH . '.env';
+        $envFile = rtrim($envPath = config('paths.env_directory', ROOTPATH), '/\\') . DS . '.env';
 
         if (! is_file($envFile)) {
             if (! is_file($baseEnv)) {
@@ -145,6 +145,6 @@ class GenerateKey extends Command
             copy($baseEnv, $envFile);
         }
 
-        return DotEnv::instance()->replace(['encryption.key' => $key]);
+        return (new DotEnv($envPath))->update(['encryption.key' => $key]);
     }
 }
