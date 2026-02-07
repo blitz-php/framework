@@ -15,6 +15,7 @@ use BlitzPHP\Formatter\XmlFormatter;
 use BlitzPHP\Formatter\CsvFormatter;
 use BlitzPHP\Formatter\ArrayFormatter;
 use BlitzPHP\Exceptions\FormatException;
+use BlitzPHP\Utilities\Reflection\ReflectionClass;
 
 use function Kahlan\expect;
 
@@ -42,11 +43,9 @@ describe('Formatter', function() {
         it('devrait lever une exception FormatException pour une classe de formateur inexistante', function() {
             // nous devons modifier une propriété protégée pour ce test
             $reflection = new ReflectionClass(Formatter::class);
-            $formatters = $reflection->getProperty('formatters');
-            $formatters->setAccessible(true);
-            $originalFormatters = $formatters->getValue();
+            $originalFormatters = $reflection->getValue('formatters');
 
-            $formatters->setValue(array_merge($originalFormatters, ['test/mime' => 'NonExistentFormatter']));
+            $reflection->setValue('formatters', array_merge($originalFormatters, ['test/mime' => 'NonExistentFormatter']));
 
             $closure = function() {
                 Formatter::type('test/mime');
@@ -54,17 +53,15 @@ describe('Formatter', function() {
             expect($closure)->toThrow(FormatException::invalidFormatter('NonExistentFormatter'));
 
             // Restaurer les formatters d'origine
-            $formatters->setValue($originalFormatters);
+            $reflection->setValue('formatters', $originalFormatters);
         });
 
         it('devrait lancer une exception FormatException pour une classe de formateur n\'implémentant pas FormatterInterface', function() {
             // nous devons modifier une propriété protégée pour ce test
             $reflection = new ReflectionClass(Formatter::class);
-            $formatters = $reflection->getProperty('formatters');
-            $formatters->setAccessible(true);
-            $originalFormatters = $formatters->getValue();
+            $originalFormatters = $reflection->getValue('formatters');
 
-            $formatters->setValue(array_merge($originalFormatters, ['test/mime' => stdClass::class]));
+            $reflection->setValue('formatters', array_merge($originalFormatters, ['test/mime' => stdClass::class]));
 
             $closure = function() {
                 Formatter::type('test/mime');
@@ -72,7 +69,7 @@ describe('Formatter', function() {
             expect($closure)->toThrow(FormatException::invalidFormatter('stdClass'));
 
             // Restaurer les formatters d'origine
-            $formatters->setValue($originalFormatters);
+            $reflection->setValue('formatters', $originalFormatters);
         });
     });
 });
