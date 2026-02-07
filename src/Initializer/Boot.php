@@ -38,6 +38,7 @@ class Boot
      *
      * @var array{
      *     app: string,
+     *     boot: string,
      *     storage: string,
      *     test: string,
      *     composer: string,
@@ -57,6 +58,7 @@ class Boot
         // Fusionne les chemins fournis avec les valeurs par défaut
         $this->paths = array_merge([
             'app'           => '',
+            'boot'          => '',
             'storage'       => '',
             'test'          => '',
             'composer'      => '',
@@ -106,11 +108,10 @@ class Boot
         $this->loadConstants();
 
         $this->loadDotEnv();
-        $this->defineEnvironment();
-        $this->loadEnvironmentBootstrap();
-
         $this->loadCommonFunctions();
+        $this->loadEnvironmentBootstrap();
         $this->loadAutoloader();
+
         $this->initializeKint();
         $this->setupApplication();
 
@@ -136,10 +137,10 @@ class Boot
         $this->loadConstants();
 
         $this->loadDotEnv();
-        $this->loadEnvironmentBootstrap();
-
         $this->loadCommonFunctions();
+        $this->loadEnvironmentBootstrap();
         $this->loadAutoloader();
+
         $this->initializeKint();
         $this->setupApplication();
 
@@ -158,11 +159,10 @@ class Boot
         $this->loadConstants();
 
         $this->loadDotEnv();
-        $this->defineEnvironment();
-        $this->loadEnvironmentBootstrap();
-
         $this->loadCommonFunctions();
+        $this->loadEnvironmentBootstrap();
         $this->loadAutoloader();
+
         $this->initializeKint();
         $this->setupApplication();
 
@@ -181,12 +181,11 @@ class Boot
         $this->loadConstants();
 
         $this->loadDotEnv();
-        $this->loadEnvironmentBootstrap(false);
-
         $this->loadCommonFunctionsMock();
         $this->loadCommonFunctions();
-
+        $this->loadEnvironmentBootstrap(false);
         $this->loadAutoloader();
+
         $this->initializeKint();
         $this->setupApplication();
     }
@@ -197,10 +196,9 @@ class Boot
     public function preload(): void
     {
         $this->definePathConstants();
-        $this->loadConstants();
-        $this->defineEnvironment();
-        $this->loadEnvironmentBootstrap(false);
 
+        $this->loadConstants();
+        $this->loadEnvironmentBootstrap(false);
         $this->loadAutoloader();
     }
 
@@ -226,10 +224,13 @@ class Boot
     protected function defineEnvironment(): void
     {
         if (! defined('ENVIRONMENT')) {
-            // @phpstan-ignore-next-line
-            $env = $_ENV['ENVIRONMENT'] ?? $_SERVER['ENVIRONMENT']
-                ?? getenv('ENVIRONMENT')
-                ?: 'production';
+            $env = function_exists('environment') ? environment() : null;
+            if ($env === null) {
+                // @phpstan-ignore-next-line
+                $env = $_ENV['ENVIRONMENT'] ?? $_SERVER['ENVIRONMENT']
+                    ?? getenv('ENVIRONMENT')
+                    ?: 'production';
+            }
 
             define('ENVIRONMENT', $env);
         }
@@ -242,7 +243,9 @@ class Boot
      */
     protected function loadEnvironmentBootstrap(bool $exit = true): void
     {
-        $bootstrapFile = $this->paths['app'] . '/Config/Boot/' . ENVIRONMENT . '.php';
+        $this->defineEnvironment();
+
+        $bootstrapFile = BOOT_PATH . ENVIRONMENT . '.php';
 
         if (is_file($bootstrapFile)) {
             require_once $bootstrapFile;
@@ -270,7 +273,7 @@ class Boot
             if (false === $appPath = realpath(rtrim($this->paths['app'], '\\/ '))) {
                 header('HTTP/1.1 503 Service Unavailable.', true, 503);
                 echo 'Le chemin du dossier de l\'application ne semble pas être correctement configuré. ';
-                echo 'Veuillez ouvrir le fichier suivant et le corriger : "' . $this->paths_config_file . '"';
+				echo 'Veuillez ouvrir le fichier "' . $this->paths_config_file . '" et corriger la clé "app".';
                 exit(3);
             }
 
@@ -287,7 +290,7 @@ class Boot
             if (false === $storagePath = realpath(rtrim($this->paths['storage'], '\\/ '))) {
                 header('HTTP/1.1 503 Service Unavailable.', true, 503);
                 echo 'Le chemin du dossier de stockage ne semble pas être correctement configuré. ';
-                echo 'Veuillez ouvrir le fichier suivant et le corriger : "' . $this->paths_config_file . '"';
+				echo 'Veuillez ouvrir le fichier "' . $this->paths_config_file . '" et corriger la clé "storage".';
                 exit(3);
             }
 
@@ -297,6 +300,15 @@ class Boot
         // Constante du chemin racine du projet (juste au-dessus de APP_PATH)
         if (! defined('ROOTPATH')) {
             define('ROOTPATH', realpath(APP_PATH . '../') . DIRECTORY_SEPARATOR);
+        }
+
+        // Constante du chemin de demarrage
+        if (! defined('BOOT_PATH')) {
+			if (false === $bootPath = realpath(rtrim($this->paths['boot'], '\\/ '))) {
+                $bootPath = ROOTPATH . 'boot';
+            }
+
+            define('BOOT_PATH', $bootPath . DIRECTORY_SEPARATOR);
         }
 
         // Constante du chemin des tests

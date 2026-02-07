@@ -299,31 +299,6 @@ describe('Config / Config', function (): void {
             // $this->config->set('app.environment', 'invalid');
             // expect(fn() => $this->config->get('app.environment'))->toThrow(new ConfigException());
         });
-
-        it('configureErrorReporting pour chaque environnement', function (): void {
-            $configureErrorReporting = ReflectionHelper::getPrivateMethodInvoker($this->config, 'configureErrorReporting');
-
-            // Sauvegarder les valeurs originales
-            $displayErrors = ini_get('display_errors');
-            $errorReporting = error_reporting();
-
-            // Tester development
-            $configureErrorReporting('development');
-            expect(ini_get('display_errors'))->toBe('1');
-            expect(error_reporting() & E_ALL)->toBe(E_ALL);
-
-            // Tester production
-            $configureErrorReporting('production');
-            expect(ini_get('display_errors'))->toBe('0');
-
-            // Tester testing
-            $configureErrorReporting('testing');
-            expect(ini_get('display_errors'))->toBe('0');
-
-            // Restaurer
-            ini_set('display_errors', $displayErrors);
-            error_reporting($errorReporting);
-        });
     });
 
     describe('Gestion des erreurs', function (): void {

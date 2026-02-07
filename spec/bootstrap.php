@@ -15,12 +15,12 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 
-// Assurez-vous qu'il reconnaisse que nous testons.
+// S'assure qu'il reconnaît que nous testons.
 $_SERVER['ENVIRONMENT'] = 'testing';
 define('ENVIRONMENT', 'testing');
-define('DEBUG', true);
+define('BLITZ_DEBUG', true);
 
-// Souvent, ces constantes sont prédéfinis, mais interroger la structure actuelle du répertoire comme un repli
+// Souvent, ces constantes sont prédéfinies, mais interroger la structure actuelle du répertoire comme un repli
 defined('HOME_PATH')     || define('HOME_PATH', realpath(rtrim(getcwd(), '\\/ ')) . DIRECTORY_SEPARATOR);
 defined('VENDOR_PATH')   || define('VENDOR_PATH', realpath(HOME_PATH . 'vendor') . DIRECTORY_SEPARATOR);
 

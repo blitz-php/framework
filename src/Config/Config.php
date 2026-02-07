@@ -416,29 +416,6 @@ class Config
         if ($config !== $environment) {
             $this->set('app.environment', $config);
         }
-
-        $this->configureErrorReporting($config);
-    }
-
-    /**
-     * Configure le reporting d'erreurs selon l'environnement
-     */
-    private function configureErrorReporting(string $environment): void
-    {
-        switch ($environment) {
-            case 'development':
-                error_reporting(-1);
-                ini_set('display_errors', 1);
-                break;
-
-            case 'testing':
-            case 'production':
-                ini_set('display_errors', 0);
-                error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-                break;
-		}
-
-        defined('BLITZ_DEBUG') || define('BLITZ_DEBUG', $environment !== 'production');
     }
 
     /**
