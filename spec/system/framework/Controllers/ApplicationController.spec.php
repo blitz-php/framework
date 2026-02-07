@@ -102,10 +102,10 @@ describe('Controllers / ApplicationController', function (): void {
 				$this->controller->testRender('test_view', ['key' => 'value']);
 			} catch (ViewException $e) {
 				// en temps normal, on va chercher à charger le fichier "spec\\system\\framework\\Views\\test_view"
-				// or ce fichier existe pas bien evidement.
+				// or ce fichier n'existe pas bien evidement.
 				// l'important pour nous à ce niveau est que le dossier et le nom du fichier soient bien déterminés
 				expect($e->getMessage())
-					->toMatch(fn($actual) => str_ends_with($actual, 'Views\test_view'));
+					->toMatch(fn($actual) => str_ends_with($actual, 'Views\test_view.php'));
 			}
         });
 
@@ -114,10 +114,10 @@ describe('Controllers / ApplicationController', function (): void {
 				$this->controller->testRender();
 			} catch (ViewException $e) {
 				// en temps normal, on va chercher à charger le fichier "spec\\system\\framework\\Views\\test_view"
-				// or ce fichier existe pas bien evidement.
+				// or ce fichier n'existe pas bien evidement.
 				// l'important pour nous à ce niveau est que le dossier et le nom du fichier soient bien déterminés
 				expect($e->getMessage())
-					->toMatch(fn($actual) => str_ends_with($actual, 'Views\\testRender'));
+					->toMatch(fn($actual) => str_ends_with($actual, 'Views\\testRender.php'));
 			}
         });
 
@@ -126,10 +126,10 @@ describe('Controllers / ApplicationController', function (): void {
 				$this->controller->testRender(['key' => 'value']);
 			} catch (ViewException $e) {
 				// en temps normal, on va chercher à charger le fichier "spec\\system\\framework\\Views\\test_view"
-				// or ce fichier existe pas bien evidement.
+				// or ce fichier n'existe pas bien evidement.
 				// l'important pour nous à ce niveau est que le dossier et le nom du fichier soient bien déterminés
 				expect($e->getMessage())
-					->toMatch(fn($actual) => str_ends_with($actual, 'Views\\testRender'));
+					->toMatch(fn($actual) => str_ends_with($actual, 'Views\\testRender.php'));
 			}
         });
     });

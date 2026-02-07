@@ -14,7 +14,6 @@ namespace BlitzPHP\View\Adapters;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\View\RendererInterface;
 use BlitzPHP\Exceptions\ViewException;
-use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\View\ViewDecoratorTrait;
 
 abstract class AbstractAdapter implements RendererInterface
@@ -254,12 +253,23 @@ abstract class AbstractAdapter implements RendererInterface
         $ext ??= $this->ext;
 
         $viewPath = $options['viewPath'] ?? $this->viewPath;
-        $file     = ! empty($viewPath) ? str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($view, '/\\')) : $view;
+		$viewExt  = pathinfo($view, PATHINFO_EXTENSION);
+        $file     = $view;
 
-        $file = Helpers::ensureExt($file, $ext);
+		if (str_contains($view, '\\')) {
+			$overrideFolder = $this->config['app_overrides_folder'] !== ''
+				? trim($this->config['app_overrides_folder'], DS) . DS
+				: '';
 
-        if (! is_file($file)) {
-            $file = $this->locator->locateFile($view, 'Views', $ext);
+			$file = $overrideFolder . ltrim(str_replace('\\', DS, $view), DS);
+		}
+
+		$file = ! empty($viewPath) ? str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($file, '/\\')) : $file;
+		$file = $viewExt === '' ? $file . '.' . $ext : $file;
+		$view = $viewExt === '' ? $view . '.' . $ext : $view;
+
+		if (! is_file($file)) {
+            $file = $this->locator->locateFile($view, 'Views', $viewExt ?: $ext) ?: '';
         }
 
         $file = realpath($file);

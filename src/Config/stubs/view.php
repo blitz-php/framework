@@ -57,6 +57,25 @@ return [
      */
     'decorators' => [],
 
+	/**
+     * Sous-répertoire dans app/Views pour les remplacements de vues avec espace de noms.
+     *
+     * Les vues avec espace de noms seront recherchées dans :
+     *
+     *   app/Views/{$appOverridesFolder}/{Namespace}/{view_path}.{php|html...}
+     *
+     * Cela permet des remplacements au niveau de l'application pour les vues de paquets ou de modules
+     * sans modifier les fichiers source du fournisseur.
+     *
+     * Exemples :
+     *   'overrides' -> app/Views/overrides/Example/Blog/post/card.php
+     *   'vendor'    -> app/Views/vendor/Example/Blog/post/card.php
+     *   ''          -> app/Views/Example/Blog/post/card.php (mappage direct)
+	 *
+	 * @var string
+     */
+	'app_overrides_folder' => 'overrides',
+
     'adapters' => [
         /**
          * [Configuration Native]

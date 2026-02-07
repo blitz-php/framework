@@ -9,6 +9,9 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Autoloader\Autoloader;
+use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Container\Services;
 use BlitzPHP\Exceptions\ConfigException;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Spec\ReflectionHelper;
@@ -18,6 +21,14 @@ use BlitzPHP\View\View;
 use function Kahlan\expect;
 
 describe('Views / View', function (): void {
+	beforeAll(function() {
+		config()->set('view.app_overrides_folder', '');
+	});
+
+	afterAll(function() {
+		config()->reset('view.app_overrides_folder');
+	});
+
     describe('Donnees', function (): void {
         it('Peut-on stocker des variable', function (): void {
             $view = new View();
@@ -335,7 +346,7 @@ describe('Views / View', function (): void {
 
 			$view->setVar('testString', 'Hello World');
 			$view->display('simple_layout')
-				->setLayout('layout');
+				->layout('layout');
 
 			expect(fn() => $view->render())->toMatchEcho(fn($actual) => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
 		});
@@ -348,6 +359,114 @@ describe('Views / View', function (): void {
 				->options(['layout' => 'layout']);
 
 			expect(fn() => $view->render())->toMatchEcho(fn($actual) => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
+		});
+	});
+
+	describe('Vues namespacées', function(): void {
+		beforeAll(function() {
+			$this->mockLocator = function(array $options) {
+				$locator = new class(service('autoloader'), $options) extends Locator {
+					public function __construct(Autoloader $autoloader, private array $options)
+					{
+						return parent::__construct($autoloader);
+					}
+
+					public function locateFile(string $file, ?string $folder = null, string $ext = 'php')
+					{
+						if ($file === $this->options['file'] && $folder === ($this->options['folder'] ?? 'Views') && $ext === ($this->options['ext'] ?? 'php')) {
+							return $this->options['return'];
+						}
+
+						return parent::locateFile($file, $folder, $ext);
+					}
+				};
+
+				Services::injectMock('locator', $locator);
+			};
+		});
+
+		afterEach(function() {
+			Services::resetSingle('locator');
+		});
+
+		it('Les vues de l\'application sont prioritaires par rapport à celles des namespaces', function() {
+			$view = new View();
+
+			$view->setVar('testString', 'Hello World');
+			$expected = '<h1>Hello World</h1>';
+
+			$output = trim($view->display('Nested\simple')->get());
+
+			expect($output)->toBe($expected);
+		});
+
+		it('Le rendu des vues namespacées passe par le locator', function(): void {
+			$namespacedView = 'Some\Library\View';
+			$realFile = VIEW_PATH . '/simple.php';
+
+			$this->mockLocator([
+				'file'   => $namespacedView . '.php',
+				'return' => $realFile,
+			]);
+			$view = new View();
+
+        	$view->setVar('testString', 'Hello World');
+        	$output = $view->display($namespacedView)->get();
+
+			expect($output)->toBe('<h1>Hello World</h1>');
+		});
+
+		it('Rend une vue namespacée avec une extension explicite', function(): void {
+			$namespacedView = 'Some\Library\View.html';
+			$realFile = VIEW_PATH . '/simple.php';
+
+			$this->mockLocator([
+				'file'   => $namespacedView,
+				'ext'    => 'html',
+				'return' => $realFile,
+			]);
+			$view = new View();
+
+			$view->setVar('testString', 'Hello World');
+
+        	expect(fn() => $view->display($namespacedView)->get())
+				->not->toThrow();
+		});
+
+		it('Les vues de l\'application peuvent surchager des vues namespacées', function() {
+			config()->set('view.app_overrides_folder', 'overrides');
+
+			$this->mockLocator([
+				'file' => 'Nested\simple.php',
+				'return' => VIEW_PATH . '/simple.php'
+			]);
+
+			$view = new View();
+			$view->setVar('testString', 'Fallback Content');
+
+        	$output = trim($view->display('Nested\simple')->get());
+
+        	expect($output)->toBe('<h1>Fallback Content</h1>');
+		});
+
+		it('Les vues de l\'application surchagent reelement les vues namespacées', function() {
+			config()->set('view.app_overrides_folder', 'overrides');
+
+			$path = VIEW_PATH . 'overrides/Nested/simple.php';
+			if (! is_dir($dir = dirname($path))) {
+				mkdir($dir, 0777, true);
+			}
+			file_put_contents($path, '<h1>Override - <?= $testString ?></h1>');
+
+			$view = new View();
+			$view->setVar('testString', 'Fallback Content');
+
+        	$output = trim($view->display('Nested\simple')->get());
+
+        	expect($output)->toBe('<h1>Override - Fallback Content</h1>');
+
+			@unlink($path);
+			@rmdir($dir);
 		});
 	});
 });

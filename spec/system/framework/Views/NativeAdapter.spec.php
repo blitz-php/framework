@@ -13,9 +13,11 @@ use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\View\Adapters\NativeAdapter;
 
+use function Kahlan\expect;
+
 describe('Views / NativeAdapter', function (): void {
     beforeAll(function (): void {
-		$this->config = config('view.adapters.native');
+		$this->config = config('view.adapters.native') + ['app_overrides_folder' => ''];
     });
 
     describe('Extends', function (): void {
