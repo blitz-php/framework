@@ -33,7 +33,7 @@ describe('Cache / ResponseCache', function (): void {
 
 			$request = Double::instance([
 				'implements' => [ServerRequestInterface::class],
-				'stubMethods' => ['getUri' => $uri]
+				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'POST']
 			]);
 
 			$cache = Double::instance([
@@ -44,7 +44,7 @@ describe('Cache / ResponseCache', function (): void {
 
             $key = $responseCache->generateCacheKey($request);
 
-            expect($key)->toBe(md5('https://example.com/test'));
+            expect($key)->toBe(md5('POST:https://example.com/test'));
             expect(strlen($key))->toBe(32);
         });
 
@@ -61,7 +61,7 @@ describe('Cache / ResponseCache', function (): void {
 
 			$request = Double::instance([
 				'implements' => [ServerRequestInterface::class],
-				'stubMethods' => ['getUri' => $uri],
+				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'POST'],
 			]);
 
 			$cache = Double::instance([
@@ -72,7 +72,7 @@ describe('Cache / ResponseCache', function (): void {
 
             $key = $responseCache->generateCacheKey($request);
 
-            expect($key)->toBe(md5('https://example.com/test?param=value'));
+            expect($key)->toBe(md5('POST:https://example.com/test?param=value'));
         });
     });
 
@@ -128,7 +128,7 @@ describe('Cache / ResponseCache', function (): void {
 
 			$request = Double::instance([
 				'implements' => [ServerRequestInterface::class],
-				'stubMethods' => ['getUri' => $uri],
+				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'POST'],
 			]);
 			$body = Double::instance([
 				'implements' => [\Psr\Http\Message\StreamInterface::class],
@@ -141,6 +141,8 @@ describe('Cache / ResponseCache', function (): void {
 				'stubMethods' => [
 					'getBody' => $body,
 					'getHeaders' => ['Content-Type' => ['application/json']],
+					'getStatusCode' => 200,
+					'getReasonPhrase' => 'Ok',
 				],
 			]);
 			allow($response)->toReceive('getHeaderLine')->with('Content-Type')->andReturn('application/json');
@@ -177,7 +179,7 @@ describe('Cache / ResponseCache', function (): void {
 
 			$request = Double::instance([
 				'implements' => [ServerRequestInterface::class],
-				'stubMethods' => ['getUri' => $uri],
+				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'GET'],
 			]);
 			$body = Double::instance([
 				'implements' => [\Psr\Http\Message\StreamInterface::class],
@@ -190,6 +192,8 @@ describe('Cache / ResponseCache', function (): void {
 				'stubMethods' => [
 					'getBody' => $body,
 					'getHeaders' => ['Content-Type' => ['application/json']],
+					'getStatusCode' => 200,
+					'getReasonPhrase' => 'Ok',
 				],
 			]);
 			allow($response)->toReceive('getHeaderLine')->with('Content-Type')->andReturn('application/json');
@@ -222,7 +226,7 @@ describe('Cache / ResponseCache', function (): void {
 
 			$request = Double::instance([
 				'implements' => [ServerRequestInterface::class],
-				'stubMethods' => ['getUri' => $uri],
+				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'GET'],
 			]);
 
 			$newResponse = Double::instance([
@@ -230,6 +234,7 @@ describe('Cache / ResponseCache', function (): void {
 			]);
 			allow($newResponse)->toReceive('withHeader')->with('X-Custom', 'value')->andReturn($newResponse);
 			allow($newResponse)->toReceive('withBody')->andReturn($newResponse);
+			allow($newResponse)->toReceive('withStatus')->andReturn($newResponse);
 
 			$response = Double::instance([
 				'implements' => [ResponseInterface::class],
@@ -267,7 +272,7 @@ describe('Cache / ResponseCache', function (): void {
 
 			$request = Double::instance([
 				'implements' => [ServerRequestInterface::class],
-				'stubMethods' => ['getUri' => $uri],
+				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'GET'],
 			]);
 
 			$response = Double::instance([

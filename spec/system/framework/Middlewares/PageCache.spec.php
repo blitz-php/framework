@@ -42,7 +42,7 @@ describe('Middleware / PageCache', function (): void {
 			$uri->shouldReceive('withQuery')->andReturn($uri);
 			$uri->shouldReceive('getQuery')->andReturn('');
 
-			$request = Mockery::mock(Request::class);
+			$request = Mockery::mock(Request::class, ['getMethod' => 'GET']);
 			$request->shouldReceive('getUri')->andReturn($uri);
 
 			return $request;
