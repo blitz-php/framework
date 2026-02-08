@@ -226,7 +226,6 @@ class Boot
         if (! defined('ENVIRONMENT')) {
             $env = function_exists('environment') ? environment() : null;
             if ($env === null) {
-                // @phpstan-ignore-next-line
                 $env = $_ENV['ENVIRONMENT'] ?? $_SERVER['ENVIRONMENT']
                     ?? getenv('ENVIRONMENT')
                     ?: 'production';

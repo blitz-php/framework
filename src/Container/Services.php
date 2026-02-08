@@ -320,7 +320,7 @@ class Services extends BaseServices
     /**
      * CacheResponse
      */
-    public static function responsecache(?CacheInterface $cache = null, array|bool $cacheQueryString = false, bool $shared = true): ResponseCache
+    public static function responsecache(?CacheInterface $cache = null, array|bool|null $cacheQueryString = null, bool $shared = true): ResponseCache
     {
         if ($shared) {
             return static::sharedInstance('responsecache', $cache, $cacheQueryString);

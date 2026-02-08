@@ -105,7 +105,7 @@ class FileLocator
 
         $files = self::locateFiles($name, $folder, $locator, $directories);
 
-        if ($files === false || $files === []) {
+        if ($files === []) {
             return self::$locateCache[$cacheKey] = Expect::mixed();
         }
 
@@ -244,7 +244,7 @@ class FileLocator
 
         $files = self::locateFiles($name, 'Translations' . DS . $locale, $locator);
 
-        if ($files === false) {
+        if ($files === []) {
             return self::$locateCache[$cacheKey] = [];
         }
 

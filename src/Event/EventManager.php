@@ -44,7 +44,7 @@ class EventManager implements EventManagerInterface
     /**
      * Log des performances pour le débogage
      *
-     * @var array<array{start: float, end: float, event: string, listener: string}>
+     * @var array<array{start: float, end: float, event: string, listener: string, duration: float, priority: int}>
      */
     protected array $performanceLog = [];
 
@@ -316,7 +316,7 @@ class EventManager implements EventManagerInterface
     /**
      * Récupère les logs de performance
      *
-     * @return array<array{start: float, end: float, event: string, listener: string, priority: bool}>
+     * @return array<array{start: float, end: float, event: string, listener: string, duration: float, priority: int}>
      */
     public function getPerformanceLogs(): array
     {

@@ -46,7 +46,7 @@ class RestController extends BaseController
      *     ajax_only: bool
      * }
      */
-    protected array $restConfig = [];
+    protected array $restConfig;
 
     /**
      * Locale à utiliser pour les messages de l'API
@@ -101,12 +101,10 @@ class RestController extends BaseController
 
         try {
             // Hook before
-            if (method_exists($this, 'before')) {
-                $before = $this->before($method, $params);
-                if ($before instanceof ResponseInterface) {
-                    return $before;
-                }
-            }
+            $before = $this->before($method, $params);
+			if ($before instanceof ResponseInterface) {
+				return $before;
+			}
 
             // Validation de la requête
             if (($check = $this->validateRequest()) instanceof ResponseInterface) {
@@ -118,9 +116,7 @@ class RestController extends BaseController
 			$response = $returned instanceof ResponseInterface ? $returned : $this->respond($returned);
 
             // Hook after
-            if (method_exists($this, 'after')) {
-                $this->after($method, $params, $response);
-            }
+            $this->after($method, $params, $response);
 
             return $response;
         } catch (Throwable $ex) {

@@ -3,12 +3,6 @@
 $ignoreErrors = [];
 $ignoreErrors[] = [
 	// identifier: method.notFound
-	'message' => '#^Call to an undefined method BlitzPHP\\\\Traits\\\\Mixins\\\\HigherOrderCollectionProxy\\:\\:__invoke\\(\\)\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Cli/Commands/Config/About.php',
-];
-$ignoreErrors[] = [
-	// identifier: method.notFound
 	'message' => '#^Call to an undefined method Ahc\\\\Cli\\\\Output\\\\Writer\\:\\:errorBold\\(\\)\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Cli/Console/Command.php',
@@ -56,16 +50,40 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Cli/Console/Console.php',
 ];
 $ignoreErrors[] = [
+	// identifier: staticMethod.notFound
+	'message' => '#^Call to an undefined static method BlitzPHP\\\\Container\\\\BaseServices\\:\\:config\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Container/BaseServices.php',
+];
+$ignoreErrors[] = [
+	// identifier: staticMethod.notFound
+	'message' => '#^Call to an undefined static method BlitzPHP\\\\Container\\\\BaseServices\\:\\:container\\(\\)\\.$#',
+	'count' => 4,
+	'path' => __DIR__ . '/src/Container/BaseServices.php',
+];
+$ignoreErrors[] = [
 	// identifier: method.templateTypeNotInParameter
-	'message' => '#^Template type T of method BlitzPHP\\\\Container\\\\Container\\:\\:make\\(\\) is not referenced in a parameter\\.$#',
+	'message' => '#^Template type T of method BlitzPHP\\\\Container\\\\BaseServices\\:\\:factory\\(\\) is not referenced in a parameter\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Container/BaseServices.php',
+];
+$ignoreErrors[] = [
+	// identifier: method.templateTypeNotInParameter
+	'message' => '#^Template type T of method BlitzPHP\\\\Container\\\\BaseServices\\:\\:singleton\\(\\) is not referenced in a parameter\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Container/BaseServices.php',
+];
+$ignoreErrors[] = [
+	// identifier: method.templateTypeNotInParameter
+	'message' => '#^Template type T of method BlitzPHP\\\\Container\\\\Container\\:\\:get\\(\\) is not referenced in a parameter\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Container/Container.php',
 ];
 $ignoreErrors[] = [
-	// identifier: property.notFound
-	'message' => '#^Access to an undefined property mindplay\\\\annotations\\\\IAnnotation\\:\\:\\$method\\.$#',
+	// identifier: method.templateTypeNotInParameter
+	'message' => '#^Template type T of method BlitzPHP\\\\Container\\\\Container\\:\\:make\\(\\) is not referenced in a parameter\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Controllers/RestController.php',
+	'path' => __DIR__ . '/src/Container/Container.php',
 ];
 $ignoreErrors[] = [
 	// identifier: booleanNot.alwaysFalse
@@ -80,10 +98,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Debug/Toolbar.php',
 ];
 $ignoreErrors[] = [
-	// identifier: booleanOr.leftAlwaysTrue
-	'message' => '#^Left side of \\|\\| is always true\\.$#',
+	// identifier: booleanAnd.rightAlwaysTrue
+	'message' => '#^Right side of && is always true\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Event/EventManager.php',
+];
+$ignoreErrors[] = [
+	// identifier: notIdentical.alwaysTrue
+	'message' => '#^Strict comparison using \\!\\=\\= between Closure\\(mixed \\.\\.\\.\\)\\: mixed and null will always evaluate to true\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Event/EventManager.php',
+];
+$ignoreErrors[] = [
+	// identifier: new.static
+	'message' => '#^Unsafe usage of new static\\(\\)\\.$#',
+	'count' => 4,
+	'path' => __DIR__ . '/src/Exceptions/MailException.php',
 ];
 $ignoreErrors[] = [
 	// identifier: phpDoc.parseError
@@ -146,507 +176,39 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Http/Request.php',
 ];
 $ignoreErrors[] = [
+	// identifier: new.static
+	'message' => '#^Unsafe usage of new static\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Initializer/Boot.php',
+];
+$ignoreErrors[] = [
+	// identifier: if.alwaysTrue
+	'message' => '#^If condition is always true\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Loader/DotEnv.php',
+];
+$ignoreErrors[] = [
+	// identifier: booleanOr.rightAlwaysFalse
+	'message' => '#^Right side of \\|\\| is always false\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Loader/DotEnv.php',
+];
+$ignoreErrors[] = [
+	// identifier: empty.variable
+	'message' => '#^Variable \\$line in empty\\(\\) always exists and is not falsy\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Loader/DotEnv.php',
+];
+$ignoreErrors[] = [
 	// identifier: method.notFound
-	'message' => '#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#',
+	'message' => '#^Call to an undefined method Symfony\\\\Component\\\\Mailer\\\\Transport\\\\Dsn\\:\\:withOption\\(\\)\\.$#',
 	'count' => 1,
-	'path' => __DIR__ . '/src/Http/Response.php',
+	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
 ];
 $ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to constant DEBUG_SERVER on an unknown class PHPMailer\\\\PHPMailer\\\\SMTP\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$AltBody on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
+	// identifier: assign.propertyType
+	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$mailer \\(Symfony\\\\Component\\\\Mime\\\\Email\\) does not accept Symfony\\\\Component\\\\Mime\\\\Message\\.$#',
 	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Body on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$CharSet on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$DKIM_domain on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$DKIM_identity on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$DKIM_passphrase on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$DKIM_private on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$DKIM_selector on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Debugoutput on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$From on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Host on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Password on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Port on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Priority on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$SMTPAuth on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$SMTPDebug on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$SMTPSecure on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Subject on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Timeout on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Access to property \\$Username on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addAddress\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addAttachment\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addBCC\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addCC\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addCustomHeader\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addEmbeddedImage\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addReplyTo\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addStringAttachment\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addStringEmbeddedImage\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method clearAddresses\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method clearAllRecipients\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method clearAttachments\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method clearBCCs\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method clearCCs\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method clearCustomHeaders\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method clearReplyTos\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method getLastMessageID\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method isHTML\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method isMail\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method isQmail\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method isSMTP\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method isSendmail\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method send\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method setFrom\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method sign\\(\\) on an unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Class PHPMailer\\\\PHPMailer\\\\PHPMailer not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class PHPMailer\\\\PHPMailer\\\\PHPMailer not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: throws.notThrowable
-	'message' => '#^PHPDoc tag @throws with type PHPMailer\\\\PHPMailer\\\\Exception is not subtype of Throwable$#',
-	'count' => 11,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\PHPMailer\\:\\:\\$mailer has unknown class PHPMailer\\\\PHPMailer\\\\PHPMailer as its type\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/PHPMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addBcc\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addCC\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addPart\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addReplyTo\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method addTo\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method asInline\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method bcc\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method cc\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method from\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method generateMessageId\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method getHeaders\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method html\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method priority\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method replyTo\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method send\\(\\) on an unknown class Symfony\\\\Component\\\\Mailer\\\\Mailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method sign\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Crypto\\\\DkimSigner\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method sign\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Crypto\\\\SMimeSigner\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method subject\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method text\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to method to\\(\\) on an unknown class Symfony\\\\Component\\\\Mime\\\\Email\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Call to static method fromDsn\\(\\) on an unknown class Symfony\\\\Component\\\\Mailer\\\\Transport\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Class Symfony\\\\Component\\\\Mailer\\\\Mailer not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class Symfony\\\\Component\\\\Mailer\\\\Mailer not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class Symfony\\\\Component\\\\Mime\\\\Address not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class Symfony\\\\Component\\\\Mime\\\\Crypto\\\\DkimSigner not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class Symfony\\\\Component\\\\Mime\\\\Crypto\\\\SMimeSigner not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class Symfony\\\\Component\\\\Mime\\\\Email not found\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class Symfony\\\\Component\\\\Mime\\\\Part\\\\DataPart not found\\.$#',
-	'count' => 4,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Instantiated class Symfony\\\\Component\\\\Mime\\\\Part\\\\File not found\\.$#',
-	'count' => 2,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Method BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:makeAddress\\(\\) has invalid return type Symfony\\\\Component\\\\Mime\\\\Address\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Method BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:transporter\\(\\) has invalid return type Symfony\\\\Component\\\\Mailer\\\\Mailer\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: property.onlyWritten
-	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$encryption is never read, only written\\.$#',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
-];
-$ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$mailer has unknown class Symfony\\\\Component\\\\Mime\\\\Email as its type\\.$#',
-	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
 ];
 $ignoreErrors[] = [
@@ -656,10 +218,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
 ];
 $ignoreErrors[] = [
-	// identifier: class.notFound
-	'message' => '#^Property BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:\\$transporter has unknown class Symfony\\\\Component\\\\Mailer\\\\Mailer as its type\\.$#',
+	// identifier: method.childReturnType
+	'message' => '#^Return type \\(Symfony\\\\Component\\\\Mime\\\\Address\\) of method BlitzPHP\\\\Mail\\\\Adapters\\\\SymfonyMailer\\:\\:makeAddress\\(\\) should be compatible with return type \\(array\\{string, string\\}\\) of method BlitzPHP\\\\Mail\\\\Adapters\\\\AbstractAdapter\\:\\:makeAddress\\(\\)$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Mail/Adapters/SymfonyMailer.php',
+];
+$ignoreErrors[] = [
+	// identifier: class.notFound
+	'message' => '#^Call to method convert\\(\\) on an unknown class League\\\\CommonMark\\\\CommonMarkConverter\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Mail/Mail.php',
+];
+$ignoreErrors[] = [
+	// identifier: class.notFound
+	'message' => '#^Instantiated class League\\\\CommonMark\\\\CommonMarkConverter not found\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Mail/Mail.php',
 ];
 $ignoreErrors[] = [
 	// identifier: new.static
@@ -684,6 +258,12 @@ $ignoreErrors[] = [
 	'message' => '#^Property BlitzPHP\\\\Router\\\\Dispatcher\\:\\:\\$response \\(BlitzPHP\\\\Http\\\\Response\\) does not accept Psr\\\\Http\\\\Message\\\\ResponseInterface\\.$#',
 	'count' => 3,
 	'path' => __DIR__ . '/src/Router/Dispatcher.php',
+];
+$ignoreErrors[] = [
+	// identifier: notIdentical.alwaysTrue
+	'message' => '#^Strict comparison using \\!\\=\\= between mixed and null will always evaluate to true\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Security/Encryption/KeyRotationDecorator.php',
 ];
 $ignoreErrors[] = [
 	// identifier: booleanAnd.alwaysFalse

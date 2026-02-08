@@ -92,7 +92,7 @@ class Config
         if (! $this->configurator->exists($key)) {
             $topLevelKey = $this->configurator->getTopLevelKey($key);
 
-            if (! isset(static::$loaded[$topLevelKey])) {
+            if (! isset(self::$loaded[$topLevelKey])) {
                 $this->load($topLevelKey);
             }
 
@@ -140,7 +140,7 @@ class Config
     public function set(string $key, mixed $value): self
     {
         $topLevelKey = $this->configurator->getTopLevelKey($key);
-        if (! isset(static::$loaded[$topLevelKey])) {
+        if (! isset(self::$loaded[$topLevelKey])) {
             $this->load($topLevelKey);
         }
 

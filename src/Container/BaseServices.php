@@ -156,8 +156,8 @@ class BaseServices
     {
         static::$instances[$name = self::serviceName($key)] = $value;
 
-		if (isset(static::$aliases[$name])) {
-			foreach (static::$aliases[$name] ?? [] as $item) {
+		if (isset(self::$aliases[$name])) {
+			foreach (self::$aliases[$name] ?? [] as $item) {
 				static::container()->set($item, $value);
 			}
 		} else {
@@ -278,11 +278,11 @@ class BaseServices
 			return self::$nameCache[$name];
 		}
 
-		if (array_key_exists($n = strtolower($name), static::$aliases)) {
+		if (array_key_exists($n = strtolower($name), self::$aliases)) {
 			return self::$nameCache[$name] = $n;
 		}
 
-		foreach (static::$aliases as $k => $v) {
+		foreach (self::$aliases as $k => $v) {
 			if (in_array($name, $v)) {
 				return self::$nameCache[$name] = $k;
 			}
@@ -303,7 +303,7 @@ class BaseServices
 	{
 		$keys = [$name];
 
-		foreach (static::$aliases as $canonical => $aliases) {
+		foreach (self::$aliases as $canonical => $aliases) {
 			// Si le nom est le nom canonique
 			if ($canonical === $n = strtolower($name)) {
 				$keys = array_merge([$n], $aliases);

@@ -17,88 +17,52 @@
  */
 defined('APP_NAMESPACE') || define('APP_NAMESPACE', 'App');
 
-// Séparateur de répertoire du système d'exploitation.
-/**
- * @var string Le séparateur de répertoire (e.g., '/' sur Unix, '\' sur Windows).
- */
+/** Séparateur de répertoire du système d'exploitation. (e.g., '/' sur Unix, '\' sur Windows). */
 defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 
-// Chemin vers l'autoloader Composer.
-/**
- * @var string Chemin vers l'autoloader Composer.
- */
+/** Chemin vers l'autoloader Composer. */
 defined('COMPOSER_PATH') || define('COMPOSER_PATH', defined('VENDOR_PATH') ? VENDOR_PATH . 'autoload.php' : __DIR__ . '/../vendor/autoload.php');
 
-// Chemin racine du projet.
-/**
- * @var string Chemin de base du projet.
- */
+/** Chemin racine du projet. */
 defined('BASEPATH') || define('BASEPATH', defined('VENDOR_PATH') ? dirname(VENDOR_PATH) . DS : __DIR__ . '/../');
 
-// Chemin vers le dossier public (exposé via web server).
-/**
- * @var string Chemin vers le dossier public pour la sécurité.
- */
+/** Chemin vers le dossier public (exposé via web server). */
 defined('PUBLIC_PATH') || define('PUBLIC_PATH', ROOTPATH . 'public' . DS);
 
-/**
- * @var string Chemin vers le dossier des configurations
- */
+/** Chemin vers le dossier des configurations */
 defined('CONFIG_PATH') || define('CONFIG_PATH', APP_PATH . 'Config' . DS);
 
-/**
- * @var string Chemin vers le dossier des controllers
- */
+/** Chemin vers le dossier des controllers */
 defined('CONTROLLER_PATH') || define('CONTROLLER_PATH', APP_PATH . 'Controllers' . DS);
 
-/**
- * @var string Chemin vers le dossier des helpers de l'application
- */
+/** Chemin vers le dossier des helpers de l'application */
 defined('HELPER_PATH') || define('HELPER_PATH', APP_PATH . 'Helpers' . DS);
 
-/**
- * @var string Chemin vers le dossier des middlewares
- */
+/** Chemin vers le dossier des middlewares */
 defined('MIDDLEWARE_PATH') || define('MIDDLEWARE_PATH', APP_PATH . 'Middlewares' . DS);
 
-/**
- * @var string Chemin  vers le dossier des ressources de base
- */
+/** Chemin  vers le dossier des ressources de base */
 defined('RESOURCE_PATH') || define('RESOURCE_PATH', BASEPATH . 'resources' . DS);
 
-/**
- * @var string Chemin vers le dossier des vues
- */
+/** Chemin vers le dossier des vues */
 defined('VIEW_PATH') || define('VIEW_PATH', APP_PATH . 'Views' . DS);
 
-/**
- * @var string Chemin vers le dossier des layouts
- */
+/** Chemin vers le dossier des layouts */
 defined('LAYOUT_PATH') || define('LAYOUT_PATH', VIEW_PATH . 'layouts' . DS);
 
-/**
- * @var string Chemin vers le dossier de stockage des fichiers du framework
- */
+/** Chemin vers le dossier de stockage des fichiers du framework */
 defined('FRAMEWORK_STORAGE_PATH') || define('FRAMEWORK_STORAGE_PATH', STORAGE_PATH . 'framework' . DS);
 
-/**
- * @var string Chemin vers le dossier de stockage des fichiers de l'application
- */
+/** Chemin vers le dossier de stockage des fichiers de l'application */
 defined('APP_STORAGE_PATH') || define('APP_STORAGE_PATH', STORAGE_PATH . 'app' . DS);
 
-/**
- * @var string Chemin vers le dossier de stockage des fichiers temporaires
- */
+/** Chemin vers le dossier de stockage des fichiers temporaires */
 defined('TEMP_PATH') || define('TEMP_PATH', FRAMEWORK_STORAGE_PATH . 'temp' . DS);
 
-/**
- * @var string Chemin vers le dossier de cache des vues
- */
+/** Chemin vers le dossier de cache des vues */
 defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', FRAMEWORK_STORAGE_PATH . 'cache' . DS);
 
-/**
- * @var string Chemin vers le dossier des logs
- */
+/** Chemin vers le dossier des logs */
 defined('LOG_PATH') || define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
 
 /**
@@ -107,50 +71,32 @@ defined('LOG_PATH') || define('LOG_PATH', STORAGE_PATH . 'logs' . DS);
  * Fournissez des moyens simples de travailler avec la myriade de fonctions PHP qui nécessitent des informations en quelques secondes.
  */
 
-/**
- * @var int Une seconde
- */
+/** Une seconde */
 defined('SECOND') || define('SECOND', 1);
 
-/**
- * @var int Une minute
- */
+/**  Une minute */
 defined('MINUTE') || define('MINUTE', 60);
 
-/**
- * @var int Une heure
- */
+/** Une heure */
 defined('HOUR') || define('HOUR', 60 * MINUTE);
 
-/**
- * @var int Un jour
- */
+/** Un jour */
 defined('DAY') || define('DAY', 24 * HOUR);
 
-/**
- * @var int Une semaine
- */
+/** Une semaine */
 defined('WEEK') || define('WEEK', 7 * DAY);
 
-/**
- * @var int Un mois (30 jours)
- */
+/** Un mois (30 jours) */
 defined('MONTH') || define('MONTH', 30 * DAY);
 
-/**
- * @var int Un trimestre (90 jours)
- */
+/** Un trimestre (90 jours) */
 defined('QUARTER') || define('QUARTER', 90 * DAY);
 
-/**
- * @var int Un an
- */
+/** Un an */
 defined('YEAR') || define('YEAR', 365 * DAY);
 
-/**
- * @var int
- */
-defined('DECADE') || define('DECADE', 315360000);
+/** Une décennie */
+defined('DECADE') || define('DECADE', 10 * YEAR);
 
 
 /**
@@ -172,52 +118,32 @@ defined('DECADE') || define('DECADE', 315360000);
  * - Bash scripting: http://tldp.org/LDP/abs/html/exitcodes.html
  */
 
-/**
- * @var int Succès : pas d'erreurs
- */
+/** Succès : pas d'erreurs */
 defined('EXIT_SUCCESS') || define('EXIT_SUCCESS', 0);
 
-/**
- * @var int Erreur générique
- */
+/** Erreur générique */
 defined('EXIT_ERROR') || define('EXIT_ERROR', 1);
 
-/**
- * @var int Erreur de configuration
- */
+/** Erreur de configuration */
 defined('EXIT_CONFIG') || define('EXIT_CONFIG', 3);
 
-/**
- * @var int Fichier non trouvé
- */
+/** Fichier non trouvé */
 defined('EXIT_UNKNOWN_FILE') || define('EXIT_UNKNOWN_FILE', 4);
 
-/**
- * @var int Classe inconnue
- */
+/** Classe inconnue */
 defined('EXIT_UNKNOWN_CLASS') || define('EXIT_UNKNOWN_CLASS', 5);
 
-/**
- * @var int Méthode inconnue
- */
+/** ?éthode inconnue */
 defined('EXIT_UNKNOWN_METHOD') || define('EXIT_UNKNOWN_METHOD', 6);
 
-/**
- * @var int Saisie utilisateur invalide
- */
+/** Saisie utilisateur invalide */
 defined('EXIT_USER_INPUT') || define('EXIT_USER_INPUT', 7);
 
-/**
- * @var int Erreur de base de données
- */
+/** Erreur de base de données */
 defined('EXIT_DATABASE') || define('EXIT_DATABASE', 8);
 
-/**
- * @var int Code d'erreur automatique minimum
- */
+/**  Code d'erreur automatique minimum */
 defined('EXIT__AUTO_MIN') || define('EXIT__AUTO_MIN', 9);
 
-/**
- * @var int Code d'erreur automatique maximum
- */
+/** Code d'erreur automatique maximum */
 defined('EXIT__AUTO_MAX') || define('EXIT__AUTO_MAX', 125);

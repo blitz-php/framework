@@ -29,9 +29,11 @@ class HttpException extends FrameworkException
      * @param non-empty-string $header Nom de l'en-tête
      * @param array<string>|string|null $value Valeur de l'en-tête
      */
-    public function setHeader(string $header, array|string|null $value = null): void
+    public function setHeader(string $header, array|string|null $value = null): self
     {
         $this->headers[$header] = $value ?? '';
+
+		return $this;
     }
 
     /**

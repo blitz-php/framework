@@ -154,7 +154,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
             }
         }
 
-        return 'ip:' . ($request->clientIp() ?? 'unknown');
+        return 'ip:' . $request->clientIp();
     }
 
     /**
