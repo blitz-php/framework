@@ -15,6 +15,7 @@ use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Exceptions\ValidationException;
 use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Traits\Http\ApiResponseTrait;
+use JsonSerializable;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -89,22 +90,22 @@ class RestController extends BaseController
      * 6. Exécution des hooks "after"
      *
      * @param string $method Nom de la méthode à exécuter
-     * @param array $params Paramètres à passer à la méthode
+     * @param array  $params Paramètres à passer à la méthode
      *
      * @return ResponseInterface Réponse HTTP formatée
      */
     public function _remap(string $method, array $params = []): ResponseInterface
     {
-        if (!method_exists($this, $method)) {
+        if (! method_exists($this, $method)) {
             return $this->respondNotImplemented($this->_translate('notImplemented', [static::class, $method]));
         }
 
         try {
             // Hook before
             $before = $this->before($method, $params);
-			if ($before instanceof ResponseInterface) {
-				return $before;
-			}
+            if ($before instanceof ResponseInterface) {
+                return $before;
+            }
 
             // Validation de la requête
             if (($check = $this->validateRequest()) instanceof ResponseInterface) {
@@ -112,8 +113,8 @@ class RestController extends BaseController
             }
 
             // Exécution de la méthode
-			$returned = service('container')->call([$this, $method], $params);
-			$response = $returned instanceof ResponseInterface ? $returned : $this->respond($returned);
+            $returned = service('container')->call([$this, $method], $params);
+            $response = $returned instanceof ResponseInterface ? $returned : $this->respond($returned);
 
             // Hook after
             $this->after($method, $params, $response);
@@ -143,8 +144,9 @@ class RestController extends BaseController
             );
         }
 
-        if (!on_dev()) {
+        if (! on_dev()) {
             $url = explode('?', $this->request->getRequestTarget())[0];
+
             return $this->respondBadRequest($this->_translate('badUsed', [$url]));
         }
 
@@ -193,9 +195,10 @@ class RestController extends BaseController
      */
     protected function validateAjaxOnly(): bool|ResponseInterface
     {
-        if ($this->restConfig['ajax_only'] && !$this->request->is('ajax')) {
+        if ($this->restConfig['ajax_only'] && ! $this->request->is('ajax')) {
             return $this->respondNotAcceptable($this->_translate('ajaxOnly'));
         }
+
         return true;
     }
 
@@ -206,9 +209,10 @@ class RestController extends BaseController
      */
     protected function validateHttps(): bool|ResponseInterface
     {
-        if ($this->restConfig['force_https'] && !$this->request->is('https')) {
+        if ($this->restConfig['force_https'] && ! $this->request->is('https')) {
             return $this->respondForbidden($this->_translate('unsupported'));
         }
+
         return true;
     }
 
@@ -220,9 +224,10 @@ class RestController extends BaseController
     protected function validateIpBlacklist(): bool|ResponseInterface
     {
         $blacklist = $this->restConfig['ip_blacklist'];
-        if (!empty($blacklist) && in_array($this->request->clientIp(), $blacklist, true)) {
+        if (! empty($blacklist) && in_array($this->request->clientIp(), $blacklist, true)) {
             return $this->respondUnauthorized($this->_translate('ipDenied'));
         }
+
         return true;
     }
 
@@ -234,12 +239,13 @@ class RestController extends BaseController
     protected function validateIpWhitelist(): bool|ResponseInterface
     {
         $whitelist = $this->restConfig['ip_whitelist'];
-        if (!empty($whitelist)) {
+        if (! empty($whitelist)) {
             $whitelist = array_merge($whitelist, ['127.0.0.1', '0.0.0.0']);
-            if (!in_array($this->request->clientIp(), $whitelist, true)) {
+            if (! in_array($this->request->clientIp(), $whitelist, true)) {
                 return $this->respondUnauthorized($this->_translate('ipUnauthorized'));
             }
         }
+
         return true;
     }
 
@@ -251,12 +257,11 @@ class RestController extends BaseController
 
     /**
      * Restreint l'accès aux requêtes AJAX uniquement
-     *
-     * @return self
      */
     public function ajaxOnly(): self
     {
         $this->restConfig['ajax_only'] = true;
+
         return $this;
     }
 
@@ -264,25 +269,23 @@ class RestController extends BaseController
      * Définit le format de réponse
      *
      * @param string $format Format de réponse (json, xml, csv, etc.)
-     *
-     * @return self
      */
     public function returnFormat(string $format): self
     {
         if (array_key_exists($format, $this->mimes) || in_array($format, $this->mimes, true)) {
             $this->restConfig['format'] = $format;
         }
+
         return $this;
     }
 
     /**
      * Force l'utilisation de HTTPS
-     *
-     * @return self
      */
     public function requireHttps(): self
     {
         $this->restConfig['force_https'] = true;
+
         return $this;
     }
 
@@ -290,12 +293,11 @@ class RestController extends BaseController
      * Définit la liste noire d'adresses IP
      *
      * @param string ...$ips Liste des adresses IP à bloquer
-     *
-     * @return self
      */
     public function ipBlacklist(string ...$ips): self
     {
         $this->restConfig['ip_blacklist'] = $ips;
+
         return $this;
     }
 
@@ -303,12 +305,11 @@ class RestController extends BaseController
      * Définit la liste blanche d'adresses IP
      *
      * @param string ...$ips Liste des adresses IP autorisées
-     *
-     * @return self
      */
     public function ipWhitelist(string ...$ips): self
     {
         $this->restConfig['ip_whitelist'] = $ips;
+
         return $this;
     }
 
@@ -316,13 +317,15 @@ class RestController extends BaseController
      * --------------------------------------------------------------------------
      * MÉTHODES DU TRAIT ApiResponseTrait
      * --------------------------------------------------------------------------
+     *
+     * @param mixed $data
      */
 
     /**
      * Formate et envoie une réponse HTTP
      *
-     * @param mixed $data Données à envoyer dans la réponse
-     * @param int $status Code de statut HTTP (200 par défaut)
+     * @param mixed $data   Données à envoyer dans la réponse
+     * @param int   $status Code de statut HTTP (200 par défaut)
      *
      * @return ResponseInterface Réponse HTTP formatée
      */
@@ -340,10 +343,10 @@ class RestController extends BaseController
     /**
      * Réponse d'erreur générique
      *
-     * @param string|null $message Message d'erreur
-     * @param int|null $status Code de statut HTTP
-     * @param int|string|null $code Code d'erreur personnalisé
-     * @param array $errors Liste détaillée des erreurs
+     * @param string|null     $message Message d'erreur
+     * @param int|null        $status  Code de statut HTTP
+     * @param int|string|null $code    Code d'erreur personnalisé
+     * @param array           $errors  Liste détaillée des erreurs
      *
      * @return ResponseInterface Réponse d'erreur formatée
      */
@@ -354,24 +357,24 @@ class RestController extends BaseController
         array $errors = []
     ): ResponseInterface {
         $message = $message ?: "Une erreur s'est produite";
-        $code = ! in_array($code, [0, '', '0', null], true) ? $code : $status;
+        $code    = ! in_array($code, [0, '', '0', null], true) ? $code : $status;
 
         $response = [
             $this->restConfig['field']['message'] => $message,
         ];
 
-        if (!empty($this->restConfig['field']['status'])) {
+        if (! empty($this->restConfig['field']['status'])) {
             $response[$this->restConfig['field']['status']] = false;
         }
-        if (!empty($this->restConfig['field']['code'])) {
+        if (! empty($this->restConfig['field']['code'])) {
             $response[$this->restConfig['field']['code']] = $code;
         }
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response[$this->restConfig['field']['errors']] = $errors;
         }
 
         // Mode non strict : toujours retourner 200 avec le statut dans le body
-        if (!$this->restConfig['strict']) {
+        if (! $this->restConfig['strict']) {
             $status = StatusCode::OK;
         }
 
@@ -382,8 +385,8 @@ class RestController extends BaseController
      * Réponse de succès générique
      *
      * @param string|null $message Message de succès
-     * @param mixed $result Données résultantes
-     * @param int|null $status Code de statut HTTP
+     * @param mixed       $result  Données résultantes
+     * @param int|null    $status  Code de statut HTTP
      *
      * @return ResponseInterface Réponse de succès formatée
      */
@@ -393,13 +396,13 @@ class RestController extends BaseController
         ?int $status = StatusCode::OK
     ): ResponseInterface {
         $message = $message ?: 'Resultat';
-        $status = $status ?? StatusCode::OK;
+        $status ??= StatusCode::OK;
 
         $response = [
             $this->restConfig['field']['message'] => $message,
         ];
 
-        if (!empty($this->restConfig['field']['status'])) {
+        if (! empty($this->restConfig['field']['status'])) {
             $response[$this->restConfig['field']['status']] = true;
         }
 
@@ -441,7 +444,7 @@ class RestController extends BaseController
             if (method_exists($element, 'toArray')) {
                 return $element->toArray();
             }
-            if ($element instanceof \JsonSerializable) {
+            if ($element instanceof JsonSerializable) {
                 return $element->jsonSerialize();
             }
         }
@@ -453,15 +456,13 @@ class RestController extends BaseController
      * Formate la réponse finale selon le format configuré
      *
      * @param mixed $data Données à formater
-     *
-     * @return void
      */
     protected function formatResponse($data): void
     {
         $format = strtolower($this->restConfig['format']);
-        $mime = $this->mimes[$format] ?? null;
+        $mime   = $this->mimes[$format] ?? null;
 
-        if (!$mime && in_array($format, $this->mimes, true)) {
+        if (! $mime && in_array($format, $this->mimes, true)) {
             $mime = $format;
         }
 
@@ -471,7 +472,7 @@ class RestController extends BaseController
             // Gestion JSONP
             if ($mime === $this->mimes['json']) {
                 $callback = $this->request->getQuery('callback');
-                if (!empty($callback) && str_starts_with(trim($output), $callback . '(')) {
+                if (! empty($callback) && str_starts_with(trim($output), $callback . '(')) {
                     $mime   = $this->mimes['jsonp'];
                     $output = $callback . '(' . trim($output) . ');';
                 }
@@ -504,7 +505,7 @@ class RestController extends BaseController
      * Traduit une chaîne de caractères
      *
      * @param string $line Clé de traduction
-     * @param array $args Arguments à injecter dans la traduction
+     * @param array  $args Arguments à injecter dans la traduction
      *
      * @return string Chaîne traduite
      */
@@ -517,7 +518,7 @@ class RestController extends BaseController
      * Traduit une chaîne spécifique à l'API REST
      *
      * @param string $line Clé de traduction (préfixée par 'Rest.')
-     * @param array $args Arguments à injecter
+     * @param array  $args Arguments à injecter
      *
      * @return string Chaîne traduite
      */
@@ -536,7 +537,7 @@ class RestController extends BaseController
      * Hook exécuté avant l'appel de la méthode du contrôleur
      *
      * @param string $method Nom de la méthode qui sera exécutée
-     * @param array $params Paramètres qui seront passés à la méthode
+     * @param array  $params Paramètres qui seront passés à la méthode
      *
      * @return ResponseInterface|null Si une réponse est retournée, elle interrompt l'exécution
      */
@@ -548,11 +549,9 @@ class RestController extends BaseController
     /**
      * Hook exécuté après l'appel de la méthode du contrôleur
      *
-     * @param string $method Nom de la méthode qui a été exécutée
-     * @param array $params Paramètres qui ont été passés à la méthode
+     * @param string            $method   Nom de la méthode qui a été exécutée
+     * @param array             $params   Paramètres qui ont été passés à la méthode
      * @param ResponseInterface $response Réponse générée par la méthode
-     *
-     * @return void
      */
     protected function after(string $method, array $params, ResponseInterface $response): void
     {

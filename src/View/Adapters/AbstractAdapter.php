@@ -253,22 +253,22 @@ abstract class AbstractAdapter implements RendererInterface
         $ext ??= $this->ext;
 
         $viewPath = $options['viewPath'] ?? $this->viewPath;
-		$viewExt  = pathinfo($view, PATHINFO_EXTENSION);
+        $viewExt  = pathinfo($view, PATHINFO_EXTENSION);
         $file     = $view;
 
-		if (str_contains($view, '\\')) {
-			$overrideFolder = $this->config['app_overrides_folder'] !== ''
-				? trim($this->config['app_overrides_folder'], DS) . DS
-				: '';
+        if (str_contains($view, '\\')) {
+            $overrideFolder = $this->config['app_overrides_folder'] !== ''
+                ? trim($this->config['app_overrides_folder'], DS) . DS
+                : '';
 
-			$file = $overrideFolder . ltrim(str_replace('\\', DS, $view), DS);
-		}
+            $file = $overrideFolder . ltrim(str_replace('\\', DS, $view), DS);
+        }
 
-		$file = ! empty($viewPath) ? str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($file, '/\\')) : $file;
-		$file = $viewExt === '' ? $file . '.' . $ext : $file;
-		$view = $viewExt === '' ? $view . '.' . $ext : $view;
+        $file = ! empty($viewPath) ? str_replace('/', DS, rtrim($viewPath, '/\\') . DS . ltrim($file, '/\\')) : $file;
+        $file = $viewExt === '' ? $file . '.' . $ext : $file;
+        $view = $viewExt === '' ? $view . '.' . $ext : $view;
 
-		if (! is_file($file)) {
+        if (! is_file($file)) {
             $file = $this->locator->locateFile($view, 'Views', $viewExt ?: $ext) ?: '';
         }
 

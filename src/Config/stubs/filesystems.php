@@ -54,13 +54,13 @@ return [
     ],
 
     /**
-    *--------------------------------------------------------------------------
-    * Disques dont les fichiers peuvent être visible
-    *--------------------------------------------------------------------------
-    * Ici, vous pouvez renseigner une liste de disques dont les fichiers peuvent être visible sur un navigateur.
-    * Par exemple, les images d'avatar uploadées dans le disque "public" pourront être affichées dans le navigateur
-    */
+     *--------------------------------------------------------------------------
+     * Disques dont les fichiers peuvent être visible
+     *--------------------------------------------------------------------------
+     * Ici, vous pouvez renseigner une liste de disques dont les fichiers peuvent être visible sur un navigateur.
+     * Par exemple, les images d'avatar uploadées dans le disque "public" pourront être affichées dans le navigateur
+     */
     'viewable' => [
-		'public',
+        'public',
     ],
 ];

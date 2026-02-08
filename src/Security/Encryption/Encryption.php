@@ -69,7 +69,7 @@ class Encryption implements EncrypterInterface
      *
      * @param object|null $config Configuration de chiffrement
      *
-	 * @throws EncryptionException
+     * @throws EncryptionException
      */
     public function __construct(protected ?object $config = null)
     {
@@ -124,25 +124,26 @@ class Encryption implements EncrypterInterface
      *
      * @param string $currentKey   Clé actuelle de chiffrement
      * @param array  $previousKeys Clés précédentes pour le fallback
-     * @param array  $config 	   Configuration supplémentaire
-	 *
+     * @param array  $config       Configuration supplémentaire
+     *
      * @return self Instance de chiffrement avec rotation de clés
      */
-	public static function withKeyRotation(string $currentKey, array $previousKeys, array $config = []): self
-	{
-		$config                = (object) array_merge(config('encryption'), $config);
-		$config->key           = $currentKey;
-		$config->previous_keys = $previousKeys;
+    public static function withKeyRotation(string $currentKey, array $previousKeys, array $config = []): self
+    {
+        $config                = (object) array_merge(config('encryption'), $config);
+        $config->key           = $currentKey;
+        $config->previous_keys = $previousKeys;
 
-		return new self($config);
-	}
+        return new self($config);
+    }
 
     /**
      * Initialiser ou réinitialiser un chiffreur
      *
      * @param object|null $config Configuration de chiffrement
+     *
      * @return EncrypterInterface Le chiffreur initialisé
-	 *
+     *
      * @throws EncryptionException
      */
     public function initialize(?object $config = null): EncrypterInterface
@@ -170,11 +171,11 @@ class Encryption implements EncrypterInterface
         $handlerName     = 'BlitzPHP\\Security\\Encryption\\Handlers\\' . $this->driver . 'Handler';
         $this->encrypter = new $handlerName($config);
 
-		if (property_exists($config, 'previous_keys')) {
-			if ([] !== $parsedKeys = $this->parsePreviousKeys($config->previous_keys)) {
-				$this->encrypter = new KeyRotationDecorator($this->encrypter, $parsedKeys);
-			}
-		}
+        if (property_exists($config, 'previous_keys')) {
+            if ([] !== $parsedKeys = $this->parsePreviousKeys($config->previous_keys)) {
+                $this->encrypter = new KeyRotationDecorator($this->encrypter, $parsedKeys);
+            }
+        }
 
         return $this->encrypter;
     }
@@ -183,7 +184,7 @@ class Encryption implements EncrypterInterface
      * Créer une clé aléatoire
      *
      * @param int $length Longueur de la clé en octets
-	 *
+     *
      * @return string Clé générée aléatoirement
      */
     public static function createKey(int $length = 32): string
@@ -195,7 +196,7 @@ class Encryption implements EncrypterInterface
      * Fourni un accès en lecture seule à certaines de nos propriétés
      *
      * @param string $key Nom de la propriété
-	 *
+     *
      * @return array|bool|int|string|null Valeur de la propriété ou null
      */
     public function __get($key)
@@ -221,7 +222,7 @@ class Encryption implements EncrypterInterface
      * Récupère ou initialise le chiffreur interne
      *
      * @return EncrypterInterface Le chiffreur
-	 *
+     *
      * @throws EncryptionException
      */
     private function encrypter(): EncrypterInterface
@@ -237,30 +238,31 @@ class Encryption implements EncrypterInterface
      * Parse les clés précédentes en un tableau formaté
      *
      * @param array|string $previous_keys Clés précédentes
-	 *
+     *
      * @return array Tableau des clés parsées
      */
-	private function parsePreviousKeys(array|string $previous_keys): array
-	{
-		$keysArray = is_string($previous_keys)
-			? array_map('trim', explode(',', $previous_keys))
-			: (array) $previous_keys;
+    private function parsePreviousKeys(array|string $previous_keys): array
+    {
+        $keysArray = is_string($previous_keys)
+            ? array_map('trim', explode(',', $previous_keys))
+            : (array) $previous_keys;
 
-		$parsedKeys = [];
-		foreach ($keysArray as $key) {
-			if (!empty($key)) {
-				$parsedKeys[] = $this->parseEncryptionKey($key);
-			}
-		}
+        $parsedKeys = [];
 
-		return $parsedKeys;
-	}
+        foreach ($keysArray as $key) {
+            if (! empty($key)) {
+                $parsedKeys[] = $this->parseEncryptionKey($key);
+            }
+        }
+
+        return $parsedKeys;
+    }
 
     /**
      * Parse une clé de chiffrement avec préfixe hex2bin: ou base64:
      *
      * @param string $key Clé à parser
-	 *
+     *
      * @return string Clé décodée
      */
     private function parseEncryptionKey(string $key): string

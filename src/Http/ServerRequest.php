@@ -154,8 +154,8 @@ class ServerRequest implements ServerRequestInterface
 
     /**
      * Tableau de fichiers.
-	 *
-	 * @var list<UploadedFileInterface>
+     *
+     * @var list<UploadedFileInterface>
      */
     protected array $uploadedFiles = [];
 
@@ -284,7 +284,7 @@ class ServerRequest implements ServerRequestInterface
      */
     protected function processUrlOption(array $config): array
     {
-        if (!str_starts_with($config['url'], '/')) {
+        if (! str_starts_with($config['url'], '/')) {
             $config['url'] = '/' . $config['url'];
         }
 
@@ -323,15 +323,16 @@ class ServerRequest implements ServerRequestInterface
     {
         if ($this->trustProxy && $this->getEnv('HTTP_X_FORWARDED_FOR')) {
             $addresses = array_map('trim', explode(',', $this->getEnv('HTTP_X_FORWARDED_FOR')));
-			$addresses = array_filter($addresses, fn($ip) => filter_var($ip, FILTER_VALIDATE_IP) !== false);
+            $addresses = array_filter($addresses, static fn ($ip) => filter_var($ip, FILTER_VALIDATE_IP) !== false);
 
-			if ($addresses === []) {
-				$ip = $this->getEnv('REMOTE_ADDR', '0.0.0.0');
-    			return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
-			}
+            if ($addresses === []) {
+                $ip = $this->getEnv('REMOTE_ADDR', '0.0.0.0');
 
-            $trusted   = $this->trustedProxies !== [];
-            $n         = count($addresses);
+                return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
+            }
+
+            $trusted = $this->trustedProxies !== [];
+            $n       = count($addresses);
 
             if ($trusted) {
                 $trusted = array_diff($addresses, $this->trustedProxies);
@@ -370,8 +371,8 @@ class ServerRequest implements ServerRequestInterface
 
     /**
      * Obtenez les proxys de confiance
-	 *
-	 * @return list<string>
+     *
+     * @return list<string>
      */
     public function getTrustedProxies(): array
     {
@@ -398,7 +399,7 @@ class ServerRequest implements ServerRequestInterface
             if ($ref === '' || str_starts_with($ref, '//')) {
                 $ref = '/';
             }
-            if (!str_starts_with($ref, '/')) {
+            if (! str_starts_with($ref, '/')) {
                 $ref = '/' . $ref;
             }
 
@@ -533,7 +534,7 @@ class ServerRequest implements ServerRequestInterface
     protected function _headerDetector(array $detect): bool
     {
         foreach ($detect['header'] as $header => $value) {
-			$header = $this->getEnv($this->normalizeHeaderName($header));
+            $header = $this->getEnv($this->normalizeHeaderName($header));
             if ($header !== null) {
                 if ($value instanceof Closure) {
                     return $value($header);
@@ -1406,37 +1407,37 @@ class ServerRequest implements ServerRequestInterface
         return $this->_environment[$key];
     }
 
-	/**
-	 * Obtient une valeur à partir des données d'environnement de la requete.
-	 *
-	 * @see BlitzPHP\Http\ServerRequest::getEnv()
-	 *
-	 * @return array|string|null
-	 */
-	public function env(?string $key = null, ?string $default = null)
-	{
-		if (null === $key) {
-			return $this->_environment;
-		}
+    /**
+     * Obtient une valeur à partir des données d'environnement de la requete.
+     *
+     * @see BlitzPHP\Http\ServerRequest::getEnv()
+     *
+     * @return array|string|null
+     */
+    public function env(?string $key = null, ?string $default = null)
+    {
+        if (null === $key) {
+            return $this->_environment;
+        }
 
-		return $this->getEnv($key, $default);
-	}
+        return $this->getEnv($key, $default);
+    }
 
-	/**
-	 * Determise si une variable d'environnement est presente.
-	 */
-	public function hasEnv(string $key): bool
-	{
-		return $this->env($key) !== null;
-	}
+    /**
+     * Determise si une variable d'environnement est presente.
+     */
+    public function hasEnv(string $key): bool
+    {
+        return $this->env($key) !== null;
+    }
 
     /**
      * Mettez à jour la demande avec un nouvel élément de données d'environnement.
      *
      * Renvoie un objet de requête mis à jour. Cette méthode retourne
      * un *nouvel* objet de requête et ne mute pas la requête sur place.
-	 *
-	 * @param array|string|null $value
+     *
+     * @param array|string|null $value
      */
     public function withEnv(string $key, $value): static
     {
@@ -1542,10 +1543,10 @@ class ServerRequest implements ServerRequestInterface
         return Arr::get($this->params, $name, $default);
     }
 
-	public function hasParam(string $name): bool
-	{
-		return Arr::has($this->params, $name);
-	}
+    public function hasParam(string $name): bool
+    {
+        return Arr::has($this->params, $name);
+    }
 
     /**
      * Renvoie une instance avec l'attribut de requête spécifié.
@@ -1840,17 +1841,14 @@ class ServerRequest implements ServerRequestInterface
         };
     }
 
-	/**
-	 *
-	 */
-	public function negotiator(): Negotiator
-	{
-		if (null === $this->negotiator) {
+    public function negotiator(): Negotiator
+    {
+        if (null === $this->negotiator) {
             $this->negotiator = service('negotiator', $this);
         }
 
-		return $this->negotiator;
-	}
+        return $this->negotiator;
+    }
 
     /**
      * Définit la chaîne locale pour cette requête.

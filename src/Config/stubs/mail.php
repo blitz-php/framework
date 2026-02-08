@@ -126,10 +126,10 @@ return [
      */
     'priority' => BlitzPHP\Mail\Mail::PRIORITY_NORMAL,
 
-	/**
-	 * Taille maximal des pieces jointes
-	 *
-	 * @var int
-	 */
-	'max_attachment_size' => 10 * 1024 * 1024,
+    /**
+     * Taille maximal des pieces jointes
+     *
+     * @var int
+     */
+    'max_attachment_size' => 10 * 1024 * 1024,
 ];

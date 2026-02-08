@@ -98,7 +98,6 @@ defined('YEAR') || define('YEAR', 365 * DAY);
 /** Une décennie */
 defined('DECADE') || define('DECADE', 10 * YEAR);
 
-
 /**
  * --------------------------------------------------------------------------
  * | Codes d'état de sortie

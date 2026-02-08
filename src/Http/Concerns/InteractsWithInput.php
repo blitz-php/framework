@@ -25,9 +25,9 @@ use SplFileInfo;
  */
 trait InteractsWithInput
 {
-	use InteractsWithData;
+    use InteractsWithData;
 
-	/**
+    /**
      * Tableau de données d'environnement.
      *
      * @var array<string, mixed>
@@ -219,7 +219,7 @@ trait InteractsWithInput
     /**
      * Récupère un fichier à partir de la requête.
      *
-     * @return ($key is null ? array<string, UploadedFile|UploadedFile[]> : list<UploadedFile>|UploadedFile|null)
+     * @return ($key is null ? array<string, list<UploadedFile>|UploadedFile> : list<UploadedFile>|UploadedFile|null)
      */
     public function file(?string $key = null, mixed $default = null)
     {

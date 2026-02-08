@@ -17,7 +17,7 @@ return Expect::structure([
         'address' => Expect::string(env('mail.from.address', 'hello@example.com')),
         'name'    => Expect::string(env('mail.from.name', 'Example')),
     ]),
-	'handler'             => Expect::string(env('mail.handler', 'log')),
+    'handler'             => Expect::string(env('mail.handler', 'log')),
     'view_dir'            => Expect::string('emails'),
     'template'            => Expect::string(''),
     'protocol'            => Expect::string(env('mail.protocol', Mail::PROTOCOL_SENDMAIL)),

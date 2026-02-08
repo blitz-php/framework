@@ -23,7 +23,7 @@ return Expect::structure([
         'errors'  => 'errors',
         'result'  => 'result',
     ]),
-    'ip_blacklist'    => Expect::listOf('string'),
-    'ip_whitelist'    => Expect::listOf('string'),
-    'ajax_only'       => Expect::bool()->default(false),
+    'ip_blacklist' => Expect::listOf('string'),
+    'ip_whitelist' => Expect::listOf('string'),
+    'ajax_only'    => Expect::bool()->default(false),
 ])->otherItems();

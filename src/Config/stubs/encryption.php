@@ -20,22 +20,22 @@ return [
      */
     'key' => env('encryption.key', ''),
 
-	 /**
+    /**
      * --------------------------------------------------------------------------
      * Clés de chiffrement précédentes
      * --------------------------------------------------------------------------
      *
      * Lors de la rotation des clés de chiffrement, ajoutez les anciennes clés ici afin de conserver la possibilité
      * de déchiffrer les données chiffrées avec les clés précédentes.
-	 * Le chiffrement utilise toujours la clé $key actuelle.
-	 * Le déchiffrement essaie d'abord la clé actuelle, puis revient aux clés précédentes si le déchiffrement échoue.
+     * Le chiffrement utilise toujours la clé $key actuelle.
+     * Le déchiffrement essaie d'abord la clé actuelle, puis revient aux clés précédentes si le déchiffrement échoue.
      *
      * Dans le fichier .env, utilisez une chaîne séparée par des virgules :
      *   encryption.previousKeys = hex2bin:9be8c64fcea509867...,hex2bin:3f5a1d8e9c2b7a4f6...
-	 *
+     *
      * @var list<string>|string
      */
-	'previous_keys' => '',
+    'previous_keys' => '',
 
     /**
      * --------------------------------------------------------------------------

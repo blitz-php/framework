@@ -57,7 +57,7 @@ return [
      */
     'decorators' => [],
 
-	/**
+    /**
      * Sous-répertoire dans app/Views pour les remplacements de vues avec espace de noms.
      *
      * Les vues avec espace de noms seront recherchées dans :
@@ -71,10 +71,10 @@ return [
      *   'overrides' -> app/Views/overrides/Example/Blog/post/card.php
      *   'vendor'    -> app/Views/vendor/Example/Blog/post/card.php
      *   ''          -> app/Views/Example/Blog/post/card.php (mappage direct)
-	 *
-	 * @var string
+     *
+     * @var string
      */
-	'app_overrides_folder' => 'overrides',
+    'app_overrides_folder' => 'overrides',
 
     'adapters' => [
         /**

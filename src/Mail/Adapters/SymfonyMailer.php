@@ -257,7 +257,7 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
-        if (!$this->isValidMimeType($type)) {
+        if (! $this->isValidMimeType($type)) {
             throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
         }
 
@@ -321,7 +321,7 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
-        if (!$this->isValidMimeType($type)) {
+        if (! $this->isValidMimeType($type)) {
             throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
         }
 
@@ -341,7 +341,7 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
-        if (!$this->isValidMimeType($type)) {
+        if (! $this->isValidMimeType($type)) {
             throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
         }
 
@@ -447,7 +447,7 @@ class SymfonyMailer extends AbstractAdapter
      */
     public function sign(string $cert_filename, string $key_filename, string $key_pass, string $extracerts_filename = ''): static
     {
-        $signer = new SMimeSigner($cert_filename, $key_filename, $key_pass, $extracerts_filename);
+        $signer       = new SMimeSigner($cert_filename, $key_filename, $key_pass, $extracerts_filename);
         $this->mailer = $signer->sign($this->mailer);
 
         return $this;
@@ -530,7 +530,7 @@ class SymfonyMailer extends AbstractAdapter
             return $this->transporter;
         }
 
-        $dsn = $this->buildDsn();
+        $dsn       = $this->buildDsn();
         $transport = Transport::fromDsn($dsn);
 
         return $this->transporter = new Mailer($transport);

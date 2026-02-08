@@ -15,15 +15,15 @@ return [
      * Liste des collecteurs de barre d'outils qui seront appelés lors du débogage de la barre d'outils
      * se déclenche et collecte des données à partir de.
      *
-     * @var string[]
+     * @var list<string>
      */
     'collectors' => [
-        \BlitzPHP\Debug\Toolbar\Collectors\TimersCollector::class,
-        \BlitzPHP\Debug\Toolbar\Collectors\LogsCollector::class,
-        \BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector::class,
-        \BlitzPHP\Debug\Toolbar\Collectors\FilesCollector::class,
-        \BlitzPHP\Debug\Toolbar\Collectors\RoutesCollector::class,
-        \BlitzPHP\Debug\Toolbar\Collectors\EventsCollector::class,
+        BlitzPHP\Debug\Toolbar\Collectors\TimersCollector::class,
+        BlitzPHP\Debug\Toolbar\Collectors\LogsCollector::class,
+        BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector::class,
+        BlitzPHP\Debug\Toolbar\Collectors\FilesCollector::class,
+        BlitzPHP\Debug\Toolbar\Collectors\RoutesCollector::class,
+        BlitzPHP\Debug\Toolbar\Collectors\EventsCollector::class,
     ],
 
     /**
@@ -67,7 +67,7 @@ return [
      * utilisées pour déterminer si la fonctionnalité de rechargement à chaud doit recharger la page ou non.
      * Nous limitons les valeurs afin de maintenir les performances au maximum.
      *
-     * REMARQUE : Le chemin racine (ROOTPATH) sera ajouté au début de toutes les valeurs.
+     * REMARQUE : Le chemin racine (ROOTPATH) sera ajouté au début de toutes les valeurs.
      *
      * @var list<string>
      */
@@ -89,7 +89,7 @@ return [
         'php', 'css', 'js', 'html', 'svg', 'json', 'env',
     ],
 
-	/**
+    /**
      * --------------------------------------------------------------------------
      * En-têtes HTTP ignorés
      * --------------------------------------------------------------------------
@@ -108,9 +108,9 @@ return [
      *
      * @var array<string, string|null>
      */
-	'disable_on_headers' => [
+    'disable_on_headers' => [
         'X-Requested-With' => 'xmlhttprequest', // Requetes AJAX
         'HX-Request'       => 'true',           // Requestes HTMX
         'X-Up-Version'     => null,             // Requetes partielle Unpoly
-	],
+    ],
 ];

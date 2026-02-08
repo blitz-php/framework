@@ -49,7 +49,7 @@ class Config
      *
      * Les registrars sont des mecanismes permettant aux packages externe de definir un elements de configuration.
      *
-     * @var array<string, mixed[]>
+     * @var array<string, list<mixed>>
      */
     private static array $registrars = [];
 
@@ -146,7 +146,7 @@ class Config
 
         $this->configurator->set($key, $value);
 
-		return $this;
+        return $this;
     }
 
     /**
@@ -187,6 +187,7 @@ class Config
     {
         if (is_array($config)) {
             $this->loadMultiple($config, $allow_empty);
+
             return;
         }
 
@@ -221,12 +222,12 @@ class Config
             return;
         }
 
-        $file   ??= self::file($topLevelKey);
+        $file ??= self::file($topLevelKey);
         $schema ??= self::schema($topLevelKey);
 
         $configurations = $this->loadConfigurationsFromFile($file);
 
-        if (!empty(self::$registrars[$topLevelKey])) {
+        if (! empty(self::$registrars[$topLevelKey])) {
             $configurations = Arr::merge(self::$registrars[$topLevelKey], $configurations);
         }
 
@@ -246,12 +247,12 @@ class Config
      */
     private function loadConfigurationsFromFile(string $file): array
     {
-        if (empty($file) || !file_exists($file)) {
+        if (empty($file) || ! file_exists($file)) {
             return [];
         }
 
         if (in_array($file, get_included_files(), true)) {
-			return []; // Le fichier est déjà inclus, on ne peut pas le requirer à nouveau
+            return []; // Le fichier est déjà inclus, on ne peut pas le requirer à nouveau
         }
 
         $configurations = require $file;
@@ -272,7 +273,7 @@ class Config
 
         $paths = service('locator')->search('Config/' . $path);
 
-        if (!empty($paths[0]) && file_exists($paths[0])) {
+        if (! empty($paths[0]) && file_exists($paths[0])) {
             return $paths[0];
         }
 
@@ -375,11 +376,11 @@ class Config
                 continue;
             }
 
-                if (! is_array($result = $method->invoke(null))) {
-                    continue;
-                }
+            if (! is_array($result = $method->invoke(null))) {
+                continue;
+            }
 
-            $name = $method->getName();
+            $name                    = $method->getName();
             self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
         }
     }
@@ -406,10 +407,10 @@ class Config
         $environment = $config = $this->get('app.environment', 'auto');
 
         $config = match (strtolower($config)) {
-            'auto'  => is_online() ? 'production' : 'development',
+            'auto' => is_online() ? 'production' : 'development',
             'dev', 'development' => 'development',
             'prod', 'production' => 'production',
-            'test', 'testing'    => 'testing',
+            'test', 'testing' => 'testing',
             default => throw new ConfigException("Environnement invalide : {$config}"),
         };
 

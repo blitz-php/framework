@@ -23,5 +23,5 @@ return Expect::structure([
         'X-Requested-With' => 'xmlhttprequest', // AJAX requests
         'HX-Request'       => 'true',           // HTMX requests
         'X-Up-Version'     => null,             // Unpoly partial requests
-	]),
+    ]),
 ])->otherItems();

@@ -994,7 +994,7 @@ if (! function_exists('timer')) {
      */
     function timer(?string $name = null, ?callable $callable = null)
     {
-		/** @var Timer */
+        /** @var Timer */
         $timer = service('timer');
 
         if ($name === null) {
@@ -1149,6 +1149,6 @@ if (! function_exists('invade')) {
      */
     function invade(object|string $objectOrClass)
     {
-		return Helpers::invade($objectOrClass);
+        return Helpers::invade($objectOrClass);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 
 return [
-	/**
-	 * Liste des TLD en deux parties connus pour l'extraction de sous-domaines
-	 *
-	 * @var list<string>
-	 */
-	'two_part_tlds' => [
+    /**
+     * Liste des TLD en deux parties connus pour l'extraction de sous-domaines
+     *
+     * @var list<string>
+     */
+    'two_part_tlds' => [
         'co.uk', 'org.uk', 'gov.uk', 'ac.uk', 'sch.uk', 'ltd.uk', 'plc.uk',
         'com.au', 'net.au', 'org.au', 'edu.au', 'gov.au', 'asn.au', 'id.au',
         'co.jp', 'ac.jp', 'go.jp', 'or.jp', 'ne.jp', 'gr.jp',

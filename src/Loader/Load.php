@@ -24,7 +24,7 @@ class Load
      * Éléments déjà chargés (module → [element → value]).
      * Si un element est deja chargé, on le renvoie simplement sans avoir besoin de le construire à nouveau
      *
-     * @var array<string, array<string, bool|array|string>>
+     * @var array<string, array<string, array|bool|string>>
      */
     private static array $loaded = [];
 
@@ -32,7 +32,7 @@ class Load
      * Charge helpers
      *
      * @param list<string>|string $helpers Noms.
-	 *
+     *
      * @throws LoadException Si empty/invalide.
      */
     public static function helper(array|string $helpers): void
@@ -41,7 +41,7 @@ class Load
             throw new LoadException('Veuillez spécifier le helper à charger.');
         }
 
-       foreach ((array) $helpers as $helper) {
+        foreach ((array) $helpers as $helper) {
             $helper = trim($helper);
             if (empty($helper)) {
                 continue;
@@ -71,8 +71,8 @@ class Load
     /**
      * Charge view (wrap, cache path)
      *
-     * @return string|false
-	 *
+     * @return false|string
+     *
      * @throws \BlitzPHP\Exceptions\ViewException
      */
     public static function view(string $name)
@@ -88,7 +88,7 @@ class Load
     /**
      * Décharge élément.
      */
-    public static function unload(string $module, string|object $element): void
+    public static function unload(string $module, object|string $element): void
     {
         $key = is_object($element) ? get_class($element) : $element;
 
@@ -102,7 +102,7 @@ class Load
      */
     public static function unloadAll(?string $module = null): void
     {
-		if ($module && isset(self::$loaded[$module])) {
+        if ($module && isset(self::$loaded[$module])) {
             self::$loaded[$module] = [];
         } else {
             self::$loaded = [];
@@ -113,9 +113,9 @@ class Load
      * Vérifie si un élément est chargé dans la liste des modules.
      * Gère objects comme string keys.
      */
-    protected static function isLoaded(string $module, string|object $element): bool
+    protected static function isLoaded(string $module, object|string $element): bool
     {
-        if (!isset(self::$loaded[$module]) || !is_array(self::$loaded[$module])) {
+        if (! isset(self::$loaded[$module]) || ! is_array(self::$loaded[$module])) {
             return false;
         }
 
@@ -127,9 +127,9 @@ class Load
     /**
      * Ajoute un element aux elements chargés.
      *
-     * @param bool|array|string $value Valeur (ou true pour helpers)
+     * @param array|bool|string $value Valeur (ou true pour helpers)
      */
-    protected static function loaded(string $module, string|object $element, bool|array|string $value): void
+    protected static function loaded(string $module, object|string $element, array|bool|string $value): void
     {
         $key = is_object($element) ? get_class($element) : $element;
 
@@ -143,9 +143,9 @@ class Load
     /**
      * Renvoie un élément chargé.
      *
-     * @return bool|array|string|null
+     * @return array|bool|string|null
      */
-    protected static function getLoaded(string $module, string|object $element): mixed
+    protected static function getLoaded(string $module, object|string $element): mixed
     {
         $key = is_object($element) ? get_class($element) : $element;
 

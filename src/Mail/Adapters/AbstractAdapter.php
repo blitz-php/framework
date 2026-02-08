@@ -26,7 +26,7 @@ abstract class AbstractAdapter implements MailerInterface
     /**
      * Tableau de correspondance entre les priorités
      *
-     * @var array<int>
+     * @var list<int>
      */
     protected const PRIORITY_MAP = [
         self::PRIORITY_HIGH,
@@ -57,7 +57,7 @@ abstract class AbstractAdapter implements MailerInterface
      * Constructeur
      *
      * @param bool $debug Activer le mode debug
-	 *
+     *
      * @throws RuntimeException Si une dépendance est manquante
      */
     public function __construct(bool $debug = false)
@@ -76,7 +76,7 @@ abstract class AbstractAdapter implements MailerInterface
      */
     private function validateDependencies(): void
     {
-		foreach ($this->dependancies as $dependency) {
+        foreach ($this->dependancies as $dependency) {
             if (empty($dependency['class']) || empty($dependency['package'])) {
                 throw new InvalidArgumentException('Propriété de dépendance invalide');
             }
@@ -172,42 +172,45 @@ abstract class AbstractAdapter implements MailerInterface
      */
     abstract public function clear(): self;
 
-	abstract protected function doAttach(array $path, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static;
+    abstract protected function doAttach(array $path, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
-	{
-		if (is_string($path)) {
+    /**
+     * {@inheritDoc}
+     */
+    public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
+    {
+        if (is_string($path)) {
             $path = [$path => $name];
         }
 
-		foreach ($path as $filePath => $fileName) {
-            if (!file_exists($filePath)) {
+        foreach ($path as $filePath => $fileName) {
+            if (! file_exists($filePath)) {
                 $this->lastError = sprintf('Fichier non trouvé: %s', $filePath);
-				unset($path[$filePath]);
+                unset($path[$filePath]);
+
                 continue;
             }
 
-            if (!$this->isValidFileSize($filePath)) {
+            if (! $this->isValidFileSize($filePath)) {
                 $this->lastError = sprintf('Fichier trop volumineux: %s', $filePath);
-				unset($path[$filePath]);
+                unset($path[$filePath]);
+
                 continue;
             }
 
-			if ($type === '' && function_exists('mime_content_type')) {
-				$type = mime_content_type($filePath) ?: 'application/octet-stream';
-			}
-            if (!$this->isValidMimeType($type)) {
+            if ($type === '' && function_exists('mime_content_type')) {
+                $type = mime_content_type($filePath) ?: 'application/octet-stream';
+            }
+            if (! $this->isValidMimeType($type)) {
                 $this->lastError = sprintf('Type MIME non autorisé: %s', $type);
-				unset($path[$filePath]);
+                unset($path[$filePath]);
+
                 continue;
             }
         }
 
-		return $this->doAttach($path, $type, $encoding, $disposition);
-	}
+        return $this->doAttach($path, $type, $encoding, $disposition);
+    }
 
     /**
      * Récupère la dernière erreur survenue
@@ -233,7 +236,7 @@ abstract class AbstractAdapter implements MailerInterface
      *
      * @throws BadMethodCallException Si la méthode n'existe pas
      */
-	public function __call(string $method, array $arguments): mixed
+    public function __call(string $method, array $arguments): mixed
     {
         $name = static::methodName($method, 'get');
         if (method_exists($this, $name)) {
@@ -269,7 +272,7 @@ abstract class AbstractAdapter implements MailerInterface
      *
      * @return array{0: string, 1: string} Tableau [email, nom]
      *
-	 * @throws InvalidArgumentException Si l'email n'est pas valide
+     * @throws InvalidArgumentException Si l'email n'est pas valide
      */
     protected function makeAddress(string $email, string $name)
     {
@@ -292,12 +295,12 @@ abstract class AbstractAdapter implements MailerInterface
      * Parse plusieurs adresses email
      *
      * @param array|string $address Adresse(s) email
-     * @param bool|string $name Nom ou indicateur de remplacement
-     * @param bool $set Indique si on doit remplacer les adresses existantes
+     * @param bool|string  $name    Nom ou indicateur de remplacement
+     * @param bool         $set     Indique si on doit remplacer les adresses existantes
      *
-	 * @return array{0: array<array{0: string, 1: string}>, 1: bool}
+     * @return array{0: list<array{0: string, 1: string}>, 1: bool}
      *
-	 * @throws InvalidArgumentException Si les arguments sont invalides
+     * @throws InvalidArgumentException Si les arguments sont invalides
      */
     protected function parseMultipleAddresses(array|string $address, bool|string $name = '', bool $set = false): array
     {
@@ -316,7 +319,7 @@ abstract class AbstractAdapter implements MailerInterface
         $addresses = [];
 
         foreach ($address as $key => $value) {
-            $email = is_string($key) ? $key : $value;
+            $email     = is_string($key) ? $key : $value;
             $nameValue = is_string($key) ? $value : '';
 
             try {
@@ -333,8 +336,8 @@ abstract class AbstractAdapter implements MailerInterface
     /**
      * Valide un type MIME pour les pièces jointes
      *
-     * @param string $mimeType Type MIME à valider
-     * @param array<string> $allowedTypes Types MIME autorisés (peuvent contenir des wildcards comme 'image/*')
+     * @param string       $mimeType     Type MIME à valider
+     * @param list<string> $allowedTypes Types MIME autorisés (peuvent contenir des wildcards comme 'image/*')
      */
     protected function isValidMimeType(string $mimeType, array $allowedTypes = []): bool
     {
@@ -353,7 +356,7 @@ abstract class AbstractAdapter implements MailerInterface
         }
 
         foreach ($allowedTypes as $allowed) {
-            if (strpos($allowed, '*') !== false) {
+            if (str_contains($allowed, '*')) {
                 // Gestion des wildcards
                 $pattern = str_replace('*', '.*', $allowed);
                 $pattern = '/^' . str_replace('/', '\/', $pattern) . '$/i';
@@ -371,12 +374,12 @@ abstract class AbstractAdapter implements MailerInterface
     /**
      * Valide la taille d'un fichier
      *
-     * @param string $filePath Chemin du fichier
-     * @param int|null $maxSize Taille maximale en octets (null = utiliser la config)
+     * @param string   $filePath Chemin du fichier
+     * @param int|null $maxSize  Taille maximale en octets (null = utiliser la config)
      */
     protected function isValidFileSize(string $filePath, ?int $maxSize = null): bool
     {
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return false;
         }
 

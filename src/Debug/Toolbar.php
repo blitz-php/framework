@@ -391,10 +391,10 @@ class Toolbar
             return $response;
         }
 
-		// S'il y'a conflit avec les entete native de php, on s'arrete
-		if ($this->hasNativeHeaderConflict()) {
-			return $response;
-		}
+        // S'il y'a conflit avec les entete native de php, on s'arrete
+        if ($this->hasNativeHeaderConflict()) {
+            return $response;
+        }
 
         // Si on a desactiver le debogage ou l'affichage de la debugbar, on s'arrete
         if (! BLITZ_DEBUG || ! $this->config->show_debugbar) {
@@ -422,7 +422,7 @@ class Toolbar
 
         // Les formats non HTML ne doivent pas inclure la barre de débogage,
         // puis nous envoyons des en-têtes indiquant où trouver les données de débogage pour cette réponse
-        if ($this->shouldDisableToolbar($request)|| ! str_contains($format, 'html')) {
+        if ($this->shouldDisableToolbar($request) || ! str_contains($format, 'html')) {
             return $response
                 ->withHeader('Debugbar-Time', "{$time}")
                 ->withHeader('Debugbar-Link', site_url("?debugbar_time={$time}"));

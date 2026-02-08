@@ -79,15 +79,15 @@ class Services extends BaseServices
      */
     public static function cache(?array $config = null, bool $shared = true): CacheInterface
     {
-		if ($shared) {
-			return static::sharedInstance('cache', $config);
-		}
+        if ($shared) {
+            return static::sharedInstance('cache', $config);
+        }
 
         if ($config === null || $config === []) {
             $config = static::get('config')->get('cache');
         }
 
-		return new Cache($config);
+        return new Cache($config);
     }
 
     /**
@@ -96,9 +96,9 @@ class Services extends BaseServices
      */
     public static function componentLoader(bool $shared = true): ComponentLoader
     {
-		if ($shared) {
-			return static::sharedInstance('componentLoader');
-		}
+        if ($shared) {
+            return static::sharedInstance('componentLoader');
+        }
 
         return new ComponentLoader(static::get('cache'));
     }
@@ -123,8 +123,8 @@ class Services extends BaseServices
     public static function container(bool $shared = true): ContainerInterface
     {
         if ($shared) {
-			return static::sharedInstance('container');
-		}
+            return static::sharedInstance('container');
+        }
 
         return new Container();
     }
@@ -170,11 +170,11 @@ class Services extends BaseServices
      */
     public static function encrypter(?array $config = null, bool $shared = false): EncrypterInterface
     {
-		if ($shared) {
-			return static::sharedInstance('encrypter', $config);
-		}
+        if ($shared) {
+            return static::sharedInstance('encrypter', $config);
+        }
 
-		if ($config === null || $config === []) {
+        if ($config === null || $config === []) {
             $config = static::get('config')->get('encryption');
         }
 
@@ -192,11 +192,11 @@ class Services extends BaseServices
      */
     public static function event(bool $shared = true): EventManagerInterface
     {
-		if ($shared) {
-			return static::sharedInstance('event');
-		}
+        if ($shared) {
+            return static::sharedInstance('event');
+        }
 
-		return new EventManager();
+        return new EventManager();
     }
 
     /**
@@ -204,11 +204,11 @@ class Services extends BaseServices
      */
     public static function fs(bool $shared = true): Filesystem
     {
-		if ($shared) {
-			return static::sharedInstance('fs');
-		}
+        if ($shared) {
+            return static::sharedInstance('fs');
+        }
 
-		return new Filesystem();
+        return new Filesystem();
     }
 
     /**
@@ -218,11 +218,11 @@ class Services extends BaseServices
      */
     public static function hashing(?array $config = null, bool $shared = true): HasherInterface
     {
-		if ($shared) {
-			return static::sharedInstance('hashing', $config);
-		}
+        if ($shared) {
+            return static::sharedInstance('hashing', $config);
+        }
 
-		if ($config === null || $config === []) {
+        if ($config === null || $config === []) {
             $config = static::get('config')->get('hashing');
         }
 
@@ -255,28 +255,28 @@ class Services extends BaseServices
      */
     public static function mail(?array $config = null, bool $shared = true): MailerInterface
     {
-		if ($shared) {
-			return static::sharedInstance('mail', $config);
-		}
+        if ($shared) {
+            return static::sharedInstance('mail', $config);
+        }
 
         if ($config === null || $config === []) {
             $config = static::get('config')->get('mail');
         }
 
-		return new Mail($config, static::event());
+        return new Mail($config, static::event());
     }
 
     /**
      * La classe Negotiator fournit les fonctionnalités de négociation de contenu permettant de traiter
-	 * la requête afin de déterminer la langue, l'encodage, le jeu de caractères et d'autres éléments appropriés.
+     * la requête afin de déterminer la langue, l'encodage, le jeu de caractères et d'autres éléments appropriés.
      */
     public static function negotiator(?ServerRequest $request = null, bool $shared = true): Negotiator
     {
-		if ($shared) {
-			return static::sharedInstance('negotiator', $request);
-		}
+        if ($shared) {
+            return static::sharedInstance('negotiator', $request);
+        }
 
-		$request ??= static::get('request');
+        $request ??= static::get('request');
 
         return new Negotiator($request);
     }
@@ -286,9 +286,9 @@ class Services extends BaseServices
      */
     public static function redirection(bool $shared = true): Redirection
     {
-		if ($shared) {
-			return static::sharedInstance('redirection');
-		}
+        if ($shared) {
+            return static::sharedInstance('redirection');
+        }
 
         return new Redirection(static::factory(UrlGenerator::class));
     }
@@ -326,8 +326,8 @@ class Services extends BaseServices
             return static::sharedInstance('responsecache', $cache, $cacheQueryString);
         }
 
-		$cache ??= static::get('cache');
-		$cacheQueryString ??= static::get('config')->get('cache.cache_query_string');
+        $cache ??= static::get('cache');
+        $cacheQueryString ??= static::get('config')->get('cache.cache_query_string');
 
         return new ResponseCache($cache, /** @scrutinizer ignore-type */ $cacheQueryString);
     }
@@ -356,10 +356,10 @@ class Services extends BaseServices
     {
         if ($shared) {
             return static::sharedInstance('router', $routes, $request);
-		}
+        }
 
-		$routes ??= static::get('routes');
-		$request ??= static::get('request');
+        $routes ??= static::get('routes');
+        $request ??= static::get('request');
 
         return new Router($routes, $request);
     }
@@ -435,7 +435,7 @@ class Services extends BaseServices
             return static::sharedInstance('translator', $locale);
         }
 
-		if (null === $locale || $locale === '' || $locale === '0') {
+        if (null === $locale || $locale === '' || $locale === '0') {
             $locale = is_cli() ? static::get('config')->get('app.locale') : static::get('request')->getLocale();
         }
 
@@ -451,7 +451,7 @@ class Services extends BaseServices
     {
         if ($shared) {
             return static::sharedInstance('uri', $uri);
-		}
+        }
 
         return new Uri($uri);
     }

@@ -85,8 +85,8 @@ final class Configurator
 
     /**
      * Définit une valeur.
-	 *
-	 * @throws UnknownOptionException
+     *
+     * @throws UnknownOptionException
      */
     public function set(string $key, mixed $value): void
     {
@@ -180,26 +180,27 @@ final class Configurator
         }
     }
 
-	/**
-	 * Normalise et valide les données. Le résultat est une donnée complète et propre.
-	 */
-	private function process(string $topLevelKey, array $userData): mixed
-	{
-		$schema    = $this->configSchemas[$topLevelKey];
-		$processor = new Processor();
-		$processed = $processor->process(Expect::structure([$topLevelKey => $schema]), $userData);
+    /**
+     * Normalise et valide les données. Le résultat est une donnée complète et propre.
+     */
+    private function process(string $topLevelKey, array $userData): mixed
+    {
+        $schema    = $this->configSchemas[$topLevelKey];
+        $processor = new Processor();
+        $processed = $processor->process(Expect::structure([$topLevelKey => $schema]), $userData);
 
-		$this->raiseAnyDeprecationNotices($processor->getWarnings());
+        $this->raiseAnyDeprecationNotices($processor->getWarnings());
 
-		return $processed;
-	}
+        return $processed;
+    }
 
     /**
      * Convertit récursivement les instances stdClass en tableaux.
      *
      * @template T
+     *
      * @param T $data Données.
-	 *
+     *
      * @return ($data is stdClass ? array<string, mixed> : T)
      */
     private static function convertStdClassesToArrays($data)
@@ -238,7 +239,7 @@ final class Configurator
      */
     public static function getTopLevelKey(string $path): string
     {
-		if ('' === $path = trim($path)) {
+        if ('' === $path = trim($path)) {
             throw new InvalidPathException('Le chemin ne peut pas être une chaîne vide.');
         }
 

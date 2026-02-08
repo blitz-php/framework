@@ -9,7 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Core\App;
 use BlitzPHP\Exceptions\RouterException;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\Uri;
@@ -25,7 +24,7 @@ use BlitzPHP\Utilities\Helpers;
 // =================================  ================================= //
 
 if (! function_exists('app_uri')) {
-	/**
+    /**
      * Utilisé par les autres fonctions d'URL pour construire un
      * URI spécifique au framework basé sur la configuration de l'application.
      *

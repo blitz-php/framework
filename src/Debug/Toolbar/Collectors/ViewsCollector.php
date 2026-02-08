@@ -61,7 +61,7 @@ class ViewsCollector extends BaseCollector
     /**
      * Constructeur.
      */
-	public function __construct(?View $viewer = null)
+    public function __construct(?View $viewer = null)
     {
         $this->viewer = $viewer ?? service('viewer');
     }

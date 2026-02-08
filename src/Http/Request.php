@@ -35,8 +35,8 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     use InteractsWithContentTypes;
     use InteractsWithInput;
     use InteractsWithFlashData;
-	use Conditionable;
-	use Macroable;
+    use Conditionable;
+    use Macroable;
 
     /**
      * Validation des donnees de la requete
@@ -154,7 +154,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function fullUrl(): string
     {
-		$query = $this->getEnv('QUERY_STRING');
+        $query = $this->getEnv('QUERY_STRING');
         if ($query !== null && $query !== '') {
             return $this->url() . '?' . $query;
         }
@@ -225,8 +225,8 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function pathIs(...$patterns): bool
     {
-		return (new Collection($patterns))
-			->contains(fn($pattern) => Text::is($pattern, $this->decodedPath()));
+        return (new Collection($patterns))
+            ->contains(fn ($pattern) => Text::is($pattern, $this->decodedPath()));
     }
 
     /**
@@ -261,8 +261,8 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function fullUrlIs(...$patterns): bool
     {
-		return (new Collection($patterns))
-			->contains(fn($pattern) => Text::is($pattern, $this->fullUrl()));
+        return (new Collection($patterns))
+            ->contains(fn ($pattern) => Text::is($pattern, $this->fullUrl()));
     }
 
     /**
@@ -338,10 +338,11 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
      */
     public function mergeIfMissing(array $input): self
     {
-        return $this->merge((new Collection($input))
-			->filter(fn ($value, $key) => $this->missing($key))
-			->toArray()
-		);
+        return $this->merge(
+            (new Collection($input))
+                ->filter(fn ($value, $key) => $this->missing($key))
+                ->toArray()
+        );
     }
 
     /**
@@ -378,10 +379,10 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
         return $this->all();
     }
 
-	public function getParams(): array
-	{
-		return $this->params ?? [];
-	}
+    public function getParams(): array
+    {
+        return $this->params ?? [];
+    }
 
     public function getScheme(): string
     {

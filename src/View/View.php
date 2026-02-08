@@ -367,7 +367,7 @@ class View implements Stringable
             $debug = on_dev();
         }
 
-		$config['app_overrides_folder'] = $this->config['app_overrides_folder'] ?? '';
+        $config['app_overrides_folder'] = $this->config['app_overrides_folder'] ?? '';
 
         $this->adapter = new self::$validAdapters[$adapter](
             $config,

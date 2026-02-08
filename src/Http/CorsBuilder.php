@@ -101,7 +101,7 @@ class CorsBuilder
      * Traite une requête préflight et retourne une réponse appropriée
      *
      * @param ServerRequestInterface $request Requête préflight
-	 *
+     *
      * @return ResponseInterface Réponse avec les en-têtes CORS appropriés
      */
     public function handlePreflightRequest(ServerRequestInterface $request): ResponseInterface
@@ -116,9 +116,9 @@ class CorsBuilder
     /**
      * Ajoute les en-têtes appropriés pour une réponse à une requête préflight
      *
-     * @param ServerRequestInterface $request Requête préflight
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête préflight
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec les en-têtes CORS ajoutés
      */
     public function addPreflightRequestHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -168,9 +168,9 @@ class CorsBuilder
     /**
      * Ajoute les en-têtes CORS appropriés pour une requête actuelle (non préflight)
      *
-     * @param ServerRequestInterface $request Requête actuelle
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête actuelle
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec les en-têtes CORS ajoutés
      */
     public function addActualRequestHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -192,8 +192,8 @@ class CorsBuilder
      * peuvent affecter la réponse
      *
      * @param ResponseInterface $response Réponse à modifier
-     * @param string $header En-tête à ajouter à Vary
-	 *
+     * @param string            $header   En-tête à ajouter à Vary
+     *
      * @return ResponseInterface Réponse avec l'en-tête Vary mis à jour
      */
     public function varyHeader(ResponseInterface $response, $header): ResponseInterface
@@ -210,9 +210,9 @@ class CorsBuilder
     /**
      * Configure l'en-tête Access-Control-Allow-Origin
      *
-     * @param ServerRequestInterface $request Requête courante
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête courante
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec l'en-tête Access-Control-Allow-Origin configuré
      */
     protected function configureAllowedOrigin(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -252,9 +252,9 @@ class CorsBuilder
     /**
      * Configure l'en-tête Access-Control-Allow-Methods
      *
-     * @param ServerRequestInterface $request Requête courante
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête courante
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec l'en-tête Access-Control-Allow-Methods configuré
      */
     protected function configureAllowedMethods(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -272,9 +272,9 @@ class CorsBuilder
     /**
      * Configure l'en-tête Access-Control-Allow-Headers
      *
-     * @param ServerRequestInterface $request Requête courante
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête courante
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec l'en-tête Access-Control-Allow-Headers configuré
      */
     protected function configureAllowedHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -292,9 +292,9 @@ class CorsBuilder
     /**
      * Configure l'en-tête Access-Control-Allow-Credentials
      *
-     * @param ServerRequestInterface $request Requête courante
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête courante
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec l'en-tête Access-Control-Allow-Credentials configuré
      */
     protected function configureAllowCredentials(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -309,9 +309,9 @@ class CorsBuilder
     /**
      * Configure l'en-tête Access-Control-Expose-Headers
      *
-     * @param ServerRequestInterface $request Requête courante
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête courante
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec l'en-tête Access-Control-Expose-Headers configuré
      */
     protected function configureExposedHeaders(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
@@ -326,9 +326,9 @@ class CorsBuilder
     /**
      * Configure l'en-tête Access-Control-Max-Age
      *
-     * @param ServerRequestInterface $request Requête courante
-     * @param ResponseInterface $response Réponse à modifier
-	 *
+     * @param ServerRequestInterface $request  Requête courante
+     * @param ResponseInterface      $response Réponse à modifier
+     *
      * @return ResponseInterface Réponse avec l'en-tête Access-Control-Max-Age configuré
      */
     protected function configureMaxAge(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface

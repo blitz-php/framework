@@ -17,7 +17,7 @@ namespace BlitzPHP\Exceptions;
 final class MethodNotFoundException extends HttpException
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected int $_defaultCode = 405;
 }

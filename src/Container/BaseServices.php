@@ -66,34 +66,34 @@ class BaseServices
      */
     private static array $serviceNames = [];
 
-	/**
+    /**
      * Cache des noms canoniques des services.
      *
      * @var list<string>
      */
     private static array $nameCache = [];
 
-	/**
+    /**
      * Mapping alias → nom canonique.
      *
      * @var array<string, list<string>>
      */
-	private static array $aliases = [
-		'locator'  => [Locator::class, LocatorInterface::class],
-		'request'  => [Request::class, ServerRequest::class, ServerRequestInterface::class],
-		'response' => [Response::class, ResponseInterface::class],
-		'router'   => [Router::class, RouterInterface::class],
-		'routes'   => [RouteCollection::class, RouteCollectionInterface::class],
-	];
+    private static array $aliases = [
+        'locator'  => [Locator::class, LocatorInterface::class],
+        'request'  => [Request::class, ServerRequest::class, ServerRequestInterface::class],
+        'response' => [Response::class, ResponseInterface::class],
+        'router'   => [Router::class, RouterInterface::class],
+        'routes'   => [RouteCollection::class, RouteCollectionInterface::class],
+    ];
 
-	/**
+    /**
      * La classe Autoloader permet de charger les fichiers simplement.
      */
     public static function autoloader(bool $shared = true): Autoloader
     {
-		if (true === $shared) {
-			return static::sharedInstance('autoloader');
-		}
+        if (true === $shared) {
+            return static::sharedInstance('autoloader');
+        }
 
         $config  = static::config()->get('autoload');
         $helpers = array_merge(['url'], ($config['helpers'] ?? []));
@@ -117,7 +117,7 @@ class BaseServices
                 }
             }
 
-			return static::$mocks['locator'] ?? static::$instances['locator'];
+            return static::$mocks['locator'] ?? static::$instances['locator'];
         }
 
         return new Locator(static::autoloader());
@@ -140,10 +140,10 @@ class BaseServices
      */
     public static function set(string $key, object $value)
     {
-		$name = self::serviceName($key);
+        $name = self::serviceName($key);
 
-		if (isset(static::$instances[$name])) {
-            throw new InvalidArgumentException("L'entrée pour '". $key . "' est déjà définie.");
+        if (isset(static::$instances[$name])) {
+            throw new InvalidArgumentException("L'entrée pour '" . $key . "' est déjà définie.");
         }
 
         static::$instances[$name] = $value;
@@ -156,13 +156,13 @@ class BaseServices
     {
         static::$instances[$name = self::serviceName($key)] = $value;
 
-		if (isset(self::$aliases[$name])) {
-			foreach (self::$aliases[$name] ?? [] as $item) {
-				static::container()->set($item, $value);
-			}
-		} else {
-			static::container()->set($name, $value);
-		}
+        if (isset(self::$aliases[$name])) {
+            foreach (self::$aliases[$name] ?? [] as $item) {
+                static::container()->set($item, $value);
+            }
+        } else {
+            static::container()->set($name, $value);
+        }
     }
 
     /**
@@ -170,7 +170,7 @@ class BaseServices
      *
      * @template T
      *
-     * @param string|class-string<T> $name
+     * @param class-string<T>|string $name
      *
      * @return mixed|T
      */
@@ -178,12 +178,12 @@ class BaseServices
     {
         $arguments = func_get_args();
         $name      = array_shift($arguments);
-		$name      = self::serviceName($name);
+        $name      = self::serviceName($name);
 
         if (empty(static::$instances[$name])) {
             static::$instances[$name] = $arguments !== []
-				? static::factory($name, $arguments)
-				: static::container()->get($name);
+                ? static::factory($name, $arguments)
+                : static::container()->get($name);
         }
 
         return static::$instances[$name];
@@ -194,7 +194,7 @@ class BaseServices
      *
      * @template T
      *
-     * @param string|class-string<T> $name
+     * @param class-string<T>|string $name
      *
      * @return object|T
      */
@@ -214,14 +214,14 @@ class BaseServices
         static::$mocks[strtolower($name)] = $mock;
     }
 
-	/**
+    /**
      * Réinitialisez les instances partagées et les simulations pour les tests.
      *
      * @testTag disponible uniquement pour le code de test
      */
     public static function reset(bool $initAutoloader = true): void
     {
-		static::$mocks     = [];
+        static::$mocks     = [];
         static::$instances = [];
         static::$factories = [];
 
@@ -238,7 +238,7 @@ class BaseServices
     public static function resetSingle(string ...$name): void
     {
         foreach ($name as $n) {
-			$n = strtolower($n);
+            $n = strtolower($n);
             unset(static::$mocks[$n], static::$instances[$n]);
         }
     }
@@ -256,7 +256,7 @@ class BaseServices
 
         foreach ($services as $service) {
             if (method_exists($service, $name)) {
-				static::$factories[$name] = [$service, $name];
+                static::$factories[$name] = [$service, $name];
 
                 return $service;
             }
@@ -265,69 +265,69 @@ class BaseServices
         return null;
     }
 
-	/**
+    /**
      * Normalise le nom de service via mapping.
      *
      * @param string $name Nom original.
-	 *
+     *
      * @return string Nom canonique.
      */
-	public static function serviceName(string $name): string
-	{
-		if (isset(self::$nameCache[$name])) {
-			return self::$nameCache[$name];
-		}
+    public static function serviceName(string $name): string
+    {
+        if (isset(self::$nameCache[$name])) {
+            return self::$nameCache[$name];
+        }
 
-		if (array_key_exists($n = strtolower($name), self::$aliases)) {
-			return self::$nameCache[$name] = $n;
-		}
+        if (array_key_exists($n = strtolower($name), self::$aliases)) {
+            return self::$nameCache[$name] = $n;
+        }
 
-		foreach (self::$aliases as $k => $v) {
-			if (in_array($name, $v)) {
-				return self::$nameCache[$name] = $k;
-			}
-		}
+        foreach (self::$aliases as $k => $v) {
+            if (in_array($name, $v, true)) {
+                return self::$nameCache[$name] = $k;
+            }
+        }
 
-		return self::$nameCache[$name] = $name;
-	}
+        return self::$nameCache[$name] = $name;
+    }
 
-	/**
-	 * Résout tous les aliases pour un nom donné.
-	 * Inclut le nom original du service et tous ses aliases
+    /**
+     * Résout tous les aliases pour un nom donné.
+     * Inclut le nom original du service et tous ses aliases
      *
      * @param string $name Nom original.
-	 *
+     *
      * @return list<string> Liste de tous les alias du service
-	 */
-	public static function resolveServiceAliases(string $name): array
-	{
-		$keys = [$name];
+     */
+    public static function resolveServiceAliases(string $name): array
+    {
+        $keys = [$name];
 
-		foreach (self::$aliases as $canonical => $aliases) {
-			// Si le nom est le nom canonique
-			if ($canonical === $n = strtolower($name)) {
-				$keys = array_merge([$n], $aliases);
-				break;
-			}
+        foreach (self::$aliases as $canonical => $aliases) {
+            // Si le nom est le nom canonique
+            if ($canonical === $n = strtolower($name)) {
+                $keys = array_merge([$n], $aliases);
+                break;
+            }
 
-			// Si le nom est dans les aliases
-			if (in_array($name, $aliases, true)) {
-				$keys = array_merge($keys, [$canonical], $aliases);
-				break;
-			}
-		}
+            // Si le nom est dans les aliases
+            if (in_array($name, $aliases, true)) {
+                $keys = array_merge($keys, [$canonical], $aliases);
+                break;
+            }
+        }
 
-		return array_unique($keys);
-	}
+        return array_unique($keys);
+    }
 
-	/**
+    /**
      * Offre la possibilité d'effectuer des appels insensibles à la casse des noms de service.
      *
      * @return object|null
      */
     public static function __callStatic(string $name, array $arguments)
     {
-		if (isset(static::$factories[$name])) {
+        if (isset(static::$factories[$name])) {
             return static::$factories[$name](...$arguments);
         }
 
@@ -378,28 +378,28 @@ class BaseServices
         return static::singleton($name, ...$arguments);
     }
 
-	/**
+    /**
      * Découvre et cache les classes de services.
      */
     protected static function cacheServices(): void
     {
         if (static::$discovered) {
-			return;
+            return;
         }
 
-		$locator = static::locator();
-		$files   = $locator->search('Config/Services');
+        $locator = static::locator();
+        $files   = $locator->search('Config/Services');
 
-		// Obtenez des instances de toutes les classes de service et mettez-les en cache localement.
-		foreach ($files as $file) {
-			if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
-				continue;
-			}
-			if (! in_array($classname, [Services::class, self::class], true)) {
-				self::$serviceNames[] = $classname;
-			}
-		}
+        // Obtenez des instances de toutes les classes de service et mettez-les en cache localement.
+        foreach ($files as $file) {
+            if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
+                continue;
+            }
+            if (! in_array($classname, [Services::class, self::class], true)) {
+                self::$serviceNames[] = $classname;
+            }
+        }
 
-		static::$discovered = true;
+        static::$discovered = true;
     }
 }

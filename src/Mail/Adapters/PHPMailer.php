@@ -198,7 +198,7 @@ class PHPMailer extends AbstractAdapter
      */
     public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
-        if (!$this->isValidMimeType($type)) {
+        if (! $this->isValidMimeType($type)) {
             throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
         }
 
@@ -370,12 +370,13 @@ class PHPMailer extends AbstractAdapter
      */
     public function send(): bool
     {
-		try {
-			return $this->mailer->send();
-		} catch (Exception $e) {
-			$this->lastError = $e->getMessage();
-			return false;
-		}
+        try {
+            return $this->mailer->send();
+        } catch (Exception $e) {
+            $this->lastError = $e->getMessage();
+
+            return false;
+        }
     }
 
     /**

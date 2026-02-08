@@ -39,7 +39,7 @@ class Validation extends BaseValidation
      */
     protected function registerRules(array $rules): void
     {
-		$container = service('container');
+        $container = service('container');
 
         foreach ($rules as $key => $value) {
             if (is_int($key)) {

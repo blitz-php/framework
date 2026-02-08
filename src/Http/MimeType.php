@@ -39,7 +39,7 @@ class MimeType
      * Certaines extensions peuvent correspondre à plusieurs types MIME, le premier type
      * du tableau étant le type préféré/par défaut.
      *
-     * @var array<string, array<string>>
+     * @var array<string, list<string>>
      */
     protected static array $mimeTypes = [
         'html'    => ['text/html', '*/*'],
@@ -242,50 +242,50 @@ class MimeType
             'image/photoshop',
             'zz-application/zz-winassoc-psd',
         ],
-        'ice' => ['x-conference/x-cooltalk'],
-        'iges' => ['model/iges'],
-        'igs' => ['model/iges'],
-        'mesh' => ['model/mesh'],
-        'msh' => ['model/mesh'],
-        'silo' => ['model/mesh'],
-        'vrml' => ['model/vrml'],
-        'wrl' => ['model/vrml'],
-        'mime' => ['www/mime'],
-        'pdb' => ['chemical/x-pdb'],
-        'xyz' => ['chemical/x-pdb'],
-        'javascript' => ['application/javascript'],
-        'form' => ['application/x-www-form-urlencoded'],
-        'file' => ['multipart/form-data'],
+        'ice'          => ['x-conference/x-cooltalk'],
+        'iges'         => ['model/iges'],
+        'igs'          => ['model/iges'],
+        'mesh'         => ['model/mesh'],
+        'msh'          => ['model/mesh'],
+        'silo'         => ['model/mesh'],
+        'vrml'         => ['model/vrml'],
+        'wrl'          => ['model/vrml'],
+        'mime'         => ['www/mime'],
+        'pdb'          => ['chemical/x-pdb'],
+        'xyz'          => ['chemical/x-pdb'],
+        'javascript'   => ['application/javascript'],
+        'form'         => ['application/x-www-form-urlencoded'],
+        'file'         => ['multipart/form-data'],
         'xhtml-mobile' => ['application/vnd.wap.xhtml+xml'],
-        'atom' => ['application/atom+xml'],
-        'amf' => ['application/x-amf'],
-        'wap' => ['text/vnd.wap.wml', 'text/vnd.wap.wmlscript', 'image/vnd.wap.wbmp'],
-        'wml' => ['text/vnd.wap.wml'],
-        'wmlscript' => ['text/vnd.wap.wmlscript'],
-        'wbmp' => ['image/vnd.wap.wbmp'],
-        'woff' => ['application/x-font-woff'],
-        'appcache' => ['text/cache-manifest'],
-        'manifest' => ['text/cache-manifest'],
-        'htc' => ['text/x-component'],
-        'rdf' => ['application/xml'],
-        'crx' => ['application/x-chrome-extension'],
-        'oex' => ['application/x-opera-extension'],
-        'xpi' => ['application/x-xpinstall'],
-        'safariextz' => ['application/octet-stream'],
-        'webapp' => ['application/x-web-app-manifest+json'],
-        'vcf' => ['text/x-vcard'],
-        'vtt' => ['text/vtt'],
-        'mkv' => ['video/x-matroska'],
-        'pkpass' => ['application/vnd.apple.pkpass'],
-        'ajax' => ['text/html'],
-        'bmp' => ['image/bmp'],
+        'atom'         => ['application/atom+xml'],
+        'amf'          => ['application/x-amf'],
+        'wap'          => ['text/vnd.wap.wml', 'text/vnd.wap.wmlscript', 'image/vnd.wap.wbmp'],
+        'wml'          => ['text/vnd.wap.wml'],
+        'wmlscript'    => ['text/vnd.wap.wmlscript'],
+        'wbmp'         => ['image/vnd.wap.wbmp'],
+        'woff'         => ['application/x-font-woff'],
+        'appcache'     => ['text/cache-manifest'],
+        'manifest'     => ['text/cache-manifest'],
+        'htc'          => ['text/x-component'],
+        'rdf'          => ['application/xml'],
+        'crx'          => ['application/x-chrome-extension'],
+        'oex'          => ['application/x-opera-extension'],
+        'xpi'          => ['application/x-xpinstall'],
+        'safariextz'   => ['application/octet-stream'],
+        'webapp'       => ['application/x-web-app-manifest+json'],
+        'vcf'          => ['text/x-vcard'],
+        'vtt'          => ['text/vtt'],
+        'mkv'          => ['video/x-matroska'],
+        'pkpass'       => ['application/vnd.apple.pkpass'],
+        'ajax'         => ['text/html'],
+        'bmp'          => ['image/bmp'],
     ];
 
     /**
      * Récupère les types MIME associés à une extension de fichier donnée
      *
      * @param string $ext Extension de fichier à rechercher
-	 *
+     *
      * @return array|null Tableau des types MIME si trouvé, null si aucun type MIME n'est associé à l'extension
      */
     public static function getMimeTypes(string $ext): ?array
@@ -296,9 +296,9 @@ class MimeType
     /**
      * Récupère le type MIME principal basé sur l'extension de fichier
      *
-     * @param string $ext Extension de fichier
+     * @param string      $ext     Extension de fichier
      * @param string|null $default Type MIME par défaut à retourner si l'extension n'est pas trouvée
-	 *
+     *
      * @return string|null Type MIME correspondant à l'extension de fichier, ou le type MIME par défaut si non trouvé
      */
     public static function getMimeType(string $ext, ?string $default = null): ?string
@@ -312,18 +312,18 @@ class MimeType
      * Si l'extension de fichier existe déjà, les nouveaux types MIME seront fusionnés
      * avec les types existants
      *
-     * @param string $ext Extension de fichier à associer avec les types MIME
+     * @param string       $ext       Extension de fichier à associer avec les types MIME
      * @param array|string $mimeTypes Types MIME à associer avec l'extension de fichier
      */
     public static function addMimeTypes(string $ext, array|string $mimeTypes): void
     {
         if (isset(static::$mimeTypes[$ext])) {
-            static::$mimeTypes[$ext] = array_merge(static::$mimeTypes[$ext], (array)$mimeTypes);
+            static::$mimeTypes[$ext] = array_merge(static::$mimeTypes[$ext], (array) $mimeTypes);
 
             return;
         }
 
-        static::$mimeTypes[$ext] = (array)$mimeTypes;
+        static::$mimeTypes[$ext] = (array) $mimeTypes;
     }
 
     /**
@@ -331,19 +331,19 @@ class MimeType
      *
      * Cela écrasera tous les types MIME existants pour l'extension de fichier
      *
-     * @param string $ext Extension de fichier
+     * @param string       $ext       Extension de fichier
      * @param array|string $mimeTypes Types MIME à associer avec l'extension de fichier
      */
     public static function setMimeTypes(string $ext, array|string $mimeTypes): void
     {
-        static::$mimeTypes[$ext] = (array)$mimeTypes;
+        static::$mimeTypes[$ext] = (array) $mimeTypes;
     }
 
     /**
      * Récupère l'extension de fichier associée à un type MIME donné
      *
      * @param string $mimeType Type MIME pour lequel récupérer l'extension de fichier
-	 *
+     *
      * @return string|null Extension de fichier associée au type MIME, ou null si aucune association n'est trouvée
      */
     public static function getExtension(string $mimeType): ?string
@@ -363,9 +363,9 @@ class MimeType
      * Si le type MIME n'est pas mappé à une extension, la méthode tentera de déterminer
      * le type MIME du fichier en utilisant l'extension fileinfo
      *
-     * @param string $path Chemin du fichier pour lequel récupérer le type MIME
+     * @param string $path    Chemin du fichier pour lequel récupérer le type MIME
      * @param string $default Type MIME par défaut à retourner si le type MIME ne peut être déterminé
-	 *
+     *
      * @return string Type MIME du fichier, ou le type MIME par défaut s'il ne peut être déterminé
      */
     public static function getMimeTypeForFile(string $path, string $default = 'application/octet-stream'): string
@@ -375,7 +375,7 @@ class MimeType
             return static::$mimeTypes[$ext][0];
         }
 
-        $finfo = new finfo(FILEINFO_MIME);
+        $finfo    = new finfo(FILEINFO_MIME);
         $mimeType = $finfo->file($path);
 
         return $mimeType === false ? $default : $mimeType;

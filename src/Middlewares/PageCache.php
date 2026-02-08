@@ -20,14 +20,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class PageCache implements MiddlewareInterface
 {
-	/**
+    /**
      * @var list<int>
      */
     private readonly array $cacheStatusCodes;
 
     public function __construct(private readonly ResponseCache $pageCache, array $cacheStatusCodes = [])
     {
-		$this->cacheStatusCodes = $cacheStatusCodes === [] ? config('cache.cache_status_codes') : $cacheStatusCodes;
+        $this->cacheStatusCodes = $cacheStatusCodes === [] ? config('cache.cache_status_codes') : $cacheStatusCodes;
     }
 
     /**

@@ -15,7 +15,7 @@ return Expect::structure([
     'handler'             => Expect::string(env('cache.handler', 'file')),
     'fallback_handler'    => Expect::string('dummy'),
     'cache_query_string'  => Expect::type('bool|array')->default(false),
-	'cache_status_codes'  => Expect::listOf('int')->default([]),
+    'cache_status_codes'  => Expect::listOf('int')->default([]),
     'prefix'              => Expect::string(env('cache.prefix', config('app.name', 'blitz_app') . '_cache_')),
     'ttl'                 => Expect::int(env('cache.duration', MINUTE)),
     'reserved_characters' => Expect::string('{}()/\@:'),

@@ -24,11 +24,11 @@ use BlitzPHP\Exceptions\EncryptionException;
 class KeyRotationDecorator implements EncrypterInterface
 {
     /**
-     * @param EncrypterInterface $innerHandler  Le gestionnaire de chiffrement enveloppé
-     * @param list<string>       $previousKeys  Tableau des clés de chiffrement précédentes
+     * @param EncrypterInterface $innerHandler Le gestionnaire de chiffrement enveloppé
+     * @param list<string>       $previousKeys Tableau des clés de chiffrement précédentes
      */
     public function __construct(private readonly EncrypterInterface $innerHandler, private readonly array $previousKeys)
-	{
+    {
     }
 
     /**
@@ -47,21 +47,21 @@ class KeyRotationDecorator implements EncrypterInterface
      *
      * @throws EncryptionException
      */
-   	public function decrypt(string $data, array|string|null $params = null): string
+    public function decrypt(string $data, array|string|null $params = null): string
     {
         try {
             return $this->innerHandler->decrypt($data, $params);
         } catch (EncryptionException $e) {
-			// Si une clé explicite est fournie, ne pas tenter les anciennes clés
-			if ($this->hasExplicitKey($params)) {
-				throw $e;
-			}
+            // Si une clé explicite est fournie, ne pas tenter les anciennes clés
+            if ($this->hasExplicitKey($params)) {
+                throw $e;
+            }
 
-			return $this->tryWithPreviousKeys($data, $params, $e);
+            return $this->tryWithPreviousKeys($data, $params, $e);
         }
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function getKey(): string
@@ -73,7 +73,7 @@ class KeyRotationDecorator implements EncrypterInterface
      * Délègue l'accès aux propriétés au gestionnaire interne.
      *
      * @param string $key Nom de la propriété
-	 *
+     *
      * @return array|bool|int|string|null
      */
     public function __get(string $key)
@@ -103,65 +103,66 @@ class KeyRotationDecorator implements EncrypterInterface
      * Vérifie si une clé explicite a été fournie dans les paramètres.
      *
      * @param array|string|null $params Paramètres de déchiffrement
-	 *
+     *
      * @return bool True si une clé explicite est présente
      */
-	private function hasExplicitKey(array|string|null $params): bool
-	{
-		if (is_string($params)) {
-			return true;
-		}
+    private function hasExplicitKey(array|string|null $params): bool
+    {
+        if (is_string($params)) {
+            return true;
+        }
 
-		if (is_array($params)) {
-			return isset($params['key']) && $params['key'] !== null;
-		}
+        if (is_array($params)) {
+            return isset($params['key']) && $params['key'] !== null;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * Tente le déchiffrement avec chaque clé précédente.
      *
-     * @param string $data Données à déchiffrer
-     * @param array|string|null $params Paramètres de déchiffrement
+     * @param string              $data     Données à déchiffrer
+     * @param array|string|null   $params   Paramètres de déchiffrement
      * @param EncryptionException $original Exception originale à lancer si tout échoue
-	 *
+     *
      * @return string Données déchiffrées
-	 *
+     *
      * @throws EncryptionException
      */
-	private function tryWithPreviousKeys(string $data, array|string|null $params, EncryptionException $original): string
-	{
-		if ($this->previousKeys === []) {
-			throw $original;
-		}
+    private function tryWithPreviousKeys(string $data, array|string|null $params, EncryptionException $original): string
+    {
+        if ($this->previousKeys === []) {
+            throw $original;
+        }
 
-		foreach ($this->previousKeys as $previousKey) {
-			try {
-				$previousParams = $this->prepareParamsWithKey($params, $previousKey);
-				return $this->innerHandler->decrypt($data, $previousParams);
-			} catch (EncryptionException) {
-				continue;
-			}
-		}
+        foreach ($this->previousKeys as $previousKey) {
+            try {
+                $previousParams = $this->prepareParamsWithKey($params, $previousKey);
 
-		throw $original;
-	}
+                return $this->innerHandler->decrypt($data, $previousParams);
+            } catch (EncryptionException) {
+                continue;
+            }
+        }
+
+        throw $original;
+    }
 
     /**
      * Prépare les paramètres de déchiffrement avec une clé spécifique.
      *
      * @param array|string|null $params Paramètres originaux
-     * @param string $key Clé à utiliser
-	 *
+     * @param string            $key    Clé à utiliser
+     *
      * @return array|string Paramètres mis à jour
      */
-	private function prepareParamsWithKey(array|string|null $params, string $key): array|string
-	{
-		if (is_array($params)) {
-			return array_merge($params, ['key' => $key]);
-		}
+    private function prepareParamsWithKey(array|string|null $params, string $key): array|string
+    {
+        if (is_array($params)) {
+            return array_merge($params, ['key' => $key]);
+        }
 
-		return $key;
-	}
+        return $key;
+    }
 }

@@ -11,8 +11,8 @@
 
 namespace BlitzPHP\Facades;
 
-use InvalidArgumentException;
 use DI\NotFoundException;
+use InvalidArgumentException;
 
 abstract class Facade
 {
@@ -30,7 +30,7 @@ abstract class Facade
     {
         $class = static::class;
 
-        if (!isset(static::$resolvedInstances[$class])) {
+        if (! isset(static::$resolvedInstances[$class])) {
             static::$resolvedInstances[$class] = static::resolveFacadeInstance();
         }
 

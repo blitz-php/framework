@@ -91,11 +91,11 @@ class Event implements EventInterface
     {
         $this->checkImmutable();
 
-		if ($name === '') {
+        if ($name === '') {
             throw new InvalidArgumentException('Le nom de l\'événement ne peut pas être vide.');
         }
 
-		$this->name = $name;
+        $this->name = $name;
 
         return $this;
     }
@@ -142,7 +142,7 @@ class Event implements EventInterface
      * Vérifie si un paramètre existe
      *
      * @param string $name Nom du paramètre
-	 *
+     *
      * @return bool True si le paramètre existe, false sinon
      */
     public function hasParam(string $name): bool
@@ -153,8 +153,8 @@ class Event implements EventInterface
     /**
      * Définit un paramètre spécifique
      *
-     * @param string $name Nom du paramètre
-     * @param mixed $value Valeur du paramètre
+     * @param string $name  Nom du paramètre
+     * @param mixed  $value Valeur du paramètre
      *
      * @throws RuntimeException Si l'événement est immuable
      */
@@ -174,7 +174,7 @@ class Event implements EventInterface
     {
         $this->checkImmutable();
 
-		$this->params = $params;
+        $this->params = $params;
 
         return $this;
     }
@@ -208,7 +208,7 @@ class Event implements EventInterface
      */
     public function stopPropagation(bool $flag = true): void
     {
-        if ($this->isPropagationStopped && !$flag) {
+        if ($this->isPropagationStopped && ! $flag) {
             throw new LogicException('Impossible de redémarrer la propagation d\'un événement arrêté');
         }
 
@@ -256,7 +256,7 @@ class Event implements EventInterface
      *     params?: array<string, mixed>,
      *     isPropagationStopped?: bool
      * } $data Données de l'événement
-	 *
+     *
      * @return self Instance de l'événement
      */
     public static function fromArray(array $data): self

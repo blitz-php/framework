@@ -213,7 +213,7 @@ class LogMailer extends AbstractAdapter
      * {@inheritDoc}
      */
     public function doAttach(array $path, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
-	{
+    {
         foreach ($path as $filePath => $fileName) {
             $this->mailer['attachments'][] = [
                 'path'        => $filePath,
@@ -231,7 +231,7 @@ class LogMailer extends AbstractAdapter
      */
     public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
-        if (!$this->isValidMimeType($type)) {
+        if (! $this->isValidMimeType($type)) {
             throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
         }
 
@@ -297,11 +297,11 @@ class LogMailer extends AbstractAdapter
      */
     public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             throw new InvalidArgumentException(sprintf('Fichier non trouvé: %s', $path));
         }
 
-        if (!$this->isValidMimeType($type)) {
+        if (! $this->isValidMimeType($type)) {
             throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
         }
 
@@ -321,7 +321,7 @@ class LogMailer extends AbstractAdapter
      */
     public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
-        if (!$this->isValidMimeType($type)) {
+        if (! $this->isValidMimeType($type)) {
             throw new InvalidArgumentException(sprintf('Type MIME non autorisé: %s', $type));
         }
 
@@ -341,7 +341,7 @@ class LogMailer extends AbstractAdapter
      */
     public function from(string $address, string $name = ''): static
     {
-        [$email, $name] = $this->makeAddress($address, $name);
+        [$email, $name]       = $this->makeAddress($address, $name);
         $this->mailer['from'] = [$email, $name];
 
         return $this;

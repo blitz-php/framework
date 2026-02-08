@@ -44,8 +44,8 @@ trait EventListenerManagerTrait
     /**
      * Récupère le gestionnaire d'événements.
      *
-	 * @return EventManager
-	 *
+     * @return EventManager
+     *
      * @throws RuntimeException Si aucun gestionnaire n'est défini
      */
     public function getEventManager(): EventManagerInterface
@@ -68,11 +68,11 @@ trait EventListenerManagerTrait
     /**
      * Ajoute un écouteur d'événement
      *
-     * @param string   $event        Nom de l'événement
-     * @param Closure  $callback     Callback à exécuter
-     * @param int      $priority     Priorité d'exécution
-     * @param bool     $bindContext  Si true, bind la closure au contexte actuel ($this)
-	 *
+     * @param string  $event       Nom de l'événement
+     * @param Closure $callback    Callback à exécuter
+     * @param int     $priority    Priorité d'exécution
+     * @param bool    $bindContext Si true, bind la closure au contexte actuel ($this)
+     *
      * @return bool True si l'écouteur a été ajouté
      *
      * @throws RuntimeException Si aucun gestionnaire d'événements n'est défini
@@ -89,12 +89,12 @@ trait EventListenerManagerTrait
     /**
      * Ajoute un écouteur d'événement qui ne s'exécute qu'une fois
      *
-     * @param string $event Nom de l'événement
-     * @param Closure $callback Callback à exécuter
-     * @param int $priority Priorité d'exécution
-     * @param bool $bindContext True pour lier le contexte de l'objet courant
+     * @param string  $event       Nom de l'événement
+     * @param Closure $callback    Callback à exécuter
+     * @param int     $priority    Priorité d'exécution
+     * @param bool    $bindContext True pour lier le contexte de l'objet courant
      *
-	 * @return bool True si l'écouteur a été ajouté
+     * @return bool True si l'écouteur a été ajouté
      */
     public function addEventListenerOnce(string $event, Closure $callback, int $priority = 0, bool $bindContext = false): bool
     {
@@ -108,11 +108,11 @@ trait EventListenerManagerTrait
     /**
      * Déclenche un événement
      *
-     * @param string|EventInterface $event Nom ou objet de l'événement
-     * @param mixed $target Cible de l'événement
-     * @param array|object $params Paramètres supplémentaires
+     * @param EventInterface|string $event  Nom ou objet de l'événement
+     * @param mixed                 $target Cible de l'événement
+     * @param array|object          $params Paramètres supplémentaires
      *
-	 * @return mixed Résultat de l'exécution des écouteurs
+     * @return mixed Résultat de l'exécution des écouteurs
      *
      * @throws RuntimeException Si aucun gestionnaire d'événements n'est défini
      */
@@ -124,10 +124,10 @@ trait EventListenerManagerTrait
     /**
      * Supprime un écouteur d'événement
      *
-     * @param string $event Nom de l'événement
+     * @param string   $event    Nom de l'événement
      * @param callable $callback Callback à supprimer
      *
-	 * @return bool True si l'écouteur a été supprimé
+     * @return bool True si l'écouteur a été supprimé
      *
      * @throws RuntimeException Si aucun gestionnaire d'événements n'est défini
      */
@@ -155,7 +155,7 @@ trait EventListenerManagerTrait
      */
     public function hasEventListeners(string $event): bool
     {
-		return $this->getEventListeners($event) !== [];
+        return $this->getEventListeners($event) !== [];
     }
 
     /**
@@ -163,7 +163,7 @@ trait EventListenerManagerTrait
      *
      * @param string|null $event Nom de l'événement (null pour tous)
      *
-	 * @return array Liste des écouteurs
+     * @return array Liste des écouteurs
      *
      * @throws RuntimeException Si aucun gestionnaire d'événements n'est défini
      */
@@ -175,13 +175,14 @@ trait EventListenerManagerTrait
     /**
      * Déclenche un événement avec des middlewares pré et post
      *
-     * @param array $preMiddlewares Middlewares pré-exécution
-     * @param array $postMiddlewares Middlewares post-exécution
+     * @param array      $preMiddlewares  Middlewares pré-exécution
+     * @param array      $postMiddlewares Middlewares post-exécution
+     * @param mixed|null $target
      *
-	 * @return mixed Résultat de l'exécution
+     * @return mixed Résultat de l'exécution
      */
     public function fireEventWithMiddleware(string $event, $target = null, array $params = [], array $preMiddlewares = [], array $postMiddlewares = []): mixed
-	{
+    {
         $manager = $this->getEventManager();
 
         // Exécute les middlewares pré-exécution

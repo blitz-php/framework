@@ -44,7 +44,7 @@ class RoutesCollector extends BaseCollector
     private readonly Router $router;
     private bool $isAutoRoute = false;
 
-	public function __construct(?RouteCollection $routes = null, ?Router $router = null, ?DefinedRouteCollector $definedRouteCollector = null)
+    public function __construct(?RouteCollection $routes = null, ?Router $router = null, ?DefinedRouteCollector $definedRouteCollector = null)
     {
         $rawRoutes                   = $routes ?? service('routes');
         $this->router                = $router ?? service('router', $rawRoutes, null);

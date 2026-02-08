@@ -25,9 +25,9 @@ use Psr\Container\NotFoundExceptionInterface;
  *
  * Supporte discovery automatique de providers, lazy init, et delegation.
  *
- * @method string debugEntry(string $name)        Obtient les informations de débogage de l'entrée.
- * @method array  getKnownEntryNames()            Obtient des entrées de conteneur définies.
- * @method object injectOn(object $instance)      Injecte toutes les dépendances sur une instance existante.
+ * @method string debugEntry(string $name)   Obtient les informations de débogage de l'entrée.
+ * @method array  getKnownEntryNames()       Obtient des entrées de conteneur définies.
+ * @method object injectOn(object $instance) Injecte toutes les dépendances sur une instance existante.
  */
 class Container implements ContainerInterface
 {
@@ -94,13 +94,13 @@ class Container implements ContainerInterface
      * Résout une entrée.
      *
      * @template T
-	 *
+     *
      * @param string $name Nom de l’entrée ou nom de classe.
-	 *
+     *
      * @return T
      *
-	 * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function get(string $name): mixed
     {
@@ -115,17 +115,17 @@ class Container implements ContainerInterface
         return $this->container->has($name);
     }
 
-	/**
-	 * Définit un objet ou une valeur dans le conteneur.
-	 */
-	public function set(string $name, mixed $value): void
-	{
-		$keys = BaseServices::resolveServiceAliases($name);
+    /**
+     * Définit un objet ou une valeur dans le conteneur.
+     */
+    public function set(string $name, mixed $value): void
+    {
+        $keys = BaseServices::resolveServiceAliases($name);
 
-		foreach ($keys as $key) {
-			$this->container->set($key, $value);
-		}
-	}
+        foreach ($keys as $key) {
+            $this->container->set($key, $value);
+        }
+    }
 
     /**
      * Construire une entrée du conteneur par son nom.
@@ -228,9 +228,6 @@ class Container implements ContainerInterface
     /**
      * Delegation magique vers PHP-DI.
      *
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
      * @throws BadMethodCallException Si méthode inconnue.
      */
     public function __call(string $method, array $parameters): mixed
@@ -239,7 +236,7 @@ class Container implements ContainerInterface
             throw new BadMethodCallException("Méthode '{$method}' inconnue sur DIContainer.");
         }
 
-        return $this->container->$method(...$parameters);
+        return $this->container->{$method}(...$parameters);
     }
 
     /**
@@ -255,12 +252,13 @@ class Container implements ContainerInterface
         $locator = service('locator');
 
         $files = array_merge(
-			$locator->search('Config/Providers'), // Providers systemes
-			$locator->listFiles('Providers/'), // Autres providers (vendors, app)
-		);
+            $locator->search('Config/Providers'), // Providers systemes
+            $locator->listFiles('Providers/'), // Autres providers (vendors, app)
+        );
 
         if ($files === []) {
             self::$discovered = true;
+
             return;
         }
 
@@ -270,10 +268,10 @@ class Container implements ContainerInterface
         $vendorFiles   = array_diff($files, $appProviders, $systProviders);
 
         $orderedFiles = [
-			...$vendorFiles, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
-			...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors
-			...$appProviders, // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
-		];
+            ...$vendorFiles, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
+            ...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors
+            ...$appProviders, // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
+        ];
 
         foreach ($orderedFiles as $file) {
             $classname = $locator->getClassname($file);

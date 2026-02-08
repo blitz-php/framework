@@ -111,7 +111,7 @@ class Mail implements MailerInterface
      *
      * @param Mailable $mailable Instance du mailable
      *
-	 * @throws MailException Si l'envoi échoue
+     * @throws MailException Si l'envoi échoue
      */
     public function envoi(Mailable $mailable): bool
     {
@@ -121,8 +121,8 @@ class Mail implements MailerInterface
     /**
      * Envoi avec réessais en cas d'échec
      *
-     * @param int $maxRetries Nombre maximum de tentatives
-     * @param int $delay Délai initial entre les tentatives en secondes
+     * @param int   $maxRetries Nombre maximum de tentatives
+     * @param int   $delay      Délai initial entre les tentatives en secondes
      * @param float $multiplier Multiplicateur pour le backoff exponentiel
      */
     public function sendWithRetry(int $maxRetries = 3, int $delay = 1, float $multiplier = 2.0): bool
@@ -138,14 +138,14 @@ class Mail implements MailerInterface
                 // Log l'erreur mais continue
                 logger()->error('Erreur d\'envoi de mail', [
                     'attempt' => $attempts + 1,
-                    'error' => $e->getMessage()
+                    'error'   => $e->getMessage(),
                 ]);
             }
 
             $attempts++;
 
             if ($attempts < $maxRetries) {
-                $sleepTime = $delay * pow($multiplier, $attempts - 1);
+                $sleepTime = $delay * $multiplier ** ($attempts - 1);
                 sleep(min((int) $sleepTime, 10)); // Maximum 10 secondes
             }
         }
@@ -169,7 +169,7 @@ class Mail implements MailerInterface
      *
      * @param string $handler Nom de l'adaptateur (phpmailer, symfony, log)
      *
-	 * @throws InvalidArgumentException Si l'adaptateur n'existe pas
+     * @throws InvalidArgumentException Si l'adaptateur n'existe pas
      */
     public function mailer(string $handler): static
     {
@@ -558,9 +558,9 @@ class Mail implements MailerInterface
         $path = '';
 
         // N'est-il pas namespaced ? on cherche le dossier en fonction du paramètre "view_base"
-        if (!str_contains($view, '\\')) {
+        if (! str_contains($view, '\\')) {
             $path = $this->config['view_dir'] ?? '';
-            if (!empty($path)) {
+            if (! empty($path)) {
                 $path .= '/';
             }
         }
@@ -568,7 +568,7 @@ class Mail implements MailerInterface
         $viewer = view($path . $view, $data);
 
         // Applique un layout si spécifié
-        if (!empty($this->config['template'])) {
+        if (! empty($this->config['template'])) {
             $viewer->layout($this->config['template']);
         }
 
@@ -578,14 +578,14 @@ class Mail implements MailerInterface
     /**
      * Envoi de mail en masse avec gestion des erreurs individuelles
      *
-     * @param array<array<string, mixed>> $recipients Liste des destinataires
-     * @param callable $callback Fonction de callback pour configurer chaque mail
-	 *
-     * @return array{array<int>, array<int, string>} [succès, échecs]
+     * @param list<array<string, mixed>> $recipients Liste des destinataires
+     * @param callable                   $callback   Fonction de callback pour configurer chaque mail
+     *
+     * @return array{list<int>, array<int, string>} [succès, échecs]
      */
     public function bulk(array $recipients, callable $callback): array
     {
-        $success = [];
+        $success  = [];
         $failures = [];
 
         foreach ($recipients as $index => $recipient) {
@@ -635,12 +635,12 @@ class Mail implements MailerInterface
         // Vérifications de base
         if (empty($result['from']['address'])) {
             $result['config_valid'] = false;
-            $result['errors'][] = 'Adresse expéditeur non configurée';
+            $result['errors'][]     = 'Adresse expéditeur non configurée';
         }
 
         if ($this->config['handler'] !== 'log' && empty($result['host'])) {
             $result['config_valid'] = false;
-            $result['errors'][] = 'Hôte SMTP non configuré';
+            $result['errors'][]     = 'Hôte SMTP non configuré';
         }
 
         return $result;

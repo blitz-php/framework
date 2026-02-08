@@ -24,10 +24,10 @@ use BlitzPHP\Router\Dispatcher;
  *
  * Fournit les méthodes statiques pour démarrer l'application dans différents contextes.
  *
- * @method static int web(array $paths, string $path_config_file) Démarre l'application en mode web
- * @method static int console(array $paths, string $path_config_file) Démarre l'application en mode console
- * @method static int klinge(array $paths, string $path_config_file) Démarre l'application en mode klinge (CLI)
- * @method static void test(array $paths, string $path_config_file) Démarre l'application en mode test
+ * @method static int  console(array $paths, string $path_config_file)                                            Démarre l'application en mode console
+ * @method static int  klinge(array $paths, string $path_config_file) Démarre l'application en mode klinge (CLI)
+ * @method static void test(array $paths, string $path_config_file)                                               Démarre l'application en mode test
+ * @method static int  web(array $paths, string $path_config_file)                                                Démarre l'application en mode web
  *
  * @codeCoverageIgnore
  */
@@ -50,7 +50,7 @@ class Boot
     /**
      * Constructeur
      *
-     * @param array $paths Les chemins de l'application
+     * @param array  $paths             Les chemins de l'application
      * @param string $paths_config_file Le chemin du fichier de configuration des chemins
      */
     public function __construct(array $paths, private string $paths_config_file)
@@ -66,7 +66,7 @@ class Boot
         ], $paths);
 
         // Définit les constantes globales si elles n'existent pas déjà
-        defined('DS') || define('DS', DIRECTORY_SEPARATOR);
+        defined('DS')                 || define('DS', DIRECTORY_SEPARATOR);
         defined('BLITZ_CORE_VERSION') || define('BLITZ_CORE_VERSION', '0.13');
     }
 
@@ -75,22 +75,24 @@ class Boot
      *
      * Permet d'appeler les méthodes de démarrage statiquement : Boot::web(), Boot::console(), etc.
      *
-     * @param string $name Le nom de la méthode à appeler
-     * @param array $arguments Les arguments à passer
+     * @param string $name      Le nom de la méthode à appeler
+     * @param array  $arguments Les arguments à passer
+     *
      * @return int Le code de sortie (pour les méthodes qui retournent un int)
+     *
      * @throws BadFunctionCallException Si la méthode n'existe pas
      */
     public static function __callStatic(string $name, array $arguments = [])
     {
-        if (! in_array($name, ['web', 'console', 'klinge', 'test'])) {
-            throw new BadFunctionCallException("Méthode $name non trouvée");
+        if (! in_array($name, ['web', 'console', 'klinge', 'test'], true)) {
+            throw new BadFunctionCallException("Méthode {$name} non trouvée");
         }
 
         // Crée une nouvelle instance avec les arguments fournis
-        $boot = new static(...$arguments);
+        $boot   = new static(...$arguments);
         $method = 'boot' . ucfirst($name);
 
-        return $boot->$method();
+        return $boot->{$method}();
     }
 
     /**
@@ -248,12 +250,14 @@ class Boot
 
         if (is_file($bootstrapFile)) {
             require_once $bootstrapFile;
+
             return;
         }
 
         if ($exit) {
             header('HTTP/1.1 503 Service Unavailable.', true, 503);
             echo "L'environnement de l'application n'est pas configuré correctement.";
+
             exit(EXIT_ERROR);
         }
     }
@@ -272,7 +276,8 @@ class Boot
             if (false === $appPath = realpath(rtrim($this->paths['app'], '\\/ '))) {
                 header('HTTP/1.1 503 Service Unavailable.', true, 503);
                 echo 'Le chemin du dossier de l\'application ne semble pas être correctement configuré. ';
-				echo 'Veuillez ouvrir le fichier "' . $this->paths_config_file . '" et corriger la clé "app".';
+                echo 'Veuillez ouvrir le fichier "' . $this->paths_config_file . '" et corriger la clé "app".';
+
                 exit(3);
             }
 
@@ -289,7 +294,8 @@ class Boot
             if (false === $storagePath = realpath(rtrim($this->paths['storage'], '\\/ '))) {
                 header('HTTP/1.1 503 Service Unavailable.', true, 503);
                 echo 'Le chemin du dossier de stockage ne semble pas être correctement configuré. ';
-				echo 'Veuillez ouvrir le fichier "' . $this->paths_config_file . '" et corriger la clé "storage".';
+                echo 'Veuillez ouvrir le fichier "' . $this->paths_config_file . '" et corriger la clé "storage".';
+
                 exit(3);
             }
 
@@ -303,7 +309,7 @@ class Boot
 
         // Constante du chemin de demarrage
         if (! defined('BOOT_PATH')) {
-			if (false === $bootPath = realpath(rtrim($this->paths['boot'], '\\/ '))) {
+            if (false === $bootPath = realpath(rtrim($this->paths['boot'], '\\/ '))) {
                 $bootPath = ROOTPATH . 'boot';
             }
 
@@ -395,7 +401,7 @@ class Boot
         $config = (object) config('app');
 
         locale_set_default($config->locale ?? 'en');
-		date_default_timezone_set($config->timezone ?? 'UTC');
+        date_default_timezone_set($config->timezone ?? 'UTC');
         ini_set('default_charset', strtoupper($config->charset));
     }
 
@@ -447,7 +453,7 @@ class Boot
 
     /**
      * Exécute une commande via la Console
-	 *
+     *
      * @return int Le code de sortie de la commande
      */
     protected static function runCommand(Console $console): int

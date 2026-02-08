@@ -42,7 +42,7 @@ class MailException extends RuntimeException
     /**
      * Constructeur
      */
-    public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null)
+    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
@@ -66,7 +66,7 @@ class MailException extends RuntimeException
     /**
      * Crée une exception pour validation échouée
      *
-     * @param array<string> $errors Liste des erreurs
+     * @param list<string> $errors Liste des erreurs
      */
     public static function validationFailed(array $errors): static
     {
@@ -80,7 +80,7 @@ class MailException extends RuntimeException
      * Crée une exception pour pièce jointe invalide
      *
      * @param string $filePath Chemin du fichier
-     * @param string $reason Raison de l'échec
+     * @param string $reason   Raison de l'échec
      */
     public static function invalidAttachment(string $filePath, string $reason): static
     {

@@ -41,7 +41,7 @@ use Stringable;
 
 class Logger implements LoggerInterface
 {
-	use LoggerTrait;
+    use LoggerTrait;
 
     /**
      * Options de configuration provenant de app/Config/log.php
@@ -74,9 +74,9 @@ class Logger implements LoggerInterface
         $this->monolog = new MonologLogger(strtolower(str_replace(' ', '-', $this->config->name ?? 'application')));
 
         foreach (($this->config->handlers ?? []) as $handler => $options) {
-			if (isset($options['active']) && $options['active'] === false) {
-				continue;
-			}
+            if (isset($options['active']) && $options['active'] === false) {
+                continue;
+            }
             $this->pushHandler($handler, (object) $options);
         }
 

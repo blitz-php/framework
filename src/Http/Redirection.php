@@ -43,7 +43,7 @@ class Redirection extends Response
      * Constructeur de la classe Redirection
      *
      * @param UrlGenerator $generator Instance du générateur d'URL
-     * @param array $options Options de configuration pour la réponse
+     * @param array        $options   Options de configuration pour la réponse
      */
     public function __construct(protected UrlGenerator $generator, array $options = [])
     {
@@ -69,11 +69,11 @@ class Redirection extends Response
     /**
      * Définit l'URI vers lequel rediriger
      *
-     * @param string $uri URI vers laquelle rediriger
-     * @param int|null $code Code d'état HTTP (si null, déterminé automatiquement)
-     * @param array $headers En-têtes HTTP supplémentaires
-     * @param bool|null $secure Si true, force l'utilisation de HTTPS
-     * @param string $method Méthode de redirection ('auto', 'refresh', etc.)
+     * @param string    $uri     URI vers laquelle rediriger
+     * @param int|null  $code    Code d'état HTTP (si null, déterminé automatiquement)
+     * @param array     $headers En-têtes HTTP supplémentaires
+     * @param bool|null $secure  Si true, force l'utilisation de HTTPS
+     * @param string    $method  Méthode de redirection ('auto', 'refresh', etc.)
      */
     public function to(string $uri, ?int $code = null, array $headers = [], ?bool $secure = null, string $method = 'auto'): static
     {
@@ -91,9 +91,9 @@ class Redirection extends Response
     /**
      * Crée une nouvelle réponse de redirection vers une URL externe (sans validation)
      *
-     * @param string $path Chemin ou URL vers lequel rediriger
-     * @param int $status Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
+     * @param string $path    Chemin ou URL vers lequel rediriger
+     * @param int    $status  Code d'état HTTP
+     * @param array  $headers En-têtes HTTP supplémentaires
      */
     public function away(string $path, int $status = StatusCode::FOUND, array $headers = []): static
     {
@@ -103,9 +103,9 @@ class Redirection extends Response
     /**
      * Crée une nouvelle réponse de redirection vers un chemin HTTPS
      *
-     * @param string $path Chemin vers lequel rediriger
-     * @param int $status Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
+     * @param string $path    Chemin vers lequel rediriger
+     * @param int    $status  Code d'état HTTP
+     * @param array  $headers En-têtes HTTP supplémentaires
      */
     public function secure(string $path, int $status = StatusCode::FOUND, array $headers = []): static
     {
@@ -115,10 +115,10 @@ class Redirection extends Response
     /**
      * Définit l'URI de redirection en utilisant une route nommée
      *
-     * @param string $route Nom de la route
-     * @param array $params Paramètres de la route
-     * @param int $code Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
+     * @param string $route   Nom de la route
+     * @param array  $params  Paramètres de la route
+     * @param int    $code    Code d'état HTTP
+     * @param array  $headers En-têtes HTTP supplémentaires
      */
     public function route(string $route, array $params = [], int $code = StatusCode::FOUND, array $headers = []): static
     {
@@ -128,10 +128,10 @@ class Redirection extends Response
     /**
      * Définit l'URI de redirection en utilisant une action de contrôleur
      *
-     * @param array|string $action Action du contrôleur (format: 'Controller::method' ou ['Controller', 'method'])
-     * @param array $params Paramètres pour l'action
-     * @param int $code Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
+     * @param array|string $action  Action du contrôleur (format: 'Controller::method' ou ['Controller', 'method'])
+     * @param array        $params  Paramètres pour l'action
+     * @param int          $code    Code d'état HTTP
+     * @param array        $headers En-têtes HTTP supplémentaires
      */
     public function action(array|string $action, array $params = [], int $code = StatusCode::FOUND, array $headers = []): static
     {
@@ -144,8 +144,8 @@ class Redirection extends Response
      * Exemple:
      *  return redirect()->back();
      *
-     * @param mixed $status Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
+     * @param mixed $status   Code d'état HTTP
+     * @param array $headers  En-têtes HTTP supplémentaires
      * @param mixed $fallback URL de secours si aucune page précédente n'est disponible
      */
     public function back($status = StatusCode::FOUND, array $headers = [], $fallback = false): static
@@ -156,7 +156,7 @@ class Redirection extends Response
     /**
      * Crée une nouvelle réponse de redirection vers l'URI courante
      *
-     * @param int $status Code d'état HTTP
+     * @param int   $status  Code d'état HTTP
      * @param array $headers En-têtes HTTP supplémentaires
      */
     public function refresh(int $status = StatusCode::FOUND, array $headers = []): static
@@ -167,10 +167,10 @@ class Redirection extends Response
     /**
      * Crée une nouvelle réponse de redirection, tout en stockant l'URL courante dans la session
      *
-     * @param string $path Chemin vers lequel rediriger
-     * @param int $status Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
-     * @param bool|null $secure Si true, force l'utilisation de HTTPS
+     * @param string    $path    Chemin vers lequel rediriger
+     * @param int       $status  Code d'état HTTP
+     * @param array     $headers En-têtes HTTP supplémentaires
+     * @param bool|null $secure  Si true, force l'utilisation de HTTPS
      */
     public function guest(string $path, int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): static
     {
@@ -190,10 +190,10 @@ class Redirection extends Response
     /**
      * Crée une réponse de redirection
      *
-     * @param string $uri URI vers laquelle rediriger
-     * @param int|null $code Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
-     * @param string $method Méthode de redirection
+     * @param string   $uri     URI vers laquelle rediriger
+     * @param int|null $code    Code d'état HTTP
+     * @param array    $headers En-têtes HTTP supplémentaires
+     * @param string   $method  Méthode de redirection
      */
     protected function createRedirect(string $uri, ?int $code = null, array $headers = [], string $method = 'auto'): static
     {
@@ -209,10 +209,10 @@ class Redirection extends Response
     /**
      * Crée une nouvelle réponse de redirection vers l'emplacement précédemment intenté
      *
-     * @param string $default URL par défaut si aucune URL intentée n'est stockée
-     * @param int $status Code d'état HTTP
-     * @param array $headers En-têtes HTTP supplémentaires
-     * @param bool|null $secure Si true, force l'utilisation de HTTPS
+     * @param string    $default URL par défaut si aucune URL intentée n'est stockée
+     * @param int       $status  Code d'état HTTP
+     * @param array     $headers En-têtes HTTP supplémentaires
+     * @param bool|null $secure  Si true, force l'utilisation de HTTPS
      */
     public function intended(string $default = '/', int $status = StatusCode::FOUND, array $headers = [], ?bool $secure = null): static
     {
@@ -235,7 +235,7 @@ class Redirection extends Response
      * Ajoute des erreurs à la session en tant que données flash
      *
      * @param array|ErrorBag|string|Validation $errors Erreurs à stocker
-     * @param string $key Clé pour stocker les erreurs dans la session
+     * @param string                           $key    Clé pour stocker les erreurs dans la session
      */
     public function withErrors(array|ErrorBag|string|Validation $errors, string $key = 'default'): static
     {
@@ -270,8 +270,8 @@ class Redirection extends Response
     /**
      * Ajoute une clé et une valeur à la session en tant que données flash
      *
-     * @param array|string $key Clé ou tableau associatif clé/valeur
-     * @param mixed $value Valeur si $key est une chaîne
+     * @param array|string $key   Clé ou tableau associatif clé/valeur
+     * @param mixed        $value Valeur si $key est une chaîne
      */
     public function with(array|string $key, mixed $value = null): static
     {
@@ -299,7 +299,7 @@ class Redirection extends Response
      * Supprime tous les fichiers téléchargés du tableau d'entrée donné
      *
      * @param array $input Tableau d'entrée à nettoyer
-	 *
+     *
      * @return array Tableau d'entrée sans les fichiers téléchargés
      */
     protected function removeFilesFromInput(array $input): array

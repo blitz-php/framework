@@ -59,10 +59,10 @@ class Negotiator
      * Compare les types supportés par l'application avec les types demandés
      * par le client dans l'en-tête Accept.
      *
-     * @param array $supported Tableau des types de média supportés par l'application
-     * @param bool $strictMatch Si true, retourne une chaîne vide quand aucun match n'est trouvé.
-     *                         Si false, retourne le premier élément supporté.
-	 *
+     * @param array $supported   Tableau des types de média supportés par l'application
+     * @param bool  $strictMatch Si true, retourne une chaîne vide quand aucun match n'est trouvé.
+     *                           Si false, retourne le premier élément supporté.
+     *
      * @return string Le meilleur type de média correspondant
      */
     public function media(array $supported, bool $strictMatch = false): string
@@ -77,7 +77,7 @@ class Negotiator
      * par le client dans l'en-tête Accept-Charset.
      *
      * @param array $supported Tableau des jeux de caractères supportés par l'application
-	 *
+     *
      * @return string Le meilleur jeu de caractères correspondant
      */
     public function charset(array $supported): string
@@ -100,7 +100,7 @@ class Negotiator
      * par le client dans l'en-tête Accept-Encoding.
      *
      * @param array $supported Tableau des encodages supportés par l'application
-	 *
+     *
      * @return string Le meilleur encodage correspondant
      */
     public function encoding(array $supported = []): string
@@ -117,7 +117,7 @@ class Negotiator
      * par le client dans l'en-tête Accept-Language.
      *
      * @param array $supported Tableau des langues supportées par l'application
-	 *
+     *
      * @return string La meilleure langue correspondante
      */
     public function language(array $supported): string
@@ -135,14 +135,14 @@ class Negotiator
      *
      * Portions de ce code basées sur la bibliothèque Aura.Accept.
      *
-     * @param array $supported Tableau des valeurs supportées par l'application
-     * @param string|null $header Chaîne de l'en-tête Accept* à analyser
-     * @param bool $enforceTypes Si true, compare les types et sous-types de média
-     * @param bool $strictMatch Si true, retourne une chaîne vide si aucun match n'est trouvé.
-     *                         Si false, retourne le premier élément supporté.
-	 *
+     * @param array       $supported    Tableau des valeurs supportées par l'application
+     * @param string|null $header       Chaîne de l'en-tête Accept* à analyser
+     * @param bool        $enforceTypes Si true, compare les types et sous-types de média
+     * @param bool        $strictMatch  Si true, retourne une chaîne vide si aucun match n'est trouvé.
+     *                                  Si false, retourne le premier élément supporté.
+     *
      * @return string La meilleure correspondance
-	 *
+     *
      * @throws HttpException Si le tableau des valeurs supportées est vide
      */
     protected function getBestMatch(array $supported, ?string $header = null, bool $enforceTypes = false, bool $strictMatch = false): string
@@ -186,7 +186,7 @@ class Negotiator
      * Ce code est basé sur la bibliothèque Aura.Accept.
      *
      * @param string $header Chaîne de l'en-tête à analyser
-	 *
+     *
      * @return array Tableau structuré des valeurs acceptables avec leurs paramètres
      */
     public function parseHeader(string $header): array

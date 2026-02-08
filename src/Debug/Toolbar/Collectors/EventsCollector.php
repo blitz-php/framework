@@ -40,12 +40,12 @@ class EventsCollector extends BaseCollector
      */
     protected string $title = 'Evénements';
 
-	private EventManager $eventManager;
+    private EventManager $eventManager;
 
-	public function __construct(?EventManager $eventManager = null)
-	{
-		$this->eventManager = $eventManager ?? service('event');
-	}
+    public function __construct(?EventManager $eventManager = null)
+    {
+        $this->eventManager = $eventManager ?? service('event');
+    }
 
     /**
      * {@inheritDoc}

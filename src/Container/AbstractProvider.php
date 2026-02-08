@@ -44,11 +44,10 @@ abstract class AbstractProvider
     /**
      * Enregistre les bindings dans le conteneur.
      */
-	public function register(): void
-	{
+    public function register(): void
+    {
         // à implementer par les classes filles
-
-	}
+    }
 
     /**
      * Liste les services fournis (pour introspection).

@@ -34,7 +34,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class ResponseEmitter
 {
-	/**
+    /**
      * Constructeur
      *
      * @param int $maxBufferLength Taille maximale de la mémoire tampon de sortie pour chaque itération.
@@ -43,7 +43,7 @@ class ResponseEmitter
     {
     }
 
-	/**
+    /**
      * Émet une réponse.
      *
      * Émet une réponse, comprenant la ligne d'état, les en-têtes et le corps du message,
@@ -52,7 +52,7 @@ class ResponseEmitter
     public function emit(ResponseInterface $response): bool
     {
         $file = '';
-		$line = 0;
+        $line = 0;
 
         if (headers_sent($file, $line)) {
             $message = "Impossible d'émettre les en-têtes. En-têtes envoyés dans le fichier={$file} ligne={$line}";
@@ -78,7 +78,7 @@ class ResponseEmitter
             fastcgi_finish_request();
         }
 
-		return true;
+        return true;
     }
 
     /**
@@ -93,7 +93,7 @@ class ResponseEmitter
     {
         $cookies = [];
         if ($response instanceof Response) {
-			$cookies = iterator_to_array($response->getCookieCollection());
+            $cookies = iterator_to_array($response->getCookieCollection());
         }
 
         foreach ($response->getHeaders() as $name => $values) {
@@ -194,7 +194,7 @@ class ResponseEmitter
     /**
      * émettre des cookies en utilisant setcookie()
      *
-     * @param array<CookieInterface|string> $cookies Un tableau d'en-têtes Set-Cookie.
+     * @param list<CookieInterface|string> $cookies Un tableau d'en-têtes Set-Cookie.
      */
     protected function emitCookies(array $cookies): void
     {

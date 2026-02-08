@@ -215,7 +215,7 @@ abstract class Mailable
      * retournées par la méthode with().
      *
      * @internal
-	 *
+     *
      * @return array<string, mixed>
      */
     public function data(): array
@@ -242,7 +242,7 @@ abstract class Mailable
      */
     public function send(Mail $mail): bool
     {
-       foreach ($this->bcc() as $key => $value) {
+        foreach ($this->bcc() as $key => $value) {
             if (! is_string($value) || trim($value) === '') {
                 continue;
             }
@@ -311,7 +311,7 @@ abstract class Mailable
         }
 
         foreach ($this->attachments() as $attachment) {
-            if (!isset($attachment['path']) || !file_exists($attachment['path'])) {
+            if (! isset($attachment['path']) || ! file_exists($attachment['path'])) {
                 continue;
             }
 

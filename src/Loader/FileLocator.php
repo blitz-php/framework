@@ -31,9 +31,9 @@ class FileLocator
      */
     private static array $locateCache = [];
 
-	protected static $APP_PATH    = APP_PATH;
-	protected static $CONFIG_PATH = CONFIG_PATH;
-	protected static $SYST_PATH   = SYST_PATH;
+    protected static $APP_PATH    = APP_PATH;
+    protected static $CONFIG_PATH = CONFIG_PATH;
+    protected static $SYST_PATH   = SYST_PATH;
 
     /**
      * Charge des helpers.
@@ -45,7 +45,7 @@ class FileLocator
      *   3. system/Helpers
      *
      * @param list<string>|string $filenames Noms des helpers
-	 *
+     *
      * @throws LoadException
      */
     public static function helper(array|string $filenames): void
@@ -53,23 +53,23 @@ class FileLocator
         static $loadedHelpers = [];
 
         /** @var LocatorInterface */
-        $locator = service('locator');
+        $locator   = service('locator');
         $filenames = (array) $filenames;
 
         foreach ($filenames as $filename) {
             if (isset($loadedHelpers[$filename])) {
-				continue; // Déjà chargé
-			}
+                continue; // Déjà chargé
+            }
 
             if ([] === $files = self::locateHelper($filename, $locator)) {
-				throw LoadException::helperNotFound($filename);
+                throw LoadException::helperNotFound($filename);
             }
 
             foreach ($files as $file) {
-				include_once $file;
-			}
+                include_once $file;
+            }
 
-			$loadedHelpers[$filename] = true;
+            $loadedHelpers[$filename] = true;
         }
     }
 
@@ -85,6 +85,7 @@ class FileLocator
      * Si aucun trouvé, retourne un Schema vide (Expect::mixed()).
      *
      * @param string $name Le nom du schema (ex. : 'database' pour schemas/database.php)
+     *
      * @return Schema Le Schema Nette chargé
      */
     public static function schema(string $name): Schema
@@ -138,7 +139,7 @@ class FileLocator
      * Les fichiers retournent des arrays PHP, fusionnés récursivement.
      *
      * @param string $name Le nom de la config (ex. : 'database' pour Config/database.php)
-	 *
+     *
      * @return array<string, mixed>
      */
     public static function config(string $name): array
@@ -163,6 +164,7 @@ class FileLocator
         }
 
         $config = [];
+
         foreach ($files as $file) {
             $partial = require $file;
             if (is_array($partial)) {
@@ -184,11 +186,12 @@ class FileLocator
      * (Le rendu effectif peut être géré ailleurs, ex. via un ViewRenderer.)
      *
      * @param string $name Le nom de la vue (ex. : 'home' pour Views/home.php, ou namespacé 'Admin::home')
-     * @return string|false Le chemin du fichier de vue
-	 *
+     *
+     * @return false|string Le chemin du fichier de vue
+     *
      * @throws ViewException Si aucune vue trouvée
      */
-    public static function view(string $name): string|false
+    public static function view(string $name): false|string
     {
         $cacheKey = "view:{$name}";
         if (isset(self::$locateCache[$cacheKey])) {
@@ -200,12 +203,12 @@ class FileLocator
 
         $files = self::locateFiles($name, 'Views', $locator);
 
-		if (isset($files['app'])) {
-			// Ordre : app > modules > system
-			$files = array_merge($files['app'], $files['modules'], $files['system']);
-		}
+        if (isset($files['app'])) {
+            // Ordre : app > modules > system
+            $files = array_merge($files['app'], $files['modules'], $files['system']);
+        }
 
-		$file = array_shift($files);
+        $file = array_shift($files);
 
         if ($file === null) {
             throw ViewException::invalidFile($name);
@@ -225,14 +228,14 @@ class FileLocator
      * Fusion récursif pour overrides (ex. : app peut override une clé système).
      * Le locale est optionnel (défaut : 'en' ou config('app.locale')).
      *
-     * @param string $name Le nom du fichier de traduction (ex. : 'validation' pour Translations/en/validation.php)
+     * @param string      $name   Le nom du fichier de traduction (ex. : 'validation' pour Translations/en/validation.php)
      * @param string|null $locale Le code de langue (ex. : 'fr', 'en'). Optionnel.
-	 *
+     *
      * @return array<string, string>
      */
     public static function translation(string $name, ?string $locale = null): array
     {
-        $locale   = $locale ?? config('app.locale', 'en');
+        $locale ??= config('app.locale', 'en');
         $cacheKey = "translation:{$name}:{$locale}";
 
         if (isset(self::$locateCache[$cacheKey])) {
@@ -258,6 +261,7 @@ class FileLocator
         }
 
         $translations = [];
+
         foreach ($files as $file) {
             $partial = require $file;
             if (is_array($partial)) {
@@ -272,7 +276,7 @@ class FileLocator
      * Récupère le nom de base à partir du nom de la classe, namespacé ou non.
      *
      * @param string $name Nom de classe
-	 *
+     *
      * @return string Basename
      */
     public static function getBasename(string $name): string
@@ -300,12 +304,12 @@ class FileLocator
             'app'    => static::$APP_PATH . $folder . DS,
             'system' => static::$SYST_PATH . $folder . DS,
         ];
-		$directories = array_map(fn($directory) => str_replace(['/', '\\'], DS, $directory), $directories);
+        $directories = array_map(static fn ($directory) => str_replace(['/', '\\'], DS, $directory), $directories);
 
         $fileMap = ['app' => [], 'system' => [], 'modules' => []];
 
         $paths = $locator->search($folder . DS . $filename);
-		$paths = array_map(fn($path) => str_replace(['/', '\\'], DS, $path), $paths);
+        $paths = array_map(static fn ($path) => str_replace(['/', '\\'], DS, $path), $paths);
 
         foreach ($paths as $path) {
             if (str_starts_with($path, $directories['app'])) {
@@ -317,13 +321,13 @@ class FileLocator
             }
         }
 
-		$fileMap = array_map(
-			fn($map) => array_filter($map, fn($file) => !empty($file) && is_readable($file)),
-			$fileMap
-		);
+        $fileMap = array_map(
+            static fn ($map) => array_filter($map, static fn ($file) => ! empty($file) && is_readable($file)),
+            $fileMap
+        );
 
-		$fileMap['app']    = array_slice($fileMap['app'], 0, 1);
-		$fileMap['system'] = array_slice($fileMap['system'], 0, 1);
+        $fileMap['app']    = array_slice($fileMap['app'], 0, 1);
+        $fileMap['system'] = array_slice($fileMap['system'], 0, 1);
 
         return $fileMap;
     }
@@ -332,8 +336,8 @@ class FileLocator
      * Localise helper.
      *
      * @param string $filename Nom du helper
-	 *
-     * @return list<string>|false
+     *
+     * @return false|list<string>
      */
     private static function locateHelper(string $filename, LocatorInterface $locator)
     {

@@ -49,9 +49,10 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      * Valeurs par défaut
      */
     protected int $maxAttempts = 60;
-    protected int $decayMinutes = 1;
-    protected string $prefix = '';
-    protected bool $userBased = false;
+
+    protected int $decayMinutes  = 1;
+    protected string $prefix     = '';
+    protected bool $userBased    = false;
     protected int $blockDuration = 0;
 
     /**
@@ -62,7 +63,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
         'decayMinutes',
         'prefix',
         'userBased',
-        'blockDuration'
+        'blockDuration',
     ];
 
     /**
@@ -70,7 +71,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      */
     protected array $errorMessages = [
         'too_many_requests' => 'Too Many Requests.',
-        'blocked' => 'Your access is temporarily blocked due to excessive requests.',
+        'blocked'           => 'Your access is temporarily blocked due to excessive requests.',
     ];
 
     /**
@@ -95,22 +96,22 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
 
     /**
      * {@inheritDoc}
-	 *
-	 * @param Request $request
+     *
+     * @param Request $request
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $key = $this->generateKey($request);
+        $key      = $this->generateKey($request);
         $blockKey = $key . ':block';
 
         // Vérifier si l'utilisateur/IP est bloqué
         if ($this->isBlocked($blockKey)) {
-			return $this->createBlockedResponse($blockKey);
+            return $this->createBlockedResponse($blockKey);
         }
 
-        $timerKey = $key . ':timer';
+        $timerKey     = $key . ':timer';
         $decaySeconds = $this->decayMinutes * 60;
-        $hits = $this->getOrInitializeCounter($key, $timerKey, $decaySeconds);
+        $hits         = $this->getOrInitializeCounter($key, $timerKey, $decaySeconds);
 
         $remaining = max(0, $this->maxAttempts - $hits);
         $resetIn   = $this->getResetTime($timerKey, $decaySeconds);
@@ -136,7 +137,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      */
     protected function generateKey(Request $request): string
     {
-		$identifier = $this->getIdentifier($request);
+        $identifier = $this->getIdentifier($request);
         $path       = $request->getUri()->getPath();
         $prefixPart = $this->prefix ? $this->prefix . ':' : '';
 
@@ -181,7 +182,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
         return $hits ?: 1;
     }
 
-	/**
+    /**
      * Calcule le temps restant avant reset
      */
     protected function getResetTime(string $timerKey, int $decaySeconds): int
@@ -226,7 +227,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     {
         // $blockExpiry = $this->cache->getMetadata($blockKey)['expire'] ?? time();
         $blockExpiry = time();
-        $retryAfter = max(1, $blockExpiry - time());
+        $retryAfter  = max(1, $blockExpiry - time());
 
         $response = service('response')
             ->withStatus(429)
@@ -234,7 +235,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
             ->withHeader('X-RateLimit-Blocked', 'true')
             ->withHeader('X-RateLimit-Block-Reset', (string) $blockExpiry);
 
-		return $this->formatErrorResponse($response, $this->errorMessages['blocked']);
+        return $this->formatErrorResponse($response, $this->errorMessages['blocked']);
     }
 
     /**
@@ -250,7 +251,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
         return $this->formatErrorResponse($response, $this->errorMessages['too_many_requests']);
     }
 
-	/**
+    /**
      * Formatage intelligent de la réponse d'erreur (JSON ou texte selon Accept)
      */
     protected function formatErrorResponse(ResponseInterface $response, string $message): ResponseInterface
@@ -271,7 +272,8 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     /**
      * Ajoute les headers de rate limiting à la réponse
      */
-    protected function addRateLimitHeaders(ResponseInterface $response, int $remaining, int $resetIn): ResponseInterface {
+    protected function addRateLimitHeaders(ResponseInterface $response, int $remaining, int $resetIn): ResponseInterface
+    {
         $headers = [
             'X-RateLimit-Limit'     => (string) $this->maxAttempts,
             'X-RateLimit-Remaining' => (string) $remaining,

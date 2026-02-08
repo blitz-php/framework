@@ -115,6 +115,6 @@ final class Environment extends Command
             copy($baseEnv, $envFile);
         }
 
-		return DotEnv::instance($envPath)->update(['ENVIRONMENT' => $newEnv]);
+        return DotEnv::instance($envPath)->update(['ENVIRONMENT' => $newEnv]);
     }
 }

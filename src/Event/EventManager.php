@@ -35,16 +35,16 @@ class EventManager implements EventManagerInterface
     /**
      * Écouteurs d'événements organisés par nom d'événement et priorité
      *
-     * @var array<string, array<int, array<callable>>>
-	 *
-	 * @example $listeners[eventName][priority][] = callback
+     * @var array<string, array<int, list<callable>>>
+     *
+     * @example $listeners[eventName][priority][] = callback
      */
     protected array $listeners = [];
 
     /**
      * Log des performances pour le débogage
      *
-     * @var array<array{start: float, end: float, event: string, listener: string, duration: float, priority: int}>
+     * @var list<array{start: float, end: float, event: string, listener: string, duration: float, priority: int}>
      */
     protected array $performanceLog = [];
 
@@ -56,7 +56,7 @@ class EventManager implements EventManagerInterface
     /**
      * Constructeur du gestionnaire d'événements
      *
-     * @param array<string, array<int, array<callable>>> $listeners Écouteurs initiaux
+     * @param array<string, array<int, list<callable>>> $listeners Écouteurs initiaux
      */
     public function __construct(array $listeners = [])
     {
@@ -77,7 +77,7 @@ class EventManager implements EventManagerInterface
     public function getListeners(?string $event = null): array
     {
         if ($event === null) {
-            return array_filter($this->listeners, static fn($key): bool => $key !== self::WILDCARD, ARRAY_FILTER_USE_KEY);
+            return array_filter($this->listeners, static fn ($key): bool => $key !== self::WILDCARD, ARRAY_FILTER_USE_KEY);
         }
 
         return $this->listeners[$event] ?? [];
@@ -115,12 +115,12 @@ class EventManager implements EventManagerInterface
         return true;
     }
 
-	/**
+    /**
      * Enregistre un écouteur qui ne s'exécute qu'une seule fois
      */
     public function once(string $event, callable $callback, int $priority = 0): bool
     {
-		$wrapper = null;
+        $wrapper = null;
         $wrapper = function (...$args) use ($callback, $event, &$wrapper) {
             $result = $callback(...$args);
 
@@ -138,12 +138,12 @@ class EventManager implements EventManagerInterface
      * Alias déprécié pour on()
      *
      * @deprecated 0.13 Utilisez on() à la place
-	 *
+     *
      * @see self::on()
      */
     public function attach(string $event, callable $callback, int $priority = 0): bool
     {
-		$this->deprecatedWarning('La méthode attach() est obsolète, utilisez plutôt on().');
+        $this->deprecatedWarning('La méthode attach() est obsolète, utilisez plutôt on().');
 
         return $this->on($event, $callback, $priority);
     }
@@ -157,7 +157,7 @@ class EventManager implements EventManagerInterface
             return false;
         }
 
-		foreach ($this->listeners[$event] as $priority => &$callbacks) {
+        foreach ($this->listeners[$event] as $priority => &$callbacks) {
             if (false !== $key = array_search($callback, $callbacks, true)) {
                 unset($callbacks[$key]);
 
@@ -186,7 +186,7 @@ class EventManager implements EventManagerInterface
      *
      * @deprecated 0.13 Utilisez off() à la place
      *
-	 * @see self::off()
+     * @see self::off()
      */
     public function detach(string $event, callable $callback): bool
     {
@@ -241,8 +241,12 @@ class EventManager implements EventManagerInterface
      * Alias déprécié pour emit()
      *
      * @deprecated 0.13 Utilisez emit() à la place
-	 *
+     *
      * @see self::emit()
+     *
+     * @param mixed      $event
+     * @param mixed|null $target
+     * @param mixed      $argv
      */
     public function trigger($event, $target = null, $argv = []): mixed
     {
@@ -254,11 +258,11 @@ class EventManager implements EventManagerInterface
     /**
      * Ajoute un middleware à un événement
      *
-     * @param string $event Nom de l'événement
+     * @param string   $event      Nom de l'événement
      * @param callable $middleware Middleware à exécuter
-     * @param string $type Type de middleware ('pre' ou 'post')
-     * @param int $priority Priorité d'exécution
-	 *
+     * @param string   $type       Type de middleware ('pre' ou 'post')
+     * @param int      $priority   Priorité d'exécution
+     *
      * @return bool True si le middleware a été ajouté
      */
     public function addMiddleware(string $event, callable $middleware, string $type = 'pre', int $priority = 0): bool
@@ -272,7 +276,7 @@ class EventManager implements EventManagerInterface
      * Vérifie si un événement a des écouteurs
      *
      * @param string $event Nom de l'événement
-	 *
+     *
      * @return bool True si l'événement a des écouteurs
      */
     public function hasListeners(string $event): bool
@@ -284,13 +288,13 @@ class EventManager implements EventManagerInterface
      * Compte le nombre d'écouteurs pour un événement
      *
      * @param string $event Nom de l'événement
-	 *
+     *
      * @return int Nombre d'écouteurs
      */
     public function countListeners(string $event): int
     {
         $listeners = $this->getListenersForEvent($event);
-        $count = 0;
+        $count     = 0;
 
         foreach ($listeners as $callbacks) {
             if (is_array($callbacks)) {
@@ -316,7 +320,7 @@ class EventManager implements EventManagerInterface
     /**
      * Récupère les logs de performance
      *
-     * @return array<array{start: float, end: float, event: string, listener: string, duration: float, priority: int}>
+     * @return list<array{start: float, end: float, event: string, listener: string, duration: float, priority: int}>
      */
     public function getPerformanceLogs(): array
     {
@@ -347,7 +351,7 @@ class EventManager implements EventManagerInterface
      * Met à jour un événement existant
      *
      * @param mixed        $target Nouvelle cible
-     * @param array|object $argv Nouveaux paramètres
+     * @param array|object $argv   Nouveaux paramètres
      */
     protected function updateEvent(Event $event, mixed $target = null, array|object $argv = []): void
     {
@@ -355,37 +359,38 @@ class EventManager implements EventManagerInterface
             $event->setTarget($target);
         }
 
-        if (!empty($argv)) {
-			$params = is_array($argv) ? $argv : get_object_vars($argv);
+        if (! empty($argv)) {
+            $params = is_array($argv) ? $argv : get_object_vars($argv);
 
-			$event->mergeParams($params);
+            $event->mergeParams($params);
         }
     }
 
     /**
      * Récupère les écouteurs pour un événement donné
      *
-     * @return array<int, array<callable>> Écouteurs organisés par priorité
+     * @return array<int, list<callable>> Écouteurs organisés par priorité
      */
     protected function getListenersForEvent(string $eventName, bool $withWildcard = true): array
     {
-		$specificListeners = $this->listeners[$eventName] ?? [];
+        $specificListeners = $this->listeners[$eventName] ?? [];
 
-		if ($withWildcard) {
-			$globalWildcardListeners   = $this->listeners[self::WILDCARD] ?? [];
-			$specificWildcardListeners = [];
+        if ($withWildcard) {
+            $globalWildcardListeners   = $this->listeners[self::WILDCARD] ?? [];
+            $specificWildcardListeners = [];
 
-			$prefix = explode('.', $eventName)[0];
-			foreach ($this->listeners as $k => $v) {
-				if (str_starts_with($k, $prefix . '.' . self::WILDCARD)) {
-					$specificWildcardListeners = [...$specificWildcardListeners, ...$v];
-				}
-			}
+            $prefix = explode('.', $eventName)[0];
 
-			$sources = [$specificListeners, $specificWildcardListeners, $globalWildcardListeners];
-		} else {
-			$sources = [$specificListeners];
-		}
+            foreach ($this->listeners as $k => $v) {
+                if (str_starts_with($k, $prefix . '.' . self::WILDCARD)) {
+                    $specificWildcardListeners = [...$specificWildcardListeners, ...$v];
+                }
+            }
+
+            $sources = [$specificListeners, $specificWildcardListeners, $globalWildcardListeners];
+        } else {
+            $sources = [$specificListeners];
+        }
 
         // Fusionne les écouteurs spécifiques et les wildcards
         $listeners = [];
@@ -418,12 +423,12 @@ class EventManager implements EventManagerInterface
             $result = $callback($event);
         } catch (Throwable $e) {
             // Log l'erreur mais continue l'exécution des autres écouteurs
-			logger()->error(sprintf(
-				'Event listener error: %s in %s:%s',
-				$e->getMessage(),
-				$e->getFile(),
-				$e->getLine()
-			));
+            logger()->error(sprintf(
+                'Event listener error: %s in %s:%s',
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ));
 
             // Relance l'exception si c'est une exception critique
             if ($e instanceof Error) {
@@ -445,16 +450,16 @@ class EventManager implements EventManagerInterface
      */
     protected function logPerformance(float $startTime, string $eventName, callable $callback, int $priority): void
     {
-        $endTime = microtime(true);
+        $endTime      = microtime(true);
         $listenerName = $this->getCallbackName($callback);
 
         $this->performanceLog[] = [
-			'start'    => $startTime,
-			'end'      => $endTime,
-			'event'    => strtolower($eventName),
-			'listener' => $listenerName,
-			'duration' => $endTime - $startTime,
-			'priority' => $priority,
+            'start'    => $startTime,
+            'end'      => $endTime,
+            'event'    => strtolower($eventName),
+            'listener' => $listenerName,
+            'duration' => $endTime - $startTime,
+            'priority' => $priority,
         ];
     }
 
@@ -486,12 +491,12 @@ class EventManager implements EventManagerInterface
         return 'Unknown';
     }
 
-	private function deprecatedWarning(string $message)
-	{
-		if (! on_test()) {
-			trigger_error($message, E_USER_DEPRECATED);
-		}
+    private function deprecatedWarning(string $message)
+    {
+        if (! on_test()) {
+            @trigger_error($message, E_USER_DEPRECATED);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

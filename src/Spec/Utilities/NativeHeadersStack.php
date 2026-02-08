@@ -32,7 +32,7 @@ final class NativeHeadersStack
 
     /**
      * Réinitialise la pile d'en-têtes aux valeurs par défaut.
-	 * Appelez cette fonction dans beforeEach/setUp pour garantir un état propre entre les tests.
+     * Appelez cette fonction dans beforeEach/setUp pour garantir un état propre entre les tests.
      */
     public static function reset(): void
     {

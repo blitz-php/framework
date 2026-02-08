@@ -34,22 +34,16 @@ class DotEnv
 
     /**
      * Chemin du fichier principal.
-     *
-     * @var string
      */
     protected string $path;
 
     /**
      * Cache TTL (secondes, 0=infini).
-     *
-     * @var int
      */
     protected int $cacheTtl = 300; // 5 min par défaut
 
     /**
      * Timestamp dernier load.
-     *
-     * @var int|null
      */
     protected ?int $lastLoad = null;
 
@@ -62,15 +56,15 @@ class DotEnv
     public function __construct(string $path, string $file = '.env')
     {
         $this->path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $file;
-        $this->env = []; // Init vide
+        $this->env  = []; // Init vide
     }
 
     /**
      * Initialise et charge (singleton).
      *
-     * @param array<string> $overrides Fichiers supplémentaires (.env.local, etc.).
+     * @param list<string> $overrides Fichiers supplémentaires (.env.local, etc.).
      *
-	 * @throws LoadException Si fichiers illisibles.
+     * @throws LoadException Si fichiers illisibles.
      */
     public static function init(string $path, string $file = '.env', array $overrides = []): bool
     {
@@ -82,7 +76,7 @@ class DotEnv
      * pour que nous nous retrouvions avec tous les paramètres dans l'environnement PHP vars
      * (c'est-à-dire getenv(), $_ENV et $_SERVER)
      *
-     * @param array<string> $overrides Fichiers extra.
+     * @param list<string> $overrides Fichiers extra.
      */
     public function load(array $overrides = []): bool
     {
@@ -93,7 +87,7 @@ class DotEnv
         $this->env = []; // Reset
 
         // Charge principal
-        if (!$this->parseFile($this->path)) {
+        if (! $this->parseFile($this->path)) {
             return false;
         }
 
@@ -121,7 +115,7 @@ class DotEnv
         return $this->load($overrides);
     }
 
-	/**
+    /**
      * Remplace les valeurs dans le fichiers .env
      *
      * Si une valeur n'existe pas, elle est ajoutée au fichier
@@ -154,6 +148,7 @@ class DotEnv
         $updated = false;
 
         $keyMap = [];
+
         foreach ($lines as $i => $line) {
             $trimmed = trim($line);
             if (empty($trimmed) || str_starts_with($trimmed, '#')) {
@@ -170,9 +165,9 @@ class DotEnv
             $entry = $key . '=' . (is_string($value) ? '"' . $value . '"' : $value);
             if (isset($keyMap[$key])) {
                 // Update ligne existante (gère comments)
-                $lineIndex = $keyMap[$key];
+                $lineIndex         = $keyMap[$key];
                 $lines[$lineIndex] = $entry;
-                $updated = true;
+                $updated           = true;
             } else {
                 // Add à la fin
                 $lines[] = $entry;
@@ -203,10 +198,11 @@ class DotEnv
      */
     protected function parseFile(string $filePath): bool
     {
-        if (!is_readable($filePath)) {
-            if (!file_exists($filePath)) {
+        if (! is_readable($filePath)) {
+            if (! file_exists($filePath)) {
                 return false; // Optionnel
             }
+
             throw new LoadException("Fichier .env '{$filePath}' non lisible.");
         }
 
@@ -216,7 +212,7 @@ class DotEnv
         }
 
         $lines     = explode("\n", $content);
-        $parsed    = $this->parseLines($lines); //Two-pass : d'abord parse, puis resolve nested après tout collecté
+        $parsed    = $this->parseLines($lines); // Two-pass : d'abord parse, puis resolve nested après tout collecté
         $this->env = array_merge($this->env, $parsed);
 
         // Resolve nested après tout parsing (pour deep nesting)
@@ -231,9 +227,9 @@ class DotEnv
      * Parse lignes en vars.
      *
      * @param list<string> $lines Lignes du fichier
-	 *
+     *
      * @return array<string, string>
-	 *
+     *
      * @throws InvalidArgumentException Si malformed (e.g., unclosed quote).
      */
     protected function parseLines(array $lines): array
@@ -253,16 +249,18 @@ class DotEnv
                 // Fin multiline ? Multiline standard dotenv : utilise quotes ou indent ; ici, fin sur ligne vide ou # après |
                 if (empty($line) || str_starts_with($line, '#') || str_starts_with($line, 'END')) {
                     $result[$multilineKey] = trim($multilineValue);
-                    $inMultiline = false;
+                    $inMultiline           = false;
+
                     continue;
                 }
                 $multilineValue .= "\n" . $line;
+
                 continue;
             }
 
             // Regex pour = dans value et comments
             if (preg_match('/^\s*([A-Za-z0-9_.-]+)\s*=\s*(.*)$/u', $line, $matches)) {
-                $key = $matches[1];
+                $key   = $matches[1];
                 $value = $matches[2];
 
                 // Trim quotes si présentes (gère escaped quotes)
@@ -277,9 +275,10 @@ class DotEnv
 
                 // Multiline : si value starts with | (folded) ou > (literal)
                 if (str_starts_with(rtrim($value), '|') || str_starts_with(rtrim($value), '>')) {
-                    $multilineKey = $key;
+                    $multilineKey   = $key;
                     $multilineValue = substr(rtrim($value), 1); // Enlève | ou >
-                    $inMultiline = true;
+                    $inMultiline    = true;
+
                     continue;
                 }
 
@@ -300,23 +299,25 @@ class DotEnv
     /**
      * Résout variables nested (${VAR}). Itératif pour deep nesting.
      *
-     * @param string $value Valeur à résoudre
-     * @param bool $iterative Itératif ?
-	 *
+     * @param string $value     Valeur à résoudre
+     * @param bool   $iterative Itératif ?
+     *
      * @return string Résolue
      */
     protected function resolveNestedVariables(string $value, bool $iterative = false): string
     {
-        if (!str_contains($value, '${')) {
+        if (! str_contains($value, '${')) {
             return $value;
         }
 
         $original = $value;
+
         do {
             $value = preg_replace_callback(
                 '/\$\{([a-zA-Z0-9_\.-]+)\}/', // Non-greedy, . autorisé
                 function ($matches) {
                     $var = $this->getVariable($matches[1]);
+
                     return $var ?? $matches[0]; // Garde literal si null
                 },
                 $value
@@ -331,14 +332,14 @@ class DotEnv
      */
     protected function getVariable(string $name): ?string
     {
-		$value = $_ENV[$name] ?? $_SERVER[$name] ?? $this->env[$name] ?? null;
+        $value = $_ENV[$name] ?? $_SERVER[$name] ?? $this->env[$name] ?? null;
 
-		// getenv() retourne false si la variable n'existe pas, donc il faut la traiter differement
-    	if (null === $value && false !== $envValue = getenv($name)) {
-			$value = $envValue;
-		}
+        // getenv() retourne false si la variable n'existe pas, donc il faut la traiter differement
+        if (null === $value && false !== $envValue = getenv($name)) {
+            $value = $envValue;
+        }
 
-    	return $value !== null ? $value : null;
+        return $value !== null ? $value : null;
     }
 
     /**
@@ -347,7 +348,7 @@ class DotEnv
     protected function syncEnv(): void
     {
         foreach ($this->env as $name => $value) {
-            $_ENV[$name] = $value;
+            $_ENV[$name]    = $value;
             $_SERVER[$name] = $value;
             putenv("{$name}={$value}");
         }
@@ -357,16 +358,16 @@ class DotEnv
      * Définit/override variable (résout nested).
      *
      * @param string $name Nom valide (A-Z0-9_.-).
-	 *
+     *
      * @throws InvalidArgumentException Si name invalide.
      */
     public function setValue(string $name, string $value): void
     {
-        if (!preg_match('/^[A-Za-z0-9_.-]+$/', $name)) {
+        if (! preg_match('/^[A-Za-z0-9_.-]+$/', $name)) {
             throw new InvalidArgumentException("Nom invalide : {$name}");
         }
 
-        $value = $this->resolveNestedVariables($value, true);
+        $value            = $this->resolveNestedVariables($value, true);
         $this->env[$name] = $value;
         $this->syncEnv(); // Sync immédiat
         $this->lastLoad = null; // Invalide cache
@@ -375,14 +376,14 @@ class DotEnv
     /**
      * Valide required vars.
      *
-     * @param array<string> $required Vars requises
-	 *
+     * @param list<string> $required Vars requises
+     *
      * @throws LoadException Si manquante.
      */
     public function validate(array $required): void
     {
         foreach ($required as $var) {
-            if (!isset($this->env[$var]) || $this->env[$var] === '') {
+            if (! isset($this->env[$var]) || $this->env[$var] === '') {
                 throw new LoadException("Variable requise manquante : {$var}");
             }
         }

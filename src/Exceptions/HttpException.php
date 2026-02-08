@@ -13,33 +13,33 @@ namespace BlitzPHP\Exceptions;
 
 class HttpException extends FrameworkException
 {
-	/**
-     * @inheritDoc
+    /**
+     * {@inheritDoc}
      */
     protected int $_defaultCode = 500;
 
     /**
-     * @var array<non-empty-string, array<string>|string>
+     * @var array<non-empty-string, list<string>|string>
      */
     protected array $headers = [];
 
     /**
      * Définir un seul en-tête de réponse HTTP.
      *
-     * @param non-empty-string $header Nom de l'en-tête
-     * @param array<string>|string|null $value Valeur de l'en-tête
+     * @param non-empty-string         $header Nom de l'en-tête
+     * @param list<string>|string|null $value  Valeur de l'en-tête
      */
     public function setHeader(string $header, array|string|null $value = null): self
     {
         $this->headers[$header] = $value ?? '';
 
-		return $this;
+        return $this;
     }
 
     /**
      * Définit les en-têtes de réponse HTTP.
      *
-     * @param array<non-empty-string, array<string>|string> $headers Tableau de paires nom/valeur d'en-tête.
+     * @param array<non-empty-string, list<string>|string> $headers Tableau de paires nom/valeur d'en-tête.
      */
     public function setHeaders(array $headers): void
     {
@@ -49,7 +49,7 @@ class HttpException extends FrameworkException
     /**
      * Renvoie le tableau d'en-têtes de réponse.
      *
-     * @return array<non-empty-string, array<string>|string>
+     * @return array<non-empty-string, list<string>|string>
      */
     public function getHeaders(): array
     {
@@ -58,7 +58,7 @@ class HttpException extends FrameworkException
 
     public static function methodNotAllowed(string $method): MethodNotFoundException
     {
-		return new MethodNotFoundException(self::lang('HTTP.methodNotAllowed', [$method]));
+        return new MethodNotFoundException(self::lang('HTTP.methodNotAllowed', [$method]));
     }
 
     public static function invalidStatusCode(int $code)

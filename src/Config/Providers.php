@@ -38,11 +38,11 @@ use BlitzPHP\Session\Cookie\CookieManager;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Reflection\ReflectionClass;
+use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
-use Closure;
 use ReflectionMethod;
 
 /**
@@ -63,7 +63,7 @@ class Providers extends AbstractProvider
         return array_merge(
             self::interfaces(),
             self::classes(),
-			self::services(),
+            self::services(),
         );
     }
 
@@ -118,29 +118,29 @@ class Providers extends AbstractProvider
         ];
     }
 
-	/**
+    /**
      * Enregistre les services.
      *
      * @return array<string, Closure>
      */
-	private static function services(): array
-	{
-		$services   = [];
-		$reflection = new ReflectionClass(Services::class);
+    private static function services(): array
+    {
+        $services   = [];
+        $reflection = new ReflectionClass(Services::class);
 
-		$internal = [
-			'get', 'set', 'override',
-			'singleton', 'factory',
-			'injectMock', 'reset', 'resetSingle',
-			'serviceExists', 'getRegistryServices', '__callStatic',
-		];
+        $internal = [
+            'get', 'set', 'override',
+            'singleton', 'factory',
+            'injectMock', 'reset', 'resetSingle',
+            'serviceExists', 'getRegistryServices', '__callStatic',
+        ];
 
-		foreach ($reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC) as $method) {
-			if (! in_array($method->getName(), $internal, true)) {
-				$services[$method->getName()] = static fn () => service($method->getName());
-			}
-		}
+        foreach ($reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC) as $method) {
+            if (! in_array($method->getName(), $internal, true)) {
+                $services[$method->getName()] = static fn () => service($method->getName());
+            }
+        }
 
-		return $services;
-	}
+        return $services;
+    }
 }

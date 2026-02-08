@@ -110,7 +110,7 @@ class Timer
      * @param string            $name     Le nom du minuteur.
      * @param callable(): mixed $callable Fonction callable à exécuter.
      */
-    public function record(string $name, callable $callable):mixed
+    public function record(string $name, callable $callable): mixed
     {
         $this->start($name);
         $returnValue = $callable();

@@ -43,6 +43,9 @@ abstract class BaseMiddleware
 
     /**
      * Applique un argument au middleware
+     *
+     * @param mixed $argument
+     * @param mixed $value
      */
     protected function applyArgument($argument, $value): void
     {
@@ -126,6 +129,8 @@ abstract class BaseMiddleware
 
     /**
      * Vérifie si un argument existe
+     *
+     * @param mixed $name
      */
     public function has($name): bool
     {

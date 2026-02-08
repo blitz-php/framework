@@ -389,7 +389,7 @@ class Response implements ResponseInterface, Stringable
      */
     public function setTypeMap(string $type, array|string $mimeType): void
     {
-		MimeType::setMimeTypes($type, $mimeType);
+        MimeType::setMimeTypes($type, $mimeType);
     }
 
     /**
@@ -433,12 +433,12 @@ class Response implements ResponseInterface, Stringable
      */
     protected function resolveType(string $contentType): string
     {
-		if (str_contains($contentType, '/')) {
+        if (str_contains($contentType, '/')) {
             return $contentType;
         }
 
-		$mimeType = MimeType::getMimeType($contentType);
-		if ($mimeType === null) {
+        $mimeType = MimeType::getMimeType($contentType);
+        if ($mimeType === null) {
             throw new InvalidArgumentException(sprintf('`%s` est un content type invalide.', $contentType));
         }
 
@@ -777,7 +777,7 @@ class Response implements ResponseInterface, Stringable
         return ini_get('zlib.output_compression') !== '1'
             && extension_loaded('zlib')
             && (str_contains((string) env('HTTP_ACCEPT_ENCODING'), 'gzip'))
-			&& ob_start('ob_gzhandler');
+            && ob_start('ob_gzhandler');
     }
 
     /**
@@ -879,7 +879,7 @@ class Response implements ResponseInterface, Stringable
             return false;
         }
 
-		return $etagMatches !== false && $timeMatches !== false;
+        return $etagMatches !== false && $timeMatches !== false;
     }
 
     /**
@@ -1029,8 +1029,8 @@ class Response implements ResponseInterface, Stringable
             'download' => null,
         ];
 
-		$extension = strtolower($file->getExtension());
-		$mapped    = MimeType::getMimeTypeForFile($file->getRealPath());
+        $extension = strtolower($file->getExtension());
+        $mapped    = MimeType::getMimeTypeForFile($file->getRealPath());
         if ($extension === '' && $options['download'] === null) {
             $options['download'] = true;
         }
