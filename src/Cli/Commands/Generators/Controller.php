@@ -24,37 +24,19 @@ class Controller extends Command
 {
     use GeneratorTrait;
 
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'Generateurs';
+    protected string $group = 'Generateurs';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'make:controller';
+    protected string $name = 'make:controller';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Génère un nouveau fichier de contrôleur.';
+    protected string $description = 'Génère un nouveau fichier de contrôleur.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de génération de code';
+    protected string $service = 'Service de génération de code';
 
-    /**
-     * @var array Arguments de la commande
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'Le nom de la classe du contrôleur.',
     ];
 
-    /**
-     * @var array Options de la commande
-     */
-    protected $options = [
+    protected array $options = [
         '--bare'      => 'S\'étend de BlitzPHP\Controllers\BaseController au lieu de AppController.',
         '--restful'   => "S'étend à partir d'une ressource RESTful, Options\u{a0}: [controller, presenter]. Par défaut\u{a0}: \"controller\".",
         '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
@@ -63,15 +45,15 @@ class Controller extends Command
     ];
 
     /**
-     * Exécutez réellement une commande.
+     * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->component     = 'Controller';
         $this->directory     = 'Controllers';
         $this->template      = 'controller.tpl.php';
         $this->classNameLang = 'CLI.generator.className.controller';
-        $params              = array_merge($params, ['suffix' => true]);
+        $params              = array_merge($this->parameters(), ['suffix' => true]);
 
         $this->task('Creation du controleur')->eol();
 

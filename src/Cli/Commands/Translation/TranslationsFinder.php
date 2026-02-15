@@ -24,10 +24,10 @@ use SplFileInfo;
  */
 class TranslationsFinder extends Command
 {
-    protected $group       = 'Translation';
-    protected $name        = 'translations:find';
-    protected $description = 'Trouver et sauvegarder les phrases disponibles à traduire';
-    protected $options     = [
+    protected string $group       = 'Translation';
+    protected string $name        = 'translations:find';
+    protected string $description = 'Trouver et sauvegarder les phrases disponibles à traduire';
+    protected array $options     = [
         '--locale'   => 'Spécifier la locale (en, ru, etc.) pour enregistrer les fichiers',
         '--dir'      => 'Répertoire de recherche des traductions relatif à APP_PATH.',
         '--show-new' => 'N\'affiche que les nouvelles traductions dans le tableau. N\'écrit pas dans les fichiers.',
@@ -49,12 +49,12 @@ class TranslationsFinder extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->verbose      = $this->option('verbose', false);
         $this->showNew      = $this->option('show-new', false);
-        $optionLocale       = $params['locale'] ?? null;
-        $optionDir          = $params['dir'] ?? null;
+        $optionLocale       = $this->option('locale');
+        $optionDir          = $this->option('dir');
         $currentLocale      = Locale::getDefault();
         $currentDir         = APP_PATH;
         $this->languagePath = $currentDir . 'Translations';

@@ -23,27 +23,18 @@ use RuntimeException;
  */
 final class Optimize extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'optimize';
+    protected string $name = 'optimize';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Optimise l\'application pour la production.';
+    protected string $description = 'Optimise l\'application pour la production.';
 
-    protected $service = 'Service de configuration';
+    protected string $service = 'Service de configuration';
 
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         try {
             $this->enableCaching();

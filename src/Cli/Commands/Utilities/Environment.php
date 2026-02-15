@@ -19,27 +19,13 @@ use BlitzPHP\Loader\DotEnv;
  */
 final class Environment extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'env';
+    protected string $name = 'env';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Récupère l\'environnement actuel, ou en définir un nouveau.';
+    protected string $description = 'Récupère l\'environnement actuel, ou en définir un nouveau.';
 
-    /**
-     * Arguments de la commande
-     *
-     * @var array<string, string>
-     */
-    protected $arguments = [
+    protected array $arguments = [
         '[environment]' => '[Optionel] Nouveau environnement à définir. Si aucun n\'est fourni, cela imprimera l\'environnement actuel.',
     ];
 
@@ -57,7 +43,7 @@ final class Environment extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         if (null === $env = $this->argument('environment')) {
             $this->write('Votre environnement est actuellement défini comme: ');
@@ -115,6 +101,6 @@ final class Environment extends Command
             copy($baseEnv, $envFile);
         }
 
-        return DotEnv::instance($envPath)->update(['ENVIRONMENT' => $newEnv]);
+		return DotEnv::instance($envPath)->update(['ENVIRONMENT' => $newEnv]);
     }
 }

@@ -18,34 +18,22 @@ use BlitzPHP\Cli\Console\Command;
  */
 class ClearLogs extends Command
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected $group = 'Housekeeping';
+    protected string $group = 'Housekeeping';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $name = 'logs:clear';
+    protected string $name = 'logs:clear';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $description = 'Efface tous les fichiers de log.';
+    protected string $description = 'Efface tous les fichiers de log.';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $options = [
+    protected array $options = [
         '--force' => 'Forcer la suppression de tous les fichiers de logs sans avoir à demander.',
     ];
 
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
-        $force = array_key_exists('force', $params) || $this->option('force');
+        $force = $this->hasOption('force');
 
         if (! $force && ! $this->confirm('Êtes-vous sûr de vouloir supprimer les logs?')) {
             // @codeCoverageIgnoreStart

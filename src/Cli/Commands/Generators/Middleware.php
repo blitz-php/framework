@@ -21,37 +21,19 @@ class Middleware extends Command
 {
     use GeneratorTrait;
 
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'Generateurs';
+    protected string $group = 'Generateurs';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'make:middleware';
+    protected string $name = 'make:middleware';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Génère un nouveau fichier de middleware.';
+    protected string $description = 'Génère un nouveau fichier de middleware.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de génération de code';
+    protected string $service = 'Service de génération de code';
 
-    /**
-     * @var array Arguments
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'Le nom de la classe de middleware.',
     ];
 
-    /**
-     * @var array Options
-     */
-    protected $options = [
+    protected array $options = [
         '--namespace' => ["Définit l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--suffix'    => 'Ajouter le titre du composant au nom de la classe (par exemple, User => UserMiddleware).',
         '--force'     => 'Forcer à écraser le fichier existant.',
@@ -61,14 +43,14 @@ class Middleware extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->component = 'Middleware';
         $this->directory = 'Middlewares';
         $this->template  = 'middleware.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.middleware';
-        $this->runGeneration($params);
+        $this->generateClass($this->parameters());
     }
 
     /**

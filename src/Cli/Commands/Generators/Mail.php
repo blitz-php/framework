@@ -21,43 +21,25 @@ class Mail extends Command
 {
     use GeneratorTrait;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $group = 'Generateurs';
+    protected string $group = 'Generateurs';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $name = 'make:mail';
+    protected string $name = 'make:mail';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $description = 'Génère une nouvelle classe d\'email.';
+    protected string $description = 'Génère une nouvelle classe d\'email.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de génération de code';
+    protected string $service = 'Service de génération de code';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'Le nom de la classe de mail.',
     ];
 
-    /**
-     * {@inheritDoc}
-     */
-    public function execute(array $params)
+    public function handle()
     {
         $this->component = 'Mail';
         $this->directory = 'Mail';
         $this->template  = 'mail.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.mail';
-        $this->runGeneration($params);
+        $this->generateClass($this->parameters());
     }
 }

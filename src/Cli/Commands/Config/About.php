@@ -27,26 +27,26 @@ class About extends Command
     /**
      * @var string Groupe
      */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    protected $service = 'Service de configuration';
+    protected string $service = 'Service de configuration';
 
     /**
      * @var string Nom
      */
-    protected $name = 'about';
+    protected string $name = 'about';
 
     /**
      * @var string Description
      */
-    protected $description = 'Affiche les informations de base sur de l\'application.';
+    protected string $description = 'Affiche les informations de base sur de l\'application.';
 
     /**
      * Options de la commande
      *
      * @var array<string, string>
      */
-    protected $options = [
+    protected array $options = [
         '--only' => 'La section à afficher.',
         '--json' => 'Afficher les informations au format json.',
     ];
@@ -69,7 +69,7 @@ class About extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->gatherApplicationInformation();
 

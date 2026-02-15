@@ -19,35 +19,26 @@ use BlitzPHP\Security\CheckPhpIni;
  */
 final class PhpIniCheck extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'phpini:check';
+    protected string $name = 'phpini:check';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Vérifiez les valeurs de votre php.ini dans l\'environnement de production.';
+    protected string $description = 'Vérifiez les valeurs de votre php.ini dans l\'environnement de production.';
 
-    protected $service   = 'Service de configuration';
-    protected $arguments = [
+    protected string $service   = 'Service de configuration';
+    
+    protected array $arguments = [
         'opcache' => 'Vérifier les valeurs détaillées de l\'opcache dans l\'environnement de production.',
     ];
 
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
-        unset($params['help'], $params['version'], $params['verbosity']);
-        $params = array_values(array_filter($params));
+        $opcache = $this->argument('opcache');
 
-        if (isset($params[0]) && ! in_array($params[0], array_keys($this->arguments), true)) {
+        if (! empty($opcache) && ! in_array($opcache, array_keys($this->arguments), true)) {
             $this->fail('Vous devez indiquer un argument correct.')->eol();
             $this->fail('  Example: phpini:check opcache')->eol();
             $this->fail('Arguments:')->eol();
@@ -60,11 +51,9 @@ final class PhpIniCheck extends Command
 
             return EXIT_ERROR;
         }
-
-        $argument = $params[0] ?? null;
-
+        
         /** @var array $data */
-        $data = CheckPhpIni::run(argument: $argument);
+        $data = CheckPhpIni::run(argument: $opcache);
 
         $this->table($data);
 

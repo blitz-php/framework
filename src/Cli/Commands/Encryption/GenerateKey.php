@@ -20,30 +20,15 @@ use BlitzPHP\Security\Encryption\Encryption;
  */
 class GenerateKey extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'Encryption';
+    protected string $group = 'Encryption';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'key:generate';
+    protected string $name = 'key:generate';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Génère une nouvelle clé de chiffrememt et la met dans le fichier `.env`.';
+    protected string $description = 'Génère une nouvelle clé de chiffrememt et la met dans le fichier `.env`.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de chiffrememt';
+    protected string $service = 'Service de chiffrememt';
 
-    /**
-     * @var array Options
-     */
-    protected $options = [
+    protected array $options = [
         '--force'  => 'Force l\'écrasement de clé existante dans le fichier `.env`.',
         '--length' => ['La longueur de la chaîne aléatoire qui doit être retournée en bytes.', 32],
         '--prefix' => ['Prefix à ajouter à la clé encodée (doit être hex2bin ou base64).', 'hex2bin'],
@@ -53,21 +38,15 @@ class GenerateKey extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
-        $prefix = $params['prefix'] ?? null;
+        $prefix = $this->option('prefix', 'hex2bin');
 
-        if (in_array($prefix, [null, true], true)) {
-            $prefix = 'hex2bin';
-        } elseif (! in_array($prefix, ['hex2bin', 'base64'], true)) {
+        if (! in_array($prefix, ['hex2bin', 'base64'], true)) {
             $prefix = $this->choice('Veuillez utiliser un prefixe validee.', ['hex2bin', 'base64']); // @codeCoverageIgnore
         }
 
-        $length = $params['length'] ?? null;
-
-        if (in_array($length, [null, true], true)) {
-            $length = 32;
-        }
+        $length = $this->option('length', 32);
 
         $this->task('Génération d\'une nouvelle clé de chiffrement');
 

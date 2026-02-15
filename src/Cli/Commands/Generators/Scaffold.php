@@ -21,37 +21,19 @@ class Scaffold extends Command
 {
     use GeneratorTrait;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $group = 'Generateurs';
+    protected string $group = 'Generateurs';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $name = 'make:scaffold';
+    protected string $name = 'make:scaffold';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $description = 'Génère un ensemble complet de fichiers d\'échafaudage.';
+    protected string $description = 'Génère un ensemble complet de fichiers d\'échafaudage.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de génération de code';
+    protected string $service = 'Service de génération de code';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'Le nom de la classe.',
     ];
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $options = [
+    protected array $options = [
         '--bare'      => 'Ajoute l\'option "--bare" au composant du contrôleur.',
         '--restful'   => 'Ajoute l\'option "--restful" au composant du contrôleur.',
         '--table'     => 'Ajoute l\'option "--table" au composant du modèle.',
@@ -65,7 +47,7 @@ class Scaffold extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $options = [];
 

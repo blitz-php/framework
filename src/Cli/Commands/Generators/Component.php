@@ -23,51 +23,33 @@ class Component extends Command
 {
     use GeneratorTrait;
 
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'Generateurs';
+    protected string $group = 'Generateurs';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'make:component';
+    protected string $name = 'make:component';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Génère un nouveau composant contrôlé et sa vue.';
+    protected string $description = 'Génère un nouveau composant contrôlé et sa vue.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de génération de code';
+    protected string $service = 'Service de génération de code';
 
-    /**
-     * @var array Arguments de la commande
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'Le nom de la classe du composant contrôlé.',
     ];
 
-    /**
-     * @var array Options de la commande
-     */
-    protected $options = [
+    protected array $options = [
         '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--force'     => 'Forcer l\'écrasement du fichier existant.',
     ];
 
     /**
-     * Exécutez réellement une commande.
+     * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->component     = 'Component';
         $this->directory     = 'Components';
         $this->template      = 'component.tpl.php';
         $this->classNameLang = 'CLI.generator.className.component';
-        $params              = array_merge($params, ['suffix' => true]);
+        $params              = array_merge($this->parameters(), ['suffix' => true]);
 
         $this->task('Creation du composant')->eol();
 

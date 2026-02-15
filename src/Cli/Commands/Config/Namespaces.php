@@ -20,36 +20,21 @@ use BlitzPHP\Cli\Console\Command;
  */
 class Namespaces extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'namespaces';
+    protected string $name = 'namespaces';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Vérifie que vos namespaces sont correctement configurés.';
+    protected string $description = 'Vérifie que vos namespaces sont correctement configurés.';
 
-    protected $service = 'Service de configuration';
+    protected string $service = 'Service de configuration';
 
-    /**
-     * @var array Options de la commande
-     */
-    protected $options = [
+    protected array $options = [
         '-b' => 'Afficher uniquement les namespaces de la config de BlitzPHP.',
         '-r' => 'Afficher chaînes brutes du chemin.',
         '-m' => 'Spécifiez la longueur maximale des chaînes de chemin d\'accès à la sortie. Defaut: 60.',
     ];
 
-    /**
-     * {@inheritDoc}
-     */
-    public function execute(array $params)
+    public function handle()
     {
         $m = (int) $this->option('m', 60);
 
@@ -67,8 +52,7 @@ class Namespaces extends Command
             ];
         }
 
-        $this->center('Namespaces disponible dans votre application', ['fg' => Color::CYAN]);
-        $this->border();
+        $this->alert()->info('Namespaces disponible dans votre application');
 
         $this->table($table);
     }

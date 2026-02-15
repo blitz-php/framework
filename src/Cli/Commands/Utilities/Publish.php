@@ -20,42 +20,27 @@ use BlitzPHP\Publisher\Publisher;
  */
 class Publish extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'publish';
+    protected string $name = 'publish';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Découvre et exécute toutes les classes Publisher prédéfinies.';
+    protected string $description = 'Découvre et exécute toutes les classes Publisher prédéfinies.';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'directory' => '[Optionel] Le répertoire à analyser dans chaque namespace.',
     ];
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $options = [
+    protected array $options = [
         '-n|--namespace' => 'Le namespace à partir duquel on devra chercher les fichiers à publier. Par défaut, tous les namespaces sont analysés.',
     ];
 
     /**
-     * Affiche l'aide du script klinge cli lui-même.
+     * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
-        $directory = $this->argument('directory', $params['directory'] ?? 'Publishers');
-        $namespace = $this->option('namespace', $params['namespace'] ?? '');
+        $directory = $this->argument('directory', 'Publishers');
+        $namespace = $this->option('namespace', '');
 
         if ([] === $publishers = Publisher::discover($directory, $namespace)) {
             if ($namespace === '') {

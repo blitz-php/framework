@@ -21,43 +21,28 @@ class Validation extends Command
 {
     use GeneratorTrait;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $group = 'Generateurs';
+    protected string $group = 'Generateurs';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $name = 'make:validation';
+    protected string $name = 'make:validation';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $description = 'Génère une nouvelle classe de validation.';
+    protected string $description = 'Génère une nouvelle classe de validation.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de génération de code';
+    protected string $service = 'Service de génération de code';
 
-    /**
-     * {@inheritDoc}
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'Le nom de la classe de validation.',
     ];
 
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->component = 'Validation';
         $this->directory = 'Validations';
         $this->template  = 'validation.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.validation';
-        $this->runGeneration($params);
+        $this->generateClass($this->parameters());
     }
 }

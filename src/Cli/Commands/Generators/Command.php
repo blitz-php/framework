@@ -21,36 +21,19 @@ class Command extends ConsoleCommand
 {
     use GeneratorTrait;
 
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'Generateurs';
+    protected string $group = 'Generateurs';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'make:command';
+    protected string $name = 'make:command';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Génère une nouvelle commande klinge.';
+    protected string $description = 'Génère une nouvelle commande klinge.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de génération de code';
+    protected string $service = 'Service de génération de code';
 
-    /**
-     * @var array Arguments */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'Le nom de la classe de commande.',
     ];
 
-    /**
-     * @var array Options
-     */
-    protected $options = [
+    protected array $options = [
         '--command'   => 'Le nom de la commande. Par défaut: "command:name"',
         '--type'      => ['Le type de commande. Options [basic, generator]. Par défault: "basic".', 'basic'],
         '--group'     => 'Le groupe de la commande. Par défaut: [basic -> "{APP_NAME}", generator -> "{APP_NAME}:Generateurs"].',
@@ -62,14 +45,14 @@ class Command extends ConsoleCommand
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->component = 'Command';
         $this->directory = 'Commands';
         $this->template  = 'command.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.command';
-        $this->generateClass($params);
+        $this->generateClass($this->parameters());
     }
 
     /**

@@ -21,37 +21,37 @@ class Clear extends Command
     /**
      * {@inheritDoc}
      */
-    protected $group = 'Cache';
+    protected string $group = 'Cache';
 
     /**
      * {@inheritDoc}
      */
-    protected $name = 'cache:clear';
+    protected string $name = 'cache:clear';
 
     /**
      * {@inheritDoc}
      */
-    protected $description = 'Efface les caches système actuels.';
+    protected string $description = 'Efface les caches système actuels.';
 
     /**
      * {@inheritDoc}
      */
-    protected $service = 'Service de mise en cache';
+    protected string $service = 'Service de mise en cache';
 
     /**
      * {@inheritDoc}
      */
-    protected $arguments = [
+    protected array $arguments = [
         'driver' => 'Le pilote de cache à utiliser',
     ];
 
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $config  = config('cache');
-        $handler = $this->argument('driver', $params[0] ?? $config['handler']);
+        $handler = $this->argument('driver', $config['handler']);
 
         if (! array_key_exists($handler, $config['valid_handlers'])) {
             $this->fail($handler . ' n\'est pas un gestionnaire de cache valide.');

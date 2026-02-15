@@ -21,34 +21,34 @@ class Info extends Command
     /**
      * {@inheritDoc}
      */
-    protected $group = 'Cache';
+    protected string $group = 'Cache';
 
     /**
      * {@inheritDoc}
      */
-    protected $name = 'cache:info';
+    protected string $name = 'cache:info';
 
     /**
      * {@inheritDoc}
      */
-    protected $description = 'Affiche les informations du cache de fichiers dans le système actuel.';
+    protected string $description = 'Affiche les informations du cache de fichiers dans le système actuel.';
 
     /**
      * {@inheritDoc}
      */
-    protected $service = 'Service de mise en cache';
+    protected string $service = 'Service de mise en cache';
 
     /**
      * {@inheritDoc}
      */
-    protected $arguments = [
+    protected array $arguments = [
         'driver' => 'Le pilote de cache à utiliser',
     ];
 
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $config = config('cache');
         helper('number');

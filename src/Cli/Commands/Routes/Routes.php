@@ -33,32 +33,15 @@ use ReflectionFunction;
  */
 class Routes extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'route:list';
+    protected string $name = 'route:list';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Affiche toutes les routes.';
+    protected string $description = 'Affiche toutes les routes.';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de routing';
+    protected string $service = 'Service de routing';
 
-    /**
-     * Les options de la commande.
-     *
-     * @var array<string, string>
-     */
-    protected $options = [
+    protected array $options = [
         '--host'          => 'Spécifiez nom d\'hôte dans la demande URI.',
         '--domain'        => 'Filtrer les routes par le domaine',
         '--handler'       => 'Filtrer les routes par le gestionnaire',
@@ -97,10 +80,10 @@ class Routes extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         if (null !== $host = $this->option('host')) {
-            Services::set(Request::class, service('request')->withHeader('HTTP_HOST', $host));
+            Services::override(Request::class, service('request')->withHeader('HTTP_HOST', $host));
         }
 
         if ([] === $routes = $this->collectRoutes($collection = service('routes')->loadRoutes())) {

@@ -19,29 +19,15 @@ use BlitzPHP\Cli\Console\Command;
  */
 class MiddlewareCheck extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'middleware:check';
+    protected string $name = 'middleware:check';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Vérifiez les middleware d\'une route.';
+    protected string $description = 'Vérifiez les middleware d\'une route.';
 
-    protected $service = 'Service de configuration';
+    protected string $service = 'Service de configuration';
 
-    /**
-     * Arguments de la commande
-     *
-     * @var array<string, string>
-     */
-    protected $arguments = [
+    protected array $arguments = [
         'method' => 'La methode HTTP. get, post, put, etc.',
         'route'  => 'La route (chemin d\'URI) pour vérifier les middlewares.',
     ];
@@ -49,10 +35,10 @@ class MiddlewareCheck extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
-        $method = strtolower($this->argument('method', $params[0] ?? ''));
-        $route  = $this->argument('route', $params[1] ?? '');
+        $method = strtolower($this->argument('method', ''));
+        $route  = $this->argument('route', '');
 
         if (empty($route) || $method === '') {
             $this->fail('Vous devez spécifier un verbe HTTP et une route.')->eol();

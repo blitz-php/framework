@@ -18,35 +18,20 @@ use BlitzPHP\Cli\Console\Command;
  */
 class Inspiring extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'Various';
+    protected string $group = 'Various';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'inspire';
+    protected string $name = 'inspire';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Citations d\'inspiration pour BlitzPHP.';
+    protected string $description = 'Citations d\'inspiration pour BlitzPHP.';
 
-    /**
-     * @var string Usage
-     */
-    protected $usage = 'php klinge inspire';
+    protected string $usage = 'php klinge inspire';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de divertissement';
+    protected string $service = 'Service de divertissement';
 
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $this->task('Cette citation pourrait vous motiver');
 

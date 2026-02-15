@@ -22,38 +22,20 @@ use BlitzPHP\Cli\Console\Command;
  */
 class Serve extends Command
 {
-    /**
-     * @var string Groupe
-     */
-    protected $group = 'BlitzPHP';
+    protected string $group = 'BlitzPHP';
 
-    /**
-     * @var string Nom
-     */
-    protected $name = 'serve';
+    protected string $name = 'serve';
 
-    /**
-     * @var string Description
-     */
-    protected $description = 'Lance le serveur de développement BlitzPHP.';
+    protected string $description = 'Lance le serveur de développement BlitzPHP.';
 
-    /**
-     * @var string Usage
-     */
-    protected $usage = 'php klinge serve';
+    protected string $usage = 'php klinge serve';
 
-    /**
-     * @var string
-     */
-    protected $service = 'Service de lancement du serveur de developpement';
+    protected string $service = 'Service de lancement du serveur de developpement';
 
-    /**
-     * @var array Options
-     */
-    protected $options = [
-        '--php'  => ['Le binaire PHP [défaut: "PHP_BINARY"]', PHP_BINARY],
-        '--host' => ['L\'hôte HTTP [défaut: "localhost"]', 'localhost'],
-        '--port' => ['Le port de l\'hôte HTTP [défaut: "3300"]', 3300],
+    protected array $options = [
+        '--php'  => ['Le binaire PHP', 'PHP_BINARY'],
+        '--host' => ['L\'hôte HTTP', 'localhost'],
+        '--port' => ['Le port de l\'hôte HTTP', 3300],
     ];
 
     /**
@@ -90,7 +72,7 @@ class Serve extends Command
     /**
      * {@inheritDoc}
      */
-    public function execute(array $params)
+    public function handle()
     {
         $options = [
             'php'  => PHP_BINARY,
@@ -133,7 +115,7 @@ class Serve extends Command
         if ($status && $this->portOffset < $this->tries) {
             $this->portOffset++;
 
-            $this->execute($params);
+            $this->handle();
         }
     }
 }
