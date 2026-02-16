@@ -40,31 +40,23 @@ class Serve extends Command
 
     /**
      * Le décalage de port actuel.
-     *
-     * @var int
      */
-    protected $portOffset = 0;
+    protected int $portOffset = 0;
 
     /**
      * Le nombre maximum de ports à partir desquels tenter de servir
-     *
-     * @var int
      */
-    protected $tries = 10;
+    protected int $tries = 10;
 
     /**
      * Chemin de base dans lequel sera lancer le server
-     *
-     * @var string
      */
-    protected $rootDirectory = WEBROOT;
+    protected string $rootDirectory = WEBROOT;
 
     /**
      * Liste des messages des taches
-     *
-     * @var array
      */
-    protected $taskMessages = [
+    protected array $taskMessages = [
         'demarrage' => '', // Message a afficher lors du demarrage du serveur
         'demarrer'  => '', // Message a afficher lorsque le serveur a demarré
     ];
@@ -74,25 +66,10 @@ class Serve extends Command
      */
     public function handle()
     {
-        $options = [
-            'php'  => PHP_BINARY,
-            'host' => 'localhost',
-            'port' => 3300,
-        ];
-
-        if (isset($this->options['--php'])) {
-            $options['php'] = $this->options['--php'][1] ?? PHP_BINARY;
-        }
-        if (isset($this->options['--host'])) {
-            $options['host'] = $this->options['--host'][1] ?? 'localhost';
-        }
-        if (isset($this->options['--port'])) {
-            $options['port'] = $this->options['--port'][1] ?? 3300;
-        }
-
-        $php  = escapeshellarg($params['php'] ?: $options['php']);
-        $host = $params['host'] ?: $options['host'];
-        $port = (int) ($params['port'] ?: $options['port']) + $this->portOffset;
+        $binary = $this->option('php', PHP_BINARY);
+        $php    = escapeshellarg($binary === 'PHP_BINARY' ? PHP_BINARY : $binary);
+        $host   = $this->option('host', 'localhost');
+        $port   = (int) ($this->option('port', 3300)) + $this->portOffset;
 
         $this->task($this->taskMessages['demarrage'] ?: 'Demarrage du serveur de developpement');
         sleep(2);

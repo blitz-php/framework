@@ -73,9 +73,8 @@ class About extends Command
     {
         $this->gatherApplicationInformation();
 
-        $this->center('Information générales sur votre application', ['fg' => Color::YELLOW]);
-        $this->border();
-
+        $this->alert()->info('Information générales sur votre application');
+       
         collect(static::$data)
             ->map(
                 static fn ($items) => collect($items)
