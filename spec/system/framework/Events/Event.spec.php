@@ -34,7 +34,7 @@ describe('Events / Event', function (): void {
         });
 
         it('Lève une exception si le nom est vide', function (): void {
-            expect(static function () {
+            expect(static function (): void {
                 new Event('');
             })->toThrow(new InvalidArgumentException('Le nom de l\'événement ne peut pas être vide.'));
         });

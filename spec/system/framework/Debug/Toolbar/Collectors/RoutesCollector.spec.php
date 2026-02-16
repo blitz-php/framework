@@ -61,7 +61,7 @@ describe('Debug / Toolbar / Collectors / RoutesCollector', function (): void {
 
     it('gère les contrôleurs sous forme de callable', function (): void {
 		// Simuler un contrôleur callable
-		$this->mockRouter->shouldReceive('controllerName')->andReturn(fn () => 'callback');
+		$this->mockRouter->shouldReceive('controllerName')->andReturn(fn (): string => 'callback');
 		$this->mockRouter->shouldReceive('methodName')->andReturn('');
 
 		$collector = new RoutesCollector($this->mockRouteCollection, $this->mockRouter);
@@ -77,7 +77,7 @@ describe('Debug / Toolbar / Collectors / RoutesCollector', function (): void {
 
 		$collector = new RoutesCollector($this->mockRouteCollection, $this->mockRouter);
 
-        expect(fn () => $collector->display())->not->toThrow();
+        expect(fn (): array => $collector->display())->not->toThrow();
     });
 
     it('collecte les routes définies sans les closures', function (): void {

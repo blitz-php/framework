@@ -22,19 +22,15 @@ use function Kahlan\expect;
 
 describe('Middleware / PageCache', function (): void {
     beforeAll(function (): void {
-        $this->getCache = function($cachedData = null) {
-			return new class($cachedData) extends Dummy {
+        $this->getCache = (fn($cachedData = null) => new class($cachedData) extends Dummy {
 				public function __construct(private $cachedData) { }
 				public function get(string $key, mixed $default = null): mixed
 				{
 					return $this->cachedData;
 				}
-			};
-		};
+			});
 
-        $this->getResponseCache = function (CacheInterface $cache, $cacheQueryString = false) {
-            return new ResponseCache($cache, $cacheQueryString);
-        };
+        $this->getResponseCache = (fn(CacheInterface $cache, $cacheQueryString = false) => new ResponseCache($cache, $cacheQueryString));
 
 		$this->request = function() {
 			$uri = Mockery::mock(UriInterface::class);
@@ -74,9 +70,7 @@ describe('Middleware / PageCache', function (): void {
 
         $request = $this->request();
 
-        $handler = new TestRequestHandler(function ($request) {
-            return (new Response())->withBody(to_stream('Nouveau contenu'));
-        });
+        $handler = new TestRequestHandler(fn($request) => (new Response())->withBody(to_stream('Nouveau contenu')));
 
         $middleware = new PageCache($responseCache);
         $response = $middleware->process($request, $handler);
@@ -88,9 +82,7 @@ describe('Middleware / PageCache', function (): void {
         $cache = $this->getCache();
         $responseCache = $this->getResponseCache($cache);
 
-        $handler = new TestRequestHandler(function ($request) {
-            return (new Response())->withStatus(404)->withBody(to_stream('Page non trouvée'));
-        });
+        $handler = new TestRequestHandler(fn($request) => (new Response())->withStatus(404)->withBody(to_stream('Page non trouvée')));
 
         // Seulement cache les 404
         $middleware = new PageCache($responseCache, [404]);

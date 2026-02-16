@@ -99,7 +99,7 @@ class ExceptionManager
     private function registerHttpErrorsHandler(): self
     {
         $this->debugger->pushHandler(function (Throwable $exception, InspectorInterface $inspector, RunInterface $run): int {
-            $exception      = $this->prepareException($exception);
+            $exception      = self::prepareException($exception);
             $exception_code = $exception->getCode();
 
             if ($exception_code >= 400 && $exception_code < 600) {
@@ -111,7 +111,7 @@ class ExceptionManager
             }
 
             if (is_dir($this->config->error_view_path)) {
-                $files = array_map(static fn (SplFileInfo $file) => $file->getFilenameWithoutExtension(), service('fs')->files($this->config->error_view_path));
+                $files = array_map(static fn (SplFileInfo $file): string => $file->getFilenameWithoutExtension(), service('fs')->files($this->config->error_view_path));
             } else {
                 $files = [];
             }

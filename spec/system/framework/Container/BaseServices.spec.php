@@ -8,7 +8,17 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use BlitzPHP\Autoloader\Autoloader;
+use BlitzPHP\Autoloader\LocatorCached;
+use BlitzPHP\HttpClient\Config\Services;
+use BlitzPHP\Autoloader\Locator;
+use BlitzPHP\Http\ServerRequest;
+use BlitzPHP\Router\Router;
+use BlitzPHP\Contracts\Router\RouterInterface;
+use BlitzPHP\Http\Response;
+use Psr\Http\Message\ResponseInterface;
+use BlitzPHP\Router\RouteCollection;
+use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Container\BaseServices;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Http\Request;
@@ -20,16 +30,16 @@ use Psr\Http\Message\ServerRequestInterface;
 use function Kahlan\expect;
 
 describe('Container / BaseServices', function (): void {
-    beforeAll(function () {
+    beforeAll(function (): void {
         $this->baseInstances = ReflectionHelper::getPrivateProperty(BaseServices::class, 'instances');
     });
 
-    beforeEach(function () {
+    beforeEach(function (): void {
         // BaseServices::reset(true);
 		BaseServices::resetSingle('test');
     });
 
-    afterEach(function () {
+    afterEach(function (): void {
 		ReflectionHelper::setPrivateProperty(
 			BaseServices::class,
 			'instances',
@@ -38,54 +48,54 @@ describe('Container / BaseServices', function (): void {
         // BaseServices::reset(true);
     });
 
-    describe('Méthodes statiques de base', function () {
-        it('autoloader retourne une instance', function () {
+    describe('Méthodes statiques de base', function (): void {
+        it('autoloader retourne une instance', function (): void {
             $autoloader = BaseServices::autoloader(false);
-            expect($autoloader)->toBeAnInstanceOf('BlitzPHP\Autoloader\Autoloader');
+            expect($autoloader)->toBeAnInstanceOf(Autoloader::class);
         });
 
-        it('autoloader partagé retourne même instance', function () {
+        it('autoloader partagé retourne même instance', function (): void {
             $autoloader1 = BaseServices::autoloader(true);
             $autoloader2 = BaseServices::autoloader(true);
             expect($autoloader1)->toBe($autoloader2);
         });
 
-        it('locator retourne une instance', function () {
+        it('locator retourne une instance', function (): void {
             $locator = BaseServices::locator(false);
             expect($locator)->toBeAnInstanceOf(LocatorInterface::class);
         });
 
-        it('locator partagé retourne même instance', function () {
+        it('locator partagé retourne même instance', function (): void {
             $locator1 = BaseServices::locator(true);
             $locator2 = BaseServices::locator(true);
             expect($locator1)->toBe($locator2);
         });
 
-        xit('locator avec cache si configuré', function () {
+        xit('locator avec cache si configuré', function (): void {
 			$initial = config()->get('optimize.locator_cache_enabled');
 			BaseServices::resetSingle('locator');
 
             $locator = BaseServices::locator(true);
-            expect($locator)->toBeAnInstanceOf('BlitzPHP\Autoloader\LocatorCached');
+            expect($locator)->toBeAnInstanceOf(LocatorCached::class);
 
 			config()->set('optimize.locator_cache_enabled', $initial);
 			BaseServices::resetSingle('locator');
         });
     });
 
-    describe('Gestion des instances', function () {
-        it('get leve une exception si non trouvé', function () {
-            expect(fn() => BaseServices::get('inexistant'))->toThrow(new DI\NotFoundException());
+    describe('Gestion des instances', function (): void {
+        it('get leve une exception si non trouvé', function (): void {
+            expect(fn(): ?object => BaseServices::get('inexistant'))->toThrow(new NotFoundException());
         });
 
-        it('set définit une entrée', function () {
+        it('set définit une entrée', function (): void {
             $obj = new stdClass();
             $obj->name = 'test';
             BaseServices::set('test', $obj);
             expect(BaseServices::get('test'))->toBe($obj);
         });
 
-        it('set échoue si déjà défini', function () {
+        it('set échoue si déjà défini', function (): void {
             $obj1 = new stdClass();
             $obj2 = new stdClass();
             BaseServices::set('test', $obj1);
@@ -93,7 +103,7 @@ describe('Container / BaseServices', function (): void {
                 ->toThrow(new InvalidArgumentException("L'entrée pour 'test' est déjà définie."));
         });
 
-        it('override remplace une entrée existante', function () {
+        it('override remplace une entrée existante', function (): void {
             $obj1 = new stdClass();
             $obj1->name = 'old';
             $obj2 = new stdClass();
@@ -106,18 +116,18 @@ describe('Container / BaseServices', function (): void {
             expect(BaseServices::get('test')->name)->toBe('new');
         });
 
-        it('singleton crée et retourne une même instance', function () {
+        it('singleton crée et retourne une même instance', function (): void {
             $instance1 = BaseServices::singleton('test');
             $instance2 = BaseServices::singleton('test');
             expect($instance1)->toBe($instance2);
         });
 
-        it('singleton avec arguments', function () {
+        it('singleton avec arguments', function (): void {
             $instance = BaseServices::singleton('request');
             expect($instance)->toBeAnInstanceOf(Request::class);
         });
 
-        it('factory crée nouvelle instance', function () {
+        it('factory crée nouvelle instance', function (): void {
             $generator1 = BaseServices::factory(UrlGenerator::class);
             $generator2 = BaseServices::factory(UrlGenerator::class);
             expect($generator1)->not->toBe($generator2);
@@ -126,15 +136,15 @@ describe('Container / BaseServices', function (): void {
         });
     });
 
-    describe('Gestion des mocks et reset', function () {
-        it('injectMock définit un mock', function () {
+    describe('Gestion des mocks et reset', function (): void {
+        it('injectMock définit un mock', function (): void {
             $mock = new stdClass();
             $mock->id = 'mock';
             BaseServices::injectMock('test', $mock);
             expect(BaseServices::get('test'))->toBe($mock);
         });
 
-        it('sharedInstance retourne mock si présent', function () {
+        it('sharedInstance retourne mock si présent', function (): void {
             $mock = new stdClass();
             $mock->name = 'mock';
             BaseServices::injectMock('request', $mock);
@@ -145,7 +155,7 @@ describe('Container / BaseServices', function (): void {
 			BaseServices::resetSingle('request');
         });
 
-        it('resetSingle réinitialise un service spécifique', function () {
+        it('resetSingle réinitialise un service spécifique', function (): void {
             $obj1 = new stdClass();
             $obj2 = new stdClass();
 
@@ -155,52 +165,52 @@ describe('Container / BaseServices', function (): void {
             BaseServices::resetSingle('service1');
 
             expect(BaseServices::get('service2'))->toBe($obj2);
-            expect(fn() => BaseServices::get('service1'))->toThrow(new NotFoundException());
+            expect(fn(): ?object => BaseServices::get('service1'))->toThrow(new NotFoundException());
         });
     });
 
-    describe('Découverte des services', function () {
-        it('serviceExists trouve un service existant', function () {
+    describe('Découverte des services', function (): void {
+        it('serviceExists trouve un service existant', function (): void {
             $result = BaseServices::serviceExists('httpclient');
-            expect($result)->toBe('BlitzPHP\HttpClient\Config\Services');
+            expect($result)->toBe(Services::class);
         });
 
-        it('serviceExists retourne null pour service inexistant', function () {
+        it('serviceExists retourne null pour service inexistant', function (): void {
             $result = BaseServices::serviceExists('inexistant');
             expect($result)->toBeNull();
         });
 
-        it('__callStatic appelle méthode de service', function () {
+        it('__callStatic appelle méthode de service', function (): void {
             $request = BaseServices::request();
             expect($request)->toBeAnInstanceOf(Request::class);
         });
 
-        it('__callStatic gère les factories', function () {
+        it('__callStatic gère les factories', function (): void {
             $request = BaseServices::request(false);
             expect($request)->toBeAnInstanceOf(Request::class);
         });
 
-        it('__callStatic gère les singletons via discoverServices', function () {
+        it('__callStatic gère les singletons via discoverServices', function (): void {
             $request = BaseServices::request(true);
             expect($request)->toBeAnInstanceOf(Request::class);
         });
     });
 
-    describe('Alias et noms de service', function () {
-        it('serviceName normalise via alias', function () {
+    describe('Alias et noms de service', function (): void {
+        it('serviceName normalise via alias', function (): void {
             expect(BaseServices::serviceName('locator'))->toBe('locator');
             expect(BaseServices::serviceName(LocatorInterface::class))->toBe('locator');
             expect(BaseServices::serviceName('request'))->toBe('request');
             expect(BaseServices::serviceName(ServerRequestInterface::class))->toBe('request');
         });
 
-        it('serviceName retourne nom original si pas d\'alias', function () {
+        it('serviceName retourne nom original si pas d\'alias', function (): void {
             expect(BaseServices::serviceName('custom'))->toBe('custom');
         });
     });
 
-    describe('cacheServices', function () {
-        it('cacheServices découvre et cache les services', function () {
+    describe('cacheServices', function (): void {
+        it('cacheServices découvre et cache les services', function (): void {
 			$cacheService = ReflectionHelper::getPrivateMethodInvoker(BaseServices::class,'cacheServices');
             ReflectionHelper::setPrivateProperty(BaseServices::class, 'discovered', false);
 
@@ -209,7 +219,7 @@ describe('Container / BaseServices', function (): void {
 			expect(ReflectionHelper::getPrivateProperty(BaseServices::class, 'discovered'))->toBeTruthy();
         });
 
-        it('cacheServices ne fait rien si déjà découvert', function () {
+        it('cacheServices ne fait rien si déjà découvert', function (): void {
            $cacheService = ReflectionHelper::getPrivateMethodInvoker(BaseServices::class,'cacheServices');
             ReflectionHelper::setPrivateProperty(BaseServices::class, 'discovered', true);
 
@@ -219,28 +229,28 @@ describe('Container / BaseServices', function (): void {
         });
     });
 
-	describe('Méthode resolveServiceAliases', function () {
-		it('resolveServiceAliases pour nom canonique retourne tous les aliases', function () {
+	describe('Méthode resolveServiceAliases', function (): void {
+		it('resolveServiceAliases pour nom canonique retourne tous les aliases', function (): void {
 			$aliases = BaseServices::resolveServiceAliases('locator');
 
 			expect($aliases)->toBeAn('array');
 			expect($aliases)->toHaveLength(3); // locator + Locator::class + LocatorInterface::class
 			expect($aliases)->toContain('locator');
-			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
-			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+			expect($aliases)->toContain(Locator::class);
+			expect($aliases)->toContain(LocatorInterface::class);
 		});
 
-		it('resolveServiceAliases pour alias FQCN retourne tous les aliases', function () {
-			$aliases = BaseServices::resolveServiceAliases('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+		it('resolveServiceAliases pour alias FQCN retourne tous les aliases', function (): void {
+			$aliases = BaseServices::resolveServiceAliases(LocatorInterface::class);
 
 			expect($aliases)->toBeAn('array');
 			expect($aliases)->toHaveLength(3);
 			expect($aliases)->toContain('locator'); // Le nom canonique
-			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
-			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+			expect($aliases)->toContain(Locator::class);
+			expect($aliases)->toContain(LocatorInterface::class);
 		});
 
-		it('resolveServiceAliases pour service sans alias retourne uniquement le nom', function () {
+		it('resolveServiceAliases pour service sans alias retourne uniquement le nom', function (): void {
 			$aliases = BaseServices::resolveServiceAliases('service_sans_alias');
 
 			expect($aliases)->toBeAn('array');
@@ -248,18 +258,18 @@ describe('Container / BaseServices', function (): void {
 			expect($aliases)->toContain('service_sans_alias');
 		});
 
-		it('resolveServiceAliases pour request retourne tous les aliases', function () {
+		it('resolveServiceAliases pour request retourne tous les aliases', function (): void {
 			$aliases = BaseServices::resolveServiceAliases('request');
 
 			expect($aliases)->toBeAn('array');
 			expect($aliases)->toHaveLength(4); // request + 3 aliases
 			expect($aliases)->toContain('request');
-			expect($aliases)->toContain('BlitzPHP\Http\Request');
-			expect($aliases)->toContain('BlitzPHP\Http\ServerRequest');
-			expect($aliases)->toContain('Psr\Http\Message\ServerRequestInterface');
+			expect($aliases)->toContain(Request::class);
+			expect($aliases)->toContain(ServerRequest::class);
+			expect($aliases)->toContain(ServerRequestInterface::class);
 		});
 
-		it('resolveServiceAliases élimine les doublons', function () {
+		it('resolveServiceAliases élimine les doublons', function (): void {
 			// Tester avec le nom canonique et vérifier qu'il n'y a pas de doublons
 			$aliases = BaseServices::resolveServiceAliases('locator');
 
@@ -267,50 +277,50 @@ describe('Container / BaseServices', function (): void {
 			expect($aliases)->toHaveLength(count($uniqueAliases));
 		});
 
-		it('resolveServiceAliases conserve l\'ordre original', function () {
+		it('resolveServiceAliases conserve l\'ordre original', function (): void {
 			$aliases = BaseServices::resolveServiceAliases('locator');
 
 			// Le premier élément doit être le nom passé
 			expect($aliases[0])->toBe('locator');
 
 			// Les suivants doivent être les aliases
-			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
-			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+			expect($aliases)->toContain(Locator::class);
+			expect($aliases)->toContain(LocatorInterface::class);
 		});
 
-		it('resolveServiceAliases pour alias intermédiaire retourne tous les aliases', function () {
+		it('resolveServiceAliases pour alias intermédiaire retourne tous les aliases', function (): void {
 			// Utilise un alias qui n'est pas le canonique
-			$aliases = BaseServices::resolveServiceAliases('BlitzPHP\Http\ServerRequest');
+			$aliases = BaseServices::resolveServiceAliases(ServerRequest::class);
 
 			expect($aliases)->toBeAn('array');
 			expect($aliases)->toHaveLength(4);
 			expect($aliases)->toContain('request'); // Le nom canonique
-			expect($aliases)->toContain('BlitzPHP\Http\Request');
-			expect($aliases)->toContain('BlitzPHP\Http\ServerRequest');
-			expect($aliases)->toContain('Psr\Http\Message\ServerRequestInterface');
+			expect($aliases)->toContain(Request::class);
+			expect($aliases)->toContain(ServerRequest::class);
+			expect($aliases)->toContain(ServerRequestInterface::class);
 		});
 
-		it('resolveServiceAliases pour différents services', function () {
+		it('resolveServiceAliases pour différents services', function (): void {
 			// Test router
 			$routerAliases = BaseServices::resolveServiceAliases('router');
 			expect($routerAliases)->toContain('router');
-			expect($routerAliases)->toContain('BlitzPHP\Router\Router');
-			expect($routerAliases)->toContain('BlitzPHP\Contracts\Router\RouterInterface');
+			expect($routerAliases)->toContain(Router::class);
+			expect($routerAliases)->toContain(RouterInterface::class);
 
 			// Test response
 			$responseAliases = BaseServices::resolveServiceAliases('response');
 			expect($responseAliases)->toContain('response');
-			expect($responseAliases)->toContain('BlitzPHP\Http\Response');
-			expect($responseAliases)->toContain('Psr\Http\Message\ResponseInterface');
+			expect($responseAliases)->toContain(Response::class);
+			expect($responseAliases)->toContain(ResponseInterface::class);
 
 			// Test routes
 			$routesAliases = BaseServices::resolveServiceAliases('routes');
 			expect($routesAliases)->toContain('routes');
-			expect($routesAliases)->toContain('BlitzPHP\Router\RouteCollection');
-			expect($routesAliases)->toContain('BlitzPHP\Contracts\Router\RouteCollectionInterface');
+			expect($routesAliases)->toContain(RouteCollection::class);
+			expect($routesAliases)->toContain(RouteCollectionInterface::class);
 		});
 
-		it('resolveServiceAliases avec cache intégration', function () {
+		it('resolveServiceAliases avec cache intégration', function (): void {
 			// Test l'intégration avec le cache de serviceName
 			// Premier appel
 			$aliases1 =  BaseServices::resolveServiceAliases('locator');
@@ -322,13 +332,13 @@ describe('Container / BaseServices', function (): void {
 			expect($aliases1)->toHaveLength(3);
 		});
 
-		it('resolveServiceAliases insensible à la casse pour noms canoniques', function () {
+		it('resolveServiceAliases insensible à la casse pour noms canoniques', function (): void {
 			// serviceName() convertit en lowercase, donc "LOCATOR" devrait devenir "locator"
 			$aliases =  BaseServices::resolveServiceAliases('LOCATOR');
 
 			expect($aliases)->toContain('locator');
-			expect($aliases)->toContain('BlitzPHP\Autoloader\Locator');
-			expect($aliases)->toContain('BlitzPHP\Contracts\Autoloader\LocatorInterface');
+			expect($aliases)->toContain(Locator::class);
+			expect($aliases)->toContain(LocatorInterface::class);
 		});
 	});
 });

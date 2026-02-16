@@ -21,10 +21,6 @@ describe('Controllers / ResourceController', function (): void {
         $this->controller = new class extends ResourceController {
             protected string $returnFormat = 'json';
 
-            public function __construct() {
-                parent::__construct();
-            }
-
             // Méthodes accessibles pour les tests
             public function testIndex() {
                 return $this->index();
@@ -134,7 +130,6 @@ describe('Controllers / ResourceController', function (): void {
             // Vérifie que le format a été défini
             $reflection = new ReflectionClass($this->controller);
             $property = $reflection->getProperty('returnFormat');
-            $property->setAccessible(true);
 
             // Note: setFormat appelle returnFormat qui est une méthode parente
             // Nous testons juste que la méthode peut être appelée sans erreur

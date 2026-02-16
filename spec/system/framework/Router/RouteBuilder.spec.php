@@ -301,7 +301,7 @@ describe('RouteBuilder', function (): void {
         });
 
         it('form en utilisant une closure', function (): void {
-            $this->builder->form('here', static fn() => 'Hello World');
+            $this->builder->form('here', static fn(): string => 'Hello World');
 
 			$match = $this->routes->getRoutes();
 
@@ -317,7 +317,7 @@ describe('RouteBuilder', function (): void {
 		});
 
         it('form en utilisant une closure et l\'option unique', function (): void {
-            $this->builder->form('here', static fn() => 'Hello World', ['unique' => true]);
+            $this->builder->form('here', static fn(): string => 'Hello World', ['unique' => true]);
 
 			$match = $this->routes->getRoutes();
 

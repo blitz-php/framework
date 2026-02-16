@@ -77,7 +77,7 @@ class About extends Command
 
         collect(static::$data)
             ->map(
-                static fn ($items) => collect($items)
+                static fn ($items): Collection => collect($items)
                     ->map(static function ($value) {
                         if (is_array($value)) {
                             return [$value];
@@ -88,7 +88,7 @@ class About extends Command
                         }
 
                         return collect(Container::call($value))
-                            ->map(static fn ($value, $key) => [$key, $value])
+                            ->map(static fn ($value, $key): array => [$key, $value])
                             ->values()
                             ->all();
                     })->flatten(1)
@@ -98,7 +98,7 @@ class About extends Command
 
                 return $index === false ? 99 : $index;
             })
-            ->filter(fn ($data, $key) => ((bool) $this->option('only')) ? in_array($this->toSearchKeyword($key), $this->sections(), true) : true)
+            ->filter(fn ($data, $key): bool => ((bool) $this->option('only')) ? in_array($this->toSearchKeyword($key), $this->sections(), true) : true)
             ->pipe(fn ($data) => $this->display($data));
 
         return EXIT_SUCCESS;
@@ -137,8 +137,8 @@ class About extends Command
      */
     protected function displayJson(Collection $data): void
     {
-        $output = $data->flatMap(fn ($data, $section) => [
-            (string) Text::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [
+        $output = $data->flatMap(fn ($data, $section): array => [
+            (string) Text::of($section)->snake() => $data->mapWithKeys(fn ($item, $key): array => [
                 $this->toSearchKeyword($item[0]) => value($item[1], true),
             ]),
         ]);
@@ -153,12 +153,12 @@ class About extends Command
     {
         self::$data = [];
 
-        $formatEnabledStatus = fn ($value) => $value ? $this->color->warn('ACTIVE') : $this->color->warn('DESACTIVE');
-        $formatCachedStatus  = fn ($value) => $value ? $this->color->ok('MISE EN CACHE') : $this->color->warn('NON MISE EN CACHE');
+        $formatEnabledStatus = fn ($value): string => $value ? $this->color->warn('ACTIVE') : $this->color->warn('DESACTIVE');
+        $formatCachedStatus  = fn ($value): string => $value ? $this->color->ok('MISE EN CACHE') : $this->color->warn('NON MISE EN CACHE');
 
         $config = (object) Config::display();
 
-        static::addToSection('Environnement', static fn () => [
+        static::addToSection('Environnement', static fn (): array => [
             'Nom de l\'application' => $config->appName,
             'Version de BlitzPHP'   => $config->blitzVersion,
             'Version de PHP'        => PHP_VERSION,
@@ -169,14 +169,14 @@ class About extends Command
             // 'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
         ]);
 
-        static::addToSection('Cache', fn () => [
+        static::addToSection('Cache', fn (): array => [
             // 'Config' => static::format($this->laravel->configurationIsCached(), console: $formatCachedStatus),
             // 'Events' => static::format($this->laravel->eventsAreCached(), console: $formatCachedStatus),
             // 'Routes' => static::format($this->laravel->routesAreCached(), console: $formatCachedStatus),
             'Vues' => static::format($this->hasPhpFiles(storage_path('framework/cache/views')), console: $formatCachedStatus),
         ]);
 
-        static::addToSection('Gestionnaires', static fn () => array_filter([
+        static::addToSection('Gestionnaires', static fn (): array => array_filter([
             'Cache' => config('cache.handler'),
             'Logs'  => static function ($json): string {
                 $handlers = [];
@@ -237,7 +237,7 @@ class About extends Command
     {
         return collect(explode(',', $this->option('only') ?? ''))
             ->filter()
-            ->map(fn ($only) => $this->toSearchKeyword($only))
+            ->map(fn ($only): string => $this->toSearchKeyword($only))
             ->all();
     }
 

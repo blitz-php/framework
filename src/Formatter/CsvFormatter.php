@@ -65,7 +65,7 @@ class CsvFormatter implements FormatterInterface
 
             // Suppression de la notification "conversion de tableau en chaîne".
             // Gardez le "mal" @ ici.
-            $record = @array_map('strval', $record);
+            $record = @array_map(strval(...), $record);
 
             fputcsv($handle, $record, $this->delimiter, $this->enclosure);
         }

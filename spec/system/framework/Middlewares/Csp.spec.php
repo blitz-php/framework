@@ -18,12 +18,8 @@ use Spec\BlitzPHP\Middlewares\TestRequestHandler;
 use function Kahlan\expect;
 
 describe('Middleware / Csp', function (): void {
-    beforeAll(function () {
-        $this->getRequestHandler = function () {
-            return new TestRequestHandler(function ($request) {
-                return new Response();
-            });
-        };
+    beforeAll(function (): void {
+        $this->getRequestHandler = (fn() => new TestRequestHandler(fn($request) => new Response()));
     });
 
     it('Process ajoute les headers', function (): void {
@@ -70,7 +66,7 @@ describe('Middleware / Csp', function (): void {
             'style_nonce'  => true,
         ]);
 
-        $handler = new TestRequestHandler(function ($request) {
+        $handler = new TestRequestHandler(function ($request): Response {
             expect($request->getAttribute('cspScriptNonce'))->not->toBeEmpty();
             expect($request->getAttribute('cspStyleNonce'))->not->toBeEmpty();
 
@@ -91,7 +87,7 @@ describe('Middleware / Csp', function (): void {
         }
     });
 
-    it('Passage d\'une instance CSPBuilder', function () {
+    it('Passage d\'une instance CSPBuilder', function (): void {
         $request = ServerRequestFactory::fromGlobals(['REQUEST_URI' => '/test']);
 
         $config = [

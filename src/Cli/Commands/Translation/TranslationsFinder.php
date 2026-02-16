@@ -149,12 +149,10 @@ class TranslationsFinder extends Command
                                 'second' => ['fg' => Color::RED],
                             ]);
                         }
-                    } else {
-                        if ($this->verbose) {
-                            $this->justify('Fichier de traduction "' . $langFileName . '"', 'Modification éffectuée avec succès', [
-                                'second' => ['fg' => Color::GREEN],
-                            ]);
-                        }
+                    } elseif ($this->verbose) {
+                        $this->justify('Fichier de traduction "' . $langFileName . '"', 'Modification éffectuée avec succès', [
+                            'second' => ['fg' => Color::GREEN],
+                        ]);
                     }
                 }
             }
@@ -185,7 +183,7 @@ class TranslationsFinder extends Command
                 $tableBadRows[] = [$value[1], $value[0]];
             }
 
-            usort($tableBadRows, static fn ($currentValue, $nextValue): int => strnatcmp((string) $currentValue[0], (string) $nextValue[0]));
+            usort($tableBadRows, static fn ($currentValue, $nextValue): int => strnatcmp($currentValue[0], $nextValue[0]));
 
             $table = [];
 
@@ -220,7 +218,7 @@ class TranslationsFinder extends Command
         preg_match_all('/\_\_\(\'([_a-z0-9À-ÿ\-]+)\'\)/ui', $fileContent, $matches);
 
         if ($matches[1] !== []) {
-            $fileContent = str_replace($matches[0], array_map(static fn ($val) => "lang('App.{$val}')", $matches[1]), $fileContent);
+            $fileContent = str_replace($matches[0], array_map(static fn ($val): string => "lang('App.{$val}')", $matches[1]), $fileContent);
         }
 
         preg_match_all('/lang\(\'([._a-z0-9À-ÿ\-]+)\'\)/ui', $fileContent, $matches);

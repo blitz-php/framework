@@ -40,7 +40,7 @@ describe('Publisher / PublisherContentReplacer', function (): void {
 
         expect($result)->toBeTruthy();
 		expect(file_get_contents($this->file))->toMatch(
-			fn($actual) => str_contains($actual, "\n\t'permitted_uri_chars'          => 'a-z 0-9~%.:_\\-',\n'csp_enabled' => false,")
+			fn($actual): bool => str_contains($actual, "\n\t'permitted_uri_chars'          => 'a-z 0-9~%.:_\\-',\n'csp_enabled' => false,")
 		);
 	});
 
@@ -53,7 +53,7 @@ describe('Publisher / PublisherContentReplacer', function (): void {
 
         expect($result)->toBeTruthy();
 		expect(file_get_contents($this->file))->toMatch(
-			fn($actual) => str_contains($actual, "\n'csp_enabled' => false,\n\t'permitted_uri_chars'          => 'a-z 0-9~%.:_\\-',\n")
+			fn($actual): bool => str_contains($actual, "\n'csp_enabled' => false,\n\t'permitted_uri_chars'          => 'a-z 0-9~%.:_\\-',\n")
 		);
 	});
 
@@ -68,10 +68,10 @@ describe('Publisher / PublisherContentReplacer', function (): void {
 
         expect($result)->toBeTruthy();
 		expect(file_get_contents($this->file))->toMatch(
-			fn($actual) => str_contains($actual, "\n\t'permitted_uri_chars'          => '',\n")
+			fn($actual): bool => str_contains($actual, "\n\t'permitted_uri_chars'          => '',\n")
 		);
 		expect(file_get_contents($this->file))->toMatch(
-			fn($actual) => str_contains($actual, "\n\t'force_global_secure_requests' => true,\n")
+			fn($actual): bool => str_contains($actual, "\n\t'force_global_secure_requests' => true,\n")
 		);
 	});
 });

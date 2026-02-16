@@ -21,7 +21,7 @@ describe('Http / MiddlewareRunner', function (): void {
 		$this->request    = service('request');
 		$this->response   = service('response');
 		$this->container  = service('container');
-		$this->middleware = fn (array $middlewares = []) => new MiddlewareQueue($this->container, $middlewares, $this->request, $this->response);
+		$this->middleware = fn (array $middlewares = []): MiddlewareQueue => new MiddlewareQueue($this->container, $middlewares, $this->request, $this->response);
 
         $this->ok   = fn ($request, $handler) => $handler->handle($request);
         $this->pass = fn ($request, $response, $next) => $next($request, $response, $next);

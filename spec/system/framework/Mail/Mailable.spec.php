@@ -71,7 +71,7 @@ describe('Mail / Mailable', function (): void {
         };
     });
 
-	afterAll(function() {
+	afterAll(function(): void {
 		config()->reset('mail');
 	});
 
@@ -255,8 +255,8 @@ describe('Mail / Mailable', function (): void {
                 public function content(): array { return ['html' => 'content']; }
             };
 
-            expect(fn() => $mailable->send($this->mockMail))
-                ->toThrow(new \InvalidArgumentException('Mail invalide: Aucun destinataire spécifié'));
+            expect(fn(): bool => $mailable->send($this->mockMail))
+                ->toThrow(new InvalidArgumentException('Mail invalide: Aucun destinataire spécifié'));
         });
     });
 

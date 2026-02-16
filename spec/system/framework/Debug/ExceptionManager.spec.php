@@ -80,7 +80,7 @@ describe('Debug / ExceptionManager', function (): void {
 
     it('enregistre les gestionnaires callable', function (): void {
         $handlerCalled = false;
-        $handler = function () use (&$handlerCalled) {
+        $handler = function () use (&$handlerCalled): int {
             $handlerCalled = true;
             return Handler::DONE;
         };
@@ -114,7 +114,7 @@ describe('Debug / ExceptionManager', function (): void {
             'log'             => true,
             'ignore_codes'    => [],
             'error_view_path' => '/path/to/views',
-            'handlers'        => [get_class($mockHandler)],
+            'handlers'        => [$mockHandler::class],
             'editor'          => 'vscode',
             'title'           => 'Error',
             'blacklist'       => [],

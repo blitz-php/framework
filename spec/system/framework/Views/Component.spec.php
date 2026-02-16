@@ -222,23 +222,23 @@ describe('Views / Component', function (): void {
 		});
 
 		it('Rendu du composant avec la vue ayant le meme nom que la classe', function (): void {
-			expect(component(AwesomeComponent::class))->toMatch(fn($actual) => str_contains($actual, 'Found!'));
+			expect(component(AwesomeComponent::class))->toMatch(fn($actual): bool => str_contains($actual, 'Found!'));
 		});
 
 		it('Rendu du composant avec une vue nommee', function (): void {
-			expect(component(SimpleNotice::class))->toMatch(fn($actual) => str_contains($actual, '4, 8, 15, 16, 23, 42'));
+			expect(component(SimpleNotice::class))->toMatch(fn($actual): bool => str_contains($actual, '4, 8, 15, 16, 23, 42'));
 		});
 
 		it('Rendu du composant a travers la methode render()', function (): void {
-			expect(component(RenderedNotice::class))->toMatch(fn($actual) => str_contains($actual, '4, 8, 15, 16, 23, 42'));
+			expect(component(RenderedNotice::class))->toMatch(fn($actual): bool => str_contains($actual, '4, 8, 15, 16, 23, 42'));
 		});
 
 		it('Rendu du composant a travers la methode render() et des donnees supplementaires', function (): void {
-			expect(component(RenderedExtraDataNotice::class))->toMatch(fn($actual) => str_contains($actual, '42, 23, 16, 15, 8, 4'));
+			expect(component(RenderedExtraDataNotice::class))->toMatch(fn($actual): bool => str_contains($actual, '42, 23, 16, 15, 8, 4'));
 		});
 
 		it('Leve une exception si on ne trouve aucune vue pour le composant', function (): void {
-			expect(fn() => component(BadComponent::class))
+			expect(fn(): string => component(BadComponent::class))
 				->toThrow(new LogicException('Impossible de localiser le fichier de vue pour le composant "Spec\\BlitzPHP\\App\\Views\\Components\\BadComponent".'));
 		});
 
@@ -254,7 +254,7 @@ describe('Views / Component', function (): void {
 		});
 
 		it('Leve une exception si on la methodde personnalisee qu\'on souhaite n\'existe pas dans le composant', function (): void {
-			expect(fn() => component('Spec\BlitzPHP\App\Views\Components\GreetingComponent::sayGoodbye'))
+			expect(fn(): string => component('Spec\BlitzPHP\App\Views\Components\GreetingComponent::sayGoodbye'))
 				->toThrow(new ViewException(lang('View.invalidComponentMethod', [
 					'class'  => GreetingComponent::class,
 					'method' => 'sayGoodbye',
@@ -263,51 +263,51 @@ describe('Views / Component', function (): void {
 
 		it('Rendu d\'un composant ayant des proprietes calculees', function (): void {
 			expect(component(ListerComponent::class, ['items' => ['one', 'two', 'three']]))
-				->toMatch(fn($actual) => str_contains($actual, '-one -two -three'));
+				->toMatch(fn($actual): bool => str_contains($actual, '-one -two -three'));
 		});
 
 		it('Rendu d\'un composant ayant des methodes publiques', function (): void {
 			expect(component(ColorsComponent::class, ['color' => 'red']))
-				->toMatch(fn($actual) => str_contains($actual, 'warm'));
+				->toMatch(fn($actual): bool => str_contains($actual, 'warm'));
 
 			expect(component(ColorsComponent::class, ['color' => 'purple']))
-				->toMatch(fn($actual) => str_contains($actual, 'cool'));
+				->toMatch(fn($actual): bool => str_contains($actual, 'cool'));
 		});
 
 		it('Montage du composant avec les valeurs par defaut', function (): void {
 			expect(component(MultiplierComponent::class))
-				->toMatch(fn($actual) => str_contains($actual, '4'));
+				->toMatch(fn($actual): bool => str_contains($actual, '4'));
 
 			expect(component(AdditionComponent::class))
-				->toMatch(fn($actual) => str_contains($actual, '2'));
+				->toMatch(fn($actual): bool => str_contains($actual, '2'));
 		});
 
 		it('Montage du composant avec d\'autres valeurs', function (): void {
 			expect(component(MultiplierComponent::class, ['value' => 3, 'multiplier' => 3]))
-				->toMatch(fn($actual) => str_contains($actual, '9'));
+				->toMatch(fn($actual): bool => str_contains($actual, '9'));
 		});
 
 		it('Montage du composant avec des parametres', function (): void {
 			expect(component(AdditionComponent::class, ['value' => 3]))
-				->toMatch(fn($actual) => str_contains($actual, '3'));
+				->toMatch(fn($actual): bool => str_contains($actual, '3'));
 		});
 
 		it('Montage du composant avec des valeurs et parametres de montage', function (): void {
 			expect(component(AdditionComponent::class, ['value' => 3, 'number' => 4, 'skipAddition' => false]))
-				->toMatch(fn($actual) => str_contains($actual, '7'));
+				->toMatch(fn($actual): bool => str_contains($actual, '7'));
 
 			expect(component(AdditionComponent::class, ['value' => 3, 'number' => 4, 'skipAddition' => true]))
-				->toMatch(fn($actual) => str_contains($actual, '3'));
+				->toMatch(fn($actual): bool => str_contains($actual, '3'));
 		});
 
 		it('Montage du composant avec des parametres manquant', function (): void {
 			// Ne fourni aucun parametres
 			expect(component(AdditionComponent::class, ['value' => 3]))
-				->toMatch(fn($actual) => str_contains($actual, '3'));
+				->toMatch(fn($actual): bool => str_contains($actual, '3'));
 
 			// Saute un parametre dans la liste des parametres
 			expect(component(AdditionComponent::class, ['value' => 3, $skipAddition = true]))
-				->toMatch(fn($actual) => str_contains($actual, '3'));
+				->toMatch(fn($actual): bool => str_contains($actual, '3'));
 		});
 	});
 });

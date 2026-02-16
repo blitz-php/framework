@@ -59,7 +59,7 @@ describe('Utilities / Invade', function (): void {
                 private static string $secret = 'static private';
             };
 
-            $invader = StaticInvader::make(get_class($class));
+            $invader = StaticInvader::make($class::class);
             expect($invader->get('secret'))->toBe('static private');
         });
 
@@ -67,7 +67,7 @@ describe('Utilities / Invade', function (): void {
             $class = new class() {
                 private static string $secret = 'original';
             };
-            $className = get_class($class);
+            $className = $class::class;
 
             $invader = StaticInvader::make($className);
             $invader->set('secret', 'modified');
@@ -81,7 +81,7 @@ describe('Utilities / Invade', function (): void {
                     return 'static ' . $param;
                 }
             };
-            $className = get_class($class);
+            $className = $class::class;
 
             $invader = StaticInvader::make($className);
             $result = $invader->method('secretMethod')->call('test');
@@ -94,7 +94,7 @@ describe('Utilities / Invade', function (): void {
         it('Doit lancer une exception si méthode non définie pour StaticInvader', function (): void {
             $invader = StaticInvader::make(stdClass::class);
 
-            expect(function () use ($invader) {
+            expect(function () use ($invader): void {
                 $invader->call('nonexistent');
             })->toThrow(new Exception());
         });

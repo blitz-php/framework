@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Cache\Cache;
+
 use BlitzPHP\Cache\Handlers\Apcu;
 use BlitzPHP\Cache\Handlers\ArrayHandler;
 use BlitzPHP\Cache\Handlers\Dummy;
@@ -69,7 +69,7 @@ describe('Cache / Handlers', function (): void {
         afterEach(function (): void {
             // Nettoyer les fichiers de test
             if (is_dir($this->tempDir)) {
-                array_map('unlink', glob($this->tempDir . '/*'));
+                array_map(unlink(...), glob($this->tempDir . '/*'));
             }
         });
 
@@ -151,7 +151,7 @@ describe('Cache / Handlers', function (): void {
             }
 
             $handler = new RedisHandler();
-            expect(fn() => $handler->init())->toThrow(new RuntimeException());
+            expect(fn(): bool => $handler->init())->toThrow(new RuntimeException());
         });
     });
 
@@ -162,7 +162,7 @@ describe('Cache / Handlers', function (): void {
             }
 
             $handler = new Apcu();
-            expect(fn() => $handler->init())->toThrow(new RuntimeException());
+            expect(fn(): bool => $handler->init())->toThrow(new RuntimeException());
         });
     });
 
@@ -173,7 +173,7 @@ describe('Cache / Handlers', function (): void {
             }
 
             $handler = new Memcached();
-            expect(fn() => $handler->init())->toThrow(new RuntimeException());
+            expect(fn(): bool => $handler->init())->toThrow(new RuntimeException());
         });
     });
 
@@ -184,7 +184,7 @@ describe('Cache / Handlers', function (): void {
             }
 
             $handler = new Wincache();
-            expect(fn() => $handler->init())->toThrow(new RuntimeException());
+            expect(fn(): bool => $handler->init())->toThrow(new RuntimeException());
         });
     });
 });

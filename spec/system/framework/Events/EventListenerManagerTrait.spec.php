@@ -321,7 +321,6 @@ describe('Events / EventListenerManagerTrait', function (): void {
             // Utilisation de la réflexion pour tester la méthode protégée
             $reflection = new ReflectionClass($this->testObject);
             $method = $reflection->getMethod('createEvent');
-            $method->setAccessible(true);
 
             $event = $method->invoke($this->testObject, 'test.event', ['param' => 'value']);
 
@@ -334,7 +333,6 @@ describe('Events / EventListenerManagerTrait', function (): void {
             // Utilisation de la réflexion pour tester la méthode protégée
             $reflection = new ReflectionClass($this->testObject);
             $method = $reflection->getMethod('fireEventWithSelf');
-            $method->setAccessible(true);
 
             $receivedTarget = null;
             $this->testObject->addEventListener('self.event', static function ($event) use (&$receivedTarget): void {

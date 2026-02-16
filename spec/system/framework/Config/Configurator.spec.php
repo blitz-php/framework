@@ -221,8 +221,8 @@ describe('Config / Configurator', function (): void {
             expect(Configurator::getTopLevelKey('database.default.host'))->toBe('database');
 
             // Doit échouer avec chemin vide
-            expect(fn() => Configurator::getTopLevelKey(''))->toThrow(new InvalidPathException());
-            expect(fn() => Configurator::getTopLevelKey('   '))->toThrow(new InvalidPathException());
+            expect(fn(): string => Configurator::getTopLevelKey(''))->toThrow(new InvalidPathException());
+            expect(fn(): string => Configurator::getTopLevelKey('   '))->toThrow(new InvalidPathException());
         });
 
         it('Configurator::set avec chemin invalide', function (): void {

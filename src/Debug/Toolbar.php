@@ -397,7 +397,7 @@ class Toolbar
         }
 
         // Si on a desactiver le debogage ou l'affichage de la debugbar, on s'arrete
-        if (! BLITZ_DEBUG || ! $this->config->show_debugbar) {
+        if (! $this->config->show_debugbar) {
             return $response;
         }
 

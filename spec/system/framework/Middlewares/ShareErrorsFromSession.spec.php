@@ -20,8 +20,7 @@ use function Kahlan\expect;
 
 describe('Middleware / ShareErrorsFromSession', function (): void {
     beforeAll(function (): void {
-        $this->getSession = function ($flashdata = []) {
-            return new class($flashdata) extends Store {
+        $this->getSession = (fn($flashdata = []) => new class($flashdata) extends Store {
 				public function __construct(private array $flashdata)
 				{
 					parent::__construct(config('session'), config('cookie'), '127.0.0.1');
@@ -31,11 +30,9 @@ describe('Middleware / ShareErrorsFromSession', function (): void {
 				{
 					return $this->flashdata[$key] ?? null;
 				}
-			};
-        };
+			});
 
-        $this->getView = function () {
-			return  new class extends View {
+        $this->getView = (fn() => new class extends View {
 				public static array $sharedData = [];
 
 				public static function share(array|Closure|string $key, mixed $value = null): void
@@ -49,8 +46,7 @@ describe('Middleware / ShareErrorsFromSession', function (): void {
 						self::$sharedData[$k] = $v;
 					}
 				}
-			};
-        };
+			});
 
 		$this->request = function($session) {
 			$request = Mockery::mock(Request::class);

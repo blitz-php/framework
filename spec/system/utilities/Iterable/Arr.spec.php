@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use BlitzPHP\Utilities\Exceptions\ItemNotFoundException;
 use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Contracts\Support\Arrayable;
 
@@ -53,7 +53,7 @@ describe('Utilities / Iterable / Arr', function (): void {
         });
 
         it('Doit lever une exception si la valeur n\'est pas un tableau', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $array = ['user' => 'not an array'];
                 Arr::array($array, 'user');
             })->toThrow(new InvalidArgumentException());
@@ -68,7 +68,7 @@ describe('Utilities / Iterable / Arr', function (): void {
         });
 
         it('Doit lever une exception si la valeur n\'est pas un booléen', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $array = ['flag' => 'true'];
                 Arr::boolean($array, 'flag');
             })->toThrow(new InvalidArgumentException());
@@ -120,7 +120,7 @@ describe('Utilities / Iterable / Arr', function (): void {
         });
 
         xit('Doit lever une exception pour des tailles différentes', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $data = [['id' => 1], ['id' => 2, 'name' => 'John']];
                 Arr::combine($data, '{n}.id');
             })->toThrow(new Exception());
@@ -296,7 +296,7 @@ describe('Utilities / Iterable / Arr', function (): void {
 
         it('Doit utiliser un callback personnalisé', function (): void {
             $array = [1, 2, 3, 4, 5];
-            $result = Arr::filter($array, fn ($value) => $value > 2);
+            $result = Arr::filter($array, fn ($value): bool => $value > 2);
             expect(array_values($result))->toBe([3, 4, 5]);
         });
     });
@@ -309,7 +309,7 @@ describe('Utilities / Iterable / Arr', function (): void {
 
         it('Doit retourner le premier élément correspondant au callback', function (): void {
             $array = [1, 2, 3, 4, 5];
-            $result = Arr::first($array, fn ($value) => $value > 3);
+            $result = Arr::first($array, fn ($value): bool => $value > 3);
             expect($result)->toBe(4);
         });
 
@@ -418,7 +418,7 @@ describe('Utilities / Iterable / Arr', function (): void {
         });
 
         it('Doit lever une exception pour un scalaire', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Arr::from('string');
             })->toThrow(new InvalidArgumentException());
         });
@@ -500,8 +500,8 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode every', function (): void {
         it('Doit vérifier que tous les éléments satisfont une condition', function (): void {
             $array = [2, 4, 6, 8];
-            expect(Arr::every($array, fn ($value) => $value % 2 === 0))->toBe(true);
-            expect(Arr::every($array, fn ($value) => $value > 5))->toBe(false);
+            expect(Arr::every($array, fn ($value): bool => $value % 2 === 0))->toBe(true);
+            expect(Arr::every($array, fn ($value): bool => $value > 5))->toBe(false);
         });
     });
 
@@ -591,7 +591,7 @@ describe('Utilities / Iterable / Arr', function (): void {
 
         it('Doit retourner le dernier élément correspondant au callback', function (): void {
             $array = [1, 2, 3, 4, 5];
-            $result = Arr::last($array, fn ($value) => $value < 4);
+            $result = Arr::last($array, fn ($value): bool => $value < 4);
             expect($result)->toBe(3);
         });
 
@@ -604,13 +604,13 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode map', function (): void {
         it('Doit transformer chaque élément', function (): void {
             $array = [1, 2, 3];
-            $result = Arr::map($array, fn ($value) => $value * 2);
+            $result = Arr::map($array, fn ($value): int|float => $value * 2);
             expect($result)->toBe([2, 4, 6]);
         });
 
         it('Doit préserver les clés', function (): void {
             $array = ['a' => 1, 'b' => 2];
-            $result = Arr::map($array, fn ($value) => $value * 2);
+            $result = Arr::map($array, fn ($value): int|float => $value * 2);
             expect($result)->toBe(['a' => 2, 'b' => 4]);
         });
     });
@@ -618,7 +618,7 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode mapSpread', function (): void {
         it('Doit mapper avec décomposition', function (): void {
             $array = [[1, 2], [3, 4]];
-            $result = Arr::mapSpread($array, fn ($a, $b) => $a + $b);
+            $result = Arr::mapSpread($array, fn ($a, $b): float|int|array => $a + $b);
             expect($result)->toBe([3, 7]);
         });
     });
@@ -626,7 +626,7 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode mapWithKeys', function (): void {
         it('Doit mapper avec nouvelles clés', function (): void {
             $array = [1, 2, 3];
-            $result = Arr::mapWithKeys($array, fn ($value) => ["key_$value" => $value * 2]);
+            $result = Arr::mapWithKeys($array, fn ($value): array => ["key_$value" => $value * 2]);
             expect($result)->toBe(['key_1' => 2, 'key_2' => 4, 'key_3' => 6]);
         });
     });
@@ -680,7 +680,7 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode partition', function (): void {
         it('Doit partitionner un tableau', function (): void {
             $array = [1, 2, 3, 4, 5];
-            [$passed, $failed] = Arr::partition($array, fn ($value) => $value > 2);
+            [$passed, $failed] = Arr::partition($array, fn ($value): bool => $value > 2);
             expect(array_values($passed))->toBe([3, 4, 5]);
             expect(array_values($failed))->toBe([1, 2]);
         });
@@ -789,7 +789,7 @@ describe('Utilities / Iterable / Arr', function (): void {
         });
 
         it('Doit lever une exception si on demande plus d\'éléments que disponible', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $array = [1, 2];
                 Arr::random($array, 3);
             })->toThrow(new InvalidArgumentException());
@@ -799,7 +799,7 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode reject', function (): void {
         it('Doit rejeter les éléments satisfaisant une condition', function (): void {
             $array = [1, 2, 3, 4, 5];
-            $result = Arr::reject($array, fn ($value) => $value > 3);
+            $result = Arr::reject($array, fn ($value): bool => $value > 3);
             expect($result)->toBe([1, 2, 3]);
         });
     });
@@ -871,19 +871,19 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode sole', function (): void {
         it('Doit retourner l\'élément unique', function (): void {
             $array = [['id' => 1, 'name' => 'John']];
-            $result = Arr::sole($array, fn ($item) => $item['name'] === 'John');
+            $result = Arr::sole($array, fn ($item): bool => $item['name'] === 'John');
             expect($result['id'])->toBe(1);
         });
 
         it('Doit lever une exception si aucun élément', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $array = [];
                 Arr::sole($array);
-            })->toThrow(new BlitzPHP\Utilities\Exceptions\ItemNotFoundException());
+            })->toThrow(new ItemNotFoundException());
         });
 
         it('Doit lever une exception si plusieurs éléments', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $array = [1, 2, 3];
                 Arr::sole($array);
             })->toThrow();
@@ -893,8 +893,8 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode some', function (): void {
         it('Doit vérifier qu\'au moins un élément satisfait une condition', function (): void {
             $array = [1, 2, 3, 4, 5];
-            expect(Arr::some($array, fn ($value) => $value > 4))->toBe(true);
-            expect(Arr::some($array, fn ($value) => $value > 5))->toBe(false);
+            expect(Arr::some($array, fn ($value): bool => $value > 4))->toBe(true);
+            expect(Arr::some($array, fn ($value): bool => $value > 5))->toBe(false);
         });
     });
 
@@ -907,7 +907,7 @@ describe('Utilities / Iterable / Arr', function (): void {
 
         it('Doit trier avec un callback', function (): void {
             $array = ['apple', 'banana', 'cherry'];
-            $result = Arr::sort($array, fn ($a, $b) => strlen($a) <=> strlen($b));
+            $result = Arr::sort($array, fn ($a, $b): int => strlen($a) <=> strlen($b));
             expect($result)->toBe(['apple', 'banana', 'cherry']);
         });
     });
@@ -1032,7 +1032,7 @@ describe('Utilities / Iterable / Arr', function (): void {
     describe('Méthode where', function (): void {
         it('Doit filtrer avec un callback', function (): void {
             $array = [1, 2, 3, 4, 5];
-            $result = Arr::where($array, fn ($value) => $value > 2);
+            $result = Arr::where($array, fn ($value): bool => $value > 2);
             expect(array_values($result))->toBe([3, 4, 5]);
         });
     });

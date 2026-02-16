@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use Nette\Schema\Schema;
 use BlitzPHP\Autoloader\Locator;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
@@ -20,7 +20,7 @@ use Kahlan\Plugin\Double;
 use function Kahlan\expect;
 
 describe('Loader / FileLocator', function (): void {
-    beforeAll(function () {
+    beforeAll(function (): void {
 		$this->trueLocator = service('locator');
 
 		$this->recursiveDelete = function(string $dir): void {
@@ -31,7 +31,7 @@ describe('Loader / FileLocator', function (): void {
 			rmdir($dir);
 		};
 
-		$this->putFileContent = function(string $path, $content, int $flags = 0) {
+		$this->putFileContent = function(string $path, $content, int $flags = 0): int|false {
 			if (! is_dir($dir = dirname($path))) {
 				mkdir($dir, 0777, true);
 			}
@@ -70,11 +70,11 @@ describe('Loader / FileLocator', function (): void {
         $this->putFileContent($this->tempDir['module'] . '/Translations/en/messages.php', '<?php return ["mod" => "translation"];');
     });
 
-    beforeEach(function () {
+    beforeEach(function (): void {
 		ReflectionHelper::setPrivateProperty(FileLocator::class, 'locateCache', []);
     });
 
-    afterAll(function () {
+    afterAll(function (): void {
         $this->recursiveDelete($this->tempDir['app']);
         $this->recursiveDelete($this->tempDir['system']);
         $this->recursiveDelete($this->tempDir['module']);
@@ -82,14 +82,14 @@ describe('Loader / FileLocator', function (): void {
 		Services::override(Locator::class, $this->trueLocator);
     });
 
-    describe('locateFiles', function () {
-        it('retourne un tableau structuré avec app, system et modules', function () {
+    describe('locateFiles', function (): void {
+        it('retourne un tableau structuré avec app, system et modules', function (): void {
             // Mock du locator
 			$dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn($path, $ext = 'php', $prioritizeApp = true) => match(true) {
+                    'search' => fn($path, $ext = 'php', $prioritizeApp = true): array => match(true) {
                         str_contains($path, 'Helpers') => [
 							$dirs['app'] . '/Helpers/test.php',
                             $dirs['system'] . '/Helpers/test.php',
@@ -112,11 +112,11 @@ describe('Loader / FileLocator', function (): void {
             expect($files['modules'])->toBeA('array');
         });
 
-        it('retourne un tableau vide pour un fichier namespacé non trouvé', function () {
+        it('retourne un tableau vide pour un fichier namespacé non trouvé', function (): void {
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'locateFile' => function() { return false; }
+                    'locateFile' => fn() => false
                 ]
             ]);
 
@@ -126,12 +126,12 @@ describe('Loader / FileLocator', function (): void {
             expect($files)->toBe([]);
         });
 
-        it('retourne un tableau pour un fichier namespacé trouvé', function () {
+        it('retourne un tableau pour un fichier namespacé trouvé', function (): void {
 			$dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'locateFile' => fn($file, $folder) => $dirs['app'] . '/Helpers/app_helper.php',
+                    'locateFile' => fn($file, $folder): string => $dirs['app'] . '/Helpers/app_helper.php',
                 ]
             ]);
 
@@ -142,12 +142,12 @@ describe('Loader / FileLocator', function (): void {
             expect($files[0])->toContain('app_helper.php');
         });
 
-        it('filtre les fichiers non lisibles', function () {
+        it('filtre les fichiers non lisibles', function (): void {
 			$dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [
+                    'search' => fn(): array => [
 						$dirs['app'] . '/Helpers/existing.php',
 						$dirs['app'] . '/Helpers/nonexistent.php',
 					],
@@ -164,13 +164,13 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-    describe('helper', function () {
-        it('charge un helper existant', function () {
+    describe('helper', function (): void {
+        it('charge un helper existant', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn($path) => [$dirs['app'] . '/Helpers/app_helper.php'],
+                    'search' => fn($path): array => [$dirs['app'] . '/Helpers/app_helper.php'],
                 ]
             ]);
 
@@ -179,11 +179,11 @@ describe('Loader / FileLocator', function (): void {
             expect(fn() => FileLocator::helper('app_helper'))->not->toThrow();
         });
 
-        it('lance une exception pour un helper non trouvé', function () {
+        it('lance une exception pour un helper non trouvé', function (): void {
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [],
+                    'search' => fn(): array => [],
                 ]
             ]);
 
@@ -192,12 +192,12 @@ describe('Loader / FileLocator', function (): void {
             expect(fn() => FileLocator::helper('nonexistent'))->toThrow(new LoadException);
         });
 
-        it('charge plusieurs helpers', function () {
+        it('charge plusieurs helpers', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn($path) => match(true) {
+                    'search' => fn($path): array => match(true) {
                         str_contains($path, 'helper1') => [$dirs['app'] . '/Helpers/helper1.php'],
                         default => [$dirs['app'] . '/Helpers/helper2.php'],
                     },
@@ -212,12 +212,12 @@ describe('Loader / FileLocator', function (): void {
             expect(fn() => FileLocator::helper(['helper1', 'helper2']))->not->toThrow();
         });
 
-        it('ne recharge pas un helper déjà chargé', function () {
+        it('ne recharge pas un helper déjà chargé', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Helpers/cached_helper.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Helpers/cached_helper.php'],
                 ]
             ]);
 
@@ -240,27 +240,27 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-    describe('schema', function () {
-        it('retourne un schema par défaut si aucun fichier trouvé', function () {
+    describe('schema', function (): void {
+        it('retourne un schema par défaut si aucun fichier trouvé', function (): void {
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => function() { return []; }
+                    'search' => fn() => []
                 ]
             ]);
 
             Services::override(Locator::class, $locator);
 
             $schema = FileLocator::schema('nonexistent');
-            expect($schema)->toBeAnInstanceOf(Nette\Schema\Schema::class);
+            expect($schema)->toBeAnInstanceOf(Schema::class);
         });
 
-        it('priorise le schema système', function () {
+        it('priorise le schema système', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-					'search' => fn() => [
+					'search' => fn(): array => [
 						$dirs['app'] . '/schemas/database.php',
 						$dirs['system'] . '/Constants/schemas/database.php',
 					]
@@ -270,15 +270,15 @@ describe('Loader / FileLocator', function (): void {
             Services::override(Locator::class, $locator);
 
             $schema = FileLocator::schema('database');
-            expect($schema)->toBeAnInstanceOf(Nette\Schema\Schema::class);
+            expect($schema)->toBeAnInstanceOf(Schema::class);
         });
 
-        it('utilise le cache', function () {
+        it('utilise le cache', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['system'] . '/Constants/schemas/database.php'],
+                    'search' => fn(): array => [$dirs['system'] . '/Constants/schemas/database.php'],
                 ]
             ]);
 
@@ -291,12 +291,12 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-    describe('config', function () {
-        it('retourne un tableau vide si aucune config trouvée', function () {
+    describe('config', function (): void {
+        it('retourne un tableau vide si aucune config trouvée', function (): void {
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => []
+                    'search' => fn(): array => []
                 ]
             ]);
 
@@ -306,12 +306,12 @@ describe('Loader / FileLocator', function (): void {
             expect($config)->toBe([]);
         });
 
-        it('fusionne les configurations dans le bon ordre', function () {
+        it('fusionne les configurations dans le bon ordre', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() =>[
+                    'search' => fn(): array =>[
 						$dirs['system'] . '/Config/database.php',
 						$dirs['module'] . '/Config/database.php',
 						$dirs['app'] . '/Config/database.php'
@@ -329,12 +329,12 @@ describe('Loader / FileLocator', function (): void {
             expect($config)->toContainKey('app');
         });
 
-        it('utilise le cache', function () {
+        it('utilise le cache', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Config/database.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Config/database.php'],
                 ]
             ]);
 
@@ -346,14 +346,14 @@ describe('Loader / FileLocator', function (): void {
             expect($config1)->toBe($config2); // Même instance
         });
 
-        it('ignore les fichiers non-tableaux', function () {
+        it('ignore les fichiers non-tableaux', function (): void {
             $this->putFileContent($this->tempDir['app'] . '/Config/invalid.php', '<?php return "not an array";');
 
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Config/invalid.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Config/invalid.php'],
                 ]
             ]);
 
@@ -364,13 +364,13 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-    describe('view', function () {
-        it('retourne le chemin d\'une vue trouvée', function () {
+    describe('view', function (): void {
+        it('retourne le chemin d\'une vue trouvée', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Views/home.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Views/home.php'],
                 ]
             ]);
 
@@ -380,12 +380,12 @@ describe('Loader / FileLocator', function (): void {
             expect($path)->toBe(str_replace(['/', '\\'], DS, $this->tempDir['app'] . '/Views/home.php'));
         });
 
-        it('lance une exception pour une vue non trouvée', function () {
+        it('lance une exception pour une vue non trouvée', function (): void {
 			$dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [
+                    'search' => fn(): array => [
 						$dirs['system'] . '/Views/existent.php',
 					],
                 ]
@@ -393,16 +393,16 @@ describe('Loader / FileLocator', function (): void {
 
             Services::override(Locator::class, $locator);
 
-            expect(fn() => FileLocator::view('nonexistent'))
+            expect(fn(): string|false => FileLocator::view('nonexistent'))
 				->toThrow();
         });
 
-        it('priorise les vues app sur system', function () {
+        it('priorise les vues app sur system', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [
+                    'search' => fn(): array => [
 						$dirs['system'] . '/Views/home.php',
 						$dirs['app'] . '/Views/home.php',
 					],
@@ -415,12 +415,12 @@ describe('Loader / FileLocator', function (): void {
             expect($path)->toBe(str_replace(['/', '\\'], DS, $this->tempDir['app'] . '/Views/home.php'));
         });
 
-        it('utilise le cache', function () {
+        it('utilise le cache', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Views/home.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Views/home.php'],
                 ]
             ]);
 
@@ -433,12 +433,12 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-    describe('translation', function () {
-        it('retourne un tableau vide si aucune traduction trouvée', function () {
+    describe('translation', function (): void {
+        it('retourne un tableau vide si aucune traduction trouvée', function (): void {
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [],
+                    'search' => fn(): array => [],
                 ]
             ]);
 
@@ -448,12 +448,12 @@ describe('Loader / FileLocator', function (): void {
             expect($translations)->toBe([]);
         });
 
-        it('fusionne les traductions dans le bon ordre', function () {
+        it('fusionne les traductions dans le bon ordre', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [
+                    'search' => fn(): array => [
 						$dirs['system'] . '/Translations/en/messages.php',
 						$dirs['module'] . '/Translations/en/messages.php',
 						$dirs['app'] . '/Translations/en/messages.php'
@@ -471,12 +471,12 @@ describe('Loader / FileLocator', function (): void {
             expect($translations)->toContainKey('app');
         });
 
-        it('utilise la locale par défaut si non spécifiée', function () {
+        it('utilise la locale par défaut si non spécifiée', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Translations/en/messages.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Translations/en/messages.php'],
                 ]
             ]);
 
@@ -487,14 +487,14 @@ describe('Loader / FileLocator', function (): void {
             expect($translations)->toBeAn('array');
         });
 
-        it('ignore les fichiers non-tableaux', function () {
+        it('ignore les fichiers non-tableaux', function (): void {
             $this->putFileContent($this->tempDir['app'] . '/Translations/en/invalid.php', '<?php return "not an array";');
 
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Translations/en/invalid.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Translations/en/invalid.php'],
                 ]
             ]);
 
@@ -504,12 +504,12 @@ describe('Loader / FileLocator', function (): void {
             expect($translations)->toBe([]);
         });
 
-        it('utilise le cache', function () {
+        it('utilise le cache', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Translations/en/messages.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Translations/en/messages.php'],
                 ]
             ]);
 
@@ -522,34 +522,34 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-    describe('getBasename', function () {
-        it('extrait le basename d\'une classe namespacée', function () {
+    describe('getBasename', function (): void {
+        it('extrait le basename d\'une classe namespacée', function (): void {
             $basename = FileLocator::getBasename('Namespace\Subnamespace\ClassName');
             expect($basename)->toBe('ClassName');
         });
 
-        it('retourne le nom tel quel si pas de namespace', function () {
+        it('retourne le nom tel quel si pas de namespace', function (): void {
             $basename = FileLocator::getBasename('ClassName');
             expect($basename)->toBe('ClassName');
         });
 
-        it('retourne une chaîne vide pour une chaîne vide', function () {
+        it('retourne une chaîne vide pour une chaîne vide', function (): void {
             $basename = FileLocator::getBasename('');
             expect($basename)->toBe('');
         });
 
-        it('gère les backslashes multiples', function () {
+        it('gère les backslashes multiples', function (): void {
             $basename = FileLocator::getBasename('\\Namespace\\ClassName');
             expect($basename)->toBe('ClassName');
         });
     });
 
-    describe('locateHelper', function () {
-        it('retourne un tableau vide si aucun helper trouvé', function () {
+    describe('locateHelper', function (): void {
+        it('retourne un tableau vide si aucun helper trouvé', function (): void {
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [],
+                    'search' => fn(): array => [],
                 ]
             ]);
 
@@ -559,12 +559,12 @@ describe('Loader / FileLocator', function (): void {
             expect($result)->toBe([]);
         });
 
-        it('retourne les chemins des helpers trouvés', function () {
+        it('retourne les chemins des helpers trouvés', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [
+                    'search' => fn(): array => [
 						$dirs['app'] . '/Helpers/test.php',
 						$dirs['system'] . '/Helpers/test.php'
 					],
@@ -581,12 +581,12 @@ describe('Loader / FileLocator', function (): void {
             expect($result)->toHaveLength(2);
         });
 
-        it('utilise le cache', function () {
+        it('utilise le cache', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Helpers/cached.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Helpers/cached.php'],
                 ]
             ]);
 
@@ -603,13 +603,13 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-    describe('cache', function () {
-        it('vide le cache après chaque test', function () {
+    describe('cache', function (): void {
+        it('vide le cache après chaque test', function (): void {
             $dirs = $this->tempDir;
             $locator = Double::instance([
                 'implements' => [LocatorInterface::class],
                 'fakeMethods' => [
-                    'search' => fn() => [$dirs['app'] . '/Helpers/test.php'],
+                    'search' => fn(): array => [$dirs['app'] . '/Helpers/test.php'],
                 ]
             ]);
 
@@ -629,13 +629,13 @@ describe('Loader / FileLocator', function (): void {
         });
     });
 
-	describe('Cas limites et edge cases', function () {
-		it('gère les chemins avec différents séparateurs', function () {
+	describe('Cas limites et edge cases', function (): void {
+		it('gère les chemins avec différents séparateurs', function (): void {
 			$dirs = $this->tempDir;
 			$locator = Double::instance([
 				'implements' => [LocatorInterface::class],
 				'fakeMethods' => [
-					'search' => fn() => [
+					'search' => fn(): array => [
 						str_replace(DS, '/', $dirs['app']) . '/Config/database.php',  // Avec /
 						str_replace(DS, '\\', $dirs['system']) . '\\Config\\database.php', // Avec \
 					],
@@ -650,14 +650,14 @@ describe('Loader / FileLocator', function (): void {
 			expect($files['system'][0])->toContain(DS . 'Config' . DS . 'database.php');
 		});
 
-		it('gère les fichiers avec extension différente', function () {
+		it('gère les fichiers avec extension différente', function (): void {
 			$dirs = $this->tempDir;
 			$this->putFileContent($this->tempDir['app'] . '/Helpers/test.inc.php', '<?php');
 
 			$locator = Double::instance([
 				'implements' => [LocatorInterface::class],
 				'fakeMethods' => [
-					'search' => fn() => [$dirs['app'] . '/Helpers/test.inc.php'],
+					'search' => fn(): array => [$dirs['app'] . '/Helpers/test.inc.php'],
 				]
 			]);
 
@@ -667,12 +667,12 @@ describe('Loader / FileLocator', function (): void {
 			expect($files['app'])->toHaveLength(1);
 		});
 
-		it('limite à un seul fichier par catégorie (app/system)', function () {
+		it('limite à un seul fichier par catégorie (app/system)', function (): void {
 			$dirs = $this->tempDir;
 			$locator = Double::instance([
 				'implements' => [LocatorInterface::class],
 				'fakeMethods' => [
-					'search' => fn() => [
+					'search' => fn(): array => [
 						$dirs['app'] . '/Helpers/test1.php',
 						$dirs['app'] . '/Helpers/test2.php',
 						$dirs['system'] . '/Helpers/test1.php',
@@ -696,15 +696,15 @@ describe('Loader / FileLocator', function (): void {
 		});
 	});
 
-	describe('Performance et concurrence', function () {
-		it('utilise le cache pour les appels répétés', function () {
+	describe('Performance et concurrence', function (): void {
+		it('utilise le cache pour les appels répétés', function (): void {
 			$dirs = $this->tempDir;
 			$callCount = 0;
 
 			$locator = Double::instance([
 				'implements' => [LocatorInterface::class],
 				'fakeMethods' => [
-					'search' => function() use (&$callCount, $dirs) {
+					'search' => function() use (&$callCount, $dirs): array {
 						$callCount++;
 						return [$dirs['app'] . '/Helpers/performance.php'];
 					}
@@ -724,12 +724,12 @@ describe('Loader / FileLocator', function (): void {
 			expect($callCount)->toBe($firstCall); // Pas d'appel supplémentaire
 		});
 
-		it('gère correctement le cache avec des noms similaires', function () {
+		it('gère correctement le cache avec des noms similaires', function (): void {
 			$dirs = $this->tempDir;
 			$locator = Double::instance([
 				'implements' => [LocatorInterface::class],
 				'fakeMethods' => [
-					'search' => fn($path) => match(true) {
+					'search' => fn($path): array => match(true) {
 						str_contains($path, 'test1') => [$dirs['app'] . '/Helpers/test1.php'],
 						default => [$dirs['app'] . '/Helpers/test2.php'],
 					},
@@ -749,8 +749,8 @@ describe('Loader / FileLocator', function (): void {
 		});
 	});
 
-	describe('Fusion de configurations', function () {
-		it('gère correctement les conflits de clés', function () {
+	describe('Fusion de configurations', function (): void {
+		it('gère correctement les conflits de clés', function (): void {
 			$dirs = $this->tempDir;
 
 			// Créer des fichiers avec des clés en conflit
@@ -760,7 +760,7 @@ describe('Loader / FileLocator', function (): void {
 			$locator = Double::instance([
 				'implements' => [LocatorInterface::class],
 				'fakeMethods' => [
-					'search' => fn() => [
+					'search' => fn(): array => [
 						$dirs['system'] . '/Config/merge.php',
 						$dirs['app'] . '/Config/merge.php',
 					],

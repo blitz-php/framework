@@ -79,7 +79,7 @@ describe('Security / Encryption / Sodium', function (): void {
         expect($encrypter->decrypt($ciphertext, $key))->not->toBe('Un message en-clair pour vous.');
     });
 
-	it('La clé interne n\'est pas modifiée par le paramètre', function() {
+	it('La clé interne n\'est pas modifiée par le paramètre', function(): void {
 		$originalKey = sodium_crypto_secretbox_keygen();
 
         $this->config->key = $originalKey;
@@ -100,7 +100,7 @@ describe('Security / Encryption / Sodium', function (): void {
         expect($encrypter->decrypt($encoded, ['key' => $differentKey]))->toBe($message);
 	});
 
-	it('Le gestionnaire peut être reutilisé après le chiffrement', function() {
+	it('Le gestionnaire peut être reutilisé après le chiffrement', function(): void {
 		$encrypter = $this->encryption->initialize($this->config);
         $message   = 'Some message to encrypt';
 

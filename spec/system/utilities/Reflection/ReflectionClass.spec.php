@@ -89,8 +89,6 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         'singleton' => new class {
             private static ?self $instance = null;
 
-            public function __construct() {}
-
             public static function getInstance(): self {
                 if (self::$instance === null) {
                     self::$instance = new self();
@@ -132,31 +130,30 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         });
 
         it('Doit créer une instance à partir d\'un nom de classe', function () use($testClasses): void {
-            $className = get_class($testClasses['simple']);
+            $className = $testClasses['simple']::class;
             $reflection = ReflectionClass::make($className);
             expect($reflection->getName())->toBe($className);
         });
     });
 
-    describe('Instanciation de classes', function () use ($testClasses): void {
+    describe('Instanciation de classes', function (): void {
         it('Doit instancier une classe avec un constructeur public', function (): void {
             $class = new class {
                 public function __construct(public string $name = 'default') {}
             };
 
-            $reflection = ReflectionClass::make(get_class($class));
+            $reflection = ReflectionClass::make($class::class);
             $instance = $reflection->newInstance('John');
 
-            expect($instance)->toBeAnInstanceOf(get_class($class));
+            expect($instance)->toBeAnInstanceOf($class::class);
             expect($instance->name)->toBe('John');
         });
-
         it('Doit instancier une classe sans constructeur', function (): void {
             $class = new class {
                 public string $name = 'default';
             };
 
-            $reflection = ReflectionClass::make(get_class($class));
+            $reflection = ReflectionClass::make($class::class);
             $instance = $reflection->newInstance();
 
             expect($instance->name)->toBe('default');
@@ -274,7 +271,7 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         });
 
         it('Doit lire la valeur d\'une propriété statique', function () use ($testClasses): void {
-            $reflection = ReflectionClass::make(get_class($testClasses['simple']));
+            $reflection = ReflectionClass::make($testClasses['simple']::class);
             $value = $reflection->getValue('staticProp');
 
             expect($value)->toBe('static_value');
@@ -295,7 +292,7 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
                 private static string $staticProp = 'old_value';
             };
 
-            $reflection = ReflectionClass::make(get_class($class));
+            $reflection = ReflectionClass::make($class::class);
             $reflection->setValue('staticProp', 'new_static_value');
 
             expect($reflection->getValue('staticProp'))->toBe('new_static_value');
@@ -335,7 +332,7 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         });
     });
 
-    describe('Types et vérifications de propriétés', function () use ($testClasses): void {
+    describe('Types et vérifications de propriétés', function (): void {
         it('Doit vérifier si une propriété a un type déclaré', function (): void {
             $class = new class {
                 public string $typedProp;
@@ -347,11 +344,10 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
             expect($reflection->hasPropertyType('typedProp'))->toBe(true);
             expect($reflection->hasPropertyType('untypedProp'))->toBe(false);
         });
-
         it('Doit récupérer le type d\'une propriété', function (): void {
             $class = new class {
                 public string $stringProp;
-                public ?int $nullableProp;
+                public ?int $nullableProp = null;
             };
 
             $reflection = ReflectionClass::make($class);
@@ -359,12 +355,7 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
             expect($reflection->getPropertyTypeName('stringProp'))->toBe('string');
             expect($reflection->getPropertyTypeName('nullableProp'))->toBe('int');
         });
-
         it('Doit vérifier si une propriété est readonly (PHP 8.1+)', function (): void {
-            if (PHP_VERSION_ID < 80100) {
-                return; // Skip test for PHP < 8.1
-            }
-
             $class = new class {
                 public readonly string $readonlyProp;
                 public string $regularProp;
@@ -375,7 +366,6 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
             expect($reflection->isReadonlyProperty('readonlyProp'))->toBe(true);
             expect($reflection->isReadonlyProperty('regularProp'))->toBe(false);
         });
-
         it('Doit vérifier si une propriété est modifiable', function (): void {
             $class = new class {
                 public string $publicProp;
@@ -391,7 +381,7 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         });
     });
 
-    describe('Annotations et DocBlocks', function () use ($testClasses): void {
+    describe('Annotations et DocBlocks', function (): void {
         it('Doit récupérer les annotations d\'une propriété', function (): void {
             $class = new class {
                 /**
@@ -409,7 +399,6 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
             expect($annotations)->toContainKey('var');
             expect($annotations['var'])->toBe('int');
         });
-
         it('Doit récupérer les annotations d\'une méthode', function (): void {
             $class = new class {
                 /**
@@ -494,28 +483,18 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
 	});
 
     describe('Attributs PHP 8+', function () use ($testClasses): void {
-        it('Doit récupérer les attributs d\'une classe', function () use ($testClasses): void {
-            if (PHP_VERSION_ID < 80000) {
-                return; // Skip test for PHP < 8.0
-            }
-
+        it('Doit récupérer les attributs d\'une classe', function (): void {
             $class = new #[TestAttribute('class')] class {
                 #[TestAttribute('method')]
                 public function testMethod(): void {}
             };
-
             $reflection = ReflectionClass::make($class);
             $attributes = $reflection->getClassAttributes();
-
             expect(count($attributes))->toBe(1);
             expect($attributes[0]->getName())->toBe('TestAttribute');
         });
 
         it('Doit récupérer les attributs d\'une propriété', function () use ($testClasses): void {
-            if (PHP_VERSION_ID < 80000) {
-                return; // Skip test for PHP < 8.0
-            }
-
             $reflection = ReflectionClass::make($testClasses['withAttributes']);
             $attributes = $reflection->getPropertyAttributes('attributedProp');
 
@@ -524,10 +503,6 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         });
 
         it('Doit récupérer les attributs d\'une méthode', function () use ($testClasses): void {
-            if (PHP_VERSION_ID < 80000) {
-                return; // Skip test for PHP < 8.0
-            }
-
             $reflection = ReflectionClass::make($testClasses['withAttributes']);
             $attributes = $reflection->getMethodAttributes('attributedMethod');
 
@@ -607,7 +582,7 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
             $class::$prop2 = 'modified2';
             $class::$prop3 = 'modified3';
 
-            $reflection = ReflectionClass::make(get_class($class));
+            $reflection = ReflectionClass::make($class::class);
             $reflection->resetStaticProperties();
 
             expect($class::$prop1)->toBe('default1');
@@ -635,7 +610,7 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         it('Doit lever une exception pour une méthode inexistante', function () use ($testClasses): void {
             $reflection = ReflectionClass::make($testClasses['simple']);
 
-            expect(function() use ($reflection) {
+            expect(function() use ($reflection): void {
                 $reflection->invoke('nonExistentMethod');
             })->toThrow(new ReflectionException());
         });
@@ -643,13 +618,13 @@ describe('Utilities / Reflection / ReflectionClass', function (): void {
         it('Doit lever une exception pour une propriété inexistante', function () use ($testClasses): void {
             $reflection = ReflectionClass::make($testClasses['simple']);
 
-            expect(function() use ($reflection) {
+            expect(function() use ($reflection): void {
                 $reflection->getValue('nonExistentProp');
             })->toThrow(new ReflectionException());
         });
 
         it('Doit gérer les classes inexistantes', function (): void {
-            expect(function() {
+            expect(function(): void {
                 ReflectionClass::make('NonExistentClass');
             })->toThrow(new ReflectionException(code: -1));
         });

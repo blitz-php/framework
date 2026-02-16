@@ -61,7 +61,7 @@ describe('Commandes / ClearLog', function (): void {
 		expect(file_exists(STORAGE_PATH . 'logs' . DS . "log-{$this->date}.log"))->toBeFalsy();
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual) => str_contains($actual, 'Logs netoyés.')
+			static fn ($actual): bool => str_contains($actual, 'Logs netoyés.')
 		);
 	});
 });

@@ -21,8 +21,8 @@ use function Kahlan\expect;
 describe('Middleware / Cors', function (): void {
     describe('CorsBuilder', function(): void {
 		beforeAll(function (): void {
-			$this->request  = fn() => new Request();
-			$this->response = fn() => new Response();
+			$this->request  = fn(): Request => new Request();
+			$this->response = fn(): Response => new Response();
 			$this->config   = [
 				'allowedOrigins'         => ['*'],
 				'allowedOriginsPatterns' => [],

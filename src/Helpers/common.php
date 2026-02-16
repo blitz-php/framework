@@ -484,7 +484,7 @@ if (! function_exists('environment')) {
             $current = config('app.environment');
         }
 
-        if ($env === '' || $env === '0' || $env === [] || $env === null) {
+        if (in_array($env, ['', '0', [], null], true)) {
             return $current;
         }
 

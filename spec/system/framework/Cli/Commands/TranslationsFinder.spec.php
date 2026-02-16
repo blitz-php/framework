@@ -29,14 +29,13 @@ describe('Commandes / TranslationsFinder', function (): void {
         COH::tearDownAfterClass();
     });
 
-	beforeAll(function () {
+	beforeAll(function (): void {
 		COH::setUpBeforeClass();
 
 		$this->locale           = Locale::getDefault();
         $this->languageTestPath = ROOTPATH . 'Translations' . DS;
 
-		$this->getActualTranslationOneKeys = function(): array  {
-			return [
+		$this->getActualTranslationOneKeys = (fn(): array => [
 				'title'                  => 'TranslationOne.title',
 				'DESCRIPTION'            => 'TranslationOne.DESCRIPTION',
 				'subTitle'               => 'TranslationOne.subTitle',
@@ -44,11 +43,9 @@ describe('Commandes / TranslationsFinder', function (): void {
 				'metaTags'               => 'TranslationOne.metaTags',
 				'Copyright'              => 'TranslationOne.Copyright',
 				'last_operation_success' => 'TranslationOne.last_operation_success',
-			];
-		};
+			]);
 
-		$this->getActualTranslationThreeKeys = function(): array {
-			return [
+		$this->getActualTranslationThreeKeys = (fn(): array => [
 				'alerts' => [
 					'created'       => 'TranslationThree.alerts.created',
 					'failed_insert' => 'TranslationThree.alerts.failed_insert',
@@ -76,17 +73,14 @@ describe('Commandes / TranslationsFinder', function (): void {
 						'missing_short_tag' => 'TranslationThree.formErrors.edit.missing_short_tag',
 					],
 				],
-			];
-		};
+			]);
 
-    	$this->getActualTranslationFourKeys = function(): array {
-			return [
+    	$this->getActualTranslationFourKeys = (fn(): array => [
 				'dashed' => [
 					'key-with-dash'     => 'Translation-Four.dashed.key-with-dash',
 					'key-with-dash-two' => 'Translation-Four.dashed.key-with-dash-two',
 				],
-			];
-		};
+			]);
 
 		$this->assertTranslationsExistAndHaveTranslatedKeys = function(): void {
 			expect(file_exists($this->languageTestPath . $this->locale . '/TranslationOne.php'))->toBeTruthy();
@@ -124,8 +118,7 @@ describe('Commandes / TranslationsFinder', function (): void {
 			}
 		};
 
-		$this->getActualTableWithNewKeys = function(): string {
-			return <<<'TEXT_WRAP'
+		$this->getActualTableWithNewKeys = (fn(): string => <<<'TEXT_WRAP'
 				+------------------+----------------------------------------------------+
 				| File             | Key                                                |
 				+------------------+----------------------------------------------------+
@@ -154,11 +147,9 @@ describe('Commandes / TranslationsFinder', function (): void {
 				| TranslationThree | TranslationThree.formFields.new.name               |
 				| TranslationThree | TranslationThree.formFields.new.short_tag          |
 				+------------------+----------------------------------------------------+
-				TEXT_WRAP;
-		};
+				TEXT_WRAP);
 
-		$this->getActualTableWithBadKeys = function(): string {
-			return <<<'TEXT_WRAP'
+		$this->getActualTableWithBadKeys = (fn(): string => <<<'TEXT_WRAP'
 				+------------------------+-----------------------------------------+
 				| Bad Key                | Filepath                                |
 				+------------------------+-----------------------------------------+
@@ -173,8 +164,7 @@ describe('Commandes / TranslationsFinder', function (): void {
 				| TranslationTwo...      | Services\Translation\TranslationTwo.php |
 				| TranslationTwo...      | Services\Translation\TranslationTwo.php |
 				+------------------------+-----------------------------------------+
-				TEXT_WRAP;
-		};
+				TEXT_WRAP);
 	});
 
 
@@ -235,7 +225,7 @@ describe('Commandes / TranslationsFinder', function (): void {
 		$lines  = array_splice($lines, 2);
 
 		foreach ($lines as $line) {
-			expect($buffer)->toMatch(fn($actual) => str_contains($actual, $line));
+			expect($buffer)->toMatch(fn($actual): bool => str_contains($actual, $line));
 		}
 	});
 
@@ -248,10 +238,10 @@ describe('Commandes / TranslationsFinder', function (): void {
 		$lines  = explode("\n", $this->getActualTableWithBadKeys());
 		$lines  = array_splice($lines, 2);
 		// hack pour les systemes linux (github actions)
-		$lines = array_map(fn($line) => str_replace(['Services\\', 'Translation\\'], ['Services' . DS, 'Translation' . DS], $line), $lines);
+		$lines = array_map(fn($line): string => str_replace(['Services\\', 'Translation\\'], ['Services' . DS, 'Translation' . DS], $line), $lines);
 
 		foreach ($lines as $line) {
-			expect($buffer)->toMatch(fn($actual) => str_contains($actual, $line));
+			expect($buffer)->toMatch(fn($actual): bool => str_contains($actual, $line));
 		}
 	});
 });

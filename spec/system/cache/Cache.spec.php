@@ -108,9 +108,7 @@ describe('Cache / Cache Factory', function (): void {
         });
 
         it('Utilise le callback comme valeur par défaut si fourni', function (): void {
-            $value = $this->cache->read('nonexistent_key', function () {
-                return 'computed_default';
-            });
+            $value = $this->cache->read('nonexistent_key', fn() => 'computed_default');
             expect($value)->toBe('computed_default');
         });
 
@@ -206,9 +204,7 @@ describe('Cache / Cache Factory', function (): void {
         it('Retourne la valeur mise en cache si elle existe', function (): void {
             $this->cache->write('cached_key', 'cached_value');
 
-            $result = $this->cache->remember('cached_key', 3600, function () {
-                return 'new_value';
-            });
+            $result = $this->cache->remember('cached_key', 3600, fn() => 'new_value');
 
             expect($result)->toBe('cached_value');
         });
@@ -216,7 +212,7 @@ describe('Cache / Cache Factory', function (): void {
         it('Exécute le callback et met en cache le résultat si la clé n\'existe pas', function (): void {
             $executionCount = 0;
 
-            $result = $this->cache->remember('new_key', 3600, function () use (&$executionCount) {
+            $result = $this->cache->remember('new_key', 3600, function () use (&$executionCount): string {
                 $executionCount++;
                 return 'computed_value';
             });
@@ -230,9 +226,7 @@ describe('Cache / Cache Factory', function (): void {
         });
 
         it('Supporte la syntaxe avec TTL en premier paramètre', function (): void {
-            $result = $this->cache->remember('key_with_ttl', function () {
-                return 'value_with_ttl';
-            });
+            $result = $this->cache->remember('key_with_ttl', fn() => 'value_with_ttl');
 
             expect($result)->toBe('value_with_ttl');
         });
@@ -364,10 +358,10 @@ describe('Cache / Cache Factory', function (): void {
         it('Lève une exception pour des clés invalides', function (): void {
             $cache = new Cache(['handler' => 'array']);
 
-            expect(fn() => $cache->write('', 'value'))
+            expect(fn(): bool => $cache->write('', 'value'))
                 ->toThrow(new InvalidArgumentException());
 
-            expect(fn() => $cache->write('key{with}invalid{chars}', 'value'))
+            expect(fn(): bool => $cache->write('key{with}invalid{chars}', 'value'))
                 ->toThrow(new InvalidArgumentException());
         });
     });

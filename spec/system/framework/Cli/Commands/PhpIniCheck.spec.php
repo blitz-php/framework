@@ -35,22 +35,22 @@ describe('Commandes / PhpIniCheck', function (): void {
 
         $result = COH::buffer();
 
-        expect($result)->toMatch(static fn ($actual) => str_contains($actual, 'Directive'));
-        expect($result)->toMatch(static fn ($actual) => str_contains($actual, 'Globale'));
-        expect($result)->toMatch(static fn ($actual) => str_contains($actual, 'Actuelle'));
-        expect($result)->toMatch(static fn ($actual) => str_contains($actual, 'Recommandation'));
-        expect($result)->toMatch(static fn ($actual) => str_contains($actual, 'Remarque'));
+        expect($result)->toMatch(static fn ($actual): bool => str_contains($actual, 'Directive'));
+        expect($result)->toMatch(static fn ($actual): bool => str_contains($actual, 'Globale'));
+        expect($result)->toMatch(static fn ($actual): bool => str_contains($actual, 'Actuelle'));
+        expect($result)->toMatch(static fn ($actual): bool => str_contains($actual, 'Recommandation'));
+        expect($result)->toMatch(static fn ($actual): bool => str_contains($actual, 'Remarque'));
 	});
 
     it('phpini:check opcache', function (): void {
         command('phpini:check opcache');
 
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'opcache.save_comments'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'opcache.save_comments'));
 	});
 
     it('phpini:check avec un argument non valide', function (): void {
         command('phpini:check unknown');
 
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'Vous devez indiquer un argument correct.'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'Vous devez indiquer un argument correct.'));
 	});
 });

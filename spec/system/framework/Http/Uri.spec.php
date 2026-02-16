@@ -45,13 +45,13 @@ describe('Http / URI', function (): void {
 		it("Teste les segments hors limites", function (): void {
 			$uri = new Uri('http://hostname/path/to/script');
 
-			expect(fn() => $uri->getSegment(5))->toThrow(new HttpException());
+			expect(fn(): string => $uri->getSegment(5))->toThrow(new HttpException());
 		});
 
 		it("Teste les segments hors limites avec une valeur par defaut", function (): void {
 			$uri = new Uri('http://abc.com/a123/b/c');
 
-			expect(fn() => $uri->getSegment(22, 'something'))->toThrow(new HttpException());
+			expect(fn(): string => $uri->getSegment(22, 'something'))->toThrow(new HttpException());
 		});
 
 		it("Teste si Segments est rempli avec les valeurs par defaut", function (): void {
@@ -117,7 +117,7 @@ describe('Http / URI', function (): void {
 		it('Teste les URL malformés', function (): void {
 			$url = 'http://abc:a123';
 
-			expect(fn() => new Uri($url))->toThrow(new HttpException());
+			expect(fn(): Uri => new Uri($url))->toThrow(new HttpException());
 		});
 
 		it('Teste les schema manquant', function (): void {
@@ -235,7 +235,7 @@ describe('Http / URI', function (): void {
 			foreach ($ports as $port) {
 				$errorString = lang('HTTP.invalidPort', [$port]);
 				expect($errorString)->not->toBeEmpty();
-				expect(fn() => $uri->setPort($port))
+				expect(fn(): Uri => $uri->setPort($port))
 					->toThrow(new HttpException($errorString));
 			}
 		});
@@ -244,7 +244,7 @@ describe('Http / URI', function (): void {
 			$url = 'http://username:password@hostname:90909/path?arg=value#anchor';
         	$uri = new Uri();
 
-			expect(fn() => $uri->setURI($url))
+			expect(fn(): Uri => $uri->setURI($url))
 				->toThrow(new HttpException());
 		});
 	});

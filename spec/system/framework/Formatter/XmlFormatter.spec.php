@@ -14,73 +14,73 @@ use BlitzPHP\Exceptions\FormatException;
 
 use function Kahlan\expect;
 
-describe('XmlFormatter', function() {
-    beforeEach(function() {
+describe('XmlFormatter', function(): void {
+    beforeEach(function(): void {
         $this->formatter = new XmlFormatter();
     });
 
-    describe('->format()', function() {
-        it('doit formater un simple tableau en XML', function() {
+    describe('->format()', function(): void {
+        it('doit formater un simple tableau en XML', function(): void {
             $data = ['name' => 'John', 'age' => 30];
             $expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<xml><name>John</name><age>30</age></xml>\n";
             expect($this->formatter->format($data))->toBe($expected);
         });
 
-        it('doit gérer les tableaux imbriqués', function() {
+        it('doit gérer les tableaux imbriqués', function(): void {
             $data = ['person' => ['name' => 'John', 'age' => 30]];
             $expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<xml><person><name>John</name><age>30</age></person></xml>\n";
             expect($this->formatter->format($data))->toBe($expected);
         });
 
-        it('doit convertir les valeurs booleennes en entier', function() {
+        it('doit convertir les valeurs booleennes en entier', function(): void {
             $data = ['active' => true, 'inactive' => false];
             $expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<xml><active>1</active><inactive>0</inactive></xml>\n";
             expect($this->formatter->format($data))->toBe($expected);
         });
 
-        it('doit gérer les clés numériques', function() {
+        it('doit gérer les clés numériques', function(): void {
             $data = ['items' => [1, 2, 3]];
             $expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<xml><items><item>1</item><item>2</item><item>3</item></items></xml>\n";
             expect($this->formatter->format($data))->toBe($expected);
         });
 
-        it('doit gérer les attribues', function() {
+        it('doit gérer les attribues', function(): void {
             $data = ['element' => ['_attributes' => ['id' => '1', 'class' => 'test'], 'value' => 'content']];
             $expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<xml><element id=\"1\" class=\"test\"><value>content</value></element></xml>\n";
             expect($this->formatter->format($data))->toBe($expected);
         });
     });
 
-    describe('->parse()', function() {
-        it('doit analyser le XML et le convertir en un tableau', function() {
+    describe('->parse()', function(): void {
+        it('doit analyser le XML et le convertir en un tableau', function(): void {
             $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><response><name>John</name><age>30</age></response>";
             $expected = ['name' => 'John', 'age' => '30'];
             expect($this->formatter->parse($xml))->toBe($expected);
         });
 
-        it('doit gérer élements imbriqués', function() {
+        it('doit gérer élements imbriqués', function(): void {
             $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><xml><person><name>John</name><age>30</age></person></xml>";
             $expected = ['person' => ['name' => 'John', 'age' => '30']];
             expect($this->formatter->parse($xml))->toBe($expected);
         });
 
-        it('doit retourner un tableau vide pour les XML invalide', function() {
+        it('doit retourner un tableau vide pour les XML invalide', function(): void {
             $xml = "This is not valid XML";
             expect($this->formatter->parse($xml))->toBe([]);
         });
 
-        it('doit gérer les attribues', function() {
+        it('doit gérer les attribues', function(): void {
             $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><xml><element id=\"1\" class=\"test\"><value>content</value></element></xml>";
             $expected = ['element' => ['@attributes' => ['id' => '1', 'class' => 'test'], 'value' => 'content']];
             expect($this->formatter->parse($xml))->toBe($expected);
         });
     });
 
-    describe('__construct()', function() {
-        xit('doit lever une exception FormatException si l\'extension simplexml n\'est pas chargée', function() {
+    describe('__construct()', function(): void {
+        xit('doit lever une exception FormatException si l\'extension simplexml n\'est pas chargée', function(): void {
             allow('extension_loaded')->toBeCalled()->with('simplexml')->andReturn(false);
 
-            $closure = function() {
+            $closure = function(): void {
                 new XmlFormatter();
             };
 

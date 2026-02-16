@@ -40,14 +40,6 @@ class MailException extends RuntimeException
     public const ATTACHMENT_ERROR = 1003;
 
     /**
-     * Constructeur
-     */
-    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
-    }
-
-    /**
      * Crée une exception pour configuration invalide
      */
     public static function invalidConfig(string $message): static

@@ -18,7 +18,6 @@ describe('Utilities / Jwt', function (): void {
         // Nettoyer l'instance singleton avant chaque test
         $reflection = new ReflectionClass(Jwt::class);
         $property = $reflection->getProperty('_instance');
-        $property->setAccessible(true);
         $property->setValue(null, null);
     });
 
@@ -111,7 +110,7 @@ describe('Utilities / Jwt', function (): void {
 				// Forcer une erreur en utilisant un algorithme invalide
 				$config = ['algorithm' => 'INVALID_ALGO'];
 
-				expect(function () use ($config) {
+				expect(function () use ($config): void {
 					Jwt::encode([], $config);
 				})->toThrow(new Exception('JWT Exception :'));
 			});
@@ -128,7 +127,7 @@ describe('Utilities / Jwt', function (): void {
 			});
 
 			it('Doit lever une exception pour un token invalide', function (): void {
-				expect(function () {
+				expect(function (): void {
 					Jwt::decode('invalid.token.here');
 				})->toThrow(new Exception('JWT Exception :'));
 			});
@@ -167,7 +166,7 @@ describe('Utilities / Jwt', function (): void {
 			});
 
 			it('Doit lever une exception si aucun token n\'est trouvé', function (): void {
-				expect(function () {
+				expect(function (): void {
 					Jwt::payload();
 				})->toThrow(new Exception('Access token not found.'));
 			});

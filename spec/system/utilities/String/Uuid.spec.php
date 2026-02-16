@@ -76,7 +76,7 @@ describe('Utilities / String / Uuid', function (): void {
         });
 
         it('Doit lever une exception pour une version invalide dans isValidVersion()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Uuid::isValidVersion('123e4567-e89b-12d3-a456-426614174000', 1);
             })->toThrow(new InvalidArgumentException());
         });
@@ -134,7 +134,7 @@ describe('Utilities / String / Uuid', function (): void {
         });
 
         it('Doit lever une exception pour un namespace invalide dans v3()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Uuid::v3('invalid-namespace', 'example.com');
             })->toThrow(new InvalidArgumentException());
         });
@@ -191,7 +191,7 @@ describe('Utilities / String / Uuid', function (): void {
         });
 
         it('Doit lever une exception pour un namespace invalide dans v5()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Uuid::v5('invalid-namespace', 'example.com');
             })->toThrow(new InvalidArgumentException());
         });
@@ -255,7 +255,7 @@ describe('Utilities / String / Uuid', function (): void {
         });
 
         it('Doit lever une exception pour un UUID invalide dans toBinary()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Uuid::toBinary('invalid-uuid');
             })->toThrow(new InvalidArgumentException('UUID invalide'));
         });
@@ -269,11 +269,11 @@ describe('Utilities / String / Uuid', function (): void {
         });
 
         it('Doit lever une exception pour une donnée binaire invalide dans fromBinary()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Uuid::fromBinary('too-short');
             })->toThrow(new InvalidArgumentException('La donnée binaire doit faire exactement 16 octets'));
 
-            expect(function () {
+            expect(function (): void {
                 Uuid::fromBinary(str_repeat('a', 20));
             })->toThrow(new InvalidArgumentException('La donnée binaire doit faire exactement 16 octets'));
         });
@@ -309,7 +309,7 @@ describe('Utilities / String / Uuid', function (): void {
         });
 
         it('Doit lever une exception pour un UUID invalide dans toInteger()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Uuid::toInteger('invalid-uuid');
             })->toThrow(new InvalidArgumentException('UUID invalide'));
         });
@@ -436,11 +436,11 @@ describe('Utilities / String / Uuid', function (): void {
         });
 
         it('Doit lever une exception pour des données invalides dans v8()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Uuid::v8('too-short');
             })->toThrow(new InvalidArgumentException('Les données personnalisées doivent faire exactement 16 octets'));
 
-            expect(function () {
+            expect(function (): void {
                 Uuid::v8(str_repeat('a', 20));
             })->toThrow(new InvalidArgumentException('Les données personnalisées doivent faire exactement 16 octets'));
         });
@@ -451,7 +451,7 @@ describe('Utilities / String / Uuid', function (): void {
             // On s'attend à une exception car ni ext-uuid ni ramsey/uuid ne sont disponibles
             // dans l'environnement de test par défaut
             if (!function_exists('uuid_create') && !class_exists('Ramsey\Uuid\Uuid')) {
-                expect(function () {
+                expect(function (): void {
                     Uuid::v1();
                 })->toThrow(new RuntimeException());
             }
@@ -459,7 +459,7 @@ describe('Utilities / String / Uuid', function (): void {
 
         it('Doit lever une exception pour v2()', function (): void {
             if (!function_exists('uuid_create')) {
-                expect(function () {
+                expect(function (): void {
                     Uuid::v2();
                 })->toThrow(new RuntimeException('UUID v2 non supporté dans cette implémentation'));
             }
@@ -471,7 +471,7 @@ describe('Utilities / String / Uuid', function (): void {
                 expect(Uuid::v2(1))->toBeAnInstanceOf('string');
                 expect(Uuid::v2(2))->toBeAnInstanceOf('string');
 
-                expect(function () {
+                expect(function (): void {
                     Uuid::v2(3);
                 })->toThrow(new InvalidArgumentException('Le domaine DCE doit être 0, 1 ou 2'));
             }

@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Event;
 
+use Stringable;
 use BlitzPHP\Contracts\Event\EventInterface;
 use InvalidArgumentException;
 use LogicException;
@@ -25,7 +26,7 @@ use RuntimeException;
  *
  * @credit      https://www.phpclasses.org/package/9961-PHP-Manage-events-implementing-PSR-14-interface.html - Kiril Savchev <k.savchev@gmail.com>
  */
-class Event implements EventInterface
+class Event implements EventInterface, Stringable
 {
     /**
      * Nom de l'événement.
@@ -312,7 +313,7 @@ class Event implements EventInterface
         return sprintf(
             'Event[name="%s", target=%s, params=%s]',
             $this->name ?? 'null',
-            is_object($this->target) ? get_class($this->target) : gettype($this->target),
+            get_debug_type($this->target),
             json_encode($this->params, JSON_THROW_ON_ERROR)
         );
     }

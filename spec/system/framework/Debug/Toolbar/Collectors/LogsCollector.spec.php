@@ -15,14 +15,14 @@ use BlitzPHP\Debug\Toolbar\Collectors\LogsCollector;
 
 use function Kahlan\expect;
 
-describe('Debug / Toolbar / Collectors / LogsCollector', function() {
-    beforeEach(function() {
+describe('Debug / Toolbar / Collectors / LogsCollector', function(): void {
+    beforeEach(function(): void {
         $this->logger = new Logger(debug: true);
         Services::injectMock('logger', $this->logger);
     });
 
-    describe('display', function() {
-        it('devrait afficher correctement les logs', function() {
+    describe('display', function(): void {
+        it('devrait afficher correctement les logs', function(): void {
             // log_message() crée toujours une nouvelle instance TestLogger pendant le test,
 			// nous devons donc enregistrer directement dans notre instance.
             $this->logger->error('Test error');
@@ -40,13 +40,13 @@ describe('Debug / Toolbar / Collectors / LogsCollector', function() {
         });
     });
 
-    describe('isEmpty', function() {
-        it("doit renvoyer « true » lorsqu'il est vide", function() {
+    describe('isEmpty', function(): void {
+        it("doit renvoyer « true » lorsqu'il est vide", function(): void {
             $collector = new LogsCollector();
             expect($collector->isEmpty())->toBeTruthy();
         });
 
-        it("doit renvoyer « false » lorsqu'il n'est pas vide", function() {
+        it("doit renvoyer « false » lorsqu'il n'est pas vide", function(): void {
             $this->logger->warning('Test warning');
 
             $collector = new LogsCollector();

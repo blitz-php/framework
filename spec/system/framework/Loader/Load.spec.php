@@ -17,21 +17,21 @@ use BlitzPHP\Spec\ReflectionHelper;
 
 use function Kahlan\expect;
 
-describe('Loader / Load', function () {
-    beforeAll(function () {
+describe('Loader / Load', function (): void {
+    beforeAll(function (): void {
         $this->originalLoaded = ReflectionHelper::getPrivateProperty(Load::class, 'loaded');
     });
 
-    beforeEach(function () {
+    beforeEach(function (): void {
         ReflectionHelper::setPrivateProperty(Load::class, 'loaded', []);
     });
 
-    afterAll(function () {
+    afterAll(function (): void {
         ReflectionHelper::setPrivateProperty(Load::class, 'loaded', $this->originalLoaded);
     });
 
-    describe('helper', function () {
-        it('charge un helper simple', function () {
+    describe('helper', function (): void {
+        it('charge un helper simple', function (): void {
             expect(ReflectionHelper::getPrivateProperty(Load::class, 'loaded'))->toBe([]);
 			// expect(function_exists('scl_cleaner'))->toBeFalsy();
 
@@ -41,7 +41,7 @@ describe('Loader / Load', function () {
 			expect(function_exists('scl_cleaner'))->toBeTruthy();
         });
 
-        it('charge plusieurs helpers sous forme de tableau', function () {
+        it('charge plusieurs helpers sous forme de tableau', function (): void {
             expect(ReflectionHelper::getPrivateProperty(Load::class, 'loaded'))->toBe([]);
 			expect(function_exists('now'))->toBeFalsy();
 
@@ -52,7 +52,7 @@ describe('Loader / Load', function () {
 			expect(function_exists('now'))->toBeTruthy();
         });
 
-        it('ignore les espaces superflus', function () {
+        it('ignore les espaces superflus', function (): void {
             expect(ReflectionHelper::getPrivateProperty(Load::class, 'loaded'))->toBe([]);
 			// expect(function_exists('camelize'))->toBeFalsy();
 
@@ -62,7 +62,7 @@ describe('Loader / Load', function () {
 			expect(function_exists('camelize'))->toBeTruthy();
         });
 
-        it('lance une exception pour des elements vide', function () {
+        it('lance une exception pour des elements vide', function (): void {
             expect(fn() => Load::helper(''))
 				->toThrow(new LoadException('Veuillez spécifier le helper à charger.'));
 
@@ -73,27 +73,27 @@ describe('Loader / Load', function () {
 				->toThrow(new LoadException('Veuillez spécifier le helper à charger.'));
         });
 
-        it('ignore les noms de helpers vides dans la liste', function () {
+        it('ignore les noms de helpers vides dans la liste', function (): void {
             expect(fn() => Load::helper(['scl', '', ' ', 'date']))->not->toThrow();
 
 			expect(ReflectionHelper::getPrivateProperty(Load::class, 'loaded')['helper'])->toContainKeys(['scl', 'date']);
         });
 
-        it('propage les exceptions de FileLocator', function () {
+        it('propage les exceptions de FileLocator', function (): void {
             expect(fn() => Load::helper('nonexistent'))
 				->toThrow(LoadException::helperNotFound('nonexistent'));
         });
     });
 
-    describe('config', function () {
-        it('charge et retourne une configuration', function () {
+    describe('config', function (): void {
+        it('charge et retourne une configuration', function (): void {
             $config = Load::config('app');
 
             expect($config)->toContainKeys(['base_url', 'environment']);
             expect(ReflectionHelper::getPrivateProperty(Load::class, 'loaded')['config']['app'])->toBe($config);
         });
 
-        it('utilise le cache pour les configurations déjà chargées', function () {
+        it('utilise le cache pour les configurations déjà chargées', function (): void {
            $config1 = Load::config('app');
 
             expect($config1)->toContainKeys(['base_url', 'environment']);
@@ -111,7 +111,7 @@ describe('Loader / Load', function () {
             expect($config1)->toBe($config2);
         });
 
-        it('charge différentes configurations séparément', function () {
+        it('charge différentes configurations séparément', function (): void {
             $config1 = Load::config('app');
             $config2 = Load::config('cache');
 
@@ -120,22 +120,22 @@ describe('Loader / Load', function () {
             expect($config1)->not->toBe($config2);
         });
 
-        it('retourne un tableau vide si FileLocator retourne un tableau vide', function () {
+        it('retourne un tableau vide si FileLocator retourne un tableau vide', function (): void {
             $config = Load::config('nonexistent');
 
             expect($config)->toBe([]);
         });
     });
 
-    describe('view', function () {
-        it('retourne le chemin d\'une vue', function () {
+    describe('view', function (): void {
+        it('retourne le chemin d\'une vue', function (): void {
             $path = Load::view('simple');
 
 			expect($path)->toBe($expected = view_path('simple.php'));
             expect(ReflectionHelper::getPrivateProperty(Load::class, 'loaded')['view']['simple'])->toBe($expected);
         });
 
-        it('utilise le cache pour les vues déjà chargées', function () {
+        it('utilise le cache pour les vues déjà chargées', function (): void {
             $path1 = Load::view('simple');
 
 			expect($path1)->toBe($expected = view_path('simple.php'));
@@ -153,14 +153,14 @@ describe('Loader / Load', function () {
             expect($path1)->toBe($path2);
         });
 
-        it('lance une exception si la vue n\'est pas trouvée', function () {
+        it('lance une exception si la vue n\'est pas trouvée', function (): void {
             expect(fn() => Load::view('nonexistent'))
 				->toThrow(ViewException::invalidFile('nonexistent'));
         });
     });
 
-    describe('unload', function () {
-        it('décharge un élément spécifique d\'un module', function () {
+    describe('unload', function (): void {
+        it('décharge un élément spécifique d\'un module', function (): void {
             Load::helper('scl');
             Load::config('app');
             Load::view('simple');
@@ -179,7 +179,7 @@ describe('Loader / Load', function () {
             expect($loadedAfter['view'])->toContainKey('simple'); // Toujours présent
         });
 
-        it('décharge un élément objet en utilisant le nom de classe', function () {
+        it('décharge un élément objet en utilisant le nom de classe', function (): void {
             $object = new class {
                 public function test() {}
             };
@@ -187,21 +187,21 @@ describe('Loader / Load', function () {
             // Simuler le chargement
             ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                 'models' => [
-                    get_class($object) => $object
+                    $object::class => $object
                 ]
             ]);
 
             Load::unload('models', $object);
 
             $loaded = ReflectionHelper::getPrivateProperty(Load::class, 'loaded');
-            expect($loaded['models'])->not->toContainKey(get_class($object));
+            expect($loaded['models'])->not->toContainKey($object::class);
         });
 
-        it('ne lance pas d\'exception si le module n\'existe pas', function () {
+        it('ne lance pas d\'exception si le module n\'existe pas', function (): void {
             expect(fn() => Load::unload('nonexistent', 'element'))->not->toThrow();
         });
 
-        it('ne lance pas d\'exception si l\'élément n\'existe pas', function () {
+        it('ne lance pas d\'exception si l\'élément n\'existe pas', function (): void {
             // Créer un module avec un élément
             ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                 'module' => ['element1' => 'value1']
@@ -215,8 +215,8 @@ describe('Loader / Load', function () {
         });
     });
 
-    describe('unloadAll', function () {
-        it('décharge tous les éléments d\'un module spécifique', function () {
+    describe('unloadAll', function (): void {
+        it('décharge tous les éléments d\'un module spécifique', function (): void {
             Load::helper(['scl', 'url', 'assets']);
             Load::config('app');
 
@@ -232,7 +232,7 @@ describe('Loader / Load', function () {
             expect($loadedAfter['config'])->toHaveLength(1); // Toujours présent
         });
 
-        it('décharge tous les modules si aucun module spécifié', function () {
+        it('décharge tous les modules si aucun module spécifié', function (): void {
             Load::helper('scl');
             Load::config('app');
             Load::view('simple');
@@ -249,7 +249,7 @@ describe('Loader / Load', function () {
             expect($loadedAfter)->toBe([]);
         });
 
-        it('gère les modules vides', function () {
+        it('gère les modules vides', function (): void {
             // Créer un module vide
             ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                 'empty_module' => []
@@ -261,7 +261,7 @@ describe('Loader / Load', function () {
             expect($loaded['empty_module'])->toBe([]);
         });
 
-        it('ne crée pas de module si on tente de décharger un module inexistant', function () {
+        it('ne crée pas de module si on tente de décharger un module inexistant', function (): void {
             ReflectionHelper::setPrivateProperty(Load::class, 'loaded', []);
 
             Load::unloadAll('nonexistent');
@@ -271,9 +271,9 @@ describe('Loader / Load', function () {
         });
     });
 
-    describe('méthodes protégées', function () {
-        describe('isLoaded', function () {
-            it('retourne true si un élément est chargé', function () {
+    describe('méthodes protégées', function (): void {
+        describe('isLoaded', function (): void {
+            it('retourne true si un élément est chargé', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                     'module' => ['element' => 'value']
                 ]);
@@ -282,7 +282,7 @@ describe('Loader / Load', function () {
                 expect($isLoaded)->toBe(true);
             });
 
-            it('retourne false si un élément n\'est pas chargé', function () {
+            it('retourne false si un élément n\'est pas chargé', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                     'module' => ['element' => 'value']
                 ]);
@@ -291,12 +291,12 @@ describe('Loader / Load', function () {
                 expect($isLoaded)->toBe(false);
             });
 
-            it('retourne false si le module n\'existe pas', function () {
+            it('retourne false si le module n\'existe pas', function (): void {
                 $isLoaded = ReflectionHelper::getPrivateMethodInvoker(Load::class, 'isLoaded')('nonexistent', 'element');
                 expect($isLoaded)->toBe(false);
             });
 
-            it('retourne false si le module n\'est pas un tableau', function () {
+            it('retourne false si le module n\'est pas un tableau', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                     'module' => 'not_an_array'
                 ]);
@@ -305,13 +305,13 @@ describe('Loader / Load', function () {
                 expect($isLoaded)->toBe(false);
             });
 
-            it('gère les objets en utilisant le nom de classe comme clé', function () {
+            it('gère les objets en utilisant le nom de classe comme clé', function (): void {
                 $object = new class {
                     public function test() {}
                 };
 
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
-                    'models' => [get_class($object) => $object]
+                    'models' => [$object::class => $object]
                 ]);
 
                 $isLoaded = ReflectionHelper::getPrivateMethodInvoker(Load::class, 'isLoaded')('models', $object);
@@ -319,8 +319,8 @@ describe('Loader / Load', function () {
             });
         });
 
-        describe('loaded', function () {
-            it('ajoute un élément au cache', function () {
+        describe('loaded', function (): void {
+            it('ajoute un élément au cache', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', []);
 
                 ReflectionHelper::getPrivateMethodInvoker(Load::class, 'loaded')('module', 'element', 'value');
@@ -329,7 +329,7 @@ describe('Loader / Load', function () {
                 expect($loaded['module']['element'])->toBe('value');
             });
 
-            it('crée le module s\'il n\'existe pas', function () {
+            it('crée le module s\'il n\'existe pas', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', []);
 
                 ReflectionHelper::getPrivateMethodInvoker(Load::class, 'loaded')('new_module', 'element', 'value');
@@ -338,7 +338,7 @@ describe('Loader / Load', function () {
                 expect($loaded)->toContainKey('new_module');
             });
 
-            it('écrase une valeur existante', function () {
+            it('écrase une valeur existante', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                     'module' => ['element' => 'old_value']
                 ]);
@@ -349,7 +349,7 @@ describe('Loader / Load', function () {
                 expect($loaded['module']['element'])->toBe('new_value');
             });
 
-            it('gère les objets en utilisant le nom de classe comme clé', function () {
+            it('gère les objets en utilisant le nom de classe comme clé', function (): void {
                 $object = new FileLocator();
 
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', []);
@@ -357,10 +357,10 @@ describe('Loader / Load', function () {
                 ReflectionHelper::getPrivateMethodInvoker(Load::class, 'loaded')('models', $object, 'test');
 
                 $loaded = ReflectionHelper::getPrivateProperty(Load::class, 'loaded');
-                expect($loaded['models'][get_class($object)])->toBe('test');
+                expect($loaded['models'][$object::class])->toBe('test');
             });
 
-            it('accepte différents types de valeurs', function () {
+            it('accepte différents types de valeurs', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', []);
 
                 ReflectionHelper::getPrivateMethodInvoker(Load::class, 'loaded')('module', 'bool', true);
@@ -374,8 +374,8 @@ describe('Loader / Load', function () {
             });
         });
 
-        describe('getLoaded', function () {
-            it('retourne la valeur d\'un élément chargé', function () {
+        describe('getLoaded', function (): void {
+            it('retourne la valeur d\'un élément chargé', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                     'module' => ['element' => 'value']
                 ]);
@@ -384,7 +384,7 @@ describe('Loader / Load', function () {
                 expect($value)->toBe('value');
             });
 
-            it('retourne null si l\'élément n\'existe pas', function () {
+            it('retourne null si l\'élément n\'existe pas', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                     'module' => ['element' => 'value']
                 ]);
@@ -393,7 +393,7 @@ describe('Loader / Load', function () {
                 expect($value)->toBeNull();
             });
 
-            it('crée le module s\'il n\'existe pas et retourne null', function () {
+            it('crée le module s\'il n\'existe pas et retourne null', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', []);
 
                 $value = ReflectionHelper::getPrivateMethodInvoker(Load::class, 'getLoaded')('new_module', 'element');
@@ -403,20 +403,20 @@ describe('Loader / Load', function () {
                 expect($loaded)->toContainKey('new_module');
             });
 
-            it('gère les objets en utilisant le nom de classe comme clé', function () {
+            it('gère les objets en utilisant le nom de classe comme clé', function (): void {
                 $object = new class {
                     public function test() {}
                 };
 
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
-                    'models' => [get_class($object) => $object]
+                    'models' => [$object::class => $object]
                 ]);
 
                 $value = ReflectionHelper::getPrivateMethodInvoker(Load::class, 'getLoaded')('models', $object);
                 expect($value)->toBe($object);
             });
 
-            it('retourne différents types de valeurs', function () {
+            it('retourne différents types de valeurs', function (): void {
                 ReflectionHelper::setPrivateProperty(Load::class, 'loaded', [
                     'module' => [
                         'bool' => true,

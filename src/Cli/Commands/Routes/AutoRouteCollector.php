@@ -85,7 +85,7 @@ final class AutoRouteCollector
         return $tbody;
     }
 
-    private function addMiddlewares($routes)
+    private function addMiddlewares(array $routes)
     {
         $middlewareCollector = new MiddlewareCollector(true);
 

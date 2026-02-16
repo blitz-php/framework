@@ -69,10 +69,10 @@ describe('Middleware / ThrottleRequests', function (): void {
 
     it("devrait bloquer une requête au-delà des limites", function (): void {
 		$cache = Mockery::mock(CacheInterface::class);
-		$cache->shouldReceive('has')->andReturnUsing(fn ($key) => str_ends_with($key, ':timer'));
+		$cache->shouldReceive('has')->andReturnUsing(fn ($key): bool => str_ends_with($key, ':timer'));
 		$cache->shouldReceive('set')->andReturnTrue();
 		$cache->shouldReceive('increment')->andReturn(62);
-		$cache->shouldReceive('get')->andReturnUsing(fn ($key) => str_ends_with($key, ':timer') ? time() + 60 : 61 /* Au-delà de maxAttempts (60) */);
+		$cache->shouldReceive('get')->andReturnUsing(fn ($key): int => str_ends_with($key, ':timer') ? time() + 60 : 61 /* Au-delà de maxAttempts (60) */);
 
 		$request = $this->getRequest();
 
@@ -88,7 +88,7 @@ describe('Middleware / ThrottleRequests', function (): void {
 
     it("devrait bloquer un utilisateur lorsque blockDuration est défini", function (): void {
         $cache = Mockery::mock(CacheInterface::class);
-		$cache->shouldReceive('has')->andReturnUsing(fn($key) => str_contains($key, 'block') /* L'utilisateur est déjà bloqué */);
+		$cache->shouldReceive('has')->andReturnUsing(fn($key): bool => str_contains($key, 'block') /* L'utilisateur est déjà bloqué */);
 		$cache->shouldReceive('set')->andReturnTrue();
 		$cache->shouldReceive('get')->andReturn(time() + 300);
 

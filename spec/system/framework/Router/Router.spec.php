@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Container\Services;
+
 use BlitzPHP\Enums\Method;
 use BlitzPHP\Exceptions\BadRequestException;
 use BlitzPHP\Exceptions\PageNotFoundException;
@@ -44,7 +44,7 @@ describe('Router', function (): void {
             'shop/(:num)'                                     => 'Shop::show',
             'shop/(:num)/edit'                                => 'Shop::edit',
             'books/(:num)/(:alpha)/(:num)'                    => 'Blog::show/$3/$1',
-            'closure/(:num)/(:alpha)'                         => static fn ($num, $str) => $num . '-' . $str,
+            'closure/(:num)/(:alpha)'                         => static fn ($num, $str): string => $num . '-' . $str,
             '{locale}/pages'                                  => 'App\Pages::list_all',
             'test/(:any)/lang/{locale}'                       => 'App\Pages::list_all',
             'admin/admins'                                    => 'App\Admin\Admins::list_all',

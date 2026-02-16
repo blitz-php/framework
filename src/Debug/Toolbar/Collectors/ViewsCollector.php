@@ -93,7 +93,7 @@ class ViewsCollector extends BaseCollector
     public function getVarData(): array
     {
         return [
-            'Données de la vues' => array_filter($this->viewer->getData(), static fn ($data) => ! ($data instanceof ErrorBag)),
+            'Données de la vues' => array_filter($this->viewer->getData(), static fn ($data): bool => ! ($data instanceof ErrorBag)),
         ];
     }
 

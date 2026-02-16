@@ -34,7 +34,7 @@ describe('Commandes / MiddlewareCheck', function (): void {
         command('middleware:check GET /');
 
 		expect(preg_replace('/\033\[.+?m/u', '', COH::buffer()))->toMatch(
-			static fn ($actual) => str_contains($actual, '| GET     | /     | forcehttps pagecache |')
+			static fn ($actual): bool => str_contains($actual, '| GET     | /     | forcehttps pagecache |')
 		);
 	});
 
@@ -42,7 +42,7 @@ describe('Commandes / MiddlewareCheck', function (): void {
         command('middleware:check PUT product/123');
 
 		expect(str_replace(["\033[0m", "\033[1;31m", "\033[0;30m", "\033[47m"], '', COH::buffer()))->toMatch(
-			static fn ($actual) => str_contains($actual, 'Impossible de trouver une route: "PUT product/123"')
+			static fn ($actual): bool => str_contains($actual, 'Impossible de trouver une route: "PUT product/123"')
 		);
 	});
 });

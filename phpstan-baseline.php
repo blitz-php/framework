@@ -26,12 +26,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Cli/Commands/Config/ConfigPublish.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method BlitzPHP\\\\Cli\\\\Commands\\\\Config\\\\ConfigPublish\\:\\:handle\\(\\) should return mixed but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Cli/Commands/Config/ConfigPublish.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Offset array on array\\<int\\<1, max\\>, \\(int\\|string\\)\\> on left side of \\?\\? does not exist\\.$#',
 	'identifier' => 'nullCoalesce.offset',
 	'count' => 1,
@@ -42,12 +36,6 @@ $ignoreErrors[] = [
 	'identifier' => 'return.missing',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Cli/Commands/Config/Namespaces.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Binary operation "\\." between string and array\\{0\\: string, 1\\?\\: mixed\\} results in an error\\.$#',
-	'identifier' => 'binaryOp.invalid',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Cli/Commands/Config/PhpIniCheck.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method BlitzPHP\\\\Cli\\\\Commands\\\\Encryption\\\\GenerateKey\\:\\:handle\\(\\) should return mixed but return statement is missing\\.$#',
@@ -204,12 +192,6 @@ $ignoreErrors[] = [
 	'identifier' => 'method.templateTypeNotInParameter',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Container/Container.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Negated boolean expression is always false\\.$#',
-	'identifier' => 'booleanNot.alwaysFalse',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Debug/Toolbar.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$result might not be defined\\.$#',

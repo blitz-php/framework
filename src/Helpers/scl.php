@@ -94,11 +94,7 @@ function scl_upLoad($input, $path = '', $size = 2500000, $type = '', $output = '
             $extensions = [explode(',', $extensions)[0]]; // Si il y'a une seule extension
         } else {
             $ext        = explode(',', $extensions);
-            $extensions = []; // Si il y'a plusieurs extensions
-
-            foreach ($ext as $ex) {
-                $extensions[] = $ex;
-            }
+            $extensions = $ext;
         }
     } else {
         $extensions = [
@@ -238,7 +234,7 @@ function scl_minimizeImg($src, $size = [], $relative = false)
         $result = imagegif($destination, $src);
     }
 
-    return ($result === true) ? true : [5, 'Erreur lors du redimensionnement'];
+    return ($result) ? true : [5, 'Erreur lors du redimensionnement'];
 }
 
 /**
@@ -255,7 +251,7 @@ function scl_generateKeys($nbr = 8, $type = 0)
 {
     // Valeurs par défaut
     $nbr = (empty($nbr)) ? 8 : (int) $nbr;
-    $nbr = (! is_int($nbr)) ? 8 : $nbr;
+    $nbr = (is_int($nbr)) ? $nbr : 8;
     $nbr = ($nbr < 3 || $nbr > 64) ? 8 : $nbr;
 
     $chars = match ($type) {
@@ -295,8 +291,7 @@ function scl_date($date, $format = 'D, d M Y', $interval = true, $fuseau = 'Euro
     // Valeurs par défaut
     $format   = (empty($format) || ! is_string($format)) ? 'D, d M Y' : htmlspecialchars(trim($format)); // Le format de sortie, par défaut = D, d M Y
     $fuseau   = (empty($fuseau) || ! is_string($fuseau)) ? 'Europe/Paris' : htmlspecialchars(trim($fuseau)); // fuseau horaire
-    $interval = (! is_bool($interval)) ? true : $interval; // Specifie si on gere les intervales ou pas
-    $interval = $interval !== false; // Specifie si on gere les intervales ou pas
+    $interval = (is_bool($interval)) ? $interval : true; // Specifie si on gere les intervales ou pas
 
     $date = new DateTime($date);  // On contruit la date
 
@@ -642,7 +637,7 @@ function scl_truncate($str, $size, $suspension = false)
 {
     // Valeur par defaut
     $str  = htmlspecialchars($str); // On protege la chaine
-    $size = (! is_numeric($size)) ? strlen($str) : $size; // Taille à couper
+    $size = (is_numeric($size)) ? $size : strlen($str); // Taille à couper
 
     $lenght = strlen($str); // longueur de la chaine
     if ($lenght > $size) {
@@ -675,7 +670,7 @@ function scl_shortenStr($str, $max, $sep = '.', $width = 3)
 {
     // Valeur par defaut
     $str = htmlspecialchars($str); // On protege la chaine
-    $max = (! is_numeric($max)) ? strlen($str) : $max; // Taille à couper
+    $max = (is_numeric($max)) ? $max : strlen($str); // Taille à couper
 
     $length = strlen($str); // Nombre de caractères
 
@@ -753,7 +748,7 @@ function scl_debug($var, $style = false): void
 {
     $vars = (array) $var;
 
-    if (true !== (bool) $style) {
+    if (!(bool) $style) {
         echo "<pre style=\"background:#eee;padding:1em;border:1px inset #adb5bd;border-radius:5px;font-family:monospace;margin-top:0;margin-bottom:1rem;overflow:auto;-ms-overflow-style:scrollbar;\">\n";
 
         foreach ($vars as $var) {
@@ -792,7 +787,7 @@ function scl_debug($var, $style = false): void
         } elseif (is_string($var) || is_numeric($var)) {
             echo "\n\t" . $var;
         } elseif (is_bool($var)) {
-            echo (true === $var) ? "\n\ttrue" : "\n\tfalse";
+            echo ($var) ? "\n\ttrue" : "\n\tfalse";
         } elseif (is_array($var) || is_object($var)) {
             if (empty($var)) {
                 echo "\n\tempty";
@@ -804,7 +799,7 @@ function scl_debug($var, $style = false): void
                         scl_debug($value);
                     } else {
                         if (is_bool($value)) {
-                            echo (true === $value) ? 'true' : 'false';
+                            echo ($value) ? 'true' : 'false';
                         } else {
                             echo $value;
                         }
@@ -878,7 +873,7 @@ function scl_moveSpecialChar($str, $leaveSpecialChar = false, $UpperToLower = tr
     }
     $modifStr = true;
 
-    while ($modifStr === true) {
+    while ($modifStr) {
         $modifStr = false;
         // On modifie tous les << -- >> par un seul << - >>
         if (preg_match('#--#iSu', $str)) {
@@ -891,7 +886,7 @@ function scl_moveSpecialChar($str, $leaveSpecialChar = false, $UpperToLower = tr
             $modifStr = true;
         }
     }
-    if ($UpperToLower === true) {
+    if ($UpperToLower) {
         // Si on veut transformer les majuscules en minuscules
         $str = strtolower($str);
     }
@@ -927,13 +922,13 @@ function scl_moveDuplicateChar($str)
  * @param int [$pas] le pas de segmentation.
  * @param string [$separateur] le separateur des segments.
  *
- * @return string|void
+ * @return string|null
  */
 function scl_splitInt($nbr, $pas = 3, $separateur = ' ')
 {
     // Valeurs par défaut
     if (! is_numeric($nbr)) {
-        return;
+        return null;
     }
     $pas        = (! empty($pas) && is_int($pas)) ? $pas : 3;
     $separateur = (in_array($separateur, ['.', ' ', ',', '-', '/'], true)) ? $separateur : ' ';
@@ -1028,9 +1023,9 @@ function scl_getTags($content, $nb_tags = 10, $relief = false, $mots_a_bannir = 
 
     foreach ($tags as $key => $value) {
         // Si on veut voir en relief c'est-a-dire avec des taille qui dependent du nombre d'apparition des tags
-        if ($relief === true) {
+        if ($relief) {
             $size           = 6;
-            $size           = $size + $size * $value; // Calcul de la taille du tag en fonction de sa fréquence d'apparition
+            $size += $size * $value; // Calcul de la taille du tag en fonction de sa fréquence d'apparition
             $render_array[] = "<span style='font-size:" . $size . "px' class='tag'>" . strtoupper($key) . '</span> ';
         } else {
             $render_array[] = $key . ' ';
@@ -1162,7 +1157,7 @@ function scl_int2letter($int)
 
         if ($cent[$i] === 1) {
             $trio[$i] = 'cent';
-        } elseif ($cent[$i] !== 0 || $cent[$i] !== '') {
+        } elseif ($cent[$i] !== 0 || $cent[$i] !== 0) {
             $trio[$i] = $chif[$cent[$i]] . ' cents';
         }
     }
@@ -1172,21 +1167,21 @@ function scl_int2letter($int)
     $secon_c = $chif2[$dix_c];
     if ($cent_c === 1) {
         $trio_c = 'cent';
-    } elseif ($cent_c !== 0 || $cent_c !== '') {
+    } elseif ($cent_c !== 0 || $cent_c !== 0) {
         $trio_c = $chif[$cent_c] . ' cents';
     }
 
-    if (($cent[3] === 0 || $cent[3] === '') && ($dix[3] === 0 || $dix[3] === '') && ($unite[3] === 1)) {
+    if (($cent[3] === 0 || $cent[3] === 0) && ($dix[3] === 0 || $dix[3] === 0) && ($unite[3] === 1)) {
         $return .= $trio[3] . '  ' . $secon[3] . ' ' . $prim[3] . ' million ';
-    } elseif (($cent[3] !== 0 && $cent[3] !== '') || ($dix[3] !== 0 && $dix[3] !== '') || ($unite[3] !== 0 && $unite[3] !== '')) {
+    } elseif (($cent[3] !== 0 && $cent[3] !== 0) || ($dix[3] !== 0 && $dix[3] !== 0) || ($unite[3] !== 0 && $unite[3] !== 0)) {
         $return .= $trio[3] . ' ' . $secon[3] . ' ' . $prim[3] . ' millions ';
     } else {
         $return .= $trio[3] . ' ' . $secon[3] . ' ' . $prim[3];
     }
 
-    if (($cent[2] === 0 || $cent[2] === '') && ($dix[2] === 0 || $dix[2] === '') && ($unite[2] === 1)) {
+    if (($cent[2] === 0 || $cent[2] === 0) && ($dix[2] === 0 || $dix[2] === 0) && ($unite[2] === 1)) {
         $return .= ' mille ';
-    } elseif (($cent[2] !== 0 && $cent[2] !== '') || ($dix[2] !== 0 && $dix[2] !== '') || ($unite[2] !== 0 && $unite[2] !== '')) {
+    } elseif (($cent[2] !== 0 && $cent[2] !== 0) || ($dix[2] !== 0 && $dix[2] !== 0) || ($unite[2] !== 0 && $unite[2] !== 0)) {
         $return .= $trio[2] . ' ' . $secon[2] . ' ' . $prim[2] . ' milles ';
     } else {
         $return .= $trio[2] . ' ' . $secon[2] . ' ' . $prim[2];
@@ -1194,9 +1189,7 @@ function scl_int2letter($int)
 
     $return .= $trio[1] . ' ' . $secon[1] . ' ' . $prim[1];
 
-    if (! ($cent_c === '0' || $cent_c === '') || ! ($dix_c === '0' || $dix_c === '')) {
-        $return .= $trio_c . ' ' . $secon_c;
-    }
+    $return .= $trio_c . ' ' . $secon_c;
 
     return trim($return);
 }

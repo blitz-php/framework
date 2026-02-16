@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use Psr\Log\LogLevel;
 use Nette\Schema\Expect;
 
 return Expect::structure([
@@ -18,7 +18,7 @@ return Expect::structure([
     'handlers'    => Expect::structure([
         'file' => Expect::structure([
             'active'         => Expect::bool(true)->nullable(),
-            'level'          => Expect::string(on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG),
+            'level'          => Expect::string(on_prod() ? LogLevel::ERROR : LogLevel::DEBUG),
             'extension'      => Expect::string('.log'),
             'permissions'    => Expect::int(0644),
             'path'           => Expect::string(LOG_PATH),

@@ -17,8 +17,8 @@ use Kahlan\Plugin\Double;
 use function Kahlan\expect;
 
 describe('Container / AbstractProvider', function (): void {
-    describe('Méthodes de base', function () {
-        it('constructeur initialise le container', function () {
+    describe('Méthodes de base', function (): void {
+        it('constructeur initialise le container', function (): void {
             $mockContainer = Double::instance(['class' => Container::class]);
             $provider = new class($mockContainer) extends AbstractProvider {};
 
@@ -27,25 +27,25 @@ describe('Container / AbstractProvider', function (): void {
             expect($container)->toBe($mockContainer);
         });
 
-        it('definitions retourne tableau vide par défaut', function () {
+        it('definitions retourne tableau vide par défaut', function (): void {
             $provider = new class(Double::instance(['class' => Container::class])) extends AbstractProvider {};
 
             expect($provider::definitions())->toBe([]);
         });
 
-        it('register ne fait rien par défaut', function () {
+        it('register ne fait rien par défaut', function (): void {
             $provider = new class(Double::instance(['class' => Container::class])) extends AbstractProvider {};
 
             expect(fn() => $provider->register())->not->toThrow();
         });
 
-        it('provides retourne les clés des définitions', function () {
+        it('provides retourne les clés des définitions', function (): void {
             $provider = new class(Double::instance(['class' => Container::class])) extends AbstractProvider {
                 public static function definitions(): array
                 {
                     return [
-                        'service.one' => fn() => 'one',
-                        'service.two' => fn() => 'two',
+                        'service.one' => fn(): string => 'one',
+                        'service.two' => fn(): string => 'two',
                     ];
                 }
             };

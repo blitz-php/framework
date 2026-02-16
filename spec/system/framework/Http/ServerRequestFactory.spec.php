@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use BlitzPHP\Http\Request;
 use BlitzPHP\Filesystem\Files\UploadedFile;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Http\ServerRequestFactory;
@@ -496,7 +496,7 @@ describe('Http / ServerRequestFactory', function (): void {
 		});
 
 		it("Test de passage d'une structure de liste de fichiers invalide.", function (): void {
-			expect(fn() => ServerRequestFactory::fromGlobals([], [], [], [], [
+			expect(fn(): Request => ServerRequestFactory::fromGlobals([], [], [], [], [
 				[
 					'invalid' => [
 						'data',

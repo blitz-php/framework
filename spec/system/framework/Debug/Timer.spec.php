@@ -63,7 +63,7 @@ describe('Debug / Timer', function (): void {
 	it('Leve une execption si on essaie de stopper un timer non demarrer', function (): void {
 		$timer = new Timer();
 
-		expect(fn() => $timer->stop('test1'))->toThrow(new RuntimeException());
+		expect(fn(): Timer => $timer->stop('test1'))->toThrow(new RuntimeException());
 	});
 
 	it('Utilisation du helper', function (): void {
@@ -80,7 +80,7 @@ describe('Debug / Timer', function (): void {
 		expect($timer->getElapsedTime('test1'))->toBeNull();
 	});
 
-	it('"Record" avec une fonction qui ne renvoie rien', function () {
+	it('"Record" avec une fonction qui ne renvoie rien', function (): void {
 		$timer       = new Timer();
         $returnValue = $timer->record('longjohn', static function (): void { usleep(100000); });
 
@@ -88,7 +88,7 @@ describe('Debug / Timer', function (): void {
 	   expect($returnValue)->toBeNull();
 	});
 
-	it('"Record" avec une fonction qui renvoie une valeur', function () {
+	it('"Record" avec une fonction qui renvoie une valeur', function (): void {
 		$timer       = new Timer();
         $returnValue = $timer->record('longjohn', static function (): string {
             usleep(100000);
@@ -100,7 +100,7 @@ describe('Debug / Timer', function (): void {
 		expect($returnValue)->toBe('test');
 	});
 
-	it('"Record" avec une fonction flechee', function () {
+	it('"Record" avec une fonction flechee', function (): void {
 		$timer       = new Timer();
          $returnValue = $timer->record('longjohn', static fn (): int => strlen('blitz-php'));
 
@@ -108,39 +108,39 @@ describe('Debug / Timer', function (): void {
 		expect($returnValue)->toBe(9);
 	});
 
-	it('"Record" avec une fonction qui leve une exception', function () {
+	it('"Record" avec une fonction qui leve une exception', function (): void {
 		$timer       = new Timer();
 
-		expect(fn() => $timer->record('ex', static function (): never {
+		expect(fn(): mixed => $timer->record('ex', static function (): never {
 			throw new RuntimeException();
 		}))->toThrow(new RuntimeException());
 	});
 
-	it('"Record" leve une exception lorsqu\'on l\'appelle sans les parametres adequats', function () {
+	it('"Record" leve une exception lorsqu\'on l\'appelle sans les parametres adequats', function (): void {
 		$timer       = new Timer();
 
-		expect(fn() => $timer->record('error', 'strlen'))
+		expect(fn(): mixed => $timer->record('error', 'strlen'))
 			->toThrow(new ArgumentCountError());
 	});
 
-	it('L\'appel de la fonction "timer" sans arguments renvoie une instance de Timer', function () {
+	it('L\'appel de la fonction "timer" sans arguments renvoie une instance de Timer', function (): void {
 		expect(timer())->toBeAnInstanceOf(Timer::class);
 	});
 
-	it('L\'appel de la fonction "timer" avec un argument renvoie une instance de Timer initialisée avec ce nom', function () {
+	it('L\'appel de la fonction "timer" avec un argument renvoie une instance de Timer initialisée avec ce nom', function (): void {
 		$returnValue = timer('test');
 
         expect($returnValue)->toBeAnInstanceOf(Timer::class);
 		expect($returnValue->has('test'))->toBeTruthy();
 	});
 
-	it('L\'appel de la fonction "timer" sans le nom mais avec le calback renvoie une instance de Timer', function () {
+	it('L\'appel de la fonction "timer" sans le nom mais avec le calback renvoie une instance de Timer', function (): void {
 		$returnValue = timer(null, static fn (): int => strlen('blitz-php'));
 
 		expect($returnValue)->toBeAnInstanceOf(Timer::class);
 	});
 
-	xit('Appel de la fonction "timer" avec un calback qui ne retourne rien', function () {
+	xit('Appel de la fonction "timer" avec un calback qui ne retourne rien', function (): void {
 		// ce test echoue 1 fois sur 2.
 		// on va regarder ca plus tard
 		$returnValue = timer('common', static function (): void { usleep(100000); });
@@ -150,7 +150,7 @@ describe('Debug / Timer', function (): void {
 		expect(timer()->getElapsedTime('common') >= 0.1)->toBeTruthy();
 	});
 
-	it('Appel de la fonction "timer" avec un calback qui retourne une valeur', function () {
+	it('Appel de la fonction "timer" avec un calback qui retourne une valeur', function (): void {
 		$returnValue = timer('common', static fn (): int => strlen('blitz-php'));
 
 		expect($returnValue)->not->toBeAnInstanceOf(Timer::class);
@@ -158,14 +158,14 @@ describe('Debug / Timer', function (): void {
 		expect(timer()->getElapsedTime('common') <= 0.1)->toBeTruthy();
 	});
 
-	xit('teste un temps d\'exécution long', function() {
+	xit('teste un temps d\'exécution long', function(): void {
 		$timer = new Timer();
 		$timer->start('longjohn', strtotime('-110 minutes'));
 
 		expect($timer->getElapsedTime('longjohn'))->toBeCloseTo(110 * 60, 1);
 	});
 
-	xit('teste un temps d\'exécution long via fonction commune', function() {
+	xit('teste un temps d\'exécution long via fonction commune', function(): void {
 		$timer = new Timer();
 		$timer->start('longjohn', strtotime('-11 minutes'));
 

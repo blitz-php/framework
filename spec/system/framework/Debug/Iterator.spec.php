@@ -19,34 +19,29 @@ describe('Debug / Iterator', function (): void {
     });
 
     it('ajoute un test avec succès', function (): void {
-        $result = $this->iterator->add('test1', function () {
-            return 'result';
-        });
+        $result = $this->iterator->add('test1', fn() => 'result');
 
         expect($result)->toBe($this->iterator);
     });
 
     it('convertit le nom en minuscules', function (): void {
-        $this->iterator->add('TEST_NAME', function () {
-            return 'result';
-        });
+        $this->iterator->add('TEST_NAME', fn() => 'result');
 
         // Utiliser la réflexion pour vérifier le nom stocké
         $reflection = new ReflectionClass($this->iterator);
         $property = $reflection->getProperty('tests');
-        $property->setAccessible(true);
         $tests = $property->getValue($this->iterator);
 
         expect($tests)->toContainKey('test_name');
     });
 
     it('exécute les tests et génère des résultats', function (): void {
-        $this->iterator->add('fast_test', function () {
+        $this->iterator->add('fast_test', function (): string {
             sleep(1); // 1 s
             return 'fast';
         });
 
-        $this->iterator->add('slow_test', function () {
+        $this->iterator->add('slow_test', function (): string {
             sleep(2); // 2s
             return 'slow';
         });
@@ -57,7 +52,6 @@ describe('Debug / Iterator', function (): void {
 
         $reflection = new ReflectionClass($this->iterator);
         $property = $reflection->getProperty('results');
-        $property->setAccessible(true);
         $results = $property->getValue($this->iterator);
 
         expect($results)->toContainKey('fast_test');
@@ -72,12 +66,12 @@ describe('Debug / Iterator', function (): void {
     });
 
     it('génère un rapport HTML avec les résultats', function (): void {
-        $this->iterator->add('test1', function () {
+        $this->iterator->add('test1', function (): string {
             usleep(100);
             return 'result1';
         });
 
-        $this->iterator->add('test2', function () {
+        $this->iterator->add('test2', function (): string {
             usleep(200);
             return 'result2';
         });
@@ -101,7 +95,7 @@ describe('Debug / Iterator', function (): void {
     it('gère différentes itérations', function (): void {
         $counter = 0;
 
-        $this->iterator->add('counter_test', function () use (&$counter) {
+        $this->iterator->add('counter_test', function () use (&$counter): int {
             $counter++;
             return $counter;
         });
@@ -113,7 +107,7 @@ describe('Debug / Iterator', function (): void {
     });
 
     it('produit un rapport avec sortie activée', function (): void {
-        $this->iterator->add('output_test', function () {
+        $this->iterator->add('output_test', function (): string {
             usleep(100);
             return 'output';
         });
@@ -126,7 +120,7 @@ describe('Debug / Iterator', function (): void {
     });
 
     it('formate correctement la mémoire dans le rapport', function (): void {
-        $this->iterator->add('format_test', function () {
+        $this->iterator->add('format_test', function (): string {
             // Allouer ~1KB de mémoire
             $string = str_repeat('x', 1024);
             return $string;

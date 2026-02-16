@@ -1,5 +1,12 @@
 <?php
 
+use BlitzPHP\Debug\Toolbar\Collectors\TimersCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\LogsCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\FilesCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\RoutesCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\EventsCollector;
+
 /**
  * ------------------------------------------------- -------------------------
  * Barre d'outils de débogage
@@ -9,7 +16,6 @@
  * et l'état de votre application lors de l'affichage de cette page. Par défaut, ce sera
  * NE PAS être affiché dans les environnements de production
  */
-
 return [
     /**
      * Liste des collecteurs de barre d'outils qui seront appelés lors du débogage de la barre d'outils
@@ -18,12 +24,12 @@ return [
      * @var list<string>
      */
     'collectors' => [
-        BlitzPHP\Debug\Toolbar\Collectors\TimersCollector::class,
-        BlitzPHP\Debug\Toolbar\Collectors\LogsCollector::class,
-        BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector::class,
-        BlitzPHP\Debug\Toolbar\Collectors\FilesCollector::class,
-        BlitzPHP\Debug\Toolbar\Collectors\RoutesCollector::class,
-        BlitzPHP\Debug\Toolbar\Collectors\EventsCollector::class,
+        TimersCollector::class,
+        LogsCollector::class,
+        ViewsCollector::class,
+        FilesCollector::class,
+        RoutesCollector::class,
+        EventsCollector::class,
     ],
 
     /**

@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use BlitzPHP\Filesystem\Files\UploadedFile;
 use BlitzPHP\Http\UploadedFileFactory;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
@@ -62,7 +62,7 @@ describe('Http / UploadedFileFactory', function (): void {
 				// 'size'     => 1234, abscense d'un element
 			];
 
-			expect(fn() => UploadedFileFactory::makeUploadedFile($files))
+			expect(fn(): UploadedFile => UploadedFileFactory::makeUploadedFile($files))
 				->toThrow(new InvalidArgumentException());
 		});
 	});

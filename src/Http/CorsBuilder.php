@@ -55,7 +55,7 @@ class CorsBuilder
         ], $options);
 
         // Normaliser la casse des méthodes
-        $options['allowedMethods'] = array_map('strtoupper', $options['allowedMethods']);
+        $options['allowedMethods'] = array_map(strtoupper(...), $options['allowedMethods']);
 
         // Normaliser ['*'] en true pour les origines, en-têtes et méthodes
         if (in_array('*', $options['allowedOrigins'], true)) {

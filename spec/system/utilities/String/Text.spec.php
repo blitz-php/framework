@@ -385,9 +385,7 @@ describe('Utilities / String / Text', function (): void {
         });
 
         it('Doit utiliser une factory personnalisée pour random()', function (): void {
-            Text::createRandomStringsUsing(function ($length) {
-                return str_repeat('a', $length);
-            });
+            Text::createRandomStringsUsing(fn($length) => str_repeat('a', $length));
 
             expect(Text::random(5))->toBe('aaaaa');
             expect(Text::random(10))->toBe('aaaaaaaaaa');
@@ -490,10 +488,8 @@ describe('Utilities / String / Text', function (): void {
         });
 
         it('Doit convertir en UTF-8 avec toUtf8()', function (): void {
-            if (MB_ENABLED || ICONV_ENABLED) {
-                $result = Text::toUtf8('test', 'ASCII');
-                expect($result)->toBe('test');
-            }
+            $result = Text::toUtf8('test', 'ASCII');
+            expect($result)->toBe('test');
         });
 
         it('Doit translittérer avec transliterate()', function (): void {
@@ -545,13 +541,13 @@ describe('Utilities / String / Text', function (): void {
         });
 
         it('Doit lever une exception pour les méthodes inconnues', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Text::unknownMethod();
             })->toThrow(new InvalidArgumentException('Méthode inconnue ' . Text::class . '::unknownMethod'));
         });
 
         it('Doit lever une exception pour les convertisseurs invalides', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Text::convertTo('test', 'invalid');
             })->toThrow(new InvalidArgumentException());
         });

@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use BlitzPHP\Controllers\ApplicationController;
 use BlitzPHP\Controllers\ResourcePresenter;
 
 use function Kahlan\expect;
@@ -112,7 +112,7 @@ describe('Controllers / ResourcePresenter', function (): void {
     describe('Héritage', function (): void {
         it('Doit étendre ApplicationController', function (): void {
             expect($this->controller)->toBeAnInstanceOf(ResourcePresenter::class);
-            expect($this->controller)->toBeAnInstanceOf('BlitzPHP\Controllers\ApplicationController');
+            expect($this->controller)->toBeAnInstanceOf(ApplicationController::class);
         });
 
         it('Doit avoir les méthodes de ApplicationController', function (): void {

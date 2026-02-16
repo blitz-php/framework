@@ -56,11 +56,11 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 		);
 
 		expect($this->getFileContents($file))->toMatch(
-			static fn ($actual) => str_contains($actual, 'class UserController extends AppController')
+			static fn ($actual): bool => str_contains($actual, 'class UserController extends AppController')
 		);
 	});
 
@@ -73,11 +73,11 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 		);
 
 		expect($this->getFileContents($file))->toMatch(
-			static fn ($actual) => str_contains($actual, 'extends BaseController')
+			static fn ($actual): bool => str_contains($actual, 'extends BaseController')
 		);
 	});
 
@@ -91,11 +91,11 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 		);
 
 		expect($this->getFileContents($file))->toMatch(
-			static fn ($actual) => str_contains($actual, 'class OrderController extends ResourceController')
+			static fn ($actual): bool => str_contains($actual, 'class OrderController extends ResourceController')
 		);
 	});
 
@@ -108,11 +108,11 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 		);
 
 		expect($this->getFileContents($file))->toMatch(
-			static fn ($actual) => str_contains($actual, 'class PayController extends ResourcePresenter')
+			static fn ($actual): bool => str_contains($actual, 'class PayController extends ResourcePresenter')
 		);
 	});
 
@@ -125,7 +125,7 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 		);
 	});
 });

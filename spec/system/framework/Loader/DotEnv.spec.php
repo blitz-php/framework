@@ -15,7 +15,7 @@ use BlitzPHP\Exceptions\LoadException;
 use function Kahlan\expect;
 
 describe('Loader / DotEnv', function (): void {
-    beforeAll(function () {
+    beforeAll(function (): void {
 		$this->recursiveDelete = function(string $dir): void {
 			if (!is_dir($dir)) return;
 			foreach (glob($dir . '/*') as $file) {
@@ -28,7 +28,7 @@ describe('Loader / DotEnv', function (): void {
         mkdir($this->tempDir, 0777, true);
     });
 
-    beforeEach(function () {
+    beforeEach(function (): void {
 		DotEnv::reset(); // Reset singleton
 
         $this->envPath = $this->tempDir . '/.env';
@@ -38,25 +38,25 @@ describe('Loader / DotEnv', function (): void {
         putenv('TEST_VAR');
     });
 
-    afterEach(function () {
+    afterEach(function (): void {
         if (is_file($this->envPath)) unlink($this->envPath);
         if (is_file($this->localPath)) unlink($this->localPath);
     });
 
-    afterAll(function () {
+    afterAll(function (): void {
         if (is_dir($this->tempDir)) {
             $this->recursiveDelete($this->tempDir);
         }
     });
 
-    describe('Singleton et init', function () {
-        it('instance retourne même objet', function () {
+    describe('Singleton et init', function (): void {
+        it('instance retourne même objet', function (): void {
             $env1 = DotEnv::instance($this->tempDir);
             $env2 = DotEnv::instance($this->tempDir);
             expect($env1)->toBe($env2);
         });
 
-        it('init charge et sync', function () {
+        it('init charge et sync', function (): void {
             file_put_contents($this->envPath, "VAR=value\nNUM=42");
             DotEnv::init($this->tempDir);
 
@@ -66,7 +66,7 @@ describe('Loader / DotEnv', function (): void {
             expect(getenv('NUM'))->toBe('42');
         });
 
-        it('init avec overrides merge last wins', function () {
+        it('init avec overrides merge last wins', function (): void {
             file_put_contents($this->envPath, "VAR=base");
             file_put_contents($this->localPath, "VAR=override\nEXTRA=local");
 
@@ -76,20 +76,20 @@ describe('Loader / DotEnv', function (): void {
         });
     });
 
-    describe('load/reload', function () {
-        it('load retourne true et parse', function () {
+    describe('load/reload', function (): void {
+        it('load retourne true et parse', function (): void {
             file_put_contents($this->envPath, "SUCCESS=true");
             $dotenv = DotEnv::instance($this->tempDir);
             expect($dotenv->load())->toBe(true);
             expect(getenv('SUCCESS'))->toBe('true');
         });
 
-        it('load retourne false si manquant', function () {
+        it('load retourne false si manquant', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             expect($dotenv->load())->toBe(false);
         });
 
-        it('reload re-parse', function () {
+        it('reload re-parse', function (): void {
             file_put_contents($this->envPath, "OLD=1");
             $dotenv = DotEnv::instance($this->tempDir);
             $dotenv->load();
@@ -101,29 +101,27 @@ describe('Loader / DotEnv', function (): void {
         });
     });
 
-    describe('parseFile', function () {
-        it('parseFile check readable', function () {
+    describe('parseFile', function (): void {
+        it('parseFile check readable', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('parseFile');
-            $method->setAccessible(true);
 
             file_put_contents($this->envPath, "VAR=ok");
             expect($method->invoke($dotenv, $this->envPath))->toBe(true);
         });
 
-        it('parseFile throw sur read fail', function () {
+        it('parseFile throw sur read fail', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('parseFile');
-            $method->setAccessible(true);
 
             $nonReadable = $this->tempDir . '/nonreadable.env';
             touch($nonReadable);
             chmod($nonReadable, 0000);
 
 			if (! is_readable($nonReadable)) {
-				expect(fn() => $method->invoke($dotenv, $nonReadable))
+				expect(fn(): mixed => $method->invoke($dotenv, $nonReadable))
 					->toThrow(new LoadException(), 'Impossible de lire');
 			}
 
@@ -132,12 +130,11 @@ describe('Loader / DotEnv', function (): void {
         });
     });
 
-    describe('parseLines', function () {
-        it('parseLines basics', function () {
+    describe('parseLines', function (): void {
+        it('parseLines basics', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('parseLines');
-            $method->setAccessible(true);
 
             $lines = explode("\n", "VAR=value\nEMPTY=\n#comment\n   \nSPACE= trimmed ");
             $parsed = $method->invoke($dotenv, $lines);
@@ -148,11 +145,10 @@ describe('Loader / DotEnv', function (): void {
             expect($parsed)->not->toContainKey('comment');
         });
 
-        it('parseLines quotes/escaped', function () {
+        it('parseLines quotes/escaped', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('parseLines');
-            $method->setAccessible(true);
 
             $lines = explode("\n", 'QUOTED="hello \"world\""' . "\nSINGLE='single'\n" . 'ESC=\n\\t');
             $parsed = $method->invoke($dotenv, $lines);
@@ -162,11 +158,10 @@ describe('Loader / DotEnv', function (): void {
             expect($parsed['ESC'])->toBe("\n\t");
         });
 
-        it('parseLines multiline', function () {
+        it('parseLines multiline', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('parseLines');
-            $method->setAccessible(true);
 
             $lines = explode("\n", "MULTI=|\nline1\nline2\nEND\nOTHER=value");
             $parsed = $method->invoke($dotenv, $lines);
@@ -175,35 +170,32 @@ describe('Loader / DotEnv', function (): void {
             expect($parsed['OTHER'])->toBe('value');
         });
 
-        it('parseLines throw malformed', function () {
+        it('parseLines throw malformed', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('parseLines');
-            $method->setAccessible(true);
 
             $lines = explode("\n", 'VARIABLE value');
-            expect(fn() => $method->invoke($dotenv, $lines))
+            expect(fn(): mixed => $method->invoke($dotenv, $lines))
 				->toThrow(new InvalidArgumentException(), 'On ne voit pas le signe =');
         });
     });
 
-    describe('resolveNestedVariables', function () {
-        it('résout simples', function () {
+    describe('resolveNestedVariables', function (): void {
+        it('résout simples', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('resolveNestedVariables');
-            $method->setAccessible(true);
 
             $_ENV['BASE'] = 'http';
             expect($method->invoke($dotenv, '${BASE}/path'))->toBe('http/path');
             expect($method->invoke($dotenv, 'no${MISSING}'))->toBe('no${MISSING}');
         });
 
-        it('résout deep', function () {
+        it('résout deep', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $method = $ref->getMethod('resolveNestedVariables');
-            $method->setAccessible(true);
 
             $_ENV['PROTO'] = 'https';
             $_ENV['HOST'] = 'example.com';
@@ -211,8 +203,8 @@ describe('Loader / DotEnv', function (): void {
         });
     });
 
-    describe('setValue/validate', function () {
-        it('setValue sync et résout', function () {
+    describe('setValue/validate', function (): void {
+        it('setValue sync et résout', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $_ENV['BASE'] = 'test';
             $dotenv->setValue('PATH', '${BASE}/set');
@@ -221,18 +213,18 @@ describe('Loader / DotEnv', function (): void {
             expect($_ENV['PATH'])->toBe('test/set');
         });
 
-        it('setValue throw invalid name', function () {
+        it('setValue throw invalid name', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             expect(fn() => $dotenv->setValue('invalid@', 'val'))->toThrow(new InvalidArgumentException());
         });
 
-        it('validate OK', function () {
+        it('validate OK', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $dotenv->setValue('OK', 'ok');
             $dotenv->validate(['OK']);
         });
 
-        it('validate throw missing/empty', function () {
+        it('validate throw missing/empty', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $dotenv->setValue('EMPTY', '');
             expect(fn() => $dotenv->validate(['OK']))->toThrow(new LoadException());
@@ -240,12 +232,11 @@ describe('Loader / DotEnv', function (): void {
         });
     });
 
-    describe('Cache/export', function () {
-        it('isCached TTL', function () {
+    describe('Cache/export', function (): void {
+        it('isCached TTL', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $ref = new ReflectionClass(DotEnv::class);
             $prop = $ref->getProperty('lastLoad');
-            $prop->setAccessible(true);
             $prop->setValue($dotenv, time() - 600); // Expired
             expect(invade($dotenv)->isCached())->toBeFalsy();
 
@@ -253,7 +244,7 @@ describe('Loader / DotEnv', function (): void {
             expect(invade($dotenv)->isCached())->toBeTruthy();
         });
 
-        it('export array', function () {
+        it('export array', function (): void {
             $dotenv = DotEnv::instance($this->tempDir);
             $dotenv->setValue('EXP', 'export');
             expect($dotenv->export())->toContainKey('EXP');

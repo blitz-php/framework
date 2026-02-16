@@ -103,7 +103,7 @@ describe('Http / Response', function (): void {
 		it('Un type invalide leve une exception', function(): void {
 			$response = new Response();
 
-			expect(fn() => $response->withType('beans'))
+			expect(fn(): Response => $response->withType('beans'))
 				->toThrow(new InvalidArgumentException('`beans` est un content type invalide.'));
 		});
 
@@ -133,7 +133,7 @@ describe('Http / Response', function (): void {
         it('Status code leve une erreur lorsque le code est invalide', function (): void {
             $response = new Response();
 
-            expect(static fn () => $response->withStatus(54322))->toThrow(new HttpException());
+            expect(static fn (): Response => $response->withStatus(54322))->toThrow(new HttpException());
         });
 
         it('Status code modifie la raison', function (): void {
@@ -153,19 +153,19 @@ describe('Http / Response', function (): void {
         it('Erreur lorsque le statut code est inconnue', function (): void {
             $response = new Response();
 
-            expect(static fn () => $response->withStatus(115))->toThrow(new HttpException(lang('HTTP.unknownStatusCode', [115])));
+            expect(static fn (): Response => $response->withStatus(115))->toThrow(new HttpException(lang('HTTP.unknownStatusCode', [115])));
         });
 
         it('Erreur lorsque le statut code est petit', function (): void {
             $response = new Response();
 
-            expect(static fn () => $response->withStatus(95))->toThrow(new HttpException(lang('HTTP.invalidStatusCode', [95])));
+            expect(static fn (): Response => $response->withStatus(95))->toThrow(new HttpException(lang('HTTP.invalidStatusCode', [95])));
         });
 
         it('Erreur lorsque le statut code est grand', function (): void {
             $response = new Response();
 
-            expect(static fn () => $response->withStatus(695))->toThrow(new HttpException(lang('HTTP.invalidStatusCode', [695])));
+            expect(static fn (): Response => $response->withStatus(695))->toThrow(new HttpException(lang('HTTP.invalidStatusCode', [695])));
         });
 
         it('Raison avec le statut different de 200', function (): void {
@@ -299,7 +299,7 @@ describe('Http / Response', function (): void {
             $response = $response->json($body);
 
             expect($response->content())->toBe($expected);
-            expect($response->getHeaderLine('content-type'))->toMatch(static fn ($content) => str_contains($content, 'application/json'));
+            expect($response->getHeaderLine('content-type'))->toMatch(static fn ($content): bool => str_contains($content, 'application/json'));
         });
 
         it('XML avec un tableau', function (): void {
@@ -317,7 +317,7 @@ describe('Http / Response', function (): void {
             $response = $response->xml($body);
 
             expect($response->content())->toBe($expected);
-            expect($response->getHeaderLine('content-type'))->toMatch(static fn ($content) => str_contains($content, 'application/xml'));
+            expect($response->getHeaderLine('content-type'))->toMatch(static fn ($content): bool => str_contains($content, 'application/xml'));
         });
     });
 
@@ -358,7 +358,7 @@ describe('Http / Response', function (): void {
         it('Download avec un fichier innexistant', function (): void {
             $response = new Response();
 
-            expect(static fn () => $response->download('__FILE__'))->toThrow(new LoadException());
+            expect(static fn (): Response => $response->download('__FILE__'))->toThrow(new LoadException());
         });
     });
 
@@ -406,7 +406,7 @@ describe('Http / Response', function (): void {
             $response = $response->withCache($date, '+1 day');
 
             expect($response->getHeaderLine('Last-Modified'))->toBe($result);
-            expect($response->getHeaderLine('Cache-Control'))->toMatch(static fn ($value) => str_contains($value, 'public, max-age='));
+            expect($response->getHeaderLine('Cache-Control'))->toMatch(static fn ($value): bool => str_contains($value, 'public, max-age='));
 
 
 			$response = new Response();
@@ -443,7 +443,7 @@ describe('Http / Response', function (): void {
 
 			$new = $response->withCharset('iso-8859-1');
 			// L'ancienne instance n'a pas été modifiée
-            expect($response->getHeaderLine('Content-Type'))->toMatch(fn($actual) => ! str_contains($actual, 'iso'));
+            expect($response->getHeaderLine('Content-Type'))->toMatch(fn($actual): bool => ! str_contains($actual, 'iso'));
             expect($new->getCharset())->toBe('iso-8859-1');
             expect($new->getHeaderLine('Content-Type'))->toBe('text/html; charset=iso-8859-1');
         });
@@ -649,21 +649,21 @@ describe('Http / Response', function (): void {
 		});
 	});
 
-	describe('ResponseTrait', function () {
-        it('Status et statusText', function () {
+	describe('ResponseTrait', function (): void {
+        it('Status et statusText', function (): void {
             $response = new Response();
             $response = $response->withStatus(404);
             expect($response->status())->toBe(404);
             expect($response->statusText())->toBe('Not Found');
         });
 
-        it('Content', function () {
+        it('Content', function (): void {
             $response = new Response();
             $response = $response->withBody(Utils::streamFor('body content'));
             expect($response->content())->toBe('body content');
         });
 
-        it('Header', function () {
+        it('Header', function (): void {
             $response = new Response();
             $response = $response->header('Content-Type', 'application/json', false); // Ajoute sans remplacer
             expect($response->getHeaderLine('Content-Type'))->toBe('text/html; charset=UTF-8, application/json');
@@ -672,41 +672,41 @@ describe('Http / Response', function (): void {
             expect($response->getHeaderLine('Content-Type'))->toBe('application/json');
         });
 
-        it('Cookie', function () {
+        it('Cookie', function (): void {
             $response = new Response();
             $cookie = new Cookie('name', 'value');
             $response = $response->cookie($cookie);
             expect($response->getCookie('name')['value'])->toBe('value');
         });
 
-        it('With date', function () {
+        it('With date', function (): void {
             $response = new Response();
-            $date = new \DateTime('2023-01-01');
+            $date = new DateTime('2023-01-01');
             $response = $response->withDate($date);
             expect($response->getHeaderLine('Date'))->toBe('Sat, 31 Dec 2022 23:00:00 GMT'); // probleme de timezone
         });
 
-        it('With headers', function () {
+        it('With headers', function (): void {
             $response = new Response();
             $response = $response->withHeaders(['Custom' => 'value']);
             expect($response->getHeaderLine('Custom'))->toBe('value');
         });
 
-        it('JSON response', function () {
+        it('JSON response', function (): void {
             $response = new Response();
             $response = $response->json(['data' => 'value'], 200);
             expect($response->getHeaderLine('Content-Type'))->toContain('application/json');
             expect($response->content())->toContain('{"data":"value"}');
         });
 
-        it('XML response', function () {
+        it('XML response', function (): void {
 			$response = new Response();
             $response = $response->xml(['data' => 'value']);
 			expect($response->getHeaderLine('Content-Type'))->toContain('application/xml; charset=UTF-8');
             expect($response->content())->toContain('<xml><data>value</data>');
         });
 
-        it('No cache', function () {
+        it('No cache', function (): void {
             $response = new Response();
             $response = $response->noCache();
             $cacheControl = $response->getHeaderLine('Cache-Control');
@@ -714,7 +714,7 @@ describe('Http / Response', function (): void {
             expect($cacheControl)->toContain('max-age=0');
         });
 
-        it('Download', function () {
+        it('Download', function (): void {
             $response = new Response();
 			$response->setTypeMap('php', 'text/x-php');
             $response = $response->download(__FILE__, 'download.txt');
@@ -722,60 +722,60 @@ describe('Http / Response', function (): void {
             expect($disposition)->toContain('attachment; filename="download.txt"');
         });
 
-        it('Stream download', function () {
+        it('Stream download', function (): void {
             $response = new Response();
             $stream = Utils::streamFor('stream content');
             $response = $response->streamDownload($stream, 'file.txt');
             expect($response->getHeaderLine('Content-Disposition'))->toContain('attachment; filename="file.txt"');
         });
 
-        it('File response', function () {
+        it('File response', function (): void {
             $response = new Response();
             $response = $response->file(__FILE__);
             expect($response->getHeaderLine('Content-Type'))->toContain('text/x-php');
         });
 
-        it('View response', function () {
+        it('View response', function (): void {
             $response = new Response();
 			$response = $response->view('simple', ['testString' => 'value'], 201);
             expect($response->status())->toBe(201);
             expect($response->content())->toContain('<h1>value</h1>');
         });
 
-        it('Download fichier inexistant', function () {
+        it('Download fichier inexistant', function (): void {
             $response = new Response();
-            expect(fn() => $response->download('/nonexistent/file.txt'))
+            expect(fn(): Response => $response->download('/nonexistent/file.txt'))
                 ->toThrow(new LoadException('Le fichier demandé n\'a pas été trouvé.'));
         });
 
-        it('Header replace vs add', function () {
+        it('Header replace vs add', function (): void {
             $response = new Response();
             $response = $response->header('Test', 'value1');
             $response = $response->header('Test', 'value2', false); // Add
             expect(count($response->getHeader('Test')))->toBe(2);
         });
 
-        it('JSON avec status', function () {
+        it('JSON avec status', function (): void {
             $response = new Response();
             $response = $response->json(['error' => 'msg'], 500);
             expect($response->status())->toBe(500);
         });
 
-        it('No cache sans Cache-Control existant', function () {
+        it('No cache sans Cache-Control existant', function (): void {
             $response = new Response();
             $response = $response->noCache();
             expect($response->getHeaderLine('Cache-Control'))->toBe('no-store, max-age=0, no-cache');
         });
     });
 
-    describe('Response core', function () {
-        it('Status codes min max', function () {
+    describe('Response core', function (): void {
+        it('Status codes min max', function (): void {
             $response = new Response();
-            expect(fn() => $response->withStatus(99))->toThrow(new HttpException());
-            expect(fn() => $response->withStatus(600))->toThrow(new HttpException());
+            expect(fn(): Response => $response->withStatus(99))->toThrow(new HttpException());
+            expect(fn(): Response => $response->withStatus(600))->toThrow(new HttpException());
         });
 
-    	it('File range request', function () {
+    	it('File range request', function (): void {
             $response = invade(new Response());
             $file = new SplFileInfo(__FILE__);
             $response->_file = $file; // Protected access via reflection or mock
@@ -784,38 +784,38 @@ describe('Http / Response', function (): void {
             expect($response->status())->toBe(416);
         });
 
-        it('Debug info', function () {
+        it('Debug info', function (): void {
             $response = new Response();
             $debug = $response->__debugInfo();
             expect($debug)->toContainKey('status');
             expect($debug['status'])->toBe(200);
         });
 
-        it('Charset', function () {
+        it('Charset', function (): void {
             $response = invade(new Response());
             expect($response->_charset)->toBe('UTF-8');
         });
 
-        it('Cache directives', function () {
+        it('Cache directives', function (): void {
             $response = invade(new Response());
             $response->_cacheDirectives = ['max-age' => 3600];
             expect($response->_cacheDirectives)->toContainKey('max-age');
         });
 
-        it('File validation', function () {
+        it('File validation', function (): void {
             $response = invade(new Response());
             // Assume validateFile prevents ../
             expect(fn() => $response->validateFile('../secret.txt'))->toThrow(new LoadException());
         });
 
-        it('With file', function () {
+        it('With file', function (): void {
             $response = new Response();
             $file = new SplFileInfo(__FILE__);
             $response = $response->withFile($file);
             expect($response->getFile())->toEqual($file);
         });
 
-        it('Partial content range', function () {
+        it('Partial content range', function (): void {
             $response = invade(new Response());
             $file = new SplFileInfo(__FILE__);
             $response->_file = $file;
@@ -824,7 +824,7 @@ describe('Http / Response', function (): void {
             expect($response->getHeaderLine('Content-Range'))->toContain('bytes 0-10');
         });
 
-        it('Invalid range', function () {
+        it('Invalid range', function (): void {
             $response = invade(new Response());
             $file = new SplFileInfo(__FILE__);
             $response->_file = $file;

@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Log\LogLevel;
+
 /**
  * ------------------------------------------------- -------------------------
  * Configuration des log
@@ -7,7 +9,6 @@
  *
  * Ce fichier vous permet de definir comment votre application doit traiter les log
  */
-
 return [
     /**
      * Nom du canal des log
@@ -106,7 +107,7 @@ return [
              *
              * @var string
              */
-            'level' => on_prod() ? Psr\Log\LogLevel::ERROR : Psr\Log\LogLevel::DEBUG,
+            'level' => on_prod() ? LogLevel::ERROR : LogLevel::DEBUG,
 
             /**
              * L'extension de nom de fichier par défaut pour les fichiers journaux.

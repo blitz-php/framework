@@ -9,7 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use BlitzPHP\Http\Request;
+
 use BlitzPHP\Validation\ErrorBag;
 use Spec\BlitzPHP\App\Controllers\RestController;
 use BlitzPHP\Contracts\Http\StatusCode;
@@ -61,7 +61,7 @@ describe('Controllers / RestController', function (): void {
 
         it('Doit gérer les exceptions', function (): void {
             $controller = new class extends RestController {
-                public function testMethod() {
+                public function testMethod(): never {
                     throw new Exception('Test exception');
                 }
             };

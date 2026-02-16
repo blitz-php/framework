@@ -160,7 +160,7 @@ class Routes extends Command
     protected function getRoutes(array $routes, SampleURIGenerator $uriGenerator): array
     {
         $routes = collect($routes)
-            ->map(fn ($route) => $this->getRouteInformation($route, $uriGenerator, new MiddlewareCollector()))
+            ->map(fn ($route): ?array => $this->getRouteInformation($route, $uriGenerator, new MiddlewareCollector()))
             ->filter()
             ->all();
 
@@ -207,7 +207,7 @@ class Routes extends Command
     {
         if ($route['handler'] instanceof Closure) {
             $path = (new ReflectionFunction($route['handler']))->getFileName();
-        } elseif (is_string($route['handler']) && ! (str_contains($route['handler'], '(View) ') || str_contains($route['handler'], '(Closure) '))) {
+        } elseif (is_string($route['handler']) && (!str_contains($route['handler'], '(View) ') && !str_contains($route['handler'], '(Closure) '))) {
             if (! class_exists($classname = explode('::', $route['handler'])[0])) {
                 return false;
             }
@@ -266,7 +266,7 @@ class Routes extends Command
      */
     protected function pluckColumns(array $routes): array
     {
-        return array_map(fn ($route) => Arr::only($route, $this->getColumns()), $routes);
+        return array_map(fn ($route): array => Arr::only($route, $this->getColumns()), $routes);
     }
 
     /**
@@ -282,7 +282,7 @@ class Routes extends Command
      */
     protected function getColumns(): array
     {
-        return array_map('strtolower', $this->headers);
+        return array_map(strtolower(...), $this->headers);
     }
 
     /**
@@ -292,7 +292,7 @@ class Routes extends Command
      */
     protected function displayRoutes(array $routes, int $total): void
     {
-        $routes = collect($routes)->map(static fn ($route) => array_merge($route, [
+        $routes = collect($routes)->map(static fn ($route): array => array_merge($route, [
             'middleware' => empty($route['middleware']) ? [] : explode(' ', $route['middleware']),
             'name'       => $route['route'] === $route['name'] ? null : $route['name'],
             'route'      => $route['domain'] ? ($route['domain'] . '/' . ltrim($route['route'], '/')) : $route['route'],
@@ -304,7 +304,7 @@ class Routes extends Command
             return;
         }
 
-        $maxMethodLength = $routes->map(static fn ($route) => strlen($route['method']) + 3)->max();
+        $maxMethodLength = $routes->map(static fn ($route): int => strlen($route['method']) + 3)->max();
         $verbose         = $this->option('verbosity');
 
         foreach ($routes->toArray() as $route) {
@@ -347,7 +347,7 @@ class Routes extends Command
         $this->justify('Nombre de routes affichées', (string) $routes->count(), $options);
         if (! $this->option('method')) {
             $this->border(char: '.');
-            $methods = $routes->map(static fn ($route) => $route['method'])->unique()->sort()->all();
+            $methods = $routes->map(static fn ($route): mixed => $route['method'])->unique()->sort()->all();
 
             foreach ($methods as $method) {
                 $this->justify(

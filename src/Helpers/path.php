@@ -259,7 +259,7 @@ if (! function_exists('controller_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if ($only === true && ! preg_match('#Controller\.php$#', $name)) {
+            if ($only && ! preg_match('#Controller\.php$#', $name)) {
                 $name = ucfirst(strtolower($name)) . 'Controller.php';
             }
         }
@@ -287,7 +287,7 @@ if (! function_exists('helper_path')) {
                 $name .= '.php';
             }
         }
-        if ($system === true) {
+        if ($system) {
             return SYST_PATH . 'helpers' . DS . str_replace('/', DS, $name);
         }
 
@@ -310,11 +310,11 @@ if (! function_exists('middleware_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
 
-            if ($only === true && ! preg_match('#Middleware\.php$#', $name)) {
+            if ($only && ! preg_match('#Middleware\.php$#', $name)) {
                 $name = ucfirst($name) . 'Middleware.php';
             }
         }
-        if ($system === true) {
+        if ($system) {
             return SYST_PATH . 'middlewares' . DS . str_replace('/', DS, $name);
         }
 
@@ -336,7 +336,7 @@ if (! function_exists('lang_path')) {
         if ($name !== '' && $name !== '0') {
             $name = ltrim($name, '/\\');
         }
-        if ($system === true) {
+        if ($system) {
             return SYST_PATH . 'constants' . DS . 'lang' . DS . str_replace('/', DS, $name);
         }
 
@@ -881,7 +881,7 @@ if (! function_exists('_include_path')) {
         if (file_exists($path)) {
             extract($data);
             require_once $path;
-        } elseif (true === $required) {
+        } elseif ($required) {
             throw new Exception("The file '{$path}' does not exist");
         }
     }

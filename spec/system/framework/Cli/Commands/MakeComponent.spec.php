@@ -43,7 +43,7 @@ describe('Commandes / MakeComponent', function (): void {
 				}
             }
 
-			if ($nbFiles == 0) {
+			if ($nbFiles === 0) {
 				rmdir($dirName);
 			}
         }
@@ -70,11 +70,11 @@ describe('Commandes / MakeComponent', function (): void {
 			expect(file_exists($file))->toBeTruthy();
 
 			expect($buffer)->toMatch(
-				static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+				static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 			);
 
 			expect($this->getFileContents($file))->toMatch(
-				static fn ($actual) => str_contains($actual, $content)
+				static fn ($actual): bool => str_contains($actual, $content)
 			);
 		}
 	});
@@ -92,11 +92,11 @@ describe('Commandes / MakeComponent', function (): void {
 			expect(file_exists($file))->toBeTruthy();
 
 			expect($buffer)->toMatch(
-				static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+				static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 			);
 
 			expect($this->getFileContents($file))->toMatch(
-				static fn ($actual) => str_contains($actual, $content)
+				static fn ($actual): bool => str_contains($actual, $content)
 			);
 		}
 	});
@@ -114,11 +114,11 @@ describe('Commandes / MakeComponent', function (): void {
 			expect(file_exists($file))->toBeTruthy();
 
 			expect($buffer)->toMatch(
-				static fn ($actual) => str_contains($actual, 'File created: ' . clean_path($file))
+				static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
 			);
 
 			expect($this->getFileContents($file))->toMatch(
-				static fn ($actual) => str_contains($actual, $content)
+				static fn ($actual): bool => str_contains($actual, $content)
 			);
 		}
 	});

@@ -62,10 +62,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $group = \'App\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $group = \'App\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $name = \'command:name\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $name = \'command:name\';')
 		);
 	});
 
@@ -77,10 +77,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $usage = \'clear:sessions [arguments] [options]\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $usage = \'clear:sessions [arguments] [options]\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $name = \'clear:sessions\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $name = \'clear:sessions\';')
 		);
 	});
 
@@ -92,10 +92,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $group = \'App\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $group = \'App\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $name = \'command:name\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $name = \'command:name\';')
 		);
 	});
 
@@ -107,10 +107,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $group = \'App:Generateurs\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $group = \'App:Generateurs\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $name = \'command:name\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $name = \'command:name\';')
 		);
 	});
 
@@ -118,7 +118,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command deliver --group=Delivrables');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'File created: ')
 		);
 
 		$file = APP_PATH . 'Commands/Deliver.php';
@@ -126,7 +126,7 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected string $group = \'Delivrables\';')
+			static fn ($actual): bool => str_contains($actual, 'protected string $group = \'Delivrables\';')
 		);
 	});
 
@@ -134,7 +134,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command deliver --suffix');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'File created: ')
 		);
 
 		$file = APP_PATH . 'Commands/DeliverCommand.php';
@@ -145,7 +145,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command TestModule');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'File created: ')
 		);
 
 		$file = APP_PATH . 'Commands/TestModule.php';
@@ -156,7 +156,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command TestModulecommand');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual) => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'File created: ')
 		);
 
 		$file = APP_PATH . 'Commands/TestModuleCommand.php';

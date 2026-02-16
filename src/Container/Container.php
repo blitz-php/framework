@@ -263,8 +263,8 @@ class Container implements ContainerInterface
         }
 
         // Ordre : vendor > system > app (last wins)
-        $appProviders  = array_filter($files, static fn ($name) => str_starts_with($name, APP_PATH));
-        $systProviders = array_filter($files, static fn ($name) => str_starts_with($name, SYST_PATH));
+        $appProviders  = array_filter($files, static fn ($name): bool => str_starts_with($name, APP_PATH));
+        $systProviders = array_filter($files, static fn ($name): bool => str_starts_with($name, SYST_PATH));
         $vendorFiles   = array_diff($files, $appProviders, $systProviders);
 
         $orderedFiles = [

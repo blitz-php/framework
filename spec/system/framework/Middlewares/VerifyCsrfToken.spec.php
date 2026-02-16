@@ -28,9 +28,7 @@ describe('Middleware / VerifyCsrfToken', function (): void {
 			return $encrypter;
 		};
 
-        $this->getSession = function ($token = 'valid-token') {
-			return Mockery::mock(Store::class, ['token' => $token]);
-        };
+        $this->getSession = (fn($token = 'valid-token') => Mockery::mock(Store::class, ['token' => $token]));
     });
 
     it("devrait autoriser les requêtes de lecture (GET, HEAD, OPTIONS)", function (): void {
@@ -45,7 +43,7 @@ describe('Middleware / VerifyCsrfToken', function (): void {
         $handler = new TestRequestHandler();
         $middleware = new VerifyCsrfToken($encrypter);
 
-        expect(function () use ($middleware, $request, $handler) {
+        expect(function () use ($middleware, $request, $handler): void {
             $middleware->process($request, $handler);
         })->not->toThrow();
     });
@@ -59,12 +57,12 @@ describe('Middleware / VerifyCsrfToken', function (): void {
             'session' => $session,
 			'header' => null,
 		]);
-		$request->shouldReceive('input')->andReturnUsing(fn($key) => $key === '_token' ? 'valid-token' : null);
+		$request->shouldReceive('input')->andReturnUsing(fn($key): ?string => $key === '_token' ? 'valid-token' : null);
 
         $handler = new TestRequestHandler();
         $middleware = new VerifyCsrfToken($encrypter);
 
-        expect(function () use ($middleware, $request, $handler) {
+        expect(function () use ($middleware, $request, $handler): void {
             $middleware->process($request, $handler);
         })->not->toThrow();
     });
@@ -78,12 +76,12 @@ describe('Middleware / VerifyCsrfToken', function (): void {
             'session' => $session,
 			'input' => null,
 		]);
-		$request->shouldReceive('header')->andReturnUsing(fn($key) => $key === 'X-CSRF-TOKEN' ? 'valid-token' : null);
+		$request->shouldReceive('header')->andReturnUsing(fn($key): ?string => $key === 'X-CSRF-TOKEN' ? 'valid-token' : null);
 
         $handler = new TestRequestHandler();
         $middleware = new VerifyCsrfToken($encrypter);
 
-        expect(function () use ($middleware, $request, $handler) {
+        expect(function () use ($middleware, $request, $handler): void {
             $middleware->process($request, $handler);
         })->not->toThrow();
     });
@@ -99,14 +97,14 @@ describe('Middleware / VerifyCsrfToken', function (): void {
 			'fullUrlIs' => false,
 			'pathIs' => false,
 		]);
-		$request->shouldReceive('input')->andReturnUsing(fn($key) => $key === '_token' ? 'invalid-token' : null);
+		$request->shouldReceive('input')->andReturnUsing(fn($key): ?string => $key === '_token' ? 'invalid-token' : null);
 
         $handler = new TestRequestHandler();
         $middleware = new VerifyCsrfToken($encrypter);
 
 		$_SERVER['ENVIRONMENT'] = 'development';
 
-        expect(function () use ($middleware, $request, $handler) {
+        expect(function () use ($middleware, $request, $handler): void {
 			$middleware->process($request, $handler);
 		})->toThrow(new TokenMismatchException('Erreur de jeton CSRF.'));
 
@@ -121,14 +119,14 @@ describe('Middleware / VerifyCsrfToken', function (): void {
             'method' => 'POST',
             'session' => $session,
 		]);
-		$request->shouldReceive('fullUrlIs')->andReturnUsing(fn($url) => $url === '/api/webhook');
-		$request->shouldReceive('pathIs')->andReturnUsing(fn($path) => $path === '/api/webhook');
+		$request->shouldReceive('fullUrlIs')->andReturnUsing(fn($url): bool => $url === '/api/webhook');
+		$request->shouldReceive('pathIs')->andReturnUsing(fn($path): bool => $path === '/api/webhook');
 
         $handler = new TestRequestHandler();
         $middleware = new VerifyCsrfToken($encrypter);
 		ReflectionClass::make($middleware)->setValue('except', ['/api/webhook']);
 
-        expect(function () use ($middleware, $request, $handler) {
+        expect(function () use ($middleware, $request, $handler): void {
             $middleware->process($request, $handler);
         })->not->toThrow();
     });

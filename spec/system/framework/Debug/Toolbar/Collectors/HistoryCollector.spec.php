@@ -13,11 +13,11 @@ use BlitzPHP\Debug\Toolbar\Collectors\HistoryCollector;
 
 use function Kahlan\expect;
 
-describe('Debug / Toolbar / Collectors / HistoryCollector', function() {
-    beforeAll(function() {
+describe('Debug / Toolbar / Collectors / HistoryCollector', function(): void {
+    beforeAll(function(): void {
 		$this->STEP = 0.000001;
 
-		$this->createDummyDebugbarJson = function() {
+		$this->createDummyDebugbarJson = function(): void {
         	$time = $this->time;
 			$path = FRAMEWORK_STORAGE_PATH . 'debugbar' . DS . "debugbar_{$time}.json";
 
@@ -46,17 +46,17 @@ describe('Debug / Toolbar / Collectors / HistoryCollector', function() {
     	};
     });
 
-    beforeEach(function() {
+    beforeEach(function(): void {
         $this->time = (float) sprintf('%.6F', microtime(true));
     });
 
-    afterEach(function() {
+    afterEach(function(): void {
         command('debugbar:clear');
     });
 
 
-    describe('setFiles', function() {
-        it('Devrait configurer les fichiers correctement', function() {
+    describe('setFiles', function(): void {
+        it('Devrait configurer les fichiers correctement', function(): void {
             $time = $this->time;
 
             // Le répertoire test est désormais rempli avec json.

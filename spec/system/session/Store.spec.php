@@ -252,16 +252,12 @@ describe('Session / Store', function (): void {
 
         it('Devrait retourner la valeur existante', function (): void {
             $this->store->put('cached', 'existing');
-            $value = $this->store->remember('cached', function (): string {
-                return 'new';
-            });
+            $value = $this->store->remember('cached', fn(): string => 'new');
             expect($value)->toBe('existing');
         });
 
         it('Devrait exécuter le callback et stocker le résultat si la clé n\'existe pas', function (): void {
-            $value = $this->store->remember('new_key', function (): string {
-                return 'computed_value';
-            });
+            $value = $this->store->remember('new_key', fn(): string => 'computed_value');
             expect($value)->toBe('computed_value');
             expect($this->store->get('new_key'))->toBe('computed_value');
         });

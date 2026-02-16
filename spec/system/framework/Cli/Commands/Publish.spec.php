@@ -36,7 +36,7 @@ describe('Commandes / Publish', function (): void {
         command('publish');
 
         expect(COH::buffer())->toMatch(
-			static fn ($actual) => str_contains($actual, lang('Publisher.publishSuccess', [
+			static fn ($actual): bool => str_contains($actual, lang('Publisher.publishSuccess', [
 				TestPublisher::class,
 				0,
 				STORAGE_PATH,
@@ -50,7 +50,7 @@ describe('Commandes / Publish', function (): void {
         command('publish');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual) => str_contains($actual, lang('Publisher.publishFailure', [
+			static fn ($actual): bool => str_contains($actual, lang('Publisher.publishFailure', [
 				TestPublisher::class,
 				STORAGE_PATH,
 			]))

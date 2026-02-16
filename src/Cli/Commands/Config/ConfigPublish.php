@@ -66,6 +66,7 @@ class ConfigPublish extends Command
         }
 
         $this->eol()->publish($name, $config[$name], config_path($name . '.php'));
+        return null;
     }
 
     /**

@@ -29,7 +29,7 @@ class Console
     protected const CONSOLE_NAME    = 'klinge';
     protected const CONSOLE_VERSION = '1.0';
 
-    private Application $app;
+    private readonly Application $app;
 
     private bool $discovered = false;
 
@@ -49,7 +49,7 @@ class Console
 				logger: config('klinge.icons.logger', true)
 			)
 			->withHooks(
-				before: [$this, 'beforeHook'],
+				before: $this->beforeHook(...),
 			);
     }
 

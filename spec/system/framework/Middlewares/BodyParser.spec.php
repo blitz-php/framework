@@ -81,7 +81,7 @@ describe('Middleware / BodyParser', function (): void {
         $handler = new TestRequestHandler();
         $middleware = new BodyParser(['json' => true]);
 
-        expect(function () use ($middleware, $request, $handler) {
+        expect(function () use ($middleware, $request, $handler): void {
             $middleware->process($request, $handler);
         })->toThrow(HttpException::badRequest());
     });
@@ -107,9 +107,7 @@ describe('Middleware / BodyParser', function (): void {
         });
 
         $middleware = new BodyParser(['json' => false]);
-        $middleware->addParser(['text/csv'], function ($body) {
-            return str_getcsv($body);
-        });
+        $middleware->addParser(['text/csv'], fn($body) => str_getcsv($body));
 
         $middleware->process($request, $handler);
     });

@@ -16,8 +16,8 @@ use Psr\Http\Message\ResponseInterface;
 
 class RestController extends BaseController
 {
-	public $before = null;
-	public $after = null;
+	public $before;
+	public $after;
 
 
     // Méthodes accessibles pour les tests
@@ -114,7 +114,7 @@ class RestController extends BaseController
 		return 'test response';
 	}
 
-	public function before($method, $params): ?ResponseInterface {
+	protected function before($method, $params): ?ResponseInterface {
 		return $this->before;
 	}
 }

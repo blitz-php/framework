@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use Psr\Log\LoggerInterface;
 use BlitzPHP\Spec\Mock\MockMailAdapter;
 use BlitzPHP\Utilities\Reflection\ReflectionClass;
 use Kahlan\Plugin\Double;
@@ -42,33 +42,33 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
             }
         };
 
-        describe('methodName()', function () use ($concreteAdapter) {
-            it('Doit convertir les noms en camelCase', function () use ($concreteAdapter) {
+        describe('methodName()', function () use ($concreteAdapter): void {
+            it('Doit convertir les noms en camelCase', function () use ($concreteAdapter): void {
                 expect($concreteAdapter->testMethodName('host_name'))->toBe('setHostName');
                 expect($concreteAdapter->testMethodName('user-name', 'get'))->toBe('getUserName');
                 expect($concreteAdapter->testMethodName('test', 'has'))->toBe('hasTest');
             });
         });
 
-        describe('makeAddress()', function () use ($concreteAdapter) {
-            it('Doit créer un tableau [email, nom]', function () use ($concreteAdapter) {
+        describe('makeAddress()', function () use ($concreteAdapter): void {
+            it('Doit créer un tableau [email, nom]', function () use ($concreteAdapter): void {
                 $result = $concreteAdapter->testMakeAddress('test@example.com', 'Test Name');
                 expect($result)->toBe(['test@example.com', 'Test Name']);
             });
 
-            it('Doit inverser email et nom si l\'email est invalide', function () use ($concreteAdapter) {
+            it('Doit inverser email et nom si l\'email est invalide', function () use ($concreteAdapter): void {
                 $result = $concreteAdapter->testMakeAddress('Invalid Name', 'valid@example.com');
                 expect($result)->toBe(['valid@example.com', 'Invalid Name']);
             });
 
-            it('Doit lever une exception pour un email invalide', function () use ($concreteAdapter) {
+            it('Doit lever une exception pour un email invalide', function () use ($concreteAdapter): void {
                 expect(fn() => $concreteAdapter->testMakeAddress('invalid-email', 'Not an email'))
-                    ->toThrow(new \InvalidArgumentException('Adresse email invalide: invalid-email'));
+                    ->toThrow(new InvalidArgumentException('Adresse email invalide: invalid-email'));
             });
         });
 
-        describe('parseMultipleAddresses()', function () use ($concreteAdapter) {
-            it('Doit parser une adresse simple', function () use ($concreteAdapter) {
+        describe('parseMultipleAddresses()', function () use ($concreteAdapter): void {
+            it('Doit parser une adresse simple', function () use ($concreteAdapter): void {
                 [$addresses, $set] = $concreteAdapter->testParseMultipleAddresses(
                     'test@example.com',
                     'Test Name'
@@ -80,7 +80,7 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
                 expect($set)->toBe(false);
             });
 
-            it('Doit parser un tableau d\'adresses', function () use ($concreteAdapter) {
+            it('Doit parser un tableau d\'adresses', function () use ($concreteAdapter): void {
                 [$addresses, $set] = $concreteAdapter->testParseMultipleAddresses([
                     'test1@example.com' => 'Test 1',
                     'test2@example.com' => 'Test 2'
@@ -91,7 +91,7 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
                 expect($set)->toBe(false);
             });
 
-            it('Doit accepter set = true via le deuxième argument', function () use ($concreteAdapter) {
+            it('Doit accepter set = true via le deuxième argument', function () use ($concreteAdapter): void {
                 [$addresses, $set] = $concreteAdapter->testParseMultipleAddresses(
                     'test@example.com',
 					'test',
@@ -101,18 +101,18 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
                 expect($set)->toBe(true);
             });
 
-            it('Doit lever une exception pour des arguments invalides', function () use ($concreteAdapter) {
+            it('Doit lever une exception pour des arguments invalides', function () use ($concreteAdapter): void {
                 expect(fn() => $concreteAdapter->testParseMultipleAddresses(
                     'test@example.com',
                     true // bool au lieu de string pour name
-                ))->toThrow(new \InvalidArgumentException(
+                ))->toThrow(new InvalidArgumentException(
                     'L\'argument 2 ($name) doit être une chaîne de caractères quand $address est une chaîne'
                 ));
             });
 
-            it('Doit ignorer les adresses invalides', function () use ($concreteAdapter) {
+            it('Doit ignorer les adresses invalides', function () use ($concreteAdapter): void {
                 allow('service')->toBeCalled()->with('logger')->andReturn(
-                    Double::instance(['implements' => ['Psr\Log\LoggerInterface']])
+                    Double::instance(['implements' => [LoggerInterface::class]])
                 );
 
                 [$addresses, $set] = $concreteAdapter->testParseMultipleAddresses([
@@ -126,32 +126,32 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
             });
         });
 
-        describe('isValidMimeType()', function () use ($concreteAdapter) {
-            it('Doit valider les types MIME de base', function () use ($concreteAdapter) {
+        describe('isValidMimeType()', function () use ($concreteAdapter): void {
+            it('Doit valider les types MIME de base', function () use ($concreteAdapter): void {
                 expect($concreteAdapter->testIsValidMimeType('image/jpeg'))->toBe(true);
                 expect($concreteAdapter->testIsValidMimeType('application/pdf'))->toBe(true);
                 expect($concreteAdapter->testIsValidMimeType('text/plain'))->toBe(true);
             });
 
-            it('Doit rejeter les types MIME non autorisés', function () use ($concreteAdapter) {
+            it('Doit rejeter les types MIME non autorisés', function () use ($concreteAdapter): void {
                 expect($concreteAdapter->testIsValidMimeType('application/x-msdownload'))->toBe(false);
                 expect($concreteAdapter->testIsValidMimeType('application/x-dosexec'))->toBe(false);
             });
 
-            it('Doit accepter les wildcards', function () use ($concreteAdapter) {
+            it('Doit accepter les wildcards', function () use ($concreteAdapter): void {
                 expect($concreteAdapter->testIsValidMimeType('image/png', ['image/*']))->toBe(true);
                 expect($concreteAdapter->testIsValidMimeType('image/jpeg', ['image/*']))->toBe(true);
                 expect($concreteAdapter->testIsValidMimeType('application/pdf', ['image/*']))->toBe(false);
             });
 
-            it('Doit être insensible à la casse', function () use ($concreteAdapter) {
+            it('Doit être insensible à la casse', function () use ($concreteAdapter): void {
                 expect($concreteAdapter->testIsValidMimeType('IMAGE/JPEG'))->toBe(true);
                 expect($concreteAdapter->testIsValidMimeType('Application/PDF'))->toBe(true);
             });
         });
 
-        describe('isValidFileSize()', function () use ($concreteAdapter) {
-            it('Doit valider la taille d\'un fichier existant', function () use ($concreteAdapter) {
+        describe('isValidFileSize()', function () use ($concreteAdapter): void {
+            it('Doit valider la taille d\'un fichier existant', function () use ($concreteAdapter): void {
                 $tempFile = tempnam(sys_get_temp_dir(), 'test');
                 file_put_contents($tempFile, 'small content');
 
@@ -160,7 +160,7 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
                 unlink($tempFile);
             });
 
-            it('Doit rejeter un fichier trop gros', function () use ($concreteAdapter) {
+            it('Doit rejeter un fichier trop gros', function () use ($concreteAdapter): void {
                 $tempFile = tempnam(sys_get_temp_dir(), 'test');
                 file_put_contents($tempFile, str_repeat('x', 2048));
 
@@ -169,11 +169,11 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
                 unlink($tempFile);
             });
 
-            it('Doit rejeter un fichier inexistant', function () use ($concreteAdapter) {
+            it('Doit rejeter un fichier inexistant', function () use ($concreteAdapter): void {
                 expect($concreteAdapter->testIsValidFileSize('/nonexistent/file.txt'))->toBe(false);
             });
 
-            it('Doit utiliser la taille par défaut de la config', function () use ($concreteAdapter) {
+            it('Doit utiliser la taille par défaut de la config', function () use ($concreteAdapter): void {
                 $tempFile = tempnam(sys_get_temp_dir(), 'test');
                 file_put_contents($tempFile, str_repeat('x', 5 * 1024 * 1024)); // 5MB
 
@@ -188,7 +188,7 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
         });
     });
 
-    describe('Méthodes publiques', function () {
+    describe('Méthodes publiques', function (): void {
         // Classe concrète pour tester
         $concreteAdapter = new class(false) extends MockMailAdapter {
             public ?string $lastError = null;
@@ -208,8 +208,8 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
             }
         };
 
-        describe('init()', function () use ($concreteAdapter) {
-            it('Doit appeler les méthodes setter correspondantes', function () use ($concreteAdapter) {
+        describe('init()', function () use ($concreteAdapter): void {
+            it('Doit appeler les méthodes setter correspondantes', function () use ($concreteAdapter): void {
                 $config = [
                     'port' => 587,
                     'host' => 'smtp.example.com',
@@ -221,7 +221,7 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
                 expect($result)->toBe($concreteAdapter);
             });
 
-            it('Doit ignorer les clés sans setter correspondant', function () use ($concreteAdapter) {
+            it('Doit ignorer les clés sans setter correspondant', function () use ($concreteAdapter): void {
                 $config = [
                     'nonexistent_key' => 'value',
                     'another_invalid' => 'test'
@@ -232,37 +232,37 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
             });
         });
 
-        describe('getLastError() et clearError()', function () use ($concreteAdapter) {
-            it('Doit retourner la dernière erreur', function () use ($concreteAdapter) {
+        describe('getLastError() et clearError()', function () use ($concreteAdapter): void {
+            it('Doit retourner la dernière erreur', function () use ($concreteAdapter): void {
                 $concreteAdapter->lastError = 'Test error';
                 expect($concreteAdapter->getLastError())->toBe('Test error');
             });
 
-            it('Doit retourner null si pas d\'erreur', function () use ($concreteAdapter) {
+            it('Doit retourner null si pas d\'erreur', function () use ($concreteAdapter): void {
                 $concreteAdapter->lastError = null;
                 expect($concreteAdapter->getLastError())->toBeNull();
             });
 
-            it('Doit nettoyer l\'erreur', function () use ($concreteAdapter) {
+            it('Doit nettoyer l\'erreur', function () use ($concreteAdapter): void {
                 $concreteAdapter->lastError = 'Test error';
                 $concreteAdapter->clearError();
                 expect($concreteAdapter->getLastError())->toBeNull();
             });
         });
 
-        describe('__call()', function () use ($concreteAdapter) {
-            it('Doit appeler les méthodes setter via __call', function () use ($concreteAdapter) {
+        describe('__call()', function () use ($concreteAdapter): void {
+            it('Doit appeler les méthodes setter via __call', function () use ($concreteAdapter): void {
                 $result = $concreteAdapter->port(587);
                 expect($result)->toBe($concreteAdapter);
             });
 
-            it('Doit appeler les méthodes getter via __call', function () use ($concreteAdapter) {
+            it('Doit appeler les méthodes getter via __call', function () use ($concreteAdapter): void {
                 $concreteAdapter->setCustomMethod('test');
                 $result = $concreteAdapter->customMethod();
                 expect($result)->toBe('test');
             });
 
-            it('Doit appeler les méthodes sur le mailer sous-jacent', function () use ($concreteAdapter) {
+            it('Doit appeler les méthodes sur le mailer sous-jacent', function () use ($concreteAdapter): void {
                 $concreteAdapter->mailer = new class {
 					public function someMethod() { return 'result'; }
 				};
@@ -271,10 +271,10 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
                 expect($result)->toBe('result');
             });
 
-            it('Doit lever une exception pour une méthode inexistante', function () use ($concreteAdapter) {
+            it('Doit lever une exception pour une méthode inexistante', function () use ($concreteAdapter): void {
                 expect(fn() => $concreteAdapter->nonexistentMethod())
                     ->toThrow(new BadMethodCallException(
-                        'La méthode nonexistentMethod n\'existe pas dans ' . get_class($concreteAdapter)
+                        'La méthode nonexistentMethod n\'existe pas dans ' . $concreteAdapter::class
                     ));
             });
         });
@@ -290,12 +290,12 @@ describe('Mail / Adapters / AbstractAdapter', function (): void {
 
             expect(fn() => $adapter->__construct(false))
 				->toThrow(new RuntimeException(
-					lang('Mail.dependancyNotFound', ['NonexistentClass', get_class($adapter), 'vendor/package'])
+					lang('Mail.dependancyNotFound', ['NonexistentClass', $adapter::class, 'vendor/package'])
 				));
         });
 
         it('Doit lever une exception pour des dépendances mal formées', function (): void {
-            expect(fn() => new class(false) extends MockMailAdapter {
+            expect(fn(): MockMailAdapter => new class(false) extends MockMailAdapter {
                 protected array $dependancies = [
                     ['invalid' => 'dependency']
                 ];

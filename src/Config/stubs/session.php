@@ -1,5 +1,7 @@
 <?php
 
+use BlitzPHP\Session\Handlers\File;
+
 return [
     /**
      * ------------------------------------------------- -------------------------
@@ -14,7 +16,7 @@ return [
      *
      * @phpstan-var class-string<BaseHandler>
      */
-    'handler' => env('session.driver', BlitzPHP\Session\Handlers\File::class),
+    'handler' => env('session.driver', File::class),
 
     /**
      * ------------------------------------------------- -------------------------

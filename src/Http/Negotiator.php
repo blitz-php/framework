@@ -36,7 +36,7 @@ class Negotiator
      */
     public function __construct(?ServerRequest $request = null)
     {
-        if (null !== $request) {
+        if ($request instanceof ServerRequest) {
             $this->request = $request;
         }
     }
@@ -151,7 +151,7 @@ class Negotiator
             throw new HttpException('Vous devez fournir un tableau de valeurs supportées pour toutes les négociations.');
         }
 
-        if ($header === null || $header === '' || $header === '0') {
+        if (in_array($header, [null, '', '0'], true)) {
             return $strictMatch ? '' : $supported[0];
         }
 

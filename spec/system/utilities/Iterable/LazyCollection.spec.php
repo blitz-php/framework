@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use BlitzPHP\Utilities\Exceptions\ItemNotFoundException;
 use BlitzPHP\Utilities\Iterable\LazyCollection;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Utilities\Helpers;
@@ -51,7 +51,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
         });
 
         it('Doit lever une exception pour un générateur direct', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $generator = (function () { yield 1; })();
                 new LazyCollection($generator);
             })->toThrow(new InvalidArgumentException());
@@ -87,7 +87,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
         });
 
         it('Doit lever une exception pour un pas de zéro', function (): void {
-            expect(function () {
+            expect(function (): void {
                 LazyCollection::range(1, 5, 0);
             })->toThrow(new InvalidArgumentException());
         });
@@ -149,8 +149,8 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
 
         it('Doit vérifier la présence avec un callback', function (): void {
             $collection = new LazyCollection([1, 2, 3]);
-            expect($collection->contains(fn ($value) => $value > 2))->toBe(true);
-            expect($collection->contains(fn ($value) => $value > 5))->toBe(false);
+            expect($collection->contains(fn ($value): bool => $value > 2))->toBe(true);
+            expect($collection->contains(fn ($value): bool => $value > 5))->toBe(false);
         });
 
         it('Doit vérifier la présence avec opérateur', function (): void {
@@ -184,7 +184,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
 
         it('Doit compter avec un callback', function (): void {
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $counted = $collection->countBy(fn ($value) => $value % 2 == 0 ? 'pair' : 'impair');
+            $counted = $collection->countBy(fn ($value): string => $value % 2 === 0 ? 'pair' : 'impair');
             expect($counted->all())->toBe(['impair' => 3, 'pair' => 2]);
         });
     });
@@ -192,7 +192,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
     describe('Méthode filter', function (): void {
         it('Doit filtrer avec un callback', function (): void {
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $filtered = $collection->filter(fn ($value) => $value > 2);
+            $filtered = $collection->filter(fn ($value): bool => $value > 2);
             expect(array_values($filtered->all()))->toBe([3, 4, 5]);
         });
 
@@ -211,7 +211,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
 
         it('Doit retourner le premier élément correspondant au callback', function (): void {
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $result = $collection->first(fn ($value) => $value > 3);
+            $result = $collection->first(fn ($value): bool => $value > 3);
             expect($result)->toBe(4);
         });
 
@@ -319,7 +319,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
 
         it('Doit retourner le dernier élément correspondant au callback', function (): void {
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $result = $collection->last(fn ($value) => $value < 4);
+            $result = $collection->last(fn ($value): bool => $value < 4);
             expect($result)->toBe(3);
         });
 
@@ -354,13 +354,13 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
     describe('Méthode map', function (): void {
         it('Doit transformer chaque élément', function (): void {
             $collection = new LazyCollection([1, 2, 3]);
-            $mapped = $collection->map(fn ($value) => $value * 2);
+            $mapped = $collection->map(fn ($value): int => $value * 2);
             expect($mapped->all())->toBe([2, 4, 6]);
         });
 
         it('Doit préserver les clés', function (): void {
             $collection = new LazyCollection(['a' => 1, 'b' => 2, 'c' => 3]);
-            $mapped = $collection->map(fn ($value) => $value * 2);
+            $mapped = $collection->map(fn ($value): int => $value * 2);
             expect($mapped->all())->toBe(['a' => 2, 'b' => 4, 'c' => 6]);
         });
     });
@@ -368,7 +368,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
     describe('Méthode mapWithKeys', function (): void {
         it('Doit transformer avec nouvelles clés', function (): void {
             $collection = new LazyCollection([1, 2, 3]);
-            $mapped = $collection->mapWithKeys(fn ($value) => ["key_$value" => $value * 2]);
+            $mapped = $collection->mapWithKeys(fn ($value): array => ["key_$value" => $value * 2]);
             expect($mapped->all())->toBe(['key_1' => 2, 'key_2' => 4, 'key_3' => 6]);
         });
     });
@@ -444,7 +444,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
 
         it('Doit rechercher avec un callback', function (): void {
             $collection = new LazyCollection(['a' => 1, 'b' => 2, 'c' => 3]);
-            $result = $collection->search(fn ($value) => $value > 1);
+            $result = $collection->search(fn ($value): bool => $value > 1);
             expect($result)->toBe('b');
         });
     });
@@ -473,7 +473,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
                 [3, 4, 5]
             ];
             expect(
-				array_map(fn($window) => array_values($window->all()), $windows->all())
+				array_map(fn($window): array => array_values($window->all()), $windows->all())
 			)->toEqual($expected);
         });
     });
@@ -495,7 +495,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
 
         it('Doit sauter jusqu\'à un callback', function (): void {
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $result = $collection->skipUntil(fn ($value) => $value > 2);
+            $result = $collection->skipUntil(fn ($value): bool => $value > 2);
             expect(array_values($result->all()))->toBe([3, 4, 5]);
         });
     });
@@ -503,7 +503,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
     describe('Méthode skipWhile', function (): void {
         it('Doit sauter tant qu\'une condition est vraie', function (): void {
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $result = $collection->skipWhile(fn ($value) => $value < 3);
+            $result = $collection->skipWhile(fn ($value): bool => $value < 3);
             expect(array_values($result->all()))->toBe([3, 4, 5]);
         });
     });
@@ -529,14 +529,14 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
         });
 
         it('Doit lever une exception si aucun élément', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $collection = new LazyCollection([]);
                 $collection->sole();
-            })->toThrow(new BlitzPHP\Utilities\Exceptions\ItemNotFoundException());
+            })->toThrow(new ItemNotFoundException());
         });
 
         it('Doit lever une exception si plusieurs éléments', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $collection = new LazyCollection([1, 2, 3]);
                 $collection->sole();
             })->toThrow();
@@ -550,10 +550,10 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
         });
 
         it('Doit lever une exception si aucun élément', function (): void {
-            expect(function () {
+            expect(function (): void {
                 $collection = new LazyCollection([]);
                 $collection->firstOrFail();
-            })->toThrow(new BlitzPHP\Utilities\Exceptions\ItemNotFoundException());
+            })->toThrow(new ItemNotFoundException());
         });
     });
 
@@ -567,7 +567,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
                 [5]
             ];
             expect(
-				array_map(fn($chunk) => array_values($chunk->all()), $chunks->all())
+				array_map(fn($chunk): array => array_values($chunk->all()), $chunks->all())
 			)->toBe($expected);
         });
 
@@ -597,16 +597,14 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
     describe('Méthode chunkWhile', function (): void {
         it('Doit créer des morceaux conditionnels', function (): void {
             $collection = new LazyCollection([1, 2, 3, 6, 7, 8, 12, 13, 14]);
-            $chunks = $collection->chunkWhile(function ($current, $key, $chunk) {
-                return empty($chunk) || $current === Helpers::last($chunk->all()) + 1;
-            });
+            $chunks = $collection->chunkWhile(fn($current, $key, $chunk) => empty($chunk) || $current === Helpers::last($chunk->all()) + 1);
             $expected = [
                 [1, 2, 3],
                 [6, 7, 8],
                 [12, 13, 14]
             ];
             expect(
-				array_map(fn($chunk) => array_values($chunk->all()), $chunks->all())
+				array_map(fn($chunk): array => array_values($chunk->all()), $chunks->all())
 			)->toEqual($expected);
         });
     });
@@ -636,7 +634,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
     describe('Méthode takeWhile', function (): void {
         it('Doit prendre tant qu\'une condition est vraie', function (): void {
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $result = $collection->takeWhile(fn ($value) => $value < 4);
+            $result = $collection->takeWhile(fn ($value): bool => $value < 4);
             expect($result->all())->toBe([1, 2, 3]);
         });
     });
@@ -645,7 +643,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
         it('Doit exécuter un callback sur chaque élément', function (): void {
             $sum = 0;
             $collection = new LazyCollection([1, 2, 3]);
-            $tapped = $collection->tapEach(function ($value) use (&$sum) {
+            $tapped = $collection->tapEach(function ($value) use (&$sum): void {
                 $sum += $value;
             });
             $tapped->all(); // Force l'énumération
@@ -697,7 +695,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
                 [3, 'c', 'z']
             ];
             expect(
-				array_map(fn($item) => $item->all(), $zipped->all())
+				array_map(fn($item): array => $item->all(), $zipped->all())
 			)->toEqual($expected);
         });
     });
@@ -801,7 +799,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
                 ['id' => 1, 'name' => 'John'],
                 ['id' => 2, 'name' => 'Jane']
             ]);
-            $keyed = $collection->keyBy(fn ($item) => strtoupper($item['name']));
+            $keyed = $collection->keyBy(fn ($item): string => strtoupper($item['name']));
             expect($keyed->all())->toBe([
                 'JOHN' => ['id' => 1, 'name' => 'John'],
                 'JANE' => ['id' => 2, 'name' => 'Jane']
@@ -878,7 +876,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
         xit('Doit exécuter un callback à intervalle régulier', function (): void {
             $callCount = 0;
             $collection = new LazyCollection([1, 2, 3, 4, 5]);
-            $withHeartbeat = $collection->withHeartbeat(1, function () use (&$callCount) {
+            $withHeartbeat = $collection->withHeartbeat(1, function () use (&$callCount): void {
                 $callCount++;
             });
             $withHeartbeat->all();
@@ -888,7 +886,7 @@ describe('Utilities / Iterable / LazyCollection', function (): void {
         it('Doit accepter un DateInterval', function (): void {
             $interval = new DateInterval('PT1S');
             $collection = new LazyCollection([1, 2, 3]);
-            $withHeartbeat = $collection->withHeartbeat($interval, function () {});
+            $withHeartbeat = $collection->withHeartbeat($interval, function (): void {});
             expect($withHeartbeat->all())->toBe([1, 2, 3]);
         });
     });

@@ -106,7 +106,7 @@ describe('Security / Encryption / OpenSSL', function (): void {
         })->toThrow(new EncryptionException());
     });
 
-	it('La clé interne n\'est pas modifiée par le paramètre', function() {
+	it('La clé interne n\'est pas modifiée par le paramètre', function(): void {
 		$params           = config('encryption');
 		$params['driver'] = 'OpenSSL';
 		$params['key']    = 'original-key-value';

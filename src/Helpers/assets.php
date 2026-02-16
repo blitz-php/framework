@@ -23,13 +23,13 @@ if (! function_exists('css_url')) {
         $name = str_replace(site_url() . 'css/', '', htmlspecialchars($name));
 
         if (is_localfile($name)) {
-            $name .= (! preg_match('#\.css$#i', $name) ? '.css' : '');
+            $name .= (preg_match('#\.css$#i', $name) ? '' : '.css');
             $filename = WEBROOT . 'css' . DS . $name;
 
             return site_url() . 'css/' . $name . ((file_exists($filename)) ? '?v=' . filemtime($filename) : '');
         }
 
-        return $name . (! preg_match('#\.css$#i', $name) ? '.css' : '');
+        return $name . (preg_match('#\.css$#i', $name) ? '' : '.css');
     }
 }
 
@@ -47,13 +47,13 @@ if (! function_exists('js_url')) {
         $name = str_replace(site_url() . 'js/', '', htmlspecialchars($name));
 
         if (is_localfile($name)) {
-            $name .= (! preg_match('#\.js$#i', $name) ? '.js' : '');
+            $name .= (preg_match('#\.js$#i', $name) ? '' : '.js');
             $filename = WEBROOT . 'js' . DS . $name;
 
             return site_url() . 'js/' . $name . ((file_exists($filename)) ? '?v=' . filemtime($filename) : '');
         }
 
-        return $name . (! preg_match('#\.js$#i', $name) ? '.js' : '');
+        return $name . (preg_match('#\.js$#i', $name) ? '' : '.js');
     }
 }
 
@@ -76,7 +76,7 @@ if (! function_exists('lib_css_url')) {
         );
 
         if (is_localfile($name)) {
-            $name .= (! preg_match('#\.css$#i', $name) ? '.css' : '');
+            $name .= (preg_match('#\.css$#i', $name) ? '' : '.css');
             $paths = ['lib', 'vendor', 'plugins'];
 
             foreach ($paths as $path) {
@@ -90,7 +90,7 @@ if (! function_exists('lib_css_url')) {
             return $site_url . 'lib/' . $name;
         }
 
-        return $name . (! preg_match('#\.css$#i', $name) ? '.css' : '');
+        return $name . (preg_match('#\.css$#i', $name) ? '' : '.css');
     }
 }
 
@@ -113,7 +113,7 @@ if (! function_exists('lib_js_url')) {
         );
 
         if (is_localfile($name)) {
-            $name .= (! preg_match('#\.js$#i', $name) ? '.js' : '');
+            $name .= (preg_match('#\.js$#i', $name) ? '' : '.js');
             $paths = ['lib', 'vendor', 'plugins'];
 
             foreach ($paths as $path) {
@@ -127,7 +127,7 @@ if (! function_exists('lib_js_url')) {
             return $site_url . 'lib/' . $name;
         }
 
-        return $name . (! preg_match('#\.js$#i', $name) ? '.js' : '');
+        return $name . (preg_match('#\.js$#i', $name) ? '' : '.js');
     }
 }
 
@@ -140,7 +140,7 @@ if (! function_exists('lib_styles')) {
      * @param list<string>|string $name  nom du fichier dont on veut inserer
      * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
-     * @return string|void
+     * @return string|null
      */
     function lib_styles($name, bool $print = true)
     {
@@ -149,7 +149,7 @@ if (! function_exists('lib_styles')) {
 
         foreach ($name as $style) {
             if (is_string($style)) {
-                $style = (! preg_match('#\.css$#i', $style) ? $style . '.css' : $style);
+                $style = (preg_match('#\.css$#i', $style) ? $style : $style . '.css');
                 if (is_file(WEBROOT . 'lib' . DS . str_replace('/', DS, $style))) {
                     $return[] = '<link rel="preload" type="text/css" href="' . lib_css_url($style) . '" as="style">
 						<link rel="stylesheet" type="text/css" href="' . lib_css_url($style) . '" />';
@@ -170,6 +170,7 @@ if (! function_exists('lib_styles')) {
         }
 
         echo $output;
+        return null;
     }
 }
 
@@ -182,7 +183,7 @@ if (! function_exists('lib_scripts')) {
      * @param list<string>|string $name  nom du fichier dont on veut inserer
      * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
-     * @return string|void
+     * @return string|null
      */
     function lib_scripts($name, bool $print = true)
     {
@@ -191,7 +192,7 @@ if (! function_exists('lib_scripts')) {
 
         foreach ($name as $script) {
             if (is_string($script)) {
-                $script = (! preg_match('#\.js$#i', $script) ? $script . '.js' : $script);
+                $script = (preg_match('#\.js$#i', $script) ? $script : $script . '.js');
                 if (is_file(WEBROOT . 'lib' . DS . str_replace('/', DS, $script))) {
                     $return[] = '<script type="text/javascript" src="' . lib_js_url($script) . '"></script>';
                 } elseif (is_localfile($script)) {
@@ -210,6 +211,7 @@ if (! function_exists('lib_scripts')) {
         }
 
         echo $output;
+        return null;
     }
 }
 
@@ -222,7 +224,7 @@ if (! function_exists('styles')) {
      * @param list<string>|string $name  nom du fichier dont on veut inserer
      * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
-     * @return string|void
+     * @return string|null
      */
     function styles($name, bool $print = true)
     {
@@ -231,7 +233,7 @@ if (! function_exists('styles')) {
 
         foreach ($name as $style) {
             if (is_string($style)) {
-                $style = (! preg_match('#\.css$#i', $style) ? $style . '.css' : $style);
+                $style = (preg_match('#\.css$#i', $style) ? $style : $style . '.css');
                 if (is_file(WEBROOT . 'css' . DS . str_replace('/', DS, $style))) {
                     $return[] = '<link rel="preload" type="text/css" href="' . css_url($style) . '" as="style">
 						<link rel="stylesheet" type="text/css" href="' . css_url($style) . '" />';
@@ -252,6 +254,7 @@ if (! function_exists('styles')) {
         }
 
         echo $output;
+        return null;
     }
 }
 
@@ -264,7 +267,7 @@ if (! function_exists('scripts')) {
      * @param list<string>|string $name  nom du fichier dont on veut inserer
      * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
-     * @return string|void
+     * @return string|null
      */
     function scripts($name, bool $print = true)
     {
@@ -273,7 +276,7 @@ if (! function_exists('scripts')) {
 
         foreach ($name as $script) {
             if (is_string($script)) {
-                $script = (! preg_match('#\.js$#i', $script) ? $script . '.js' : $script);
+                $script = (preg_match('#\.js$#i', $script) ? $script : $script . '.js');
                 if (is_file(WEBROOT . 'js' . DS . str_replace('/', DS, $script))) {
                     $return[] = '<script type="text/javascript" src="' . js_url($script) . '"></script>';
                 } elseif (is_localfile($script)) {
@@ -292,6 +295,7 @@ if (! function_exists('scripts')) {
         }
 
         echo $output;
+        return null;
     }
 }
 
@@ -309,13 +313,13 @@ if (! function_exists('less_url')) {
         $name = str_replace(site_url() . 'less/', '', htmlspecialchars($name));
 
         if (is_localfile($name)) {
-            $name .= (! preg_match('#\.less$#i', $name) ? '.less' : '');
+            $name .= (preg_match('#\.less$#i', $name) ? '' : '.less');
             $filename = WEBROOT . 'less' . DS . $name;
 
             return site_url() . 'less/' . $name . ((file_exists($filename)) ? '?v=' . filemtime($filename) : '');
         }
 
-        return $name . (! preg_match('#\.less$#i', $name) ? '.less' : '');
+        return $name . (preg_match('#\.less$#i', $name) ? '' : '.less');
     }
 }
 
@@ -328,7 +332,7 @@ if (! function_exists('less_styles')) {
      * @param list<string>|string $name  nom du fichier dont on veut inserer
      * @param bool                $print Specifie si on affiche directement la sortie ou si on la retourne
      *
-     * @return string|void
+     * @return string|null
      */
     function less_styles($name, bool $print = true)
     {
@@ -337,7 +341,7 @@ if (! function_exists('less_styles')) {
 
         foreach ($name as $style) {
             if (is_string($style)) {
-                $style = (! preg_match('#\.less$#i', $style) ? $style . '.less' : $style);
+                $style = (preg_match('#\.less$#i', $style) ? $style : $style . '.less');
                 if (is_file(WEBROOT . 'less' . DS . str_replace('/', DS, $style))) {
                     $return[] = '<link rel="stylesheet" type="text/less" href="' . less_url($style) . '" />';
                 } elseif (is_localfile($style)) {
@@ -356,6 +360,7 @@ if (! function_exists('less_styles')) {
         }
 
         echo $output;
+        return null;
     }
 }
 
@@ -369,7 +374,7 @@ if (! function_exists('img_url')) {
      */
     function img_url(?string $name, bool $add_version = true): string
     {
-        if ($name === null || $name === '' || $name === '0') {
+        if (in_array($name, [null, '', '0'], true)) {
             return '';
         }
 
@@ -395,7 +400,7 @@ if (! function_exists('img')) {
      * @param string $name nom du fichier dont on veut inserer
      * @param string $alt  texte alternatif
      *
-     * @return string|void
+     * @return string|null
      */
     function img(string $name, string $alt = '', array $options = [])
     {
@@ -409,11 +414,12 @@ if (! function_exists('img')) {
         }
         $return .= ' />';
 
-        if ($noprint === true) {
+        if ($noprint) {
             return $return;
         }
 
         echo $return;
+        return null;
     }
 }
 
@@ -427,7 +433,7 @@ if (! function_exists('docs_url')) {
      */
     function docs_url(?string $name, bool $add_version = true): string
     {
-        if ($name === null || $name === '' || $name === '0') {
+        if (in_array($name, [null, '', '0'], true)) {
             return '';
         }
 
@@ -454,7 +460,7 @@ if (! function_exists('videos_url')) {
      */
     function videos_url(?string $name, bool $add_version = true): string
     {
-        if ($name === null || $name === '' || $name === '0') {
+        if (in_array($name, [null, '', '0'], true)) {
             return '';
         }
 

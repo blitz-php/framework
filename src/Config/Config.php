@@ -247,7 +247,7 @@ class Config
      */
     private function loadConfigurationsFromFile(string $file): array
     {
-        if (empty($file) || ! file_exists($file)) {
+        if ($file === '' || $file === '0' || ! file_exists($file)) {
             return [];
         }
 

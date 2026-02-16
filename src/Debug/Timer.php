@@ -32,7 +32,7 @@ class Timer
     public function start(string $name, ?float $time = null): self
     {
         $this->timers[strtolower($name)] = [
-            'start' => ! empty($time) ? $time : microtime(true),
+            'start' => empty($time) ? microtime(true) : $time,
             'end'   => null,
         ];
 

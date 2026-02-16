@@ -8,7 +8,8 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was was distributed with this source code.
  */
-
+use BlitzPHP\Utilities\Iterable\Collection;
+use BlitzPHP\Traits\Mixins\HigherOrderTapProxy;
 use BlitzPHP\Utilities\Helpers;
 
 use function Kahlan\expect;
@@ -172,7 +173,7 @@ describe('Utilities / Helpers', function (): void {
 			});
 
 			it('Doit lever une exception pour un contexte invalide', function (): void {
-				expect(function () {
+				expect(function (): void {
 					Helpers::esc('test', 'invalid');
 				})->toThrow(new InvalidArgumentException('Invalid escape context provided.'));
 			});
@@ -193,7 +194,7 @@ describe('Utilities / Helpers', function (): void {
         it('Doit créer une collection', function (): void {
             $collection = Helpers::collect([1, 2, 3]);
 
-            expect($collection)->toBeAnInstanceOf(BlitzPHP\Utilities\Iterable\Collection::class);
+            expect($collection)->toBeAnInstanceOf(Collection::class);
             expect($collection->toArray())->toBe([1, 2, 3]);
         });
 
@@ -233,7 +234,7 @@ describe('Utilities / Helpers', function (): void {
     describe('Exécution et retry', function (): void {
         it('Doit exécuter une fonction avec retry', function (): void {
             $attempts = 0;
-            $result = Helpers::retry(3, function () use (&$attempts) {
+            $result = Helpers::retry(3, function () use (&$attempts): string {
                 $attempts++;
                 if ($attempts < 3) {
                     throw new Exception('Temporary failure');
@@ -246,8 +247,8 @@ describe('Utilities / Helpers', function (): void {
         });
 
         it('Doit propager l\'exception après tous les retry', function (): void {
-            expect(function () {
-                Helpers::retry(2, function () {
+            expect(function (): void {
+                Helpers::retry(2, function (): void {
                     throw new Exception('Always fails');
                 });
             })->toThrow(new Exception('Always fails'));
@@ -255,7 +256,7 @@ describe('Utilities / Helpers', function (): void {
 
         it('Doit exécuter tap() avec callback', function (): void {
             $value = 'test';
-            $tapped = Helpers::tap($value, function (&$v) {
+            $tapped = Helpers::tap($value, function (&$v): void {
                 $v = 'modified';
             });
 
@@ -266,7 +267,7 @@ describe('Utilities / Helpers', function (): void {
             $value = new stdClass();
             $proxy = Helpers::tap($value);
 
-            expect($proxy)->toBeAnInstanceOf(BlitzPHP\Traits\Mixins\HigherOrderTapProxy::class);
+            expect($proxy)->toBeAnInstanceOf(HigherOrderTapProxy::class);
         });
     });
 
@@ -289,7 +290,7 @@ describe('Utilities / Helpers', function (): void {
         });
 
         it('Doit lever une exception avec throwIf()', function (): void {
-            expect(function () {
+            expect(function (): void {
                 Helpers::throwIf(true, 'RuntimeException', 'Test exception');
             })->toThrow(new RuntimeException('Test exception'));
 

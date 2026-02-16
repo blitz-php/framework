@@ -36,7 +36,6 @@ describe('Utilities / String / Inflector', function (): void {
 
             $reflection = new ReflectionClass(Inflector::class);
             $cacheProperty = $reflection->getProperty('_cache');
-            $cacheProperty->setAccessible(true);
             $cacheBefore = $cacheProperty->getValue();
 
             Inflector::setLanguage('fr');
@@ -357,7 +356,6 @@ describe('Utilities / String / Inflector', function (): void {
         it('Doit utiliser le cache interne', function (): void {
             $reflection = new ReflectionClass(Inflector::class);
             $cacheMethod = $reflection->getMethod('_cache');
-            $cacheMethod->setAccessible(true);
 
             // Premier appel, pas dans le cache
             $result = $cacheMethod->invoke(null, 'test', 'key');
@@ -436,7 +434,6 @@ describe('Utilities / String / Inflector', function (): void {
 
             $reflection = new ReflectionClass(Inflector::class);
             $cacheProperty = $reflection->getProperty('_cache');
-            $cacheProperty->setAccessible(true);
             $cacheBefore = $cacheProperty->getValue();
 
             expect($cacheBefore)->not->toBeEmpty();

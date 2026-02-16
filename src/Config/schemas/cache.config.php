@@ -8,7 +8,13 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use BlitzPHP\Cache\Handlers\Apcu;
+use BlitzPHP\Cache\Handlers\ArrayHandler;
+use BlitzPHP\Cache\Handlers\Dummy;
+use BlitzPHP\Cache\Handlers\File;
+use BlitzPHP\Cache\Handlers\Memcached;
+use BlitzPHP\Cache\Handlers\RedisHandler;
+use BlitzPHP\Cache\Handlers\Wincache;
 use Nette\Schema\Expect;
 
 return Expect::structure([
@@ -39,12 +45,12 @@ return Expect::structure([
     ]),
 
     'valid_handlers' => Expect::arrayOf('string', 'string')->default([
-        'apcu'      => BlitzPHP\Cache\Handlers\Apcu::class,
-        'array'     => BlitzPHP\Cache\Handlers\ArrayHandler::class,
-        'dummy'     => BlitzPHP\Cache\Handlers\Dummy::class,
-        'file'      => BlitzPHP\Cache\Handlers\File::class,
-        'memcached' => BlitzPHP\Cache\Handlers\Memcached::class,
-        'redis'     => BlitzPHP\Cache\Handlers\RedisHandler::class,
-        'wincache'  => BlitzPHP\Cache\Handlers\Wincache::class,
+        'apcu'      => Apcu::class,
+        'array'     => ArrayHandler::class,
+        'dummy'     => Dummy::class,
+        'file'      => File::class,
+        'memcached' => Memcached::class,
+        'redis'     => RedisHandler::class,
+        'wincache'  => Wincache::class,
     ]),
 ]);

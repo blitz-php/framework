@@ -105,7 +105,7 @@ describe('Controllers / ApplicationController', function (): void {
 				// or ce fichier n'existe pas bien evidement.
 				// l'important pour nous à ce niveau est que le dossier et le nom du fichier soient bien déterminés
 				expect($e->getMessage())
-					->toMatch(fn($actual) => str_ends_with($actual, 'Views\test_view.php'));
+					->toMatch(fn($actual): bool => str_ends_with($actual, 'Views\test_view.php'));
 			}
         });
 
@@ -117,7 +117,7 @@ describe('Controllers / ApplicationController', function (): void {
 				// or ce fichier n'existe pas bien evidement.
 				// l'important pour nous à ce niveau est que le dossier et le nom du fichier soient bien déterminés
 				expect($e->getMessage())
-					->toMatch(fn($actual) => str_ends_with($actual, 'Views\\testRender.php'));
+					->toMatch(fn($actual): bool => str_ends_with($actual, 'Views\\testRender.php'));
 			}
         });
 
@@ -129,7 +129,7 @@ describe('Controllers / ApplicationController', function (): void {
 				// or ce fichier n'existe pas bien evidement.
 				// l'important pour nous à ce niveau est que le dossier et le nom du fichier soient bien déterminés
 				expect($e->getMessage())
-					->toMatch(fn($actual) => str_ends_with($actual, 'Views\\testRender.php'));
+					->toMatch(fn($actual): bool => str_ends_with($actual, 'Views\\testRender.php'));
 			}
         });
     });

@@ -209,7 +209,7 @@ class EventDiscover
             return false;
         }
 
-        return ! (! class_exists($className) || ! is_subclass_of($className, EventListenerInterface::class));
+        return class_exists($className) && is_subclass_of($className, EventListenerInterface::class);
     }
 
     /**

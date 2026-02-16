@@ -11,42 +11,42 @@
 
 use BlitzPHP\Formatter\ArrayFormatter;
 
-describe('ArrayFormatter', function () {
+describe('ArrayFormatter', function (): void {
 
-    beforeEach(function () {
+    beforeEach(function (): void {
         $this->formatter = new ArrayFormatter();
     });
 
-    describe('->format()', function () {
+    describe('->format()', function (): void {
 
-        it('devrait formater un tableau simple', function () {
+        it('devrait formater un tableau simple', function (): void {
             $data = ['clé' => 'valeur'];
             $result = $this->formatter->format($data);
             expect($result)->toBe($data);
         });
 
-        it('devrait formater un objet en tableau', function () {
+        it('devrait formater un objet en tableau', function (): void {
             $data = (object) ['clé' => 'valeur'];
             $result = $this->formatter->format($data);
             expect($result)->toBe(['clé' => 'valeur']);
         });
 
-        it('devrait formater un tableau imbriqué', function () {
+        it('devrait formater un tableau imbriqué', function (): void {
             $data = ['clé' => ['sous_clé' => 'valeur']];
             $result = $this->formatter->format($data);
             expect($result)->toBe($data);
         });
 
-        it('devrait formater un objet imbriqué en tableau', function () {
+        it('devrait formater un objet imbriqué en tableau', function (): void {
             $data = (object) ['clé' => (object) ['sous_clé' => 'valeur']];
             $result = $this->formatter->format($data);
             expect($result)->toBe(['clé' => ['sous_clé' => 'valeur']]);
         });
     });
 
-    describe('->parse()', function () {
+    describe('->parse()', function (): void {
 
-        it('devrait retourner une chaîne dans un tableau', function () {
+        it('devrait retourner une chaîne dans un tableau', function (): void {
             $data = 'chaîne';
             $result = $this->formatter->parse($data);
             expect($result)->toBe([$data]);

@@ -379,9 +379,7 @@ describe('Utilities / String / Stringable', function (): void {
             $result = $string->replaceMatches('/\d+/', '456');
             expect((string) $result)->toBe('Hello 456 World');
 
-            $result2 = $string->replaceMatches('/\d+/', function ($matches) {
-                return (int)$matches[0] * 2;
-            });
+            $result2 = $string->replaceMatches('/\d+/', fn($matches) => (int)$matches[0] * 2);
             expect((string) $result2)->toBe('Hello 246 World');
         });
 
@@ -616,70 +614,52 @@ describe('Utilities / String / Stringable', function (): void {
     describe('Méthodes conditionnelles et fluides', function (): void {
         it('Doit utiliser when()', function (): void {
             $string = new Stringable('Hello');
-            $result = $string->when(true, function ($str) {
-                return $str->append(' World');
-            });
+            $result = $string->when(true, fn($str) => $str->append(' World'));
             expect((string) $result)->toBe('Hello World');
 
-            $result2 = $string->when(false, function ($str) {
-                return $str->append(' World');
-            });
+            $result2 = $string->when(false, fn($str) => $str->append(' World'));
             expect((string) $result2)->toBe('Hello');
         });
 
         it('Doit utiliser unless()', function (): void {
             $string = new Stringable('Hello');
-            $result = $string->unless(false, function ($str) {
-                return $str->append(' World');
-            });
+            $result = $string->unless(false, fn($str) => $str->append(' World'));
             expect((string) $result)->toBe('Hello World');
 
-            $result2 = $string->unless(true, function ($str) {
-                return $str->append(' World');
-            });
+            $result2 = $string->unless(true, fn($str) => $str->append(' World'));
             expect((string) $result2)->toBe('Hello');
         });
 
         it('Doit utiliser whenNotEmpty()', function (): void {
             $string = new Stringable('Hello');
-            $result = $string->whenNotEmpty(function ($str) {
-                return $str->append(' World');
-            });
+            $result = $string->whenNotEmpty(fn($str) => $str->append(' World'));
             expect((string) $result)->toBe('Hello World');
 
             $empty = new Stringable('');
-            $result2 = $empty->whenNotEmpty(function ($str) {
-                return $str->append(' World');
-            });
+            $result2 = $empty->whenNotEmpty(fn($str) => $str->append(' World'));
             expect((string) $result2)->toBe('');
         });
 
         it('Doit utiliser whenEmpty()', function (): void {
             $string = new Stringable('Hello');
-            $result = $string->whenEmpty(function ($str) {
-                return $str->append(' Default');
-            });
+            $result = $string->whenEmpty(fn($str) => $str->append(' Default'));
             expect((string) $result)->toBe('Hello');
 
             $empty = new Stringable('');
-            $result2 = $empty->whenEmpty(function ($str) {
-                return $str->append('Default');
-            });
+            $result2 = $empty->whenEmpty(fn($str) => $str->append('Default'));
             expect((string) $result2)->toBe('Default');
         });
 
         it('Doit transformer avec transform()', function (): void {
             $string = new Stringable('Hello');
-            $result = $string->transform(function ($str) {
-                return strtoupper($str->value());
-            });
+            $result = $string->transform(fn($str) => strtoupper($str->value()));
             expect($result)->toBe('HELLO');
         });
 
         it('Doit utiliser tap()', function (): void {
             $string = new Stringable('Hello');
             $captured = null;
-            $result = $string->tap(function ($str) use (&$captured) {
+            $result = $string->tap(function ($str) use (&$captured): void {
                 $captured = $str->value();
             });
             expect($captured)->toBe('Hello');
@@ -688,9 +668,7 @@ describe('Utilities / String / Stringable', function (): void {
 
         it('Doit utiliser pipe()', function (): void {
             $string = new Stringable('Hello');
-            $result = $string->pipe(function ($str) {
-                return $str->append(' World');
-            });
+            $result = $string->pipe(fn($str) => $str->append(' World'));
             expect((string) $result)->toBe('Hello World');
         });
     });
@@ -830,7 +808,7 @@ describe('Utilities / String / Stringable', function (): void {
         it('Doit combiner les méthodes conditionnelles', function (): void {
             $isAdmin = true;
             $result = (new Stringable('user'))
-                ->when($isAdmin, fn($str) => $str->prepend('admin_'))
+                ->when($isAdmin, fn($str): Stringable => $str->prepend('admin_'))
                 ->append('_controller')
                 ->camel();
 

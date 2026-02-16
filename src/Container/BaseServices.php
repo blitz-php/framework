@@ -91,7 +91,7 @@ class BaseServices
      */
     public static function autoloader(bool $shared = true): Autoloader
     {
-        if (true === $shared) {
+        if ($shared) {
             return static::sharedInstance('autoloader');
         }
 

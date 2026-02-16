@@ -51,7 +51,7 @@ describe('Autoloader', function (): void {
             $config['classmap'] = [];
             $loader             = new Autoloader($config);
 
-            expect(static fn () => $loader->initialize())
+            expect(static fn (): Autoloader => $loader->initialize())
                 ->toThrow(new InvalidArgumentException('Le tableau de configuration doit contenir soit la clé \'psr4\' soit la clé \'classmap\'.'));
         });
 
@@ -183,7 +183,7 @@ describe('Autoloader', function (): void {
 
             $namespaces = $loader->getNamespace();
             expect($namespaces['Psr\Log'][0])->toBe('/Config/Autoload/Psr/Log' . DS);
-            expect($namespaces['Psr\Log'][1])->toMatch(static fn ($actual) => str_contains($actual, VENDOR_PATH));
+            expect($namespaces['Psr\Log'][1])->toMatch(static fn ($actual): bool => str_contains($actual, VENDOR_PATH));
         });
 
         it(': Restriction des packages decouverts par Composer', function (): void {
@@ -196,7 +196,7 @@ describe('Autoloader', function (): void {
 
             $namespaces = $loader->getNamespace();
             expect(count($namespaces))->toBe(1);
-            expect($namespaces['Psr\Log'][0])->toMatch(static fn ($actual) => str_contains($actual, VENDOR_PATH));
+            expect($namespaces['Psr\Log'][0])->toMatch(static fn ($actual): bool => str_contains($actual, VENDOR_PATH));
         });
 
         it(': Exclusion des packages decouvers par Composer', function (): void {
@@ -218,7 +218,7 @@ describe('Autoloader', function (): void {
             $config['composer']['packages'] = ['only' => ['psr/log'], 'exclude' => ['kahlan/kahlan']];
             $loader                         = new Autoloader($config);
 
-            expect(static fn () => $loader->initialize())
+            expect(static fn (): Autoloader => $loader->initialize())
                 ->toThrow(new LogicException('Impossible d\'utiliser "only" et "exclude" en même temps dans "Config\autoload::composer>packages".'));
         });
 

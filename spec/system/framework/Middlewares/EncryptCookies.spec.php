@@ -29,8 +29,8 @@ describe('Middleware / EncryptCookies', function (): void {
 				'getKey' => 'test-key',
 			]);
 
-			$encrypter->shouldReceive('encrypt')->andReturnUsing(fn($value) => 'encrypted:' . $value);
-			$encrypter->shouldReceive('decrypt')->andReturnUsing(fn($value) => str_replace('encrypted:', '', $value));
+			$encrypter->shouldReceive('encrypt')->andReturnUsing(fn($value): string => 'encrypted:' . $value);
+			$encrypter->shouldReceive('decrypt')->andReturnUsing(fn($value): string|array => str_replace('encrypted:', '', $value));
 
 			return $encrypter;
         };
@@ -92,14 +92,12 @@ describe('Middleware / EncryptCookies', function (): void {
 		});
 
 		$response = Mockery::mock(Response::class);
-		$response->shouldReceive('getCookieCollection')->andReturnUsing(function() use ($cookie) {
+		$response->shouldReceive('getCookieCollection')->andReturnUsing(function() use ($cookie): CookieCollection {
 			$collection = new CookieCollection();
 			$collection->add($cookie);
 			return $collection;
 		});
-		$response->shouldReceive('withCookie')->andReturnUsing(function($cookie) use ($response) {
-			return $response;
-		});
+		$response->shouldReceive('withCookie')->andReturnUsing(fn($cookie) => $response);
 
         $handler = Mockery::mock(RequestHandlerInterface::class, [
             'handle' => $response,

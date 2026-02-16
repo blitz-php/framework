@@ -1,5 +1,7 @@
 <?php
 
+use BlitzPHP\Mail\Mail;
+
 return [
     /**
      * Adresse "From" globale
@@ -57,7 +59,7 @@ return [
      *
      * @var string
      */
-    'protocol' => env('mail.protocol', BlitzPHP\Mail\Mail::PROTOCOL_SENDMAIL),
+    'protocol' => env('mail.protocol', Mail::PROTOCOL_SENDMAIL),
 
     /**
      * Adresse du serveur SMTP
@@ -105,7 +107,7 @@ return [
      *
      * @var string
      */
-    'encryption' => env('mail.encryption', BlitzPHP\Mail\Mail::ENCRYPTION_NONE),
+    'encryption' => env('mail.encryption', Mail::ENCRYPTION_NONE),
 
     /**
      *Type de mail par defaut, soit 'text' ou 'html'
@@ -117,14 +119,14 @@ return [
     /**
      * Jeu de caractères (utf-8, iso-8859-1, etc.)
      */
-    'charset' => env('mail.charset', BlitzPHP\Mail\Mail::CHARSET_UTF8),
+    'charset' => env('mail.charset', Mail::CHARSET_UTF8),
 
     /**
      * Priorité d'email. 1 = le plus haut. 5 = le plus bas. 3 = normal
      *
      * @var int
      */
-    'priority' => BlitzPHP\Mail\Mail::PRIORITY_NORMAL,
+    'priority' => Mail::PRIORITY_NORMAL,
 
     /**
      * Taille maximal des pieces jointes

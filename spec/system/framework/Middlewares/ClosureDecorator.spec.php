@@ -19,9 +19,7 @@ use function Kahlan\expect;
 
 describe('Middleware / ClosureDecorator', function (): void {
     beforeAll(function (): void {
-        $this->getRequest = function () {
-            return Mockery::mock(Request::class);
-        };
+        $this->getRequest = (fn() => Mockery::mock(Request::class));
     });
 
     it("devrait décorer une closure avec la signature PSR-15 standard", function (): void {
@@ -29,7 +27,7 @@ describe('Middleware / ClosureDecorator', function (): void {
         $response = new Response();
 
         $called = false;
-        $closure = function ($request, $handler) use (&$called, $req) {
+        $closure = function ($request, $handler) use (&$called, $req): Response {
             $called = true;
             expect($request)->toBe($req);
             expect($handler)->toBeAnInstanceOf(RequestHandlerInterface::class);
@@ -49,7 +47,7 @@ describe('Middleware / ClosureDecorator', function (): void {
         $res = new Response();
 
         $called = false;
-        $closure = function ($request, $response, $next) use (&$called, $req, $res) {
+        $closure = function ($request, $response, $next) use (&$called, $req, $res): Response {
             $called = true;
             expect($request)->toBe($req);
             expect($response)->toBe($res);
@@ -74,9 +72,7 @@ describe('Middleware / ClosureDecorator', function (): void {
             'handle' => $handlerResponse,
         ]);
 
-        $closure = function ($unknownParam) {
-            return new Response();
-        };
+        $closure = (fn($unknownParam) => new Response());
 
         $middleware = new ClosureDecorator($closure, $response);
         $result = $middleware->process($request, $handler);
@@ -85,9 +81,7 @@ describe('Middleware / ClosureDecorator', function (): void {
     });
 
     it("devrait retourner la closure décorée via getCallable", function (): void {
-        $closure = function () {
-            return new Response();
-        };
+        $closure = (fn() => new Response());
 
         $middleware = new ClosureDecorator($closure);
 

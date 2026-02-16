@@ -32,16 +32,11 @@ describe('DefinedRouteCollector', function (): void {
         $routes = $this->getCollector();
         $routes->get('journals', 'Blogs');
         $routes->get('product/(:num)', 'Catalog::productLookupByID/$1');
-        $routes->get('feed', static fn () => 'A Closure route.');
+        $routes->get('feed', static fn (): string => 'A Closure route.');
         $routes->view('about', 'pages/about');
 
         $collector = new DefinedRouteCollector($routes);
-
-        $definedRoutes = [];
-
-        foreach ($collector->collect() as $route) {
-            $definedRoutes[] = $route;
-        }
+        $definedRoutes = $collector->collect();
 
         $expected = [
             [
@@ -80,12 +75,7 @@ describe('DefinedRouteCollector', function (): void {
         $routes->get('logout', 'AuthController::logout', ['as' => 'logout']);
 
         $collector = new DefinedRouteCollector($routes);
-
-        $definedRoutes = [];
-
-        foreach ($collector->collect() as $route) {
-            $definedRoutes[] = $route;
-        }
+        $definedRoutes = $collector->collect();
 
         $expected = [
             [
@@ -115,7 +105,7 @@ describe('DefinedRouteCollector', function (): void {
         $routes = $this->getCollector();
         $routes->get('journals', 'Blogs');
         $routes->get('product/(:num)', 'Catalog::productLookupByID/$1');
-        $routes->get('feed', static fn () => 'A Closure route.');
+        $routes->get('feed', static fn (): string => 'A Closure route.');
         $routes->view('about', 'pages/about');
 
         $collector = new DefinedRouteCollector($routes);
@@ -146,20 +136,10 @@ describe('DefinedRouteCollector', function (): void {
                 'handler' => '(View) pages/about',
             ],
         ];
-
-        $definedRoutes = [];
-
-        foreach ($collector->collect() as $route) {
-            $definedRoutes[] = $route;
-        }
+        $definedRoutes = $collector->collect();
 
         expect($definedRoutes)->toBe($expected);
-
-		$definedRoutes = [];
-
-        foreach ($collector->collect(false) as $route) {
-            $definedRoutes[] = $route;
-        }
+        $definedRoutes = $collector->collect(false);
 
         expect($definedRoutes)->toBe($expected);
     });

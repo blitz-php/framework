@@ -80,7 +80,7 @@ describe('Publisher / PublisherRestrictions', function (): void {
 
         foreach ($directories as [$destination, $allowed]) {
             if (! $allowed) {
-                expect(fn() => new Publisher(null, $destination))
+                expect(fn(): Publisher => new Publisher(null, $destination))
 					->toThrow(PublisherException::destinationNotAllowed($destination));
             } else {
 				expect(new Publisher(null, $destination))->toBeAnInstanceOf(Publisher::class);

@@ -27,7 +27,7 @@ describe('Views / NativeAdapter', function (): void {
 			$view->setVar('testString', 'Hello World');
 			$expected = "<p>Open</p>\n<h1>Hello World</h1>";
 
-            expect($view->render('extend'))->toMatch(fn($actual) => str_contains($actual, $expected));
+            expect($view->render('extend'))->toMatch(fn($actual): bool => str_contains($actual, $expected));
         });
 
         it("Le layout n'est pas rendu plusieurs fois même si on l'appelle à plusieurs reprise", function (): void {
@@ -38,7 +38,7 @@ describe('Views / NativeAdapter', function (): void {
 
 			$view->render('extend');
 
-        	expect($view->render('extend'))->toMatch(fn($actual) => str_contains($actual, $expected));
+        	expect($view->render('extend'))->toMatch(fn($actual): bool => str_contains($actual, $expected));
         });
 
         it("Les variables sont disponibles partout", function (): void {
@@ -47,7 +47,7 @@ describe('Views / NativeAdapter', function (): void {
 			$view->setVar('testString', 'Hello World');
 			$expected = "<p>Open</p>\n<h1>Hello World</h1>\n<p>Hello World</p>";
 
-        	expect($view->render('extend'))->toMatch(fn($actual) => str_contains($actual, $expected));
+        	expect($view->render('extend'))->toMatch(fn($actual): bool => str_contains($actual, $expected));
         });
 
         it("Deux sections peuvent avoir le meme nom", function (): void {
@@ -56,7 +56,7 @@ describe('Views / NativeAdapter', function (): void {
 			$view->setVar('testString', 'Hello World');
 			$expected = "<p>First</p>\n<p>Second</p>";
 
-        	expect($view->render('extend_two'))->toMatch(fn($actual) => str_contains($actual, $expected));
+        	expect($view->render('extend_two'))->toMatch(fn($actual): bool => str_contains($actual, $expected));
         });
 
         it("Une erreur syntaxique dans la closure d'une section leve une exception", function (): void {
@@ -64,7 +64,7 @@ describe('Views / NativeAdapter', function (): void {
 
 			$view->setVar('testString', 'Hello World');
 
-			expect(fn() => $view->render('broken'))->toThrow(new RuntimeException());
+			expect(fn(): string => $view->render('broken'))->toThrow(new RuntimeException());
         });
 
         it("L'abscence d'un renderSection n'affichera pas le contenu de la vue", function (): void {
@@ -73,7 +73,7 @@ describe('Views / NativeAdapter', function (): void {
         	$view->setVar('testString', 'Hello World');
         	$expected = '';
 
-            expect($view->render('apples'))->toMatch(fn($actual) => str_contains($actual, $expected));
+            expect($view->render('apples'))->toMatch(fn($actual): bool => str_contains($actual, $expected));
         });
 
         it("Le rendu de section conserve les donnees", function (): void {
@@ -83,7 +83,7 @@ describe('Views / NativeAdapter', function (): void {
 			$view->setVar('testString', 'Hello World');
 			$expected = "<title>Bienvenue sur BlitzPHP!</title>\n<h1>Bienvenue sur BlitzPHP!</h1>\n<p>Hello World</p>";
 
-            expect($view->render('extend_reuse_section'))->toMatch(fn($actual) => str_contains($actual, $expected));
+            expect($view->render('extend_reuse_section'))->toMatch(fn($actual): bool => str_contains($actual, $expected));
         });
     });
 
@@ -95,9 +95,9 @@ describe('Views / NativeAdapter', function (): void {
 
  	       	$content = $view->render('extend_include');
 
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, 'Hello World'));
         });
 
 		it('includeWhen', function (): void {
@@ -107,10 +107,10 @@ describe('Views / NativeAdapter', function (): void {
 
  	       	$content = $view->render('extend_include_when');
 
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
-			expect($content)->toMatch(fn($actual) => !str_contains($actual, '<h1>Hello World</h1>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>{teststring}</h1>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, 'Hello World'));
+			expect($content)->toMatch(fn($actual): bool => !str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<h1>{teststring}</h1>'));
         });
 
 		it('includeUnless', function (): void {
@@ -120,9 +120,9 @@ describe('Views / NativeAdapter', function (): void {
 
  	       	$content = $view->render('extend_include_unless');
 
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, 'Hello World'));
         });
 
 		it('includeIf', function (): void {
@@ -132,9 +132,9 @@ describe('Views / NativeAdapter', function (): void {
 
  	       	$content = $view->render('extend_include_if');
 
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, 'Hello World'));
         });
 
 		it('includeFirst', function (): void {
@@ -144,10 +144,10 @@ describe('Views / NativeAdapter', function (): void {
 
  	       	$content = $view->render('extend_include_first');
 
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Open</p>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>Hello World</h1>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, 'Hello World'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<h1>{teststring}</h1>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>Open</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<h1>Hello World</h1>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, 'Hello World'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<h1>{teststring}</h1>'));
         });
 
 		it('includeFirst leve  une exception si on ne trouve aucune vue', function (): void {
@@ -155,7 +155,7 @@ describe('Views / NativeAdapter', function (): void {
 
         	$view->setVar('testString', 'Hello World');
 
- 	       	expect(fn() => $view->render('extend_include_first_throw'))->toThrow(new ViewException());
+ 	       	expect(fn(): string => $view->render('extend_include_first_throw'))->toThrow(new ViewException());
         });
     });
 
@@ -177,7 +177,7 @@ describe('Views / NativeAdapter', function (): void {
 			$view->render('simple', null, true);
 			$view->render('simple', null, false);
 
-			expect($view->render('simple', null, false))->toMatch(fn($actual) => str_contains($actual, '<h1>test</h1>'));
+			expect($view->render('simple', null, false))->toMatch(fn($actual): bool => str_contains($actual, '<h1>test</h1>'));
         });
 	});
 
@@ -188,9 +188,9 @@ describe('Views / NativeAdapter', function (): void {
 			$view->setVar('testString', 'Hello World');
         	$content = $view->render('nested_section');
 
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>First</p>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Second</p>'));
-			expect($content)->toMatch(fn($actual) => str_contains($actual, '<p>Third</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>First</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>Second</p>'));
+			expect($content)->toMatch(fn($actual): bool => str_contains($actual, '<p>Third</p>'));
         });
 
 		it('La mise en cache fonctionne', function(): void {
@@ -199,9 +199,9 @@ describe('Views / NativeAdapter', function (): void {
 			$view->setVar('testString', 'Hello World');
         	$expected = '<h1>Hello World</h1>';
 
-			expect($view->render('Nested/simple', ['cache' => 10]))->toMatch(fn($actual) => str_contains($actual, $expected));
+			expect($view->render('Nested/simple', ['cache' => 10]))->toMatch(fn($actual): bool => str_contains($actual, $expected));
         	// ce deuxième rendu doit passer par le cache
-			expect($view->render('Nested/simple', ['cache' => 10]))->toMatch(fn($actual) => str_contains($actual, $expected));
+			expect($view->render('Nested/simple', ['cache' => 10]))->toMatch(fn($actual): bool => str_contains($actual, $expected));
 		});
 	});
 
@@ -267,7 +267,7 @@ describe('Views / NativeAdapter', function (): void {
 
 
 			foreach ($expecteds as $expected) {
-				expect(fn() => $view->stylesBundle())->toMatchEcho(fn($actual) => str_contains($actual, $expected));
+				expect(fn() => $view->stylesBundle())->toMatchEcho(fn($actual): bool => str_contains($actual, $expected));
 			}
 		});
 
@@ -290,7 +290,7 @@ describe('Views / NativeAdapter', function (): void {
 			expect(fn() => $view->stylesBundle())->toEcho('');
 
 			foreach ($expecteds as $expected) {
-				expect(fn() => $view->scriptsBundle())->toMatchEcho(fn($actual) => str_contains($actual, $expected));
+				expect(fn() => $view->scriptsBundle())->toMatchEcho(fn($actual): bool => str_contains($actual, $expected));
 			}
 		});
 	});

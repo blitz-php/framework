@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use Psr\Http\Server\MiddlewareInterface;
 use BlitzPHP\Http\MiddlewareQueue;
 use BlitzPHP\Spec\ReflectionHelper;
 use Spec\BlitzPHP\App\Middlewares\DumbMiddleware;
@@ -21,7 +21,7 @@ describe('Http / MiddlewareQueue', function (): void {
 		$this->request    = service('request');
 		$this->response   = service('response');
 		$this->container  = service('container');
-		$this->middleware = fn (array $middlewares = []) => new MiddlewareQueue($this->container, $middlewares, $this->request, $this->response);
+		$this->middleware = fn (array $middlewares = []): MiddlewareQueue => new MiddlewareQueue($this->container, $middlewares, $this->request, $this->response);
     });
 
     describe('Constructeur', function (): void {
@@ -342,7 +342,7 @@ describe('Http / MiddlewareQueue', function (): void {
 			$queue = new MiddlewareQueue($this->container, [], $this->request, $this->response);
 			$queue->add('UnresolvableMiddleware');
 
-			expect(fn() => $queue->current())
+			expect(fn(): MiddlewareInterface => $queue->current())
 				->toThrow(new InvalidArgumentException("Middleware, `UnresolvableMiddleware` n'a pas été trouvé."));
 		});
 	});

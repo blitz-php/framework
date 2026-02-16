@@ -44,11 +44,7 @@ describe('Events / EventDiscover', function (): void {
 
         public function make(string $className, array $parameters = []): mixed
         {
-            if (isset($this->instances[$className])) {
-                return $this->instances[$className];
-            }
-
-            return new $className();
+            return $this->instances[$className] ?? new $className();
         }
     };
 
@@ -308,7 +304,7 @@ describe('Events / EventDiscover', function (): void {
         xit('Gère les erreurs lors de l\'instanciation', function (): void {
             // Simuler une erreur lors de l'instanciation
 			$mockContainer = Mockery::mock($this->mockContainer);
-			$mockContainer->shouldReceive('make')->with(TestListener1::class)->andReturn(function () {
+			$mockContainer->shouldReceive('make')->with(TestListener1::class)->andReturn(function (): void {
                 throw new Exception('Instantiation failed');
             });
 

@@ -93,7 +93,7 @@ describe('Redirection', function (): void {
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-            expect(static fn () => $response->route('differentRoute'))
+            expect(static fn (): Redirection => $response->route('differentRoute'))
                 ->toThrow(new HttpException());
         });
 
@@ -102,7 +102,7 @@ describe('Redirection', function (): void {
 
             $response = new Redirection(new UrlGenerator($this->routes, $this->request));
 
-            expect(static fn () => $response->route('Bad::badMethod'))
+            expect(static fn (): Redirection => $response->route('Bad::badMethod'))
                 ->toThrow(new HttpException());
         });
 
@@ -132,8 +132,8 @@ describe('Redirection', function (): void {
             expect($response->hasHeader('Location'))->toBeTruthy();
             expect($response->getHeaderLine('Location'))->toBe('http://example.com/users/123');
 
-            expect(static fn () => $response->route('users.profile'))->toThrow(new InvalidArgumentException());
-            expect(static fn () => $response->route('users.profile', ['user']))->toThrow(new RouterException('A parameter does not match the expected type.'));
+            expect(static fn (): Redirection => $response->route('users.profile'))->toThrow(new InvalidArgumentException());
+            expect(static fn (): Redirection => $response->route('users.profile', ['user']))->toThrow(new RouterException('A parameter does not match the expected type.'));
         });
     });
 
@@ -300,7 +300,7 @@ describe('Redirection', function (): void {
             expect($response->hasHeader('Location'))->toBeTruthy();
             expect($response->getHeaderLine('Location'))->toBe('http://example.com/action/une-action');
 
-            expect(static fn () => $response->action('fackeAction::method'))->toThrow(new RouterException('Action fackeAction::method not defined.'));
+            expect(static fn (): Redirection => $response->action('fackeAction::method'))->toThrow(new RouterException('Action fackeAction::method not defined.'));
         });
 
         it('away', function (): void {

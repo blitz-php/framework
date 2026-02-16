@@ -55,7 +55,7 @@ class MiddlewareRunner implements RequestHandlerInterface
             return $middleware->process($request, $this);
         }
 
-        if ($this->fallback !== null) {
+        if ($this->fallback instanceof RequestHandlerInterface) {
             return $this->fallback->handle($request);
         }
 

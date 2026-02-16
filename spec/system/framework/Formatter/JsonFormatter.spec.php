@@ -13,31 +13,31 @@ use BlitzPHP\Formatter\JsonFormatter;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Http\Request;
 
-describe('JsonFormatter', function() {
-    beforeEach(function() {
+describe('JsonFormatter', function(): void {
+    beforeEach(function(): void {
         $this->formatter = new JsonFormatter();
     });
 
-    describe('->format()', function() {
-        it('devrait formater un tableau simple en JSON', function() {
+    describe('->format()', function(): void {
+        it('devrait formater un tableau simple en JSON', function(): void {
             $data = ['nom' => 'Jean', 'age' => 30];
             $expected = '{"nom":"Jean","age":30}';
             expect($this->formatter->format($data))->toBe($expected);
         });
 
-        it('devrait gérer les caractères Unicode', function() {
+        it('devrait gérer les caractères Unicode', function(): void {
             $data = ['nom' => 'Éloïse'];
             $expected = '{"nom":"Éloïse"}';
             expect($this->formatter->format($data))->toBe($expected);
         });
 
-        it('devrait gérer les barres obliques', function() {
+        it('devrait gérer les barres obliques', function(): void {
             $data = ['url' => 'http://exemple.com/chemin/vers/ressource'];
             $expected = '{"url":"http://exemple.com/chemin/vers/ressource"}';
             expect($this->formatter->format($data))->toBe($expected);
         });
 
-        it('devrait gérer le rappel JSONP valide', function() {
+        it('devrait gérer le rappel JSONP valide', function(): void {
 			$request = service('request');
 
 			Services::override(
@@ -52,7 +52,7 @@ describe('JsonFormatter', function() {
 			Services::override(Request::class, $request);
         });
 
-        it('devrait gérer le rappel JSONP invalide', function() {
+        it('devrait gérer le rappel JSONP invalide', function(): void {
 			$request = service('request');
 
             Services::override(
@@ -68,18 +68,18 @@ describe('JsonFormatter', function() {
         });
     });
 
-    describe('->parse()', function() {
-        it('devrait analyser une chaîne JSON en tableau', function() {
+    describe('->parse()', function(): void {
+        it('devrait analyser une chaîne JSON en tableau', function(): void {
             $json = '{"nom":"Jean","age":30}';
             $expected = ['nom' => 'Jean', 'age' => 30];
             expect($this->formatter->parse($json))->toBe($expected);
         });
 
-        it('devrait retourner un tableau vide pour une chaîne vide', function() {
+        it('devrait retourner un tableau vide pour une chaîne vide', function(): void {
             expect($this->formatter->parse(''))->toBe([]);
         });
 
-        it('devrait supprimer les espaces blancs avant et après', function() {
+        it('devrait supprimer les espaces blancs avant et après', function(): void {
             $json = '  {"nom":"Jean"}  ';
             $expected = ['nom' => 'Jean'];
             expect($this->formatter->parse($json))->toBe($expected);

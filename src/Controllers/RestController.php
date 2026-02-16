@@ -357,7 +357,7 @@ class RestController extends BaseController
         array $errors = []
     ): ResponseInterface {
         $message = $message ?: "Une erreur s'est produite";
-        $code    = ! in_array($code, [0, '', '0', null], true) ? $code : $status;
+        $code    = in_array($code, [0, '', '0', null], true) ? $status : $code;
 
         $response = [
             $this->restConfig['field']['message'] => $message,
@@ -369,7 +369,7 @@ class RestController extends BaseController
         if (! empty($this->restConfig['field']['code'])) {
             $response[$this->restConfig['field']['code']] = $code;
         }
-        if (! empty($errors)) {
+        if ($errors !== []) {
             $response[$this->restConfig['field']['errors']] = $errors;
         }
 
@@ -423,7 +423,7 @@ class RestController extends BaseController
     protected function formatResult($result)
     {
         if (is_array($result)) {
-            return array_map([$this, 'formatEntity'], $result);
+            return array_map($this->formatEntity(...), $result);
         }
 
         return $this->formatEntity($result);

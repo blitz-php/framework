@@ -8,9 +8,9 @@
  * For the full copyright and license information, please view
  * the LICENSE file that was distributed with this source code.
  */
-
+use Psr\SimpleCache\CacheInterface;
+use Psr\Http\Message\StreamInterface;
 use BlitzPHP\Cache\ResponseCache;
-use BlitzPHP\Contracts\Cache\CacheInterface;
 use Kahlan\Plugin\Double;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -37,7 +37,7 @@ describe('Cache / ResponseCache', function (): void {
 			]);
 
 			$cache = Double::instance([
-				'implements' => [\Psr\SimpleCache\CacheInterface::class],
+				'implements' => [CacheInterface::class],
 			]);
 
             $responseCache = new ResponseCache($cache);
@@ -65,7 +65,7 @@ describe('Cache / ResponseCache', function (): void {
 			]);
 
 			$cache = Double::instance([
-				'implements' => [\Psr\SimpleCache\CacheInterface::class],
+				'implements' => [CacheInterface::class],
 			]);
 
             $responseCache = new ResponseCache($cache, true);
@@ -92,7 +92,7 @@ describe('Cache / ResponseCache', function (): void {
 				'implements' => [ServerRequestInterface::class],
 			]);
 			$body = Double::instance([
-				'implements' => [\Psr\Http\Message\StreamInterface::class],
+				'implements' => [StreamInterface::class],
 				'stubMethods' => [
 					'getContents' => 'response content',
 				],
@@ -105,7 +105,7 @@ describe('Cache / ResponseCache', function (): void {
 			]);
 
 			$cache = Double::instance([
-				'implements' => [\Psr\SimpleCache\CacheInterface::class],
+				'implements' => [CacheInterface::class],
 			]);
 
 			$responseCache = new ResponseCache($cache);
@@ -131,7 +131,7 @@ describe('Cache / ResponseCache', function (): void {
 				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'POST'],
 			]);
 			$body = Double::instance([
-				'implements' => [\Psr\Http\Message\StreamInterface::class],
+				'implements' => [StreamInterface::class],
 				'stubMethods' => [
 					'getContents' => '{"data": "test"}',
 				],
@@ -148,7 +148,7 @@ describe('Cache / ResponseCache', function (): void {
 			allow($response)->toReceive('getHeaderLine')->with('Content-Type')->andReturn('application/json');
 
 			$cache = Double::instance([
-				'implements' => [\Psr\SimpleCache\CacheInterface::class],
+				'implements' => [CacheInterface::class],
 			]);
             $expectedData = serialize([
                 'headers' => ['Content-Type' => 'application/json'],
@@ -182,7 +182,7 @@ describe('Cache / ResponseCache', function (): void {
 				'stubMethods' => ['getUri' => $uri, 'getMethod' => 'GET'],
 			]);
 			$body = Double::instance([
-				'implements' => [\Psr\Http\Message\StreamInterface::class],
+				'implements' => [StreamInterface::class],
 				'stubMethods' => [
 					'getContents' => '{"data": "test"}',
 				],
@@ -199,7 +199,7 @@ describe('Cache / ResponseCache', function (): void {
 			allow($response)->toReceive('getHeaderLine')->with('Content-Type')->andReturn('application/json');
 
 			$cache = Double::instance([
-				'implements' => [\Psr\SimpleCache\CacheInterface::class],
+				'implements' => [CacheInterface::class],
 			]);
             $expectedData = serialize([
                 'headers' => ['Content-Type' => 'application/json'],
@@ -246,7 +246,7 @@ describe('Cache / ResponseCache', function (): void {
 			allow($response)->toReceive('withHeader')->with('Content-Type', 'application/json')->andReturn($newResponse);
 
 			$cache = Double::instance([
-				'implements' => [\Psr\SimpleCache\CacheInterface::class],
+				'implements' => [CacheInterface::class],
 			]);
             allow($cache)->toReceive('get')->andReturn($cachedData = serialize([
                 'headers' => ['Content-Type' => 'application/json', 'X-Custom' => 'value'],
@@ -280,7 +280,7 @@ describe('Cache / ResponseCache', function (): void {
 			]);
 
 			$cache = Double::instance([
-				'implements' => [\Psr\SimpleCache\CacheInterface::class],
+				'implements' => [CacheInterface::class],
 			]);
             allow($cache)->toReceive('get')->andReturn(serialize('invalid_data'));
 
@@ -288,7 +288,7 @@ describe('Cache / ResponseCache', function (): void {
 			$responseCache = new ResponseCache($cache);
 
 
-            expect(fn() => $responseCache->get($request, $response))
+            expect(fn(): ?ResponseInterface => $responseCache->get($request, $response))
                 ->toThrow(new Exception());
         });
     });

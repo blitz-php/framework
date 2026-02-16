@@ -231,8 +231,8 @@ describe('Session / Cookie / CookieManager', function (): void {
             $actualExpiry = $cookie->getExpiresTimestamp();
 
             // Tolérance de 1 seconde pour les différences de timing
-            expect($actualExpiry)->toMatch(fn($actual) => $actual >= $expectedExpiry - 1);
-            expect($actualExpiry)->toMatch(fn($actual) => $actual <= $expectedExpiry + 1);
+            expect($actualExpiry)->toMatch(fn($actual): bool => $actual >= $expectedExpiry - 1);
+            expect($actualExpiry)->toMatch(fn($actual): bool => $actual <= $expectedExpiry + 1);
         });
 
         it('Devrait créer un cookie avec durée négative', function (): void {
@@ -251,9 +251,7 @@ describe('Session / Cookie / CookieManager', function (): void {
 
     describe('Macroable trait', function (): void {
         it('Devrait supporter les macros', function (): void {
-            CookieManager::macro('makeJson', function (string $name, array $data, int $minutes = 0) {
-                return $this->make($name, json_encode($data), $minutes);
-            });
+            CookieManager::macro('makeJson', fn(string $name, array $data, int $minutes = 0) => $this->make($name, json_encode($data), $minutes));
 
             $data = ['key' => 'value'];
             $cookie = $this->manager->makeJson('json_cookie', $data, 60);

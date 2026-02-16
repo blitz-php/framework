@@ -105,7 +105,7 @@ class ConfigCheck extends Command
     {
         return preg_replace_callback(
             '/(.*)\.(.*)$/',
-            static fn ($matches) => sprintf(
+            static fn ($matches): string => sprintf(
                 '%s -> %s',
                 str_replace('.', ' ⇁ ', $matches[1]),
                 $matches[2]
@@ -128,7 +128,7 @@ class ConfigCheck extends Command
             is_numeric($value)                        => $value,
             is_array($value) && array_is_list($value) => [implode(', ', $value), ['fg' => Color::PURPLE]],
             is_array($value)                          => '[]',
-            is_object($value)                         => get_class($value),
+            is_object($value)                         => $value::class,
             is_string($value)                         => $value,
             default                                   => print_r($value, true),
         };

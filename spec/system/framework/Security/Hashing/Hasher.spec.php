@@ -44,7 +44,7 @@ describe('Security / Hashing', function (): void {
             })->toThrow(new HashingException());
         });
 
-		it(':isHashed', function () {
+		it(':isHashed', function (): void {
 			$hash = $this->hasher->make('password');
 
 			expect($this->hasher->isHashed($hash))->toBeTruthy();
@@ -84,8 +84,8 @@ describe('Security / Hashing', function (): void {
         });
     });
 
-	describe(':check' , function () {
-		it('Les valeurs vide renvoient false', function () {
+	describe(':check' , function (): void {
+		it('Les valeurs vide renvoient false', function (): void {
 			$hasher = service('hashing');
             expect($hasher->check('', ''))->toBeFalsy();
             expect($hasher->check('test', ''))->toBeFalsy();
@@ -151,7 +151,7 @@ describe('Security / Hashing', function (): void {
 			$argonHandler = new ArgonHandler(['verify' => true]);
 			$argonHashed = $argonHandler->make('password');
 
-			expect(fn() => (new BcryptHandler(['verify' => true]))->check('password', $argonHashed))
+			expect(fn(): bool => (new BcryptHandler(['verify' => true]))->check('password', $argonHashed))
 				->toThrow(new RuntimeException());
 		});
 
@@ -159,7 +159,7 @@ describe('Security / Hashing', function (): void {
 			$argonHandler = new BcryptHandler(['verify' => true]);
 			$argonHashed = $argonHandler->make('password');
 
-			expect(fn() => (new ArgonHandler(['verify' => true]))->check('password', $argonHashed))
+			expect(fn(): bool => (new ArgonHandler(['verify' => true]))->check('password', $argonHashed))
 				->toThrow(new RuntimeException());
 		});
 
@@ -167,7 +167,7 @@ describe('Security / Hashing', function (): void {
 			$argonHandler = new BcryptHandler(['verify' => true]);
 			$argonHashed = $argonHandler->make('password');
 
-			expect(fn() => (new Argon2IdHandler(['verify' => true]))->check('password', $argonHashed))
+			expect(fn(): bool => (new Argon2IdHandler(['verify' => true]))->check('password', $argonHashed))
 				->toThrow(new RuntimeException());
 		});
 	});

@@ -21,11 +21,11 @@ use BlitzPHP\View\View;
 use function Kahlan\expect;
 
 describe('Views / View', function (): void {
-	beforeAll(function() {
+	beforeAll(function(): void {
 		config()->set('view.app_overrides_folder', '');
 	});
 
-	afterAll(function() {
+	afterAll(function(): void {
 		config()->reset('view.app_overrides_folder');
 	});
 
@@ -260,7 +260,7 @@ describe('Views / View', function (): void {
 
 		it('Share', function(): void {
 			View::share('testString', 'String');
-			View::share('testClosure', fn() => 'String');
+			View::share('testClosure', fn(): string => 'String');
 
 			$view     = new View();
 			$expected = '<h1>String</h1>';
@@ -312,7 +312,7 @@ describe('Views / View', function (): void {
 			$view->first(['missing', 'simple'], ['testString' => 'String']);
 			expect((string) $view)->toBe('<h1>String</h1>');
 
-			expect(fn() => $view->first(['missing', 'mixed']))
+			expect(fn(): View => $view->first(['missing', 'mixed']))
 				->toThrow(new ViewException());
 		});
 
@@ -320,7 +320,7 @@ describe('Views / View', function (): void {
 			$config = config()->get('view.active_adapter');
 			config()->set('view.active_adapter', 'blade');
 
-			expect(fn() => new View())->toThrow(new ConfigException());
+			expect(fn(): View => new View())->toThrow(new ConfigException());
 
 			config()->set('view.active_adapter', $config);
 		});
@@ -348,7 +348,7 @@ describe('Views / View', function (): void {
 			$view->display('simple_layout')
 				->layout('layout');
 
-			expect(fn() => $view->render())->toMatchEcho(fn($actual) => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
+			expect(fn() => $view->render())->toMatchEcho(fn($actual): bool => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
 		});
 
 		it('Layout a travers options', function (): void {
@@ -358,13 +358,13 @@ describe('Views / View', function (): void {
 			$view->display('simple_layout')
 				->options(['layout' => 'layout']);
 
-			expect(fn() => $view->render())->toMatchEcho(fn($actual) => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
+			expect(fn() => $view->render())->toMatchEcho(fn($actual): bool => str_contains($actual, '<h1>Hello World</h1>') && str_contains($actual, '<p>Open</p>'));
 		});
 	});
 
 	describe('Vues namespacées', function(): void {
-		beforeAll(function() {
-			$this->mockLocator = function(array $options) {
+		beforeAll(function(): void {
+			$this->mockLocator = function(array $options): void {
 				$locator = new class(service('autoloader'), $options) extends Locator {
 					public function __construct(Autoloader $autoloader, private array $options)
 					{
@@ -385,11 +385,11 @@ describe('Views / View', function (): void {
 			};
 		});
 
-		afterEach(function() {
+		afterEach(function(): void {
 			Services::resetSingle('locator');
 		});
 
-		it('Les vues de l\'application sont prioritaires par rapport à celles des namespaces', function() {
+		it('Les vues de l\'application sont prioritaires par rapport à celles des namespaces', function(): void {
 			$view = new View();
 
 			$view->setVar('testString', 'Hello World');
@@ -429,11 +429,11 @@ describe('Views / View', function (): void {
 
 			$view->setVar('testString', 'Hello World');
 
-        	expect(fn() => $view->display($namespacedView)->get())
+        	expect(fn(): string => $view->display($namespacedView)->get())
 				->not->toThrow();
 		});
 
-		it('Les vues de l\'application peuvent surchager des vues namespacées', function() {
+		it('Les vues de l\'application peuvent surchager des vues namespacées', function(): void {
 			config()->set('view.app_overrides_folder', 'overrides');
 
 			$this->mockLocator([
@@ -449,7 +449,7 @@ describe('Views / View', function (): void {
         	expect($output)->toBe('<h1>Fallback Content</h1>');
 		});
 
-		it('Les vues de l\'application surchagent reelement les vues namespacées', function() {
+		it('Les vues de l\'application surchagent reelement les vues namespacées', function(): void {
 			config()->set('view.app_overrides_folder', 'overrides');
 
 			$path = VIEW_PATH . 'overrides/Nested/simple.php';

@@ -28,7 +28,6 @@ use BlitzPHP\Router\RouteBuilder;
 use BlitzPHP\Spec\ReflectionHelper;
 use BlitzPHP\Utilities\Reflection\ReflectionClass;
 use BlitzPHP\View\View as ViewView;
-use DI\NotFoundException;
 
 use function Kahlan\expect;
 
@@ -210,7 +209,7 @@ describe('Facades', function (): void {
 
 			/** @var SplFileInfo $file */
    			$file = last(Fs::files(storage_path('logs')));
-			expect($file->getContents())->toMatch(fn($actual) => str_contains($actual, 'test file ' . __FILE__));
+			expect($file->getContents())->toMatch(fn($actual): bool => str_contains($actual, 'test file ' . __FILE__));
         });
     });
 
@@ -377,7 +376,7 @@ describe('Facades', function (): void {
 
 		it('Le cache fonctionne correctement avec plusieurs appels', function (): void {
 			$counter = 0;
-			$factory = function () use (&$counter) {
+			$factory = function () use (&$counter): object {
 				$counter++;
 				return new class() {
 					public function method() {

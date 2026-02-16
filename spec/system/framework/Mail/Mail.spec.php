@@ -76,7 +76,7 @@ describe('Mail / Mail', function (): void {
         it('Doit lever une exception pour un handler non défini', function (): void {
             $mail = new Mail([]);
 
-            expect(fn() => ReflectionClass::make($mail)->invoke('factory'))
+            expect(fn(): mixed => ReflectionClass::make($mail)->invoke('factory'))
                 ->toThrow(new InvalidArgumentException(lang('Mail.undefinedHandler')));
         });
 
@@ -84,7 +84,7 @@ describe('Mail / Mail', function (): void {
             $config = ['handler' => 'nonexistent'];
             $mail = new Mail($config);
 
-            expect(fn() => ReflectionClass::make($mail)->invoke('factory'))
+            expect(fn(): mixed => ReflectionClass::make($mail)->invoke('factory'))
                 ->toThrow(new InvalidArgumentException(lang('Mail.invalidHandler', ['nonexistent'])));
         });
 
@@ -92,7 +92,7 @@ describe('Mail / Mail', function (): void {
             $config = ['handler' => 'stdClass'];
             $mail = new Mail($config);
 
-            expect(fn() => ReflectionClass::make($mail)->invoke('factory'))
+            expect(fn(): mixed => ReflectionClass::make($mail)->invoke('factory'))
                 ->toThrow(new InvalidArgumentException(lang('Mail.handlerMustExtendClass', ['stdClass', AbstractAdapter::class])));
         });
     });
@@ -116,7 +116,7 @@ describe('Mail / Mail', function (): void {
 
         it('Doit émettre un événement "sending" avant l\'envoi et "sent" après un envoi réussi', function (): void {
 			$events = [];
-			service('event')->on('*', static function($event) use (&$events) {
+			service('event')->on('*', static function($event) use (&$events): void {
 				$events[] = $event->getName();
 			});
 
@@ -131,7 +131,7 @@ describe('Mail / Mail', function (): void {
 			ReflectionClass::make($this->mail)->setValue('adapter', $this->mockAdapter);
 
 			$events = [];
-			service('event')->on('*', static function($event) use (&$events) {
+			service('event')->on('*', static function($event) use (&$events): void {
 				$events[] = $event->getName();
 			});
 
@@ -155,8 +155,8 @@ describe('Mail / Mail', function (): void {
         });
 
         it('Doit lever une exception si l\'adaptateur lève une exception', function (): void {
-			allow($this->mockAdapter)->toReceive('send')->andRun(function () {
-				throw new \Exception('SMTP Connection failed');
+			allow($this->mockAdapter)->toReceive('send')->andRun(function (): void {
+				throw new Exception('SMTP Connection failed');
 			});
 			ReflectionClass::make($this->mail)->setValue('adapter', $this->mockAdapter);
 
@@ -233,7 +233,7 @@ describe('Mail / Mail', function (): void {
                 ['email' => 'test2@example.com']
             ];
 
-            [$success, $failures] = $this->mail->bulk($recipients, function ($mail, $recipient) {
+            [$success, $failures] = $this->mail->bulk($recipients, function ($mail, $recipient): void {
                 $mail->to($recipient['email']);
                 $mail->subject('Bulk email');
                 $mail->html('Content');

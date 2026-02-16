@@ -58,30 +58,30 @@ describe('Commandes / GenerateKey', function (): void {
 
     it(': GenerateKey affiche la clé codée', function (): void {
         command('key:generate --show');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'hex2bin:'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'hex2bin:'));
 
         command('key:generate --prefix=base64 --show');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'base64:'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'base64:'));
 
         command('key:generate --prefix=hex2bin --show');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'hex2bin:'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'hex2bin:'));
     });
 
     it(': GenerateKey génère une nouvelle la clé', function (): void {
         command('key:generate');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
-        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual) => str_contains($actual, env('encryption.key')));
-        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual) => str_contains($actual, 'hex2bin:'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'SUCCESS'));
+        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual): bool => str_contains($actual, env('encryption.key')));
+        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual): bool => str_contains($actual, 'hex2bin:'));
 
         command('key:generate --prefix=base64 --force');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'SUCCESS'));
         // expect(file_get_contents($this->envPath))->toMatch(fn($actual) => str_contains($actual, env('encryption.key')));
-        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual) => str_contains($actual, 'base64:'));
+        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual): bool => str_contains($actual, 'base64:'));
 
         command('key:generate --prefix=hex2bin --force');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'SUCCESS'));
         // expect(file_get_contents($this->envPath))->toMatch(fn($actual) => str_contains($actual, env('encryption.key')));
-        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual) => str_contains($actual, 'hex2bin:'));
+        expect(file_get_contents($this->envPath))->toMatch(static fn ($actual): bool => str_contains($actual, 'hex2bin:'));
     });
 
     it(": Le fichier .env.example n'existe pas", function (): void {
@@ -89,8 +89,8 @@ describe('Commandes / GenerateKey', function (): void {
         command('key:generate');
         rename(ROOTPATH . 'lostenv', ROOTPATH . '.env.example');
 
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'livré par défaut'));
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'Erreur dans la configuration'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'livré par défaut'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'Erreur dans la configuration'));
     });
 
     it(': Le fichier .env existe mais il est vide', function (): void {
@@ -98,7 +98,7 @@ describe('Commandes / GenerateKey', function (): void {
 
         command('key:generate');
 
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'SUCCESS'));
         expect(file_get_contents($this->envPath))->toBe("\nencryption.key=\"" . env('encryption.key') . "\"\n");
     });
 
@@ -117,7 +117,7 @@ describe('Commandes / GenerateKey', function (): void {
 
         StreamInterceptor::$buffer = '';
         command('key:generate --force');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'SUCCESS'));
         // expect($key)->not->toBe(env('encryption.key', $key)); // Échec du remplacement de la clé commentée.
     });
 
@@ -136,7 +136,7 @@ describe('Commandes / GenerateKey', function (): void {
 
         StreamInterceptor::$buffer = '';
         command('key:generate --force');
-        expect(COH::buffer())->toMatch(static fn ($actual) => str_contains($actual, 'SUCCESS'));
+        expect(COH::buffer())->toMatch(static fn ($actual): bool => str_contains($actual, 'SUCCESS'));
         // expect($key)->not->toBe(env('encryption.key', $key)); // Échec du remplacement de la clé commentée.
     });
 });

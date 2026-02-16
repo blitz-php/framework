@@ -173,7 +173,7 @@ describe('Security / Encryption', function (): void {
         it('getKey', function (): void {
            $config           = (object) config('encryption');
 		   $this->encryption = new Encryption($config);
-		   expect(fn() => $this->encryption->getKey())->toThrow(EncryptionException::needsStarterKey());
+		   expect(fn(): string => $this->encryption->getKey())->toThrow(EncryptionException::needsStarterKey());
 
 		   // try a different key
 		   $ikm              = 'Secret stuff';

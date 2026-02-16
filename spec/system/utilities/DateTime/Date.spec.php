@@ -45,12 +45,12 @@ describe('Utilities / DateTime / Date', function (): void {
 		});
 
 		it('Création avec locale invalide', function (): void {
-			expect(fn() => new Date('now', 'Africa/Douala', 'invalid_locale'))
+			expect(fn(): Date => new Date('now', 'Africa/Douala', 'invalid_locale'))
 				->toThrow(new InvalidArgumentException("La locale 'invalid_locale' n'est pas valide."));
 		});
 
 		it('Création avec timezone invalide', function (): void {
-			expect(fn() => new Date('now', 'Invalid/Timezone'))
+			expect(fn(): Date => new Date('now', 'Invalid/Timezone'))
 				->toThrow(new InvalidArgumentException("Le fuseau horaire fourni [Invalid/Timezone] n'est pas supporté."));
 		});
 
@@ -270,7 +270,7 @@ describe('Utilities / DateTime / Date', function (): void {
 			$date1 = Date::parse('2025-08-01');
 			$date2 = Date::parse('2027-08-01');
 			expect(Date::diffYears($date1, $date2))->toBe(2);
-			expect(fn() => Date::diffYears('invalid', $date2))->toThrow(new InvalidArgumentException());
+			expect(fn(): int => Date::diffYears('invalid', $date2))->toThrow(new InvalidArgumentException());
 		});
 
 		it('diffDays statique', function (): void {
@@ -398,7 +398,7 @@ describe('Utilities / DateTime / Date', function (): void {
 		it('diffForHumans avec locale non définie', function (): void {
 			$date = Date::create('2025-08-01', 'Africa/Douala', 'fr_FR');
 			$other = Date::create('2025-08-03', 'Africa/Douala', 'fr_FR');
-			expect(fn() => $date->diffForHumans($other, false, 'de_DE'))
+			expect(fn(): string => $date->diffForHumans($other, false, 'de_DE'))
 				->toThrow(new InvalidArgumentException("Aucune traduction définie pour la locale 'de_DE'. Utilisez setTranslations pour la définir."));
 		});
 	});
@@ -410,7 +410,7 @@ describe('Utilities / DateTime / Date', function (): void {
 		});
 
 		it('setDay invalide', function (): void {
-			expect(fn() => Date::create('2025-08-01')->setDay(32))
+			expect(fn(): Date => Date::create('2025-08-01')->setDay(32))
 				->toThrow(new DateException());
 		});
 
@@ -420,7 +420,7 @@ describe('Utilities / DateTime / Date', function (): void {
 		});
 
 		it('setMonth invalide', function (): void {
-			expect(fn() => Date::create('2025-08-01')->setMonth(13))
+			expect(fn(): Date => Date::create('2025-08-01')->setMonth(13))
 				->toThrow(new DateException());
 		});
 
@@ -430,7 +430,7 @@ describe('Utilities / DateTime / Date', function (): void {
 		});
 
 		it('setHour invalide', function (): void {
-			expect(fn() => Date::create('2025-08-01')->setHour(24))
+			expect(fn(): Date => Date::create('2025-08-01')->setHour(24))
 				->toThrow(new DateException());
 		});
 
@@ -456,7 +456,7 @@ describe('Utilities / DateTime / Date', function (): void {
 		});
 
 		it('setLocale invalide', function (): void {
-			expect(fn() => Date::create('2025-08-01')->setLocale('invalid_locale'))
+			expect(fn(): Date => Date::create('2025-08-01')->setLocale('invalid_locale'))
 				->toThrow(new InvalidArgumentException("La locale 'invalid_locale' n'est pas valide."));
 		});
 
@@ -565,7 +565,7 @@ describe('Utilities / DateTime / Date', function (): void {
 
 		it('getCalendar', function (): void {
 			$date = Date::create('2025-08-01');
-			expect($date->getCalendar())->toBeAnInstanceOf(\IntlCalendar::class);
+			expect($date->getCalendar())->toBeAnInstanceOf(IntlCalendar::class);
 		});
 	});
 
@@ -673,7 +673,7 @@ describe('Utilities / DateTime / Date', function (): void {
 		});
 
 		it('convertToDate lève exception pour invalide', function (): void {
-			expect(fn() => Date::convertToDate('invalid'))->toThrow(new InvalidArgumentException());
+			expect(fn(): Date => Date::convertToDate('invalid'))->toThrow(new InvalidArgumentException());
 		});
 	});
 

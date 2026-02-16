@@ -16,7 +16,7 @@ return Expect::structure([
     'compress_output'      => Expect::type('bool|closure|string')->default('auto'),
     'view_base'            => Expect::string(VIEW_PATH),
     'debug'                => Expect::anyOf(true, false, 'auto')->default('auto'),
-    'shared'               => Expect::type('closure')->default(static fn () => []),
+    'shared'               => Expect::type('closure')->default(static fn (): array => []),
     'decorators'           => Expect::listOf('string')->default([]),
     'app_overrides_folder' => Expect::string('overrides'),
     'adapters'             => Expect::structure([
