@@ -29,10 +29,10 @@ class GenerateKey extends Command
     protected string $service = 'Service de chiffrememt';
 
     protected array $options = [
-        '--force'  => 'Force l\'écrasement de clé existante dans le fichier `.env`.',
+        '--force'  => ['Force l\'écrasement de clé existante dans le fichier `.env`.'],
         '--length' => ['La longueur de la chaîne aléatoire qui doit être retournée en bytes.', 32],
         '--prefix' => ['Prefix à ajouter à la clé encodée (doit être hex2bin ou base64).', 'hex2bin'],
-        '--show'   => 'Indique qu\'on souhaite afficher la clé générée dans le terminal après l\'avoir mis dans le fichier `.env`.',
+        '--show'   => ['Indique qu\'on souhaite afficher la clé générée dans le terminal après l\'avoir mis dans le fichier `.env`.'],
     ];
 
     /**

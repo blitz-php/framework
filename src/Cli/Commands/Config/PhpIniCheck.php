@@ -28,7 +28,7 @@ final class PhpIniCheck extends Command
     protected string $service   = 'Service de configuration';
 
     protected array $arguments = [
-        'opcache' => 'Vérifier les valeurs détaillées de l\'opcache dans l\'environnement de production.',
+        'opcache' => ['Vérifier les valeurs détaillées de l\'opcache dans l\'environnement de production.'],
     ];
 
     /**
@@ -45,7 +45,7 @@ final class PhpIniCheck extends Command
 
             $length = max(array_map(strlen(...), array_keys($this->arguments)));
 
-            foreach ($this->arguments as $argument => $description) {
+            foreach ($this->arguments as $argument => [$description]) {
                 $this->write($this->color->ok($this->pad($argument, $length, 2, 2)) . $description)->eol();
             }
 

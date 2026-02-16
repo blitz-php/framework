@@ -32,12 +32,12 @@ class Component extends Command
     protected string $service = 'Service de génération de code';
 
     protected array $arguments = [
-        'name' => 'Le nom de la classe du composant contrôlé.',
+        'name' => ['Le nom de la classe du composant contrôlé.'],
     ];
 
     protected array $options = [
         '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
-        '--force'     => 'Forcer l\'écrasement du fichier existant.',
+        '--force'     => ['Forcer l\'écrasement du fichier existant.'],
     ];
 
     /**

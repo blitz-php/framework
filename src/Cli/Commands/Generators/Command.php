@@ -30,16 +30,16 @@ class Command extends ConsoleCommand
     protected string $service = 'Service de génération de code';
 
     protected array $arguments = [
-        'name' => 'Le nom de la classe de commande.',
+        'name' => ['Le nom de la classe de commande.'],
     ];
 
     protected array $options = [
-        '--command'   => 'Le nom de la commande. Par défaut: "command:name"',
+        '--command'   => ['Le nom de la commande.', 'command:name'],
         '--type'      => ['Le type de commande. Options [basic, generator]. Par défault: "basic".', 'basic'],
-        '--group'     => 'Le groupe de la commande. Par défaut: [basic -> "{APP_NAME}", generator -> "{APP_NAME}:Generateurs"].',
+        '--group'     => ['Le groupe de la commande. Par défaut: [basic -> "{APP_NAME}", generator -> "{APP_NAME}:Generateurs"].'],
         '--namespace' => ['Définissez l\'espace de noms racine. Par défaut: "APP_NAMESPACE".', APP_NAMESPACE],
-        '--suffix'    => 'Ajouter le titre du composant au nom de la classe (par exemple, User => UserCommand).',
-        '--force'     => "Forcer l'écrasement du fichier existant.",
+        '--suffix'    => ['Ajouter le titre du composant au nom de la classe (par exemple, User => UserCommand).'],
+        '--force'     => ["Forcer l'écrasement du fichier existant."],
     ];
 
     /**

@@ -25,12 +25,12 @@ class ConfigPublish extends Command
     protected string $description = 'Publie des fichiers de configuration dans votre application.';
 
     protected array $arguments = [
-        'name' => 'Le nom du fichier de configuration à publier.',
+        'name' => ['Le nom du fichier de configuration à publier.'],
     ];
-    
+
     protected array $options = [
-        '--all'   => 'Publie tous les fichiers de configuration.',
-        '--force' => 'Ecrase les fichiers de configuration existants.',
+        '--all'   => ['Publie tous les fichiers de configuration.'],
+        '--force' => ['Ecrase les fichiers de configuration existants.'],
     ];
 
     /**

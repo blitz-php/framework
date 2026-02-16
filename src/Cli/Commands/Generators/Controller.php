@@ -33,15 +33,15 @@ class Controller extends Command
     protected string $service = 'Service de génération de code';
 
     protected array $arguments = [
-        'name' => 'Le nom de la classe du contrôleur.',
+        'name' => ['Le nom de la classe du contrôleur.'],
     ];
 
     protected array $options = [
-        '--bare'      => 'S\'étend de BlitzPHP\Controllers\BaseController au lieu de AppController.',
-        '--restful'   => "S'étend à partir d'une ressource RESTful, Options\u{a0}: [controller, presenter]. Par défaut\u{a0}: \"controller\".",
+        '--bare'      => ['S\'étend de BlitzPHP\Controllers\BaseController au lieu de AppController.'],
+        '--restful'   => ["S'étend à partir d'une ressource RESTful, Options\u{a0}: [controller, presenter]. Par défaut\u{a0}: \"controller\"."],
         '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
-        '--force'     => 'Forcer l\'écrasement du fichier existant.',
-        '--invokable' => 'Spécifie si on veut avoir un contrôleur à action unique.',
+        '--force'     => ['Forcer l\'écrasement du fichier existant.'],
+        '--invokable' => ['Spécifie si on veut avoir un contrôleur à action unique.'],
     ];
 
     /**

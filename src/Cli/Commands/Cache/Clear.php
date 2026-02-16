@@ -42,7 +42,7 @@ class Clear extends Command
      * {@inheritDoc}
      */
     protected array $arguments = [
-        'driver' => 'Le pilote de cache à utiliser',
+        'driver' => ['Le pilote de cache à utiliser'],
     ];
 
     /**

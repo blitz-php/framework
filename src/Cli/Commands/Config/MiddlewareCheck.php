@@ -28,8 +28,8 @@ class MiddlewareCheck extends Command
     protected string $service = 'Service de configuration';
 
     protected array $arguments = [
-        'method' => 'La methode HTTP. get, post, put, etc.',
-        'route'  => 'La route (chemin d\'URI) pour vérifier les middlewares.',
+        'method' => ['La methode HTTP. get, post, put, etc.'],
+        'route'  => ['La route (chemin d\'URI) pour vérifier les middlewares.'],
     ];
 
     /**

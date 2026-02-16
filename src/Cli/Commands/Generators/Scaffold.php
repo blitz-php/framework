@@ -30,7 +30,7 @@ class Scaffold extends Command
     protected string $service = 'Service de génération de code';
 
     protected array $arguments = [
-        'name' => 'Le nom de la classe.',
+        'name' => ['Le nom de la classe.'],
     ];
 
     protected array $options = [

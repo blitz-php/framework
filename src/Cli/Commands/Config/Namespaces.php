@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Cli\Commands\Config;
 
-use Ahc\Cli\Output\Color;
 use BlitzPHP\Cli\Console\Command;
 
 /**
@@ -29,9 +28,9 @@ class Namespaces extends Command
     protected string $service = 'Service de configuration';
 
     protected array $options = [
-        '-b' => 'Afficher uniquement les namespaces de la config de BlitzPHP.',
-        '-r' => 'Afficher chaînes brutes du chemin.',
-        '-m' => 'Spécifiez la longueur maximale des chaînes de chemin d\'accès à la sortie. Defaut: 60.',
+        '-b' => ['Afficher uniquement les namespaces de la config de BlitzPHP.'],
+        '-r' => ['Afficher chaînes brutes du chemin.'],
+        '-m' => ['Spécifiez la longueur maximale des chaînes de chemin d\'accès à la sortie.', 60],
     ];
 
     public function handle()

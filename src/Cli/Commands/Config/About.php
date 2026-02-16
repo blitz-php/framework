@@ -47,8 +47,8 @@ class About extends Command
      * @var array<string, string>
      */
     protected array $options = [
-        '--only' => 'La section à afficher.',
-        '--json' => 'Afficher les informations au format json.',
+        '--only' => ['La section à afficher.'],
+        '--json' => ['Afficher les informations au format json.'],
     ];
 
     /**
@@ -74,7 +74,7 @@ class About extends Command
         $this->gatherApplicationInformation();
 
         $this->alert()->info('Information générales sur votre application');
-       
+
         collect(static::$data)
             ->map(
                 static fn ($items) => collect($items)

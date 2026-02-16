@@ -30,7 +30,7 @@ class ConfigCheck extends Command
     protected string $description = 'Vérifie les valeurs d\'un fichier de configuration.';
 
     protected array $arguments = [
-        'config' => 'La configuration dont on souhaite vérifier les valeurs.',
+        'config' => ['La configuration dont on souhaite vérifier les valeurs.'],
     ];
 
     /**

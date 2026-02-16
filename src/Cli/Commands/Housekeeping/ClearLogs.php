@@ -25,7 +25,7 @@ class ClearLogs extends Command
     protected string $description = 'Efface tous les fichiers de log.';
 
     protected array $options = [
-        '--force' => 'Forcer la suppression de tous les fichiers de logs sans avoir à demander.',
+        '--force' => ['Forcer la suppression de tous les fichiers de logs sans avoir à demander.'],
     ];
 
     /**

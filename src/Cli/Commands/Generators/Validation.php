@@ -30,7 +30,7 @@ class Validation extends Command
     protected string $service = 'Service de génération de code';
 
     protected array $arguments = [
-        'name' => 'Le nom de la classe de validation.',
+        'name' => ['Le nom de la classe de validation.'],
     ];
 
     /**

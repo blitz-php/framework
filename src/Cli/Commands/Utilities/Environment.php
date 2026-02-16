@@ -26,7 +26,7 @@ final class Environment extends Command
     protected string $description = 'Récupère l\'environnement actuel, ou en définir un nouveau.';
 
     protected array $arguments = [
-        '[environment]' => '[Optionel] Nouveau environnement à définir. Si aucun n\'est fourni, cela imprimera l\'environnement actuel.',
+        '[environment]' => ['[Optionel] Nouveau environnement à définir. Si aucun n\'est fourni, cela imprimera l\'environnement actuel.'],
     ];
 
     /**

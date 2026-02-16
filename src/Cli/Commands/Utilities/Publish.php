@@ -27,11 +27,11 @@ class Publish extends Command
     protected string $description = 'Découvre et exécute toutes les classes Publisher prédéfinies.';
 
     protected array $arguments = [
-        'directory' => '[Optionel] Le répertoire à analyser dans chaque namespace.',
+        'directory' => ['[Optionel] Le répertoire à analyser dans chaque namespace.'],
     ];
 
     protected array $options = [
-        '-n|--namespace' => 'Le namespace à partir duquel on devra chercher les fichiers à publier. Par défaut, tous les namespaces sont analysés.',
+        '-n|--namespace' => ['Le namespace à partir duquel on devra chercher les fichiers à publier. Par défaut, tous les namespaces sont analysés.'],
     ];
 
     /**

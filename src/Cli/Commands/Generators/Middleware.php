@@ -30,7 +30,7 @@ class Middleware extends Command
     protected string $service = 'Service de génération de code';
 
     protected array $arguments = [
-        'name' => 'Le nom de la classe de middleware.',
+        'name' => ['Le nom de la classe de middleware.'],
     ];
 
     protected array $options = [

@@ -42,19 +42,19 @@ class Routes extends Command
     protected string $service = 'Service de routing';
 
     protected array $options = [
-        '--host'          => 'Spécifiez nom d\'hôte dans la demande URI.',
-        '--domain'        => 'Filtrer les routes par le domaine',
-        '--handler'       => 'Filtrer les routes par le gestionnaire',
-        '--method'        => 'Filtrer les routes par la méthode',
-        '--name'          => 'Filtrer les routes par le nom',
-        '--json'          => 'Produire la liste des routes au format JSON',
-        '--show-stats'    => 'Afficher les statistiques de collecte de routes',
-        '-r|--reverse'    => "Inverser l'ordre des routes",
+        '--host'          => ['Spécifiez nom d\'hôte dans la demande URI.'],
+        '--domain'        => ['Filtrer les routes par le domaine'],
+        '--handler'       => ['Filtrer les routes par le gestionnaire'],
+        '--method'        => ['Filtrer les routes par la méthode'],
+        '--name'          => ['Filtrer les routes par le nom'],
+        '--json'          => ['Produire la liste des routes au format JSON'],
+        '--show-stats'    => ['Afficher les statistiques de collecte de routes'],
+        '-r|--reverse'    => ["Inverser l'ordre des routes"],
         '--sort'          => ['La colonne (domain, method, uri, name, handler, middleware, definition) à trier', 'uri'],
-        '--path'          => 'Afficher uniquement les routes correspondant au modèle de chemin donné',
-        '--except-path'   => 'Ne pas afficher les routes correspondant au modèle de chemin donné',
-        '--except-vendor' => 'Ne pas afficher les routes définis par les paquets des fournisseurs',
-        '--only-vendor'   => 'Afficher uniquement les routes définis par les paquets des fournisseurs',
+        '--path'          => ['Afficher uniquement les routes correspondant au modèle de chemin donné'],
+        '--except-path'   => ['Ne pas afficher les routes correspondant au modèle de chemin donné'],
+        '--except-vendor' => ['Ne pas afficher les routes définis par les paquets des fournisseurs'],
+        '--only-vendor'   => ['Afficher uniquement les routes définis par les paquets des fournisseurs'],
     ];
 
     /**

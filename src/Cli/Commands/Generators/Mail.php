@@ -30,7 +30,7 @@ class Mail extends Command
     protected string $service = 'Service de génération de code';
 
     protected array $arguments = [
-        'name' => 'Le nom de la classe de mail.',
+        'name' => ['Le nom de la classe de mail.'],
     ];
 
     public function handle()

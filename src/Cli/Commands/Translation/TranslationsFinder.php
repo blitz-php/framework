@@ -28,10 +28,10 @@ class TranslationsFinder extends Command
     protected string $name        = 'translations:find';
     protected string $description = 'Trouver et sauvegarder les phrases disponibles à traduire';
     protected array $options     = [
-        '--locale'   => 'Spécifier la locale (en, ru, etc.) pour enregistrer les fichiers',
-        '--dir'      => 'Répertoire de recherche des traductions relatif à APP_PATH.',
-        '--show-new' => 'N\'affiche que les nouvelles traductions dans le tableau. N\'écrit pas dans les fichiers.',
-        '--verbose'  => 'Affiche des informations détaillées',
+        '--locale'   => ['Spécifier la locale (en, ru, etc.) pour enregistrer les fichiers'],
+        '--dir'      => ['Répertoire de recherche des traductions relatif à APP_PATH.'],
+        '--show-new' => ['N\'affiche que les nouvelles traductions dans le tableau. N\'écrit pas dans les fichiers.'],
+        '--verbose'  => ['Affiche des informations détaillées'],
     ];
 
     /**
