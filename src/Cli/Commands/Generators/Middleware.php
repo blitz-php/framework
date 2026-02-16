@@ -21,18 +21,13 @@ class Middleware extends Command
 {
     use GeneratorTrait;
 
-    protected string $group = 'Generateurs';
-
-    protected string $name = 'make:middleware';
-
+    protected string $group       = 'Generateurs';
+    protected string $name        = 'make:middleware';
     protected string $description = 'Génère un nouveau fichier de middleware.';
-
-    protected string $service = 'Service de génération de code';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de génération de code';
+    protected array $arguments    = [
         'name' => ['Le nom de la classe de middleware.'],
     ];
-
     protected array $options = [
         '--namespace' => ["Définit l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--suffix'    => 'Ajouter le titre du composant au nom de la classe (par exemple, User => UserMiddleware).',

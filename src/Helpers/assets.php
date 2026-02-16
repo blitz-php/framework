@@ -170,6 +170,7 @@ if (! function_exists('lib_styles')) {
         }
 
         echo $output;
+
         return null;
     }
 }
@@ -211,6 +212,7 @@ if (! function_exists('lib_scripts')) {
         }
 
         echo $output;
+
         return null;
     }
 }
@@ -254,6 +256,7 @@ if (! function_exists('styles')) {
         }
 
         echo $output;
+
         return null;
     }
 }
@@ -295,6 +298,7 @@ if (! function_exists('scripts')) {
         }
 
         echo $output;
+
         return null;
     }
 }
@@ -360,6 +364,7 @@ if (! function_exists('less_styles')) {
         }
 
         echo $output;
+
         return null;
     }
 }
@@ -419,6 +424,7 @@ if (! function_exists('img')) {
         }
 
         echo $return;
+
         return null;
     }
 }

@@ -16,18 +16,13 @@ use Symfony\Component\Finder\Finder;
 
 class ConfigPublish extends Command
 {
-    protected string $group = 'BlitzPHP';
-
-    protected string $service = 'Service de configuration';
-
-    protected string $name = 'config:publish';
-
+    protected string $group       = 'BlitzPHP';
+    protected string $service     = 'Service de configuration';
+    protected string $name        = 'config:publish';
     protected string $description = 'Publie des fichiers de configuration dans votre application.';
-
-    protected array $arguments = [
+    protected array $arguments    = [
         'name' => ['Le nom du fichier de configuration à publier.'],
     ];
-
     protected array $options = [
         '--all'   => ['Publie tous les fichiers de configuration.'],
         '--force' => ['Ecrase les fichiers de configuration existants.'],
@@ -66,6 +61,7 @@ class ConfigPublish extends Command
         }
 
         $this->eol()->publish($name, $config[$name], config_path($name . '.php'));
+
         return null;
     }
 

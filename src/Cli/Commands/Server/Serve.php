@@ -22,17 +22,12 @@ use BlitzPHP\Cli\Console\Command;
  */
 class Serve extends Command
 {
-    protected string $group = 'BlitzPHP';
-
-    protected string $name = 'serve';
-
+    protected string $group       = 'BlitzPHP';
+    protected string $name        = 'serve';
     protected string $description = 'Lance le serveur de développement BlitzPHP.';
-
-    protected string $usage = 'php klinge serve';
-
-    protected string $service = 'Service de lancement du serveur de developpement';
-
-    protected array $options = [
+    protected string $usage       = 'php klinge serve';
+    protected string $service     = 'Service de lancement du serveur de developpement';
+    protected array $options      = [
         '--php'  => ['Le binaire PHP', 'PHP_BINARY'],
         '--host' => ['L\'hôte HTTP', 'localhost'],
         '--port' => ['Le port de l\'hôte HTTP', 3300],

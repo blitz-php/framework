@@ -171,7 +171,7 @@ class Boot
         $this->initializeDispatcher();
 
         $console = new Console(service('container'));
-        $exit = $console->run();
+        $exit    = $console->run();
 
         return is_int($exit) ? $exit : EXIT_SUCCESS;
     }

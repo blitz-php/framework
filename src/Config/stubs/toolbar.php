@@ -1,11 +1,11 @@
 <?php
 
-use BlitzPHP\Debug\Toolbar\Collectors\TimersCollector;
-use BlitzPHP\Debug\Toolbar\Collectors\LogsCollector;
-use BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector;
-use BlitzPHP\Debug\Toolbar\Collectors\FilesCollector;
-use BlitzPHP\Debug\Toolbar\Collectors\RoutesCollector;
 use BlitzPHP\Debug\Toolbar\Collectors\EventsCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\FilesCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\LogsCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\RoutesCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\TimersCollector;
+use BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector;
 
 /**
  * ------------------------------------------------- -------------------------

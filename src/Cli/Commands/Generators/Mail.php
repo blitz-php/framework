@@ -21,15 +21,11 @@ class Mail extends Command
 {
     use GeneratorTrait;
 
-    protected string $group = 'Generateurs';
-
-    protected string $name = 'make:mail';
-
+    protected string $group       = 'Generateurs';
+    protected string $name        = 'make:mail';
     protected string $description = 'Génère une nouvelle classe d\'email.';
-
-    protected string $service = 'Service de génération de code';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de génération de code';
+    protected array $arguments    = [
         'name' => ['Le nom de la classe de mail.'],
     ];
 

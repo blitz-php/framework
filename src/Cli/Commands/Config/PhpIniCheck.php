@@ -19,15 +19,11 @@ use BlitzPHP\Security\CheckPhpIni;
  */
 final class PhpIniCheck extends Command
 {
-    protected string $group = 'BlitzPHP';
-
-    protected string $name = 'phpini:check';
-
+    protected string $group       = 'BlitzPHP';
+    protected string $name        = 'phpini:check';
     protected string $description = 'Vérifiez les valeurs de votre php.ini dans l\'environnement de production.';
-
-    protected string $service   = 'Service de configuration';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de configuration';
+    protected array $arguments    = [
         'opcache' => ['Vérifier les valeurs détaillées de l\'opcache dans l\'environnement de production.'],
     ];
 

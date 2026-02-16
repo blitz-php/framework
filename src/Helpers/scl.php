@@ -748,7 +748,7 @@ function scl_debug($var, $style = false): void
 {
     $vars = (array) $var;
 
-    if (!(bool) $style) {
+    if (! (bool) $style) {
         echo "<pre style=\"background:#eee;padding:1em;border:1px inset #adb5bd;border-radius:5px;font-family:monospace;margin-top:0;margin-bottom:1rem;overflow:auto;-ms-overflow-style:scrollbar;\">\n";
 
         foreach ($vars as $var) {
@@ -1024,7 +1024,7 @@ function scl_getTags($content, $nb_tags = 10, $relief = false, $mots_a_bannir = 
     foreach ($tags as $key => $value) {
         // Si on veut voir en relief c'est-a-dire avec des taille qui dependent du nombre d'apparition des tags
         if ($relief) {
-            $size           = 6;
+            $size = 6;
             $size += $size * $value; // Calcul de la taille du tag en fonction de sa fréquence d'apparition
             $render_array[] = "<span style='font-size:" . $size . "px' class='tag'>" . strtoupper($key) . '</span> ';
         } else {

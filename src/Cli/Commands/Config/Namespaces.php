@@ -19,15 +19,11 @@ use BlitzPHP\Cli\Console\Command;
  */
 class Namespaces extends Command
 {
-    protected string $group = 'BlitzPHP';
-
-    protected string $name = 'namespaces';
-
+    protected string $group       = 'BlitzPHP';
+    protected string $name        = 'namespaces';
     protected string $description = 'Vérifie que vos namespaces sont correctement configurés.';
-
-    protected string $service = 'Service de configuration';
-
-    protected array $options = [
+    protected string $service     = 'Service de configuration';
+    protected array $options      = [
         '-b' => ['Afficher uniquement les namespaces de la config de BlitzPHP.'],
         '-r' => ['Afficher chaînes brutes du chemin.'],
         '-m' => ['Spécifiez la longueur maximale des chaînes de chemin d\'accès à la sortie.', 60],

@@ -18,10 +18,8 @@ use BlitzPHP\Cli\Console\Command;
  */
 class ClearDebugbar extends Command
 {
-    protected string $group = 'Housekeeping';
-
-    protected string $name = 'debugbar:clear';
-
+    protected string $group       = 'Housekeeping';
+    protected string $name        = 'debugbar:clear';
     protected string $description = 'Efface tous les fichiers JSON de la debugbar.';
 
     /**

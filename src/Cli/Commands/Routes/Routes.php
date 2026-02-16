@@ -33,15 +33,11 @@ use ReflectionFunction;
  */
 class Routes extends Command
 {
-    protected string $group = 'BlitzPHP';
-
-    protected string $name = 'route:list';
-
+    protected string $group       = 'BlitzPHP';
+    protected string $name        = 'route:list';
     protected string $description = 'Affiche toutes les routes.';
-
-    protected string $service = 'Service de routing';
-
-    protected array $options = [
+    protected string $service     = 'Service de routing';
+    protected array $options      = [
         '--host'          => ['Spécifiez nom d\'hôte dans la demande URI.'],
         '--domain'        => ['Filtrer les routes par le domaine'],
         '--handler'       => ['Filtrer les routes par le gestionnaire'],
@@ -207,7 +203,7 @@ class Routes extends Command
     {
         if ($route['handler'] instanceof Closure) {
             $path = (new ReflectionFunction($route['handler']))->getFileName();
-        } elseif (is_string($route['handler']) && (!str_contains($route['handler'], '(View) ') && !str_contains($route['handler'], '(Closure) '))) {
+        } elseif (is_string($route['handler']) && (! str_contains($route['handler'], '(View) ') && ! str_contains($route['handler'], '(Closure) '))) {
             if (! class_exists($classname = explode('::', $route['handler'])[0])) {
                 return false;
             }

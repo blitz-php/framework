@@ -19,15 +19,11 @@ use BlitzPHP\Cli\Console\Command;
  */
 class MiddlewareCheck extends Command
 {
-    protected string $group = 'BlitzPHP';
-
-    protected string $name = 'middleware:check';
-
+    protected string $group       = 'BlitzPHP';
+    protected string $name        = 'middleware:check';
     protected string $description = 'Vérifiez les middleware d\'une route.';
-
-    protected string $service = 'Service de configuration';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de configuration';
+    protected array $arguments    = [
         'method' => ['La methode HTTP. get, post, put, etc.'],
         'route'  => ['La route (chemin d\'URI) pour vérifier les middlewares.'],
     ];

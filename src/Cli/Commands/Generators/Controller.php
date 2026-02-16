@@ -24,18 +24,13 @@ class Controller extends Command
 {
     use GeneratorTrait;
 
-    protected string $group = 'Generateurs';
-
-    protected string $name = 'make:controller';
-
+    protected string $group       = 'Generateurs';
+    protected string $name        = 'make:controller';
     protected string $description = 'Génère un nouveau fichier de contrôleur.';
-
-    protected string $service = 'Service de génération de code';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de génération de code';
+    protected array $arguments    = [
         'name' => ['Le nom de la classe du contrôleur.'],
     ];
-
     protected array $options = [
         '--bare'      => ['S\'étend de BlitzPHP\Controllers\BaseController au lieu de AppController.'],
         '--restful'   => ["S'étend à partir d'une ressource RESTful, Options\u{a0}: [controller, presenter]. Par défaut\u{a0}: \"controller\"."],

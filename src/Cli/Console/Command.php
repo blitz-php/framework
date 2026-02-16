@@ -16,8 +16,8 @@ use Ahc\Cli\IO\Interactor;
 /**
  * Classe de base utilisée pour créer des commandes pour la console
  *
- * @method array required()
  * @method Interactor io()
+ * @method array      required()
  */
 abstract class Command extends \Dimtrovich\Console\Command
 {

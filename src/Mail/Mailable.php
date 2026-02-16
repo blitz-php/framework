@@ -30,7 +30,7 @@ abstract class Mailable
      * - type: Type MIME (optionnel)
      * - disposition: 'attachment' ou 'inline' (défaut: 'attachment')
      *
-     * @return array<array{
+     * @return list<array{
      *     path: string,
      *     name?: string,
      *     type?: string,

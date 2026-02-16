@@ -23,13 +23,10 @@ use RuntimeException;
  */
 final class Optimize extends Command
 {
-    protected string $group = 'BlitzPHP';
-
-    protected string $name = 'optimize';
-
+    protected string $group       = 'BlitzPHP';
+    protected string $name        = 'optimize';
     protected string $description = 'Optimise l\'application pour la production.';
-
-    protected string $service = 'Service de configuration';
+    protected string $service     = 'Service de configuration';
 
     /**
      * {@inheritDoc}

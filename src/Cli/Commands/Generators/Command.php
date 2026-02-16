@@ -21,18 +21,13 @@ class Command extends ConsoleCommand
 {
     use GeneratorTrait;
 
-    protected string $group = 'Generateurs';
-
-    protected string $name = 'make:command';
-
+    protected string $group       = 'Generateurs';
+    protected string $name        = 'make:command';
     protected string $description = 'Génère une nouvelle commande klinge.';
-
-    protected string $service = 'Service de génération de code';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de génération de code';
+    protected array $arguments    = [
         'name' => ['Le nom de la classe de commande.'],
     ];
-
     protected array $options = [
         '--command'   => ['Le nom de la commande.', 'command:name'],
         '--type'      => ['Le type de commande. Options [basic, generator]. Par défault: "basic".', 'basic'],

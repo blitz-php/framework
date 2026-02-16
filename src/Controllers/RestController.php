@@ -42,8 +42,8 @@ class RestController extends BaseController
      *     format: string,
      *     strict: bool,
      *     field: array{status: string, message: string, code: string, errors: string, result: string},
-     *     ip_blacklist: array<string>,
-     *     ip_whitelist: array<string>,
+     *     ip_blacklist: list<string>,
+     *     ip_whitelist: list<string>,
      *     ajax_only: bool
      * }
      */

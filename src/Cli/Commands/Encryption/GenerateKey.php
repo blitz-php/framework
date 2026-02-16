@@ -20,15 +20,11 @@ use BlitzPHP\Security\Encryption\Encryption;
  */
 class GenerateKey extends Command
 {
-    protected string $group = 'Encryption';
-
-    protected string $name = 'key:generate';
-
+    protected string $group       = 'Encryption';
+    protected string $name        = 'key:generate';
     protected string $description = 'Génère une nouvelle clé de chiffrememt et la met dans le fichier `.env`.';
-
-    protected string $service = 'Service de chiffrememt';
-
-    protected array $options = [
+    protected string $service     = 'Service de chiffrememt';
+    protected array $options      = [
         '--force'  => ['Force l\'écrasement de clé existante dans le fichier `.env`.'],
         '--length' => ['La longueur de la chaîne aléatoire qui doit être retournée en bytes.', 32],
         '--prefix' => ['Prefix à ajouter à la clé encodée (doit être hex2bin ou base64).', 'hex2bin'],

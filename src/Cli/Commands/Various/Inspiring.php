@@ -18,15 +18,11 @@ use BlitzPHP\Cli\Console\Command;
  */
 class Inspiring extends Command
 {
-    protected string $group = 'Various';
-
-    protected string $name = 'inspire';
-
+    protected string $group       = 'Various';
+    protected string $name        = 'inspire';
     protected string $description = 'Citations d\'inspiration pour BlitzPHP.';
-
-    protected string $usage = 'php klinge inspire';
-
-    protected string $service = 'Service de divertissement';
+    protected string $usage       = 'php klinge inspire';
+    protected string $service     = 'Service de divertissement';
 
     /**
      * {@inheritDoc}

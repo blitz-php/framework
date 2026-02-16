@@ -11,11 +11,11 @@
 
 namespace BlitzPHP\Event;
 
-use Stringable;
 use BlitzPHP\Contracts\Event\EventInterface;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
+use Stringable;
 
 /**
  * Implémentation d'un événement PSR-14

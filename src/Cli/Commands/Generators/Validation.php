@@ -21,15 +21,11 @@ class Validation extends Command
 {
     use GeneratorTrait;
 
-    protected string $group = 'Generateurs';
-
-    protected string $name = 'make:validation';
-
+    protected string $group       = 'Generateurs';
+    protected string $name        = 'make:validation';
     protected string $description = 'Génère une nouvelle classe de validation.';
-
-    protected string $service = 'Service de génération de code';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de génération de code';
+    protected array $arguments    = [
         'name' => ['Le nom de la classe de validation.'],
     ];
 

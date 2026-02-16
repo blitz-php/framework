@@ -24,16 +24,16 @@ class LogMailer extends AbstractAdapter
      * Configuration du mailer
      *
      * @var array{
-     *     to: array<array{0: string, 1: string}>,
+     *     to: list<array{0: string, 1: string}>,
      *     from: array{0: string, 1: string},
-     *     cc: array<array{0: string, 1: string}>,
-     *     bcc: array<array{0: string, 1: string}>,
-     *     replyTo: array<array{0: string, 1: string}>,
+     *     cc: list<array{0: string, 1: string}>,
+     *     bcc: list<array{0: string, 1: string}>,
+     *     replyTo: list<array{0: string, 1: string}>,
      *     subject: string,
      *     html: string,
      *     text: string,
      *     alt: string,
-     *     attachments: array<array{
+     *     attachments: list<array{
      *         path: string,
      *         name: string,
      *         type: string,
@@ -61,17 +61,17 @@ class LogMailer extends AbstractAdapter
     /**
      * Mails envoyés (stockés pour inspection)
      *
-     * @var array<array{
-     *     to: array<array{0: string, 1: string}>,
+     * @var list<array{
+     *     to: list<array{0: string, 1: string}>,
      *     from: array{0: string, 1: string},
-     *     cc: array<array{0: string, 1: string}>,
-     *     bcc: array<array{0: string, 1: string}>,
-     *     replyTo: array<array{0: string, 1: string}>,
+     *     cc: list<array{0: string, 1: string}>,
+     *     bcc: list<array{0: string, 1: string}>,
+     *     replyTo: list<array{0: string, 1: string}>,
      *     subject: string,
      *     html: string,
      *     text: string,
      *     alt: string,
-     *     attachments: array<array{
+     *     attachments: list<array{
      *         path: string,
      *         name: string,
      *         type: string,
@@ -487,17 +487,17 @@ class LogMailer extends AbstractAdapter
     /**
      * Récupère tous les mails envoyés (stockés)
      *
-     * @return array<array{
-     *     to: array<array{0: string, 1: string}>,
+     * @return list<array{
+     *     to: list<array{0: string, 1: string}>,
      *     from: array{0: string, 1: string},
-     *     cc: array<array{0: string, 1: string}>,
-     *     bcc: array<array{0: string, 1: string}>,
-     *     replyTo: array<array{0: string, 1: string}>,
+     *     cc: list<array{0: string, 1: string}>,
+     *     bcc: list<array{0: string, 1: string}>,
+     *     replyTo: list<array{0: string, 1: string}>,
      *     subject: string,
      *     html: string,
      *     text: string,
      *     alt: string,
-     *     attachments: array<array{
+     *     attachments: list<array{
      *         path: string,
      *         name: string,
      *         type: string,

@@ -51,7 +51,7 @@ class Clear extends Command
     public function handle()
     {
         $config  = config('cache');
-        $handler = $this->argument('driver',  $this->parameter(0, $config['handler']));
+        $handler = $this->argument('driver', $this->parameter(0, $config['handler']));
 
         if (! array_key_exists($handler, $config['valid_handlers'])) {
             $this->fail($handler . ' n\'est pas un gestionnaire de cache valide.');

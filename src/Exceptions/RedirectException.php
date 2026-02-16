@@ -58,7 +58,7 @@ class RedirectException extends Exception implements ResponsableInterface
 
     public function getResponse(): ResponseInterface
     {
-        if (!$this->response instanceof ResponseInterface) {
+        if (! $this->response instanceof ResponseInterface) {
             $this->response = service('response')
                 ->redirect(base_url($this->getMessage()), 'auto', $this->getCode());
         }

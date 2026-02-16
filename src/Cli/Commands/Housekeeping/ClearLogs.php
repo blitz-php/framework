@@ -18,13 +18,10 @@ use BlitzPHP\Cli\Console\Command;
  */
 class ClearLogs extends Command
 {
-    protected string $group = 'Housekeeping';
-
-    protected string $name = 'logs:clear';
-
+    protected string $group       = 'Housekeeping';
+    protected string $name        = 'logs:clear';
     protected string $description = 'Efface tous les fichiers de log.';
-
-    protected array $options = [
+    protected array $options      = [
         '--force' => ['Forcer la suppression de tous les fichiers de logs sans avoir à demander.'],
     ];
 

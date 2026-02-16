@@ -21,18 +21,13 @@ class Scaffold extends Command
 {
     use GeneratorTrait;
 
-    protected string $group = 'Generateurs';
-
-    protected string $name = 'make:scaffold';
-
+    protected string $group       = 'Generateurs';
+    protected string $name        = 'make:scaffold';
     protected string $description = 'Génère un ensemble complet de fichiers d\'échafaudage.';
-
-    protected string $service = 'Service de génération de code';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de génération de code';
+    protected array $arguments    = [
         'name' => ['Le nom de la classe.'],
     ];
-
     protected array $options = [
         '--bare'      => 'Ajoute l\'option "--bare" au composant du contrôleur.',
         '--restful'   => 'Ajoute l\'option "--restful" au composant du contrôleur.',

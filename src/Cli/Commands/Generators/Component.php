@@ -23,18 +23,13 @@ class Component extends Command
 {
     use GeneratorTrait;
 
-    protected string $group = 'Generateurs';
-
-    protected string $name = 'make:component';
-
+    protected string $group       = 'Generateurs';
+    protected string $name        = 'make:component';
     protected string $description = 'Génère un nouveau composant contrôlé et sa vue.';
-
-    protected string $service = 'Service de génération de code';
-
-    protected array $arguments = [
+    protected string $service     = 'Service de génération de code';
+    protected array $arguments    = [
         'name' => ['Le nom de la classe du composant contrôlé.'],
     ];
-
     protected array $options = [
         '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--force'     => ['Forcer l\'écrasement du fichier existant.'],
