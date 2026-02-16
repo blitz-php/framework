@@ -38,8 +38,13 @@ describe('Commandes / MakeCommand', function (): void {
         COH::tearDown();
 
 		$result = str_replace(["\033[0;32m", "\033[0m", "\n"], '', COH::buffer());
-        $file   = str_replace('APP_PATH' . DS, APP_PATH, trim(substr($result, 14)));
-        $dir    = dirname($file);
+		$result = explode('APP_PATH', $result);
+		if (!isset($result[1])) {
+			return;
+		}
+
+		$file = APP_PATH . ltrim($result[1], DS);
+		$dir  = dirname($file);
 
         if (is_file($file)) {
             unlink($file);
@@ -57,10 +62,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $group = \'App\';')
+			static fn ($actual) => str_contains($actual, 'protected string $group = \'App\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $name = \'command:name\';')
+			static fn ($actual) => str_contains($actual, 'protected string $name = \'command:name\';')
 		);
 	});
 
@@ -72,10 +77,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $usage = \'clear:sessions [arguments] [options]\';')
+			static fn ($actual) => str_contains($actual, 'protected string $usage = \'clear:sessions [arguments] [options]\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $name = \'clear:sessions\';')
+			static fn ($actual) => str_contains($actual, 'protected string $name = \'clear:sessions\';')
 		);
 	});
 
@@ -87,10 +92,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $group = \'App\';')
+			static fn ($actual) => str_contains($actual, 'protected string $group = \'App\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $name = \'command:name\';')
+			static fn ($actual) => str_contains($actual, 'protected string $name = \'command:name\';')
 		);
 	});
 
@@ -102,10 +107,10 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $group = \'App:Generateurs\';')
+			static fn ($actual) => str_contains($actual, 'protected string $group = \'App:Generateurs\';')
 		);
         expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $name = \'command:name\';')
+			static fn ($actual) => str_contains($actual, 'protected string $name = \'command:name\';')
 		);
 	});
 
@@ -121,7 +126,7 @@ describe('Commandes / MakeCommand', function (): void {
 
 		$contents = $this->getFileContents($file);
 		expect($contents)->toMatch(
-			static fn ($actual) => str_contains($actual, 'protected $group = \'Delivrables\';')
+			static fn ($actual) => str_contains($actual, 'protected string $group = \'Delivrables\';')
 		);
 	});
 

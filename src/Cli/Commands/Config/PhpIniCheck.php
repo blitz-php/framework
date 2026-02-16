@@ -26,7 +26,7 @@ final class PhpIniCheck extends Command
     protected string $description = 'Vérifiez les valeurs de votre php.ini dans l\'environnement de production.';
 
     protected string $service   = 'Service de configuration';
-    
+
     protected array $arguments = [
         'opcache' => 'Vérifier les valeurs détaillées de l\'opcache dans l\'environnement de production.',
     ];
@@ -36,7 +36,7 @@ final class PhpIniCheck extends Command
      */
     public function handle()
     {
-        $opcache = $this->argument('opcache');
+        $opcache = $this->argument('opcache', $this->parameter(0));
 
         if (! empty($opcache) && ! in_array($opcache, array_keys($this->arguments), true)) {
             $this->fail('Vous devez indiquer un argument correct.')->eol();
@@ -51,7 +51,7 @@ final class PhpIniCheck extends Command
 
             return EXIT_ERROR;
         }
-        
+
         /** @var array $data */
         $data = CheckPhpIni::run(argument: $opcache);
 

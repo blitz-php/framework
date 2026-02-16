@@ -68,6 +68,24 @@ class Console
         return $this->app->run($argv);
     }
 
+	/**
+     * Appelle une commande déjà enregistrée
+     * Utile pour exécuter une commande dans une autre commande ou dans un contrôleur
+     */
+	public function call(string $commandName, array $arguments = [], array $options = []): mixed
+	{
+		return $this->app->getConsole()->call($commandName, $arguments, $options);
+	}
+
+	/**
+     * Appelle une commande déjà enregistrée sans afficher sa sortie
+     * Utile pour exécuter une commande dans une autre commande ou dans un contrôleur
+     */
+	public function callSilent(string $commandName, array $arguments = [], array $options = []): mixed
+	{
+		return $this->app->getConsole()->callSilent($commandName, $arguments, $options);
+	}
+
     /**
      * Definie les fichiers qui pourront etre considerer comme commandes
      *

@@ -37,8 +37,8 @@ class MiddlewareCheck extends Command
      */
     public function handle()
     {
-        $method = strtolower($this->argument('method', ''));
-        $route  = $this->argument('route', '');
+        $method = strtolower($this->argument('method', $this->parameter(0, '')));
+        $route  = $this->argument('route', $this->parameter(1, ''));
 
         if (empty($route) || $method === '') {
             $this->fail('Vous devez spécifier un verbe HTTP et une route.')->eol();
@@ -57,7 +57,7 @@ class MiddlewareCheck extends Command
 
         // PageNotFoundException
         if ($middlewares === ['<unknown>']) {
-            $this->fail('Impossible de trouver une route: ');
+            $this->ierror('Impossible de trouver une route: ');
             $this->colorize('"' . strtoupper($method) . ' ' . $route . '"', 'black');
 
             return EXIT_ERROR;

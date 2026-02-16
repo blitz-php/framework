@@ -14,36 +14,34 @@ class {class} extends Command
 
 <?php endif ?>
     /** @var string Groupe auquel appartient la commande */
-    protected $group = '{group}';
+    protected string $group = '{group}';
 
     /** @var string Nom de la commande */
-    protected $name = '{command}';
+    protected string $name = '{command}';
 
     /** @var string Description de la commande */
-    protected $description = '';
+    protected string $description = '';
 
     /** @var string Utilisation de la commande */
-    protected $usage = '{command} [arguments] [options]';
+    protected string $usage = '{command} [arguments] [options]';
 
     /** @var array Arguments de la commande */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /** @var array Options de la commande */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Execution de la commande
-     *
-     * @param array $params
      */
-    public function execute(array $params)
+    public function handle()
     {
 <?php if ($type === 'generator'): ?>
         $this->component = 'Command';
         $this->directory = 'Commands';
         $this->template  = 'command.tpl.php';
 
-        $this->generateClass($params);
+        $this->generateClass($this->parameters());
 <?php else: ?>
         //
 <?php endif ?>

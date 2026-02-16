@@ -53,8 +53,8 @@ class TranslationsFinder extends Command
     {
         $this->verbose      = $this->option('verbose', false);
         $this->showNew      = $this->option('show-new', false);
-        $optionLocale       = $this->option('locale');
-        $optionDir          = $this->option('dir');
+        $optionLocale       = $this->parameter('locale');
+        $optionDir          = $this->parameter('dir');
         $currentLocale      = Locale::getDefault();
         $currentDir         = APP_PATH;
         $this->languagePath = $currentDir . 'Translations';

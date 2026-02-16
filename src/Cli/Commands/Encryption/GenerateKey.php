@@ -64,7 +64,7 @@ class GenerateKey extends Command
             return;
         }
 
-        $this->success('Une nouvelle clé de chiffrement de l\'application a été définie avec succès.');
+        $this->badge()->success('Une nouvelle clé de chiffrement de l\'application a été définie avec succès.');
     }
 
     /**
