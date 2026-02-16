@@ -169,9 +169,11 @@ class Boot
         $this->setupApplication();
 
         $this->initializeDispatcher();
-        $console = $this->initializeConsole();
 
-        return $this->runCommand($console);
+        $console = new Console(service('container'));
+        $exit = $console->run();
+
+        return is_int($exit) ? $exit : EXIT_SUCCESS;
     }
 
     /**
@@ -434,32 +436,5 @@ class Boot
     protected function runDispatcher(Dispatcher $app): void
     {
         $app->run();
-    }
-
-    /**
-     * Initialise la Console
-     */
-    protected function initializeConsole(): Console
-    {
-        // Affiche les informations de base avant de faire quoi que ce soit d'autre
-        // Vérifie si l'option --no-header est présente
-        if (is_int($suppress = array_search('--no-header', $_SERVER['argv'], true))) {
-            unset($_SERVER['argv'][$suppress]);
-            $suppress = true;
-        }
-
-        return new Console($suppress);
-    }
-
-    /**
-     * Exécute une commande via la Console
-     *
-     * @return int Le code de sortie de la commande
-     */
-    protected static function runCommand(Console $console): int
-    {
-        $exit = $console->handle($_SERVER['argv']);
-
-        return is_int($exit) ? $exit : EXIT_SUCCESS;
     }
 }

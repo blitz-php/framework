@@ -13,8 +13,11 @@ namespace BlitzPHP\Cli\Console;
 
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Container\ContainerInterface;
+use Composer\InstalledVersions;
 use Dimtrovich\Console\Application;
 use Psr\Log\LoggerInterface;
+
+use function Ahc\Cli\t;
 
 /**
  * Classe abstraite pour le fonctionnement de la console
@@ -36,22 +39,29 @@ class Console
             ->withContainer($container)
             ->withLogger($container->get(LoggerInterface::class), static::CONSOLE_NAME)
             ->withCommands($this->discoverCommands($container->get(LocatorInterface::class)))
-            ->withIcons(logger: true)
             ->withLocale(config('app.locale'))
             ->withTheme(config('klinge.theme', 'monokai'))
             ->withStyles(config('klinge.styles', []))
-            ->withHeadTitle(static::APP_NAME . ' Command Line Interface - v' . self::APP_VERSION . ' | Server time: ' . date('Y-m-d H:i:s'));
+            ->withHeadTitle(static::APP_NAME . ' Command Line Interface - v' . self::APP_VERSION . ' | Server time: ' . date('Y-m-d H:i:s'))
+            ->withIcons(
+				alert: config('klinge.icons.alert', false),
+				badge: config('klinge.icons.badge', false),
+				logger: config('klinge.icons.logger', true)
+			)
+			->withHooks(
+				before: [$this, 'beforeHook'],
+			);
     }
 
-    public function run(): mixed 
+    public function run(): mixed
     {
         $argv = $_SERVER['argv'];
-        
+
         // Affiche les informations de base avant de faire quoi que ce soit d'autre
         // Vérifie si l'option --no-header est présente
         if (is_int($suppress = array_search('--no-header', $argv, true))) {
             unset($argv[$suppress]);
-            
+
             $this->app->withoutHeadTitle();
         }
 
@@ -73,7 +83,17 @@ class Console
         return array_unique($files);
     }
 
-    private function discoverCommands(LocatorInterface $locator): array 
+	/**
+	 * Découvre automatiquement les commandes dans les dossiers standards.
+	 *
+	 * Parcourt les dossiers Commands/ et Cli/Commands/ pour trouver
+	 * toutes les classes qui étendent Command.
+	 *
+	 * @param LocatorInterface $locator Service de localisation de fichiers
+	 *
+	 * @return array<class-string<Command>> Liste des classes de commandes découvertes
+	 */
+    private function discoverCommands(LocatorInterface $locator): array
     {
         if ($this->discovered) {
             return [];
@@ -84,7 +104,7 @@ class Console
         foreach ($this->files($locator) as $file) {
              $className = $locator->findQualifiedNameFromPath($file);
 
-            if ($className && class_exists($className) && is_subclass_of($className, Command::class, true)) {
+            if ($className && is_subclass_of($className, Command::class, true)) {
                 $classes[] = $className;
             }
         }
@@ -93,4 +113,41 @@ class Console
 
         return $classes;
     }
+
+	/**
+	 * Hook exécuté avant chaque commande.
+	 *
+	 * Vérifie les dépendances requises par la commande et propose
+	 * de les installer automatiquement si elles sont manquantes.
+	 *
+	 * @param bool    $suppress Si vrai, supprime les informations du header
+	 * @param Command $command  Instance de la commande en cours d'exécution
+	 *
+	 * @return void
+	 *
+	 * @internal
+	 */
+	public function beforeHook(bool $suppress, Command $command)
+	{
+		foreach ($command->required() as $package) {
+			$package = explode(':', $package);
+			$version = $package[1] ?? null;
+			$package = $package[0];
+
+			if (! InstalledVersions::isInstalled($package)) {
+				$command->badge()->info(t('Cette commande nécessite le package "%s" mais vous ne l\'avez pas', [$package]));
+				if (! $command->confirm(t('Voulez-vous l\'installer maintenant ?'))) {
+					return;
+				}
+
+				$package .= ($version !== null ? ":{$version}" : '');
+				$command->task(t('Installation de "%s" en cours', [$package]))->eol();
+
+				chdir(ROOTPATH);
+				passthru('composer require ' . $package, $status);
+
+				$command->eol();
+			}
+		}
+	}
 }
