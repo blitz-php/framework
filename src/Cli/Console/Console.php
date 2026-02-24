@@ -16,6 +16,7 @@ use BlitzPHP\Contracts\Container\ContainerInterface;
 use Composer\InstalledVersions;
 use Dimtrovich\Console\Application;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
 
 use function Ahc\Cli\t;
 
@@ -37,7 +38,7 @@ class Console
         $this->app = Application::create(static::APP_NAME, static::APP_VERSION)
             ->withContainer($container)
             ->withLogger($container->get(LoggerInterface::class), static::CONSOLE_NAME)
-            ->withCommands($this->discoverCommands($container->get(LocatorInterface::class)))
+            ->withCommandInstances($this->discoverCommands($container))
             ->withLocale(config('app.locale'))
             ->withTheme(config('klinge.theme', 'monokai'))
             ->withStyles(config('klinge.styles', []))
@@ -106,29 +107,34 @@ class Console
      * Parcourt les dossiers Commands/ et Cli/Commands/ pour trouver
      * toutes les classes qui étendent Command.
      *
-     * @param LocatorInterface $locator Service de localisation de fichiers
-     *
-     * @return list<class-string<Command>> Liste des classes de commandes découvertes
+     * @return list<Command> Liste des instances de commandes découvertes
      */
-    private function discoverCommands(LocatorInterface $locator): array
+    private function discoverCommands(ContainerInterface $container): array
     {
         if ($this->discovered) {
             return [];
         }
 
-        $classes = [];
+        /** @var LocatorInterface */
+        $locator = $container->get(LocatorInterface::class);
+
+        $commands = [];
 
         foreach ($this->files($locator) as $file) {
-            $className = $locator->findQualifiedNameFromPath($file);
+            if (false === $className = $locator->findQualifiedNameFromPath($file)) {
+                continue;
+            }
 
-            if ($className && is_subclass_of($className, Command::class, true)) {
-                $classes[] = $className;
+            $class = new ReflectionClass($className);
+
+            if ($class->isInstantiable() && $class->isSubclassOf(Command::class)) {
+                $commands[] = $container->make($className);
             }
         }
 
         $this->discovered = true;
 
-        return $classes;
+        return $commands;
     }
 
     /**
