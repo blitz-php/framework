@@ -57,7 +57,7 @@ class ApplicationController extends BaseController
                 $cachedPaths[static::class] = is_dir($fullpath) ? $fullpath : $dirname . DS;
             }
 
-            $view = $cachedPaths[static::class] . $view;
+            $view = str_replace([VIEW_PATH, DS], ['', '/'], $cachedPaths[static::class] . $view);
         }
 
         /** @var View */

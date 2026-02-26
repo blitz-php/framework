@@ -473,18 +473,23 @@ if (! function_exists('method_field')) {
 
 if (! function_exists('environment')) {
     /**
-     * Renvoi l'environnement d'execution actuel ou determine si on est dans un environnement specifie
+     * Récupère ou vérifie l'environnement d'exécution actuel
      *
-     * @return bool|string
+     * Renvoi l'environnement d'execution actuel ou determine si on est dans un environnement specifique
+     *
+     * L'environnement est défini dans config/app.php via 'environment'
+     * Les alias sont automatiquement résolus (ex: 'prod' -> 'production')
+     *
+     * @param array|string|null $env Environnement(s) à vérifier (optionnel)
+     *
+     * @return bool|string L'environnement actuel ou le résultat de la vérification
      */
     function environment(array|string|null $env = null)
     {
-        $current = env('ENVIRONMENT');
-        if (empty($current) || $current === 'auto') {
-            $current = config('app.environment');
-        }
+        /** @var string */
+        $current = config('app.environment');
 
-        if (in_array($env, ['', '0', [], null], true)) {
+        if ($env === null) {
             return $current;
         }
 
@@ -497,13 +502,7 @@ if (! function_exists('environment')) {
             'staging' => 'testing',
         ];
 
-        $current = $envMap[$current] ?? $current;
-
-        if (is_string($env)) {
-            $env = [$env];
-        }
-
-        $env = array_map(static fn ($k) => $envMap[$k] ?? $k, $env);
+        $env = array_map(static fn ($k) => $envMap[$k] ?? $k, (array) $env);
 
         return in_array($current, $env, true);
     }
