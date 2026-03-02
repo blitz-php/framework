@@ -249,6 +249,10 @@ abstract class AbstractAdapter implements RendererInterface
      */
     protected function getRenderedFile(?array $options, string $view, ?string $ext = null): string
     {
+        if (is_file($view)) {
+            return realpath($view);
+        }
+
         $options = (array) $options;
         $ext ??= $this->ext;
 
