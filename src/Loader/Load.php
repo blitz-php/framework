@@ -12,6 +12,7 @@
 namespace BlitzPHP\Loader;
 
 use BlitzPHP\Exceptions\LoadException;
+use BlitzPHP\Traits\Macroable;
 
 /**
  * Facade pour chargement de ressources (helpers, models, etc.).
@@ -20,6 +21,8 @@ use BlitzPHP\Exceptions\LoadException;
  */
 class Load
 {
+	use Macroable;
+
     /**
      * Éléments déjà chargés (module → [element → value]).
      * Si un element est deja chargé, on le renvoie simplement sans avoir besoin de le construire à nouveau

@@ -14,6 +14,7 @@ namespace BlitzPHP\Loader;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Exceptions\LoadException;
 use BlitzPHP\Exceptions\ViewException;
+use BlitzPHP\Traits\Macroable;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 
@@ -24,6 +25,8 @@ use Nette\Schema\Schema;
  */
 class FileLocator
 {
+	use Macroable;
+
     /**
      * Cache locates.
      *
