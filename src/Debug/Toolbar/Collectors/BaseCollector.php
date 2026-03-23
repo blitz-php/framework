@@ -199,8 +199,10 @@ abstract class BaseCollector
 
     /**
      * Obtient la valeur "badge" pour le bouton.
+     *
+     * @return int|string|null
      */
-    public function getBadgeValue(): ?int
+    public function getBadgeValue()
     {
         return null;
     }
