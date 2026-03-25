@@ -11,34 +11,19 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
-use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Cli\Traits\GeneratorTrait;
-
 /**
  * Génère une nouvelle classe de validation.
  */
-class Validation extends Command
+class Validation extends GeneratorCommand
 {
-    use GeneratorTrait;
-
-    protected string $group       = 'Generateurs';
     protected string $name        = 'make:validation';
     protected string $description = 'Génère une nouvelle classe de validation.';
-    protected string $service     = 'Service de génération de code';
     protected array $arguments    = [
         'name' => ['Le nom de la classe de validation.'],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
-    public function handle()
-    {
-        $this->component = 'Validation';
-        $this->directory = 'Validations';
-        $this->template  = 'validation.tpl.php';
-
-        $this->classNameLang = 'CLI.generator.className.validation';
-        $this->generateClass($this->parameters());
-    }
+	protected string $component     = 'Validation';
+	protected string $directory     = 'Validations';
+	protected string $template      = 'validation.tpl.php';
+	protected string $classNameLang = 'CLI.generator.className.validation';
 }

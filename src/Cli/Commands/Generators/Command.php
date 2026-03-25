@@ -11,20 +11,13 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
-use BlitzPHP\Cli\Console\Command as ConsoleCommand;
-use BlitzPHP\Cli\Traits\GeneratorTrait;
-
 /**
  * Generates a skeleton command file.
  */
-class Command extends ConsoleCommand
+class Command extends GeneratorCommand
 {
-    use GeneratorTrait;
-
-    protected string $group       = 'Generateurs';
     protected string $name        = 'make:command';
     protected string $description = 'Génère une nouvelle commande klinge.';
-    protected string $service     = 'Service de génération de code';
     protected array $arguments    = [
         'name' => ['Le nom de la classe de commande.'],
     ];
@@ -37,18 +30,10 @@ class Command extends ConsoleCommand
         '--force'     => ["Forcer l'écrasement du fichier existant."],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
-    public function handle()
-    {
-        $this->component = 'Command';
-        $this->directory = 'Commands';
-        $this->template  = 'command.tpl.php';
-
-        $this->classNameLang = 'CLI.generator.className.command';
-        $this->generateClass($this->parameters());
-    }
+	protected string $directory     = 'Commands';
+	protected string $component     = 'Command';
+	protected string $template      = 'command.tpl.php';
+	protected string $classNameLang = 'CLI.generator.className.command';
 
     /**
      * Préparez les options et effectuez les remplacements nécessaires.

@@ -11,20 +11,13 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
-use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Cli\Traits\GeneratorTrait;
-
 /**
  * Génère un fichier squelette de middleware.
  */
-class Middleware extends Command
+class Middleware extends GeneratorCommand
 {
-    use GeneratorTrait;
-
-    protected string $group       = 'Generateurs';
     protected string $name        = 'make:middleware';
     protected string $description = 'Génère un nouveau fichier de middleware.';
-    protected string $service     = 'Service de génération de code';
     protected array $arguments    = [
         'name' => ['Le nom de la classe de middleware.'],
     ];
@@ -35,18 +28,10 @@ class Middleware extends Command
         '--standard'  => 'Le standard utilisé pour le middleware. Par défaut: "psr15"',
     ];
 
-    /**
-     * {@inheritDoc}
-     */
-    public function handle()
-    {
-        $this->component = 'Middleware';
-        $this->directory = 'Middlewares';
-        $this->template  = 'middleware.tpl.php';
-
-        $this->classNameLang = 'CLI.generator.className.middleware';
-        $this->generateClass($this->parameters());
-    }
+	protected string $component     = 'Middleware';
+	protected string $directory     = 'Middlewares';
+	protected string $template      = 'middleware.tpl.php';
+	protected string $classNameLang = 'CLI.generator.className.middleware';
 
     /**
      * Préparez les options et effectuez les remplacements nécessaires.

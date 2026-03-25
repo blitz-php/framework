@@ -11,20 +11,13 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
-use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Cli\Traits\GeneratorTrait;
-
 /**
  * Génère un ensemble complet de fichiers d'échafaudage.
  */
-class Scaffold extends Command
+class Scaffold extends GeneratorCommand
 {
-    use GeneratorTrait;
-
-    protected string $group       = 'Generateurs';
     protected string $name        = 'make:scaffold';
     protected string $description = 'Génère un ensemble complet de fichiers d\'échafaudage.';
-    protected string $service     = 'Service de génération de code';
     protected array $arguments    = [
         'name' => ['Le nom de la classe.'],
     ];

@@ -21,38 +21,28 @@ trait GeneratorTrait
 {
     /**
      * Nom du composant
-     *
-     * @var string
      */
-    protected $component;
+    protected string $component;
 
     /**
      * Répertoire de fichiers
-     *
-     * @var string
      */
-    protected $directory;
+    protected string $directory;
 
     /**
      * Nom de la vue du template
-     *
-     * @var string
      */
-    protected $template;
+    protected string $template;
 
     /**
      * Chemin dans du dossier dans lequelle les vues de generation sont cherchees
-     *
-     * @var string
      */
-    protected $templatePath = SYST_PATH . 'Cli/Commands/Generators/Views';
+    protected string $templatePath = SYST_PATH . 'Cli/Commands/Generators/Views';
 
     /**
      * Clé de chaîne de langue pour les noms de classe requis.
-     *
-     * @var string
      */
-    protected $classNameLang = '';
+    protected string $classNameLang = '';
 
     /**
      * Namespace a utiliser pour la classe.
@@ -259,7 +249,7 @@ trait GeneratorTrait
             return $class; // @codeCoverageIgnore
         }
 
-        $directory = ($this->directory !== null) ? $this->directory . '\\' : '';
+        $directory = ($this->directory !== '') ? $this->directory . '\\' : '';
 
         return $namespace . $directory . str_replace('/', '\\', $class);
     }
@@ -390,7 +380,7 @@ trait GeneratorTrait
 
         helper('inflector');
 
-        $component = singular($this->component);
+        $component = $this->component === '' ? '' : singular($this->component);
 
         /**
          * @see https://regex101.com/r/a5KNCR/1

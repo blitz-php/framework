@@ -11,22 +11,16 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
-use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Cli\Traits\GeneratorTrait;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\String\Text;
 
 /**
  * Génère un fichier squelette de composant.
  */
-class Component extends Command
+class Component extends GeneratorCommand
 {
-    use GeneratorTrait;
-
-    protected string $group       = 'Generateurs';
     protected string $name        = 'make:component';
     protected string $description = 'Génère un nouveau composant contrôlé et sa vue.';
-    protected string $service     = 'Service de génération de code';
     protected array $arguments    = [
         'name' => ['Le nom de la classe du composant contrôlé.'],
     ];
@@ -35,21 +29,23 @@ class Component extends Command
         '--force'     => ['Forcer l\'écrasement du fichier existant.'],
     ];
 
+	protected string $component     = 'Component';
+	protected string $directory     = 'Components';
+	protected string $template      = 'component.tpl.php';
+	protected string $classNameLang = 'CLI.generator.className.component';
+
+
     /**
      * {@inheritDoc}
      */
-    public function handle()
+    protected function process(array $params)
     {
-        $this->component     = 'Component';
-        $this->directory     = 'Components';
-        $this->template      = 'component.tpl.php';
-        $this->classNameLang = 'CLI.generator.className.component';
-        $params              = array_merge($this->parameters(), ['suffix' => true]);
+        $params['suffix'] = true;
 
         $this->task('Creation du composant')->eol();
 
         if (null === $className = $this->generateClass($params)) {
-            return 0;
+            return EXIT_SUCCESS;
         }
 
         $this->template = 'component_view.tpl.php';
@@ -64,6 +60,6 @@ class Component extends Command
 
         $this->generateView($namespace . $viewName . '-component', $params);
 
-        return 0;
+        return EXIT_SUCCESS;
     }
 }

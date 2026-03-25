@@ -11,31 +11,19 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
-use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Cli\Traits\GeneratorTrait;
-
 /**
  * Génère une nouvelle classe d\'email.
  */
-class Mail extends Command
+class Mail extends GeneratorCommand
 {
-    use GeneratorTrait;
-
-    protected string $group       = 'Generateurs';
     protected string $name        = 'make:mail';
     protected string $description = 'Génère une nouvelle classe d\'email.';
-    protected string $service     = 'Service de génération de code';
     protected array $arguments    = [
         'name' => ['Le nom de la classe de mail.'],
     ];
 
-    public function handle()
-    {
-        $this->component = 'Mail';
-        $this->directory = 'Mail';
-        $this->template  = 'mail.tpl.php';
-
-        $this->classNameLang = 'CLI.generator.className.mail';
-        $this->generateClass($this->parameters());
-    }
+	protected string $component     = 'Mail';
+	protected string $directory     = 'Mail';
+	protected string $template      = 'mail.tpl.php';
+	protected string $classNameLang = 'CLI.generator.className.mail';
 }

@@ -11,8 +11,6 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
-use BlitzPHP\Cli\Console\Command;
-use BlitzPHP\Cli\Traits\GeneratorTrait;
 use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Controllers\ResourceController;
 use BlitzPHP\Controllers\ResourcePresenter;
@@ -20,14 +18,10 @@ use BlitzPHP\Controllers\ResourcePresenter;
 /**
  * Génère un fichier squelette de contrôleur.
  */
-class Controller extends Command
+class Controller extends GeneratorCommand
 {
-    use GeneratorTrait;
-
-    protected string $group       = 'Generateurs';
     protected string $name        = 'make:controller';
     protected string $description = 'Génère un nouveau fichier de contrôleur.';
-    protected string $service     = 'Service de génération de code';
     protected array $arguments    = [
         'name' => ['Le nom de la classe du contrôleur.'],
     ];
@@ -39,20 +33,19 @@ class Controller extends Command
         '--invokable' => ['Spécifie si on veut avoir un contrôleur à action unique.'],
     ];
 
+	protected string $component     = 'Controller';
+	protected string $directory     = 'Controllers';
+	protected string $template      = 'controller.tpl.php';
+	protected string $classNameLang = 'CLI.generator.className.controller';
+
     /**
      * {@inheritDoc}
      */
-    public function handle()
-    {
-        $this->component     = 'Controller';
-        $this->directory     = 'Controllers';
-        $this->template      = 'controller.tpl.php';
-        $this->classNameLang = 'CLI.generator.className.controller';
-        $params              = array_merge($this->parameters(), ['suffix' => true]);
+    protected function process(array $parameters)
+	{
+		$this->task('Creation du controleur')->eol();
 
-        $this->task('Creation du controleur')->eol();
-
-        $this->generateClass($params);
+		return parent::process($parameters + ['suffix' => true]);
     }
 
     /**
