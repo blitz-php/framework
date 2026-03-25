@@ -42,7 +42,7 @@ class Console
             ->withLocale(config('app.locale'))
             ->withTheme(config('klinge.theme', 'monokai'))
             ->withStyles(config('klinge.styles', []))
-            ->withHeadTitle(static::APP_NAME . ' Command Line Interface - v' . self::APP_VERSION . ' | Server time: ' . date('Y-m-d H:i:s'))
+            ->withHeadTitle($this->headtitle())
             ->withIcons(
                 alert: config('klinge.icons.alert', false),
                 badge: config('klinge.icons.badge', false),
@@ -152,6 +152,8 @@ class Console
      */
     public function beforeHook(bool $suppress, Command $command)
     {
+        $command->eol()->io()->help_header($this->headtitle())->eol(2);
+
         foreach ($command->required() as $package) {
             $package = explode(':', $package);
             $version = $package[1] ?? null;
@@ -172,5 +174,10 @@ class Console
                 $command->eol();
             }
         }
+    }
+
+    private function headtitle(): string
+    {
+        return static::APP_NAME . ' Command Line Interface - v' . self::APP_VERSION . ' | Server time: ' . date('Y-m-d H:i:s');
     }
 }
