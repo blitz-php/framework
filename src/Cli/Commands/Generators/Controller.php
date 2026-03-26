@@ -43,8 +43,6 @@ class Controller extends GeneratorCommand
      */
     protected function process(array $parameters)
 	{
-		$this->task('Creation du controleur')->eol();
-
 		return parent::process($parameters + ['suffix' => true]);
     }
 

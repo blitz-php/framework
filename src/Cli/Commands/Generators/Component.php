@@ -42,8 +42,6 @@ class Component extends GeneratorCommand
     {
         $params['suffix'] = true;
 
-        $this->task('Creation du composant')->eol();
-
         if (null === $className = $this->generateClass($params)) {
             return EXIT_SUCCESS;
         }

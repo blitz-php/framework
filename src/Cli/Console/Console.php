@@ -152,7 +152,9 @@ class Console
      */
     public function beforeHook(bool $suppress, Command $command)
     {
-        $command->eol()->io()->help_header($this->headtitle())->eol(2);
+        if (! $suppress) {
+            $command->eol()->io()->help_header($this->headtitle())->eol(2);
+        }
 
         foreach ($command->required() as $package) {
             $package = explode(':', $package);
