@@ -54,37 +54,29 @@ trait GeneratorTrait
      * S'il faut exiger le nom de la classe.
      *
      * @internal
-     *
-     * @var bool
      */
-    private $hasClassName = true;
+    private bool $hasClassName = true;
 
     /**
      * S'il faut trier les importations de classe.
      *
      * @internal
-     *
-     * @var bool
      */
-    private $sortImports = true;
+    private bool $sortImports = true;
 
     /**
      * Indique si l'option `--suffix` a un effet.
      *
      * @internal
-     *
-     * @var bool
      */
-    private $enabledSuffixing = true;
+    private bool $enabledSuffixing = true;
 
     /**
      * Le tableau params pour un accès facile par d'autres méthodes.
      *
-     * @internal
-     *
      * @var array<int|string, string|null>
      */
-    private $params = [];
+    private array $params = [];
 
     /**
      * Exécute la generation.
@@ -146,16 +138,56 @@ trait GeneratorTrait
     }
 
     /**
+     * Affiche un avertissement indiquant que le fichier a été écrasé.
+     *
+     * @param string $file Chemin du fichier écrasé
+     */
+    protected function displayFileOverwrited(string $file)
+    {
+        $this->warning(lang('CLI.generator.fileOverwrite', [clean_path($file)]));
+    }
+
+    /**
+     * Affiche un message de succès indiquant que le fichier a été créé.
+     *
+     * @param string $file Chemin du fichier créé
+     */
+    protected function displayFileCreated(string $file)
+    {
+        $this->success(lang('CLI.generator.fileCreate', [clean_path($file)]));
+    }
+
+    /**
+     * Affiche une erreur indiquant que le fichier existe déjà.
+     *
+     * @param string $file Chemin du fichier existant
+     */
+    protected function displayFileExists(string $file)
+    {
+        $this->error(lang('CLI.generator.fileExist', [clean_path($file)]));
+    }
+
+    /**
+     * Affiche une erreur indiquant qu'une erreur s'est produite avec le fichier.
+     *
+     * @param string $file Chemin du fichier en erreur
+     */
+    protected function displayFileError(string $file)
+    {
+        $this->error(lang('CLI.generator.fileError', [clean_path($file)]));
+    }
+
+    /**
      * Handles writing the file to disk, and all of the safety checks around that.
      */
     private function generateFile(string $target, string $content): void
     {
         if ($this->option('namespace') === 'BlitzPHP') {
             // @codeCoverageIgnoreStart
-            $this->colorize(lang('CLI.generator.usingBlitzNamespace'), 'yellow');
+			$this->warning(lang('CLI.generator.usingBlitzNamespace'));
 
             if (! $this->confirm('Are you sure you want to continue?')) {
-                $this->eol()->colorize(lang('CLI.generator.cancelOperation'), 'yellow');
+                $this->eol()->warning(lang('CLI.generator.cancelOperation'));
 
                 return;
             }
@@ -169,7 +201,7 @@ trait GeneratorTrait
         // Écraser des fichiers sans le savoir est une gêne sérieuse, nous allons donc vérifier si nous dupliquons des choses,
         // si l'option "forcer" n'est pas fournie, nous renvoyons.
         if (! $this->option('force') && $isFile) {
-            $this->io->error(lang('CLI.generator.fileExist', [clean_path($target)]), true);
+            $this->displayFileExists($target);
 
             return;
         }
@@ -187,20 +219,18 @@ trait GeneratorTrait
         // Nous obtiendrons le contenu de notre fichier à partir du modèle,
         // puis nous effectuerons les remplacements nécessaires.
         if (! write_file($target, $content)) {
-            // @codeCoverageIgnoreStart
-            $this->io->error(lang('CLI.generator.fileError', [clean_path($target)]), true);
+            $this->displayFileError($target);
 
             return;
-            // @codeCoverageIgnoreEnd
         }
 
         if ($this->option('force') && $isFile) {
-            $this->colorize(lang('CLI.generator.fileOverwrite', [clean_path($target)]), 'yellow');
+            $this->displayFileOverwrited($target);
 
             return;
         }
 
-        $this->colorize(lang('CLI.generator.fileCreate', [clean_path($target)]), 'green');
+        $this->displayFileCreated($target);
     }
 
     /**
@@ -371,16 +401,14 @@ trait GeneratorTrait
         $class = $this->params[0] ?? $this->params['name'] ?? null;
 
         if ($class === null && $this->hasClassName) {
-            // @codeCoverageIgnoreStart
             $nameLang = $this->classNameLang ?: 'CLI.generator.className.default';
             $class    = $this->prompt(lang($nameLang));
             $this->eol();
-            // @codeCoverageIgnoreEnd
         }
 
         helper('inflector');
 
-        $component = $this->component === '' ? '' : singular($this->component);
+        $component = singular($this->component);
 
         /**
          * @see https://regex101.com/r/a5KNCR/1

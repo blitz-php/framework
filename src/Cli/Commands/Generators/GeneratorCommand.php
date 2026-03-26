@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Cli\Commands\Generators;
 
+use BlitzPHP\Cli\Console\Command;
 use BlitzPHP\Cli\Traits\GeneratorTrait;
 
 abstract class GeneratorCommand extends Command
@@ -43,5 +44,57 @@ abstract class GeneratorCommand extends Command
 		$this->generateClass($parameters);
 
 		return EXIT_SUCCESS;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function displayFileCreated(string $file)
+	{
+		$this->badge()->info(sprintf('%s [%s] %s',
+			$this->component,
+			$this->color->ok($file),
+			'Créé avec succès',
+		));
+		$this->eol();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function displayFileExists(string $file)
+	{
+		$this->badge()->error(sprintf('%s [%s]. %s',
+			$this->component,
+			$file,
+			'Fichier déjà existant',
+		));
+		$this->eol();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function displayFileError(string $file)
+	{
+		$this->badge()->error(sprintf('%s [%s]. %s',
+			$this->component,
+			$file,
+			'Erreur lors de la création du fichier',
+		));
+		$this->eol();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function displayFileOverwrited(string $file)
+	{
+		$this->badge()->warning(sprintf('%s [%s]. %s',
+			$this->component,
+			$file,
+			'Fichier écrasé',
+		));
+		$this->eol();
 	}
 }
