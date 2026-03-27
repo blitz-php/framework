@@ -54,6 +54,13 @@ class Config
     private static array $registrars = [];
 
     /**
+     * Chemins d'accès vers les différents registrars découverts
+     * 
+     * @var array<string, array<string, array<mixed>>>
+     */
+    protected static array $registrarPaths = [];
+
+    /**
      *  La découverte des modules est-elle terminée ?
      */
     protected static bool $didDiscovery = false;
@@ -62,11 +69,6 @@ class Config
      *  Le module discovery fonctionne-t-il ou non ?
      */
     protected static bool $discovering = false;
-
-    /**
-     * Le traitement du fichier Registrar pour le message d'erreur.
-     */
-    protected static string $registrarFile = '';
 
     /**
      * Drapeau permettant de savoir si la config a deja ete initialiser
@@ -90,11 +92,7 @@ class Config
     public function exists(string $key): bool
     {
         if (! $this->configurator->exists($key)) {
-            $topLevelKey = $this->configurator->getTopLevelKey($key);
-
-            if (! isset(self::$loaded[$topLevelKey])) {
-                $this->load($topLevelKey);
-            }
+            $this->ensureConfigLoaded($key);
 
             return $this->configurator->exists($key);
         }
@@ -139,10 +137,7 @@ class Config
      */
     public function set(string $key, mixed $value): self
     {
-        $topLevelKey = $this->configurator->getTopLevelKey($key);
-        if (! isset(self::$loaded[$topLevelKey])) {
-            $this->load($topLevelKey);
-        }
+        $this->ensureConfigLoaded($key);
 
         $this->configurator->set($key, $value);
 
@@ -192,6 +187,16 @@ class Config
         }
 
         $this->loadSingle($config, $file, $schema, $allow_empty);
+    }
+
+    /**
+     * Retourne la valeurs d'un registrar donné
+     * 
+     * @return array<string, array<mixed>>
+     */
+    public function registrar(string $key): array
+    {
+        return self::$registrarPaths[$key] ?? [];
     }
 
     /**
@@ -258,6 +263,17 @@ class Config
         $configurations = require $file;
 
         return is_array($configurations) ? $configurations : [];
+    }
+
+    /**
+     * S'assure que la configuration demandée est bien chargée
+     */
+    private function ensureConfigLoaded(string $key): void 
+    {
+        $topLevelKey = $this->configurator->getTopLevelKey($key);
+        if (! isset(self::$loaded[$topLevelKey])) {
+            $this->load($topLevelKey);
+        }
     }
 
     /**
@@ -335,10 +351,12 @@ class Config
 
         // La decouverte doit etre complete apres la premiere initalisation de la classe.
         if (static::$discovering) {
+            $file = last(array_values(self::$registrarPaths));
+
             throw new ConfigException(
                 'Pendant la découverte automatique des Registrars,'
                 . ' "' . static::class . '" a été re-éxecuté.'
-                . ' "' . clean_path(static::$registrarFile) . '" doit avoir un mauvais code.'
+                . ' "' . clean_path($file) . '" doit avoir un mauvais code.'
             );
         }
 
@@ -362,15 +380,13 @@ class Config
      */
     private function processRegistrarFile(Locator $locator, string $file): void
     {
-        static::$registrarFile = $file;
-
         if (false === $classname = $locator->findQualifiedNameFromPath($file)) {
             return;
         }
 
         $class   = new ReflectionClass($classname);
         $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
-
+        
         foreach ($methods as $method) {
             if (! ($method->isPublic() && $method->isStatic())) {
                 continue;
@@ -382,6 +398,15 @@ class Config
 
             $name                    = $method->getName();
             self::$registrars[$name] = Arr::merge(self::$registrars[$name] ?? [], $result);
+
+            if (! isset(self::$registrarPaths[$name])) {
+                self::$registrarPaths[$name] = [];
+            }
+
+            self::$registrarPaths[$name][$file] = array_merge(
+                self::$registrarPaths[$name][$file] ?? [], 
+                $result
+            );
         }
     }
 
