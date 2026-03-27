@@ -21,7 +21,7 @@ use BlitzPHP\Utilities\Iterable\Arr;
  */
 class ConfigCheck extends Command
 {
-    protected string $group       = 'BlitzPHP';
+    protected string $group       = 'Configuration';
     protected string $service     = 'Service de configuration';
     protected string $name        = 'config:check';
     protected string $description = 'Vérifie les valeurs d\'un fichier de configuration.';

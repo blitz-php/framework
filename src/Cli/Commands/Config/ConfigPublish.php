@@ -16,7 +16,7 @@ use Symfony\Component\Finder\Finder;
 
 class ConfigPublish extends Command
 {
-    protected string $group       = 'BlitzPHP';
+    protected string $group       = 'Configuration';
     protected string $service     = 'Service de configuration';
     protected string $name        = 'config:publish';
     protected string $description = 'Publie des fichiers de configuration dans votre application.';
@@ -24,8 +24,9 @@ class ConfigPublish extends Command
         'name' => ['Le nom du fichier de configuration à publier.'],
     ];
     protected array $options = [
-        '--all'   => ['Publie tous les fichiers de configuration.'],
-        '--force' => ['Ecrase les fichiers de configuration existants.'],
+        '--all'             => ['Publie tous les fichiers de configuration.'],
+        '--skip-on-missing' => ['Ignore les fichiers de configuration non reconnu.'],
+        '--force'           => ['Ecrase les fichiers de configuration existants.'],
     ];
 
     /**
@@ -34,35 +35,47 @@ class ConfigPublish extends Command
     public function handle()
     {
         $config = $this->getBaseConfigurationFiles();
-
-        if (null === $this->argument('name') && $this->option('all')) {
-            foreach ($config as $key => $file) {
-                $this->publish($key, $file, config_path($key . '.php'));
+        $name   = $this->argument('name');
+        $skip   = (bool) $this->option('skip-on-missing');
+        $names  = [];
+        
+        if ($name === null) {
+            if ($this->option('all')) {
+                $names = array_keys($config);
+            } else {
+                $names = $this->choices('Quel fichier de configuration souhaitez-vous publier ?', array_keys($config));
             }
+        } else if (is_string($name)) {
+            $names = explode(',', $name);
+        }
+
+        if ($names === []) {
+            $this->badge()->info('Aucune configuration à publier');
 
             return EXIT_SUCCESS;
         }
 
-        if (null === $name = $this->argument('name')) {
-            $choices = [];
+        $published = 0;
+        
+        foreach ($names as $name) {
+            if (! isset($config[$name])) {
+                $this->badge()->errorFull("Fichier de configuration '{$name}' non reconnu.");
 
-            foreach (array_keys($config) as $key => $val) {
-                $choices[$key + 1] = $val;
+                if (!$skip) {
+                    return EXIT_ERROR;
+                }
+                
+                continue;
             }
+                
+            $published++;
 
-            $name = $this->choices('Quel fichier de configuration souhaitez-vous publier ?', $choices);
-            $name = $choices[$name] ?? null;
+            $this->eol()->publish($name, $config[$name], config_path($name));
         }
 
-        if (null !== $name && ! isset($config[$name])) {
-            $this->error('Fichier de configuration non reconnu.');
-
-            return EXIT_ERROR;
-        }
-
-        $this->eol()->publish($name, $config[$name], config_path($name . '.php'));
-
-        return null;
+        $this->eol()->success(sprintf('%d fichiers publié%s avec succès', $published, $published > 1 ? 's' : ''));
+        
+        return EXIT_SUCCESS;
     }
 
     /**
@@ -71,14 +84,14 @@ class ConfigPublish extends Command
     protected function publish(string $name, string $file, string $destination)
     {
         if (file_exists($destination) && ! $this->option('force')) {
-            $this->error("Le fichier de configuration '{$name}' existe déjà.");
+            $this->badge()->warningFull("Le fichier de configuration '{$name}' existe déjà.");
 
             return;
         }
 
         copy($file, $destination);
 
-        $this->info("Fichier de configuration '{$name}' publié.");
+        $this->badge()->successFull("Fichier de configuration '{$name}' publié.");
     }
 
     /**
@@ -89,10 +102,20 @@ class ConfigPublish extends Command
         $config = [];
 
         foreach (Finder::create()->files()->name('*.php')->in(SYST_PATH . 'Config/stubs') as $file) {
-            $name          = basename($file->getRealPath(), '.php');
-            $config[$name] = $file->getRealPath();
+            $name          = basename($path = $file->getRealPath(), '.php');
+            $config[$name] = $path;
         }
 
+        $registrars = config()->registrar('config');
+        
+        foreach ($registrars as $key => $value) {
+            $path = dirname($key);
+
+            foreach ($value as $name) {
+                $config[$name] = $path . DIRECTORY_SEPARATOR . $name . '.php';
+            }
+        }
+        
         return collect($config)->sortKeys()->all();
     }
 }
