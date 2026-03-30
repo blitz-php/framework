@@ -130,9 +130,9 @@ class Load
     /**
      * Ajoute un element aux elements chargés.
      *
-     * @param array|bool|string $value Valeur (ou true pour helpers)
+     * @param mixed $value Valeur (ou true pour helpers)
      */
-    protected static function loaded(string $module, object|string $element, array|bool|string $value): void
+    protected static function loaded(string $module, object|string $element, mixed $value): void
     {
         $key = is_object($element) ? get_class($element) : $element;
 
