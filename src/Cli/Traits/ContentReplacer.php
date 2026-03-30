@@ -11,6 +11,9 @@
 
 namespace BlitzPHP\Cli\Traits;
 
+/**
+ * @mixin \BlitzPHP\Cli\Console\Command
+ */
 trait ContentReplacer
 {
     /**
@@ -81,7 +84,7 @@ trait ContentReplacer
         }
 
         if (write_file($path, $content)) {
-            $this->success($cleanPath, true, 'Crée:')->eol();
+            $this->badge()->success($cleanPath, 'Crée:')->eol();
         } else {
             $this->error("Erreur de création: {$cleanPath}.")->eol();
         }
@@ -107,7 +110,7 @@ trait ContentReplacer
         }
 
         if (write_file($path, $output)) {
-            $this->success($cleanPath, true, 'Modifié:')->eol();
+            $this->badge()->success($cleanPath, 'Modifié:')->eol();
 
             return true;
         }
@@ -144,7 +147,7 @@ trait ContentReplacer
         }
 
         if (write_file($path, $output)) {
-            $this->success($cleanPath, true, 'Modifié:')->eol();
+            $this->badge()->success($cleanPath, 'Modifié:')->eol();
         } else {
             $this->error("Erreur lors de la mise à jour de {$cleanPath}.")->eol();
         }

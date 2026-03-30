@@ -359,7 +359,7 @@ trait GeneratorTrait
      */
     protected function getNamespace(): string
     {
-        return $this->namespace ?? trim(str_replace('/', '\\', $this->option('namespace') ?? APP_NAMESPACE), '\\');
+        return $this->namespace ?? trim(str_replace('/', '\\', $this->option('namespace', APP_NAMESPACE)), '\\');
     }
 
     /**

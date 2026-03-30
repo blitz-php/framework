@@ -20,7 +20,7 @@ use BlitzPHP\Security\Encryption\Encryption;
  */
 class GenerateKey extends Command
 {
-    protected string $group       = 'Encryption';
+    protected string $group       = 'Sécurité';
     protected string $name        = 'key:generate';
     protected string $description = 'Génère une nouvelle clé de chiffrememt et la met dans le fichier `.env`.';
     protected string $service     = 'Service de chiffrememt';
