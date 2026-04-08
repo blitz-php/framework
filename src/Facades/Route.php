@@ -28,6 +28,7 @@ use Closure;
  * @method static RouteBuilder fallback($callable = null)                                                 Définit la classe/méthode qui doit être appelée si le routage ne trouver pas une correspondance.
  * @method static void         form(string $from, array|callable|string $to, array $options = [])         Enregistre une route qui ne sera disponible que pour les requêtes GET et POST.
  * @method static void         get(string $from, array|callable|string $to, array $options = [])          Enregistre une route qui ne sera disponible que pour les requêtes GET.
+ * @method static void         group(array|Closure $options, ?Closure $callback = null)          		  Crée un groupe de routes avec des attributs communs.
  * @method static void         head(string $from, array|callable|string $to, array $options = [])         Enregistre une route qui ne sera disponible que pour les requêtes HEAD.
  * @method static RouteBuilder hostname(string $hostname)                                                 Defini une restriction de non d'hôte pour la route
  * @method static void         map(array $routes = [], array $options = [])                               Une méthode de raccourci pour ajouter un certain nombre de routes en une seule fois. Il ne permet pas de définir des options sur la route, ou de définir la méthode utilisée.

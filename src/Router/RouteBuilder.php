@@ -195,14 +195,20 @@ final class RouteBuilder
     }
 
     /**
-     * Create a route group with shared attributes.
+     * Crée un groupe de routes avec des attributs communs.
      */
-    public function group(callable $callback): void
+    public function group(array|Closure $options, ?Closure $callback = null): void
     {
+		if (! is_array($options)) {
+			$callback = $options;
+			$options  = [];
+		}
+
         $prefix = $this->attributes['prefix'] ?? '';
         unset($this->attributes['prefix']);
+		$attributes = array_merge($this->attributes, $options);
 
-        $this->collection->group($prefix, $this->attributes, fn () => $callback($this));
+        $this->collection->group($prefix, $attributes, fn () => $callback($this));
     }
 
     /**
