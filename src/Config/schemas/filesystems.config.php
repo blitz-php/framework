@@ -40,4 +40,5 @@ return Expect::structure([
             'throw'                   => Expect::bool(false),
         ])->otherItems(),
     ])->otherItems(),
+	'viewable' => Expect::listOf('string')->default(['public'])->mergeDefaults(false),
 ])->otherItems();

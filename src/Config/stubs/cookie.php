@@ -62,7 +62,7 @@ return [
      *
      * @var bool
      */
-    'secure' => env('cookie.secure', false),
+    'secure' => (bool) env('cookie.secure', false),
 
     /**
      * --------------------------------------------------------------------------
@@ -73,7 +73,7 @@ return [
      *
      * @var bool
      */
-    'httponly' => env('cookie.httponly', true),
+    'httponly' => (bool) env('cookie.httponly', true),
 
     /**
      * --------------------------------------------------------------------------
@@ -115,5 +115,5 @@ return [
      *
      * @var bool
      */
-    'raw' => env('cookie.raw', false),
+    'raw' => (bool) env('cookie.raw', false),
 ];

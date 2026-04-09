@@ -17,7 +17,7 @@ return Expect::structure([
     'default_controller'          => Expect::string('HomeController'),
     'default_method'              => Expect::string('index'),
     'translate_uri_dashes'        => Expect::bool(false),
-    'translate_uri_to_camel_case' => Expect::bool(false),
+    'translate_uri_to_camel_case' => Expect::bool(true),
     'fallback'                    => Expect::mixed()->nullable()->default(null),
     'auto_route'                  => Expect::bool(false),
     'prioritize'                  => Expect::bool(false),

@@ -13,12 +13,12 @@ use BlitzPHP\Session\Cookie\Cookie;
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'prefix'   => Expect::string(''),
-    'expires'  => Expect::type('DateTimeInterface|int|string')->default(0),
-    'path'     => Expect::string('/'),
-    'domain'   => Expect::string(''),
-    'secure'   => Expect::bool(false),
-    'httponly' => Expect::bool(true),
-    'samesite' => Expect::anyOf('', ...Cookie::SAMESITE_VALUES)->default(Cookie::SAMESITE_LAX),
-    'raw'      => Expect::bool(false),
+    'prefix'   => Expect::string(env('cookie.prefix', '')),
+    'expires'  => Expect::type('DateTimeInterface|int|string')->default(env('cookie.expires', 0)),
+    'path'     => Expect::string(env('cookie.path', '/')),
+    'domain'   => Expect::string(env('cookie.domain', '')),
+    'secure'   => Expect::bool((bool) env('cookie.secure', false)),
+    'httponly' => Expect::bool((bool) env('cookie.httponly', true)),
+    'samesite' => Expect::anyOf('', ...Cookie::SAMESITE_VALUES)->default(env('cookie.samesite', Cookie::SAMESITE_LAX)),
+    'raw'      => Expect::bool((bool) env('cookie.raw', false)),
 ]);

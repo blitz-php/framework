@@ -12,9 +12,9 @@
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'locale'      => Expect::string('en'),
+    'locale'      => Expect::string(config('app.locale', 'en')),
     'force_https' => Expect::bool()->default(false),
-    'format'      => Expect::string()->default('json'),
+    'format'      => Expect::anyOf('array', 'csv', 'json', 'jsonp', 'php', 'serialized', 'xml')->default('json'),
     'strict'      => Expect::bool()->default(true),
     'field'       => Expect::arrayOf('string', 'string')->default([
         'status'  => 'status',

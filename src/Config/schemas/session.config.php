@@ -14,7 +14,7 @@ use BlitzPHP\Session\Handlers\File;
 use Nette\Schema\Expect;
 
 return Expect::structure([
-    'handler'             => Expect::string()->default(environment('test') ? ArrayHandler::class : File::class),
+    'handler'             => Expect::string()->default(environment('test') ? ArrayHandler::class : env('session.driver', File::class)),
     'cookie_name'         => Expect::string(env('session.cookieName', config('app.name', 'blitz_app') . '_session')),
     'expiration'          => Expect::int(env('session.expiration', 7200)),
     'save_path'           => Expect::string(env('session.savePath', FRAMEWORK_STORAGE_PATH . 'session')),

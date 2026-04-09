@@ -14,7 +14,7 @@ use Nette\Schema\Expect;
 return Expect::structure([
     'driver' => Expect::anyOf('bcrypt', 'argon', 'argon2id')->default('bcrypt'),
     'bcrypt' => Expect::structure([
-        'rounds' => Expect::int(12),
+        'rounds' => Expect::int(env('BCRYPT_ROUNDS', 12)),
         'verify' => Expect::bool(true),
     ]),
     'argon' => Expect::structure([

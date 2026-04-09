@@ -16,7 +16,7 @@ return [
      *
      * @var string
      */
-    'default_namespace' => 'App\Controllers',
+    'default_namespace' => APP_NAMESPACE . '\Controllers',
 
     /**
      * Le contrôleur par défaut à utiliser lorsqu'aucun autre contrôleur n'a été spécifié.
@@ -36,9 +36,18 @@ return [
      * Utiliser pour traduire des tirets dans URIs en underscore.
      * Principalement utile lors de l'utilisation de l'auto-routage.
      *
-     * @var string
+     * @var bool
      */
     'translate_uri_dashes' => false,
+
+    /**
+     * Pour le routage automatique.
+     * Si les tirets dans les URIs pour les contrôleurs/méthodes doivent être traduits en CamelCase.
+     * Par exemple, blog-controller -> BlogController
+     *
+     * Si vous activez ceci, `translate_uri_dashes` est ignoré.
+     */
+    'translate_uri_to_camel_case' => true,
 
     /**
      * Définit la classe/la méthode qui doit être appelée si le routage ne trouve pas de correspondance.
@@ -93,13 +102,4 @@ return [
      * @var array [ uri_segment => namespace ]
      */
     'module_routes' => [],
-
-    /**
-     * Pour le routage automatique.
-     * Si les tirets dans les URIs pour les contrôleurs/méthodes doivent être traduits en CamelCase.
-     * Par exemple, blog-controller -> BlogController
-     *
-     * Si vous activez ceci, `translate_uri_dashes` est ignoré.
-     */
-    'translate_uri_to_camel_case' => true,
 ];
