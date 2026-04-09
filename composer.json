@@ -27,7 +27,7 @@
         "blitz-php/traits": "^1.7",
         "blitz-php/translator": "^0.1",
         "dflydev/dot-access-data": "^3.0.1",
-        "dimtrovich/console": "^0.11",
+        "dimtrovich/console": "^0.12",
         "dimtrovich/validation": "^1.5",
         "guzzlehttp/psr7": "^2.9",
         "jawira/case-converter": "^3.6",

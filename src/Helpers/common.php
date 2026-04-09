@@ -133,51 +133,9 @@ if (! function_exists('command')) {
      */
     function command(string $command)
     {
-        $regexString = '([^\s]+?)(?:\s|(?<!\\\\)"|(?<!\\\\)\'|$)';
-        $regexQuoted = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\')';
+		ob_start();
 
-        $args   = [];
-        $length = strlen($command);
-        $cursor = 0;
-
-        /**
-         * Adopté de `StringInput::tokenize()` de Symfony avec quelques modifications.
-         *
-         * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Input/StringInput.php
-         */
-        while ($cursor < $length) {
-            if (preg_match('/\s+/A', $command, $match, 0, $cursor)) {
-                // Rien a faire
-            } elseif (preg_match('/' . $regexQuoted . '/A', $command, $match, 0, $cursor)) {
-                $args[] = stripcslashes(substr($match[0], 1, strlen($match[0]) - 2));
-            } elseif (preg_match('/' . $regexString . '/A', $command, $match, 0, $cursor)) {
-                $args[] = stripcslashes($match[1]);
-            } else {
-                // @codeCoverageIgnoreStart
-                throw new InvalidArgumentException(sprintf(
-                    'Impossible d\'analyser l\'entrée à proximité "... %s ...".',
-                    substr($command, $cursor, 10)
-                ));
-                // @codeCoverageIgnoreEnd
-            }
-
-            $cursor += strlen($match[0]);
-        }
-
-        $command = array_shift($args);
-        $params  = [];
-
-        foreach ($args as $key => $arg) {
-            if (mb_strpos($arg, '--') !== false) {
-                unset($args[$key]);
-                [$arg, $v]          = explode('=', $arg) + [1 => true];
-                $params[trim($arg)] = is_string($v) ? trim($v) : $v;
-            }
-        }
-
-        ob_start();
-
-        service(Console::class)->call($command, $args, $params);
+		service(Console::class)->callRaw($command);
 
         return ob_get_clean();
     }

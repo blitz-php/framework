@@ -87,6 +87,28 @@ class Console
     }
 
     /**
+     * Appelle une commande déjà enregistrée sous forme de chaine
+	 * Entrée attendue dans une seule chaîne comme celle qui serait utilisée sur la ligne de commande elle-même :
+     *
+     *  Exp: callRaw('migrate:create SomeMigration');
+     */
+    public function callRaw(string $commandLine): mixed
+    {
+        return $this->app->getConsole()->callRaw($commandLine);
+    }
+
+    /**
+     * Appelle une commande déjà enregistrée sous forme de chaine sans afficher sa sortie
+	 * Entrée attendue dans une seule chaîne comme celle qui serait utilisée sur la ligne de commande elle-même :
+     *
+     *  Exp: callRawSilent('migrate:create SomeMigration');
+     */
+    public function callRawSilent(string $commandLine): mixed
+    {
+        return $this->app->getConsole()->callRawSilent($commandLine);
+    }
+
+    /**
      * Definie les fichiers qui pourront etre considerer comme commandes
      *
      * @return list<string> Chemins absolus des fichiers
