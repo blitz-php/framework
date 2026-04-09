@@ -248,40 +248,93 @@ class Container implements ContainerInterface
             return;
         }
 
-        /** @var LocatorInterface */
-        $locator = service('locator');
+		$autoDiscovered  = $this->getAutoDiscoveredProviders(service('locator'));
+		$manualProviders = $this->getManualProviders();
+		$providers       = $this->orderProviders($autoDiscovered, $manualProviders);
 
-        $files = array_merge(
+        foreach ($providers as $classname) {
+			if (!in_array($classname, self::$providerNames, true) && is_subclass_of($classname, AbstractProvider::class, true)) {
+				self::$providerNames[] = $classname;
+			}
+		}
+
+        self::$discovered = true;
+    }
+
+	/**
+	 * Récupère les providers découverts automatiquement via le locator.
+	 *
+	 * @return array<string, class-string> [chemin_fichier => classe_provider]
+	 */
+	private function getAutoDiscoveredProviders(LocatorInterface $locator): array
+	{
+		$files = array_merge(
             $locator->search('Config/Providers'), // Providers systemes
             $locator->listFiles('Providers/'), // Autres providers (vendors, app)
         );
 
-        if ($files === []) {
-            self::$discovered = true;
+		$providers = [];
 
-            return;
-        }
+		foreach ($files as $file) {
+			if ('' !== $classname = $locator->getClassname($file)) {
+				$providers[$file] = $classname;
+			}
+		}
 
-        // Ordre : vendor > system > app (last wins)
-        $appProviders  = array_filter($files, static fn ($name): bool => str_starts_with($name, APP_PATH));
-        $systProviders = array_filter($files, static fn ($name): bool => str_starts_with($name, SYST_PATH));
-        $vendorFiles   = array_diff($files, $appProviders, $systProviders);
+		return $providers;
+	}
 
-        $orderedFiles = [
-            ...$vendorFiles, // Les founisseurs des vendors sont les premier a etre remplacer si besoin
-            ...$systProviders, // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors
-            ...$appProviders, // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
-        ];
+	/**
+	 * Récupère les providers définis manuellement dans la configuration.
+	 *
+	 * @return list<class-string>
+	 */
+	private function getManualProviders(): array
+	{
+		$providers = config('app.providers', []);
 
-        foreach ($orderedFiles as $file) {
-            $classname = $locator->getClassname($file);
-            if ($classname && is_subclass_of($classname, AbstractProvider::class, true)) {
-                self::$providerNames[] = $classname;
-            }
-        }
+		return array_values(array_filter($providers, function ($provider) {
+			return is_string($provider) && class_exists($provider);
+		}));
+	}
 
-        self::$discovered = true;
-    }
+	/**
+	 * Ordonne les providers selon la priorité :
+	 * 1. Vendors (Providers auto-découverts hors system et app)
+	 * 2. Providers manuels (config)
+	 * 3. System (Providers du framework)
+	 * 4. App (Providers de l'application)
+	 *
+	 * @param array<string, class-string> $autoDiscovered Providers auto-découverts [fichier => classe]
+	 * @param list<class-string> $manualProviders Providers manuels
+	 *
+	 * @return list<class-string> Liste ordonnée des classes providers
+	 */
+	private function orderProviders(array $autoDiscovered, array $manualProviders): array
+	{
+		$vendors = [];
+		$system  = [];
+		$app     = [];
+
+		// Catégoriser les providers auto-découverts
+		foreach ($autoDiscovered as $file => $class) {
+			if (str_starts_with($file, APP_PATH)) {
+				$app[] = $class;
+			} elseif (str_starts_with($file, SYST_PATH)) {
+				$system[] = $class;
+			} else {
+				$vendors[] = $class;
+			}
+		}
+
+		// Ordre de fusion: vendor > manuel > system > app (last wins)
+		return array_merge(
+			$vendors        ,  // Les founisseurs des vendors sont les premier a etre remplacer si besoin
+			$manualProviders,  // Providers manuels (même niveau que vendors)
+			$system         ,  // Les founisseurs du systeme viennent ensuite pour eventuelement remplacer pour les vendors
+			$app            ,  // Ceux de l'application ont peu de chance de modifier quelque chose mais peuvent le faire
+		);
+	}
 
     /**
      * Enregistre les providers.
