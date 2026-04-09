@@ -316,14 +316,6 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Obtient l'agent utilisateur client.
-     */
-    public function userAgent(): ?string
-    {
-        return $this->header('User-Agent');
-    }
-
-    /**
      * Fusionne la nouvelle entrée dans le tableau d'entrée de la requête actuelle.
      */
     public function merge(array $input): self

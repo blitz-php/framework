@@ -39,6 +39,7 @@ use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Reflection\ReflectionClass;
 use Closure;
+use Dimtrovich\UserAgent\Extensions\BlitzPHP\AgentProvider;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -64,6 +65,7 @@ class Providers extends AbstractProvider
             self::interfaces(),
             self::classes(),
             self::services(),
+			AgentProvider::definitions(),
         );
     }
 

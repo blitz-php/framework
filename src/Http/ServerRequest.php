@@ -19,6 +19,7 @@ use BlitzPHP\Session\Cookie\CookieCollection;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Iterable\Arr;
 use Closure;
+use Dimtrovich\UserAgent\Agent;
 use GuzzleHttp\Psr7\ServerRequest as Psr7ServerRequest;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Utils;
@@ -138,6 +139,11 @@ class ServerRequest implements ServerRequestInterface
      */
     protected Store $session;
 
+	/**
+	 * Instance UserAgent
+	 */
+	protected Agent $userAgent;
+
     /**
      * Stockez les attributs supplémentaires attachés à la requête.
      *
@@ -225,6 +231,9 @@ class ServerRequest implements ServerRequestInterface
         if (empty($config['session'])) {
             $config['session'] = single_service('session');
         }
+        if (empty($config['userAgent'])) {
+            $config['userAgent'] = service('userAgent');
+        }
 
         if (empty($config['environment']['REQUEST_METHOD'])) {
             $config['environment']['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -275,6 +284,7 @@ class ServerRequest implements ServerRequestInterface
         $this->query         = $config['query'];
         $this->params        = $config['params'];
         $this->session       = $config['session'];
+        $this->userAgent     = $config['userAgent'];
     }
 
     /**
@@ -314,6 +324,14 @@ class ServerRequest implements ServerRequestInterface
     public function session(): Store
     {
         return $this->session;
+    }
+
+    /**
+     * Obtient l'agent utilisateur client.
+     */
+    public function userAgent(): Agent
+    {
+		return $this->userAgent;
     }
 
     /**
