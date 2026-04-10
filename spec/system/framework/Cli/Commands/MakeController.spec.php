@@ -37,10 +37,15 @@ describe('Commandes / MakeController', function (): void {
     afterEach(function (): void {
         COH::tearDown();
 
-		$result = str_replace(["\033[0;32m", "\033[0m", "\n"], '', COH::buffer());
-		$file   = str_replace('APP_PATH' . DS, APP_PATH, trim(substr($result, 14)));
-		$file   = explode('File created: ', $file);
-		$file   = $file[1] ?? '';
+		$buffer = str_replace(["\033[0;32m", "\033[0m", "\n", "\x1b[0;38;5;119m"], '', COH::buffer());
+		preg_match('/\[([^\]]+\.php)\]/', $buffer, $matches);
+
+		if (!isset($matches[1])) {
+			return;
+		}
+
+		$result = explode('[', $matches[1]);
+		$file   = array_pop($result);
 
 		if ($file !== '' && is_file($file)) {
             unlink($file);
@@ -56,7 +61,7 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		expect($this->getFileContents($file))->toMatch(
@@ -73,7 +78,7 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		expect($this->getFileContents($file))->toMatch(
@@ -91,7 +96,7 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		expect($this->getFileContents($file))->toMatch(
@@ -108,7 +113,7 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		expect($this->getFileContents($file))->toMatch(
@@ -125,7 +130,7 @@ describe('Commandes / MakeController', function (): void {
 		expect(file_exists($file))->toBeTruthy();
 
 		expect($buffer)->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 	});
 });

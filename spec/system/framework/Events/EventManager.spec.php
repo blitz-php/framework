@@ -1164,7 +1164,7 @@ describe('Events / EventManager', function (): void {
         });
 
         it('Les méthodes dépréciées déclenchent des warnings', function (): void {
-			$_SERVER['ENVIRONMENT'] = 'dev';
+			config()->set('app.environment', 'dev');
 
             $warnings = [];
             set_error_handler(static function ($errno, $errstr) use (&$warnings): bool {
@@ -1177,7 +1177,7 @@ describe('Events / EventManager', function (): void {
             $this->eventManager->detach('test', static function (): void {});
 
             restore_error_handler();
-			$_SERVER['ENVIRONMENT'] = 'test';
+			config()->set('app.environment', 'test');
 
             expect($warnings)->toHaveLength(3);
             expect($warnings[0])->toContain('attach() est obsolète');

@@ -460,7 +460,8 @@ if (! function_exists('environment')) {
             'staging' => 'testing',
         ];
 
-        $env = array_map(static fn ($k) => $envMap[$k] ?? $k, (array) $env);
+		$env     = array_map(static fn ($k) => $envMap[$k] ?? $k, (array) $env);
+		$current = $envMap[$current] ?? $current;
 
         return in_array($current, $env, true);
     }

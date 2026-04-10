@@ -298,7 +298,7 @@ describe('Http / Request', function (): void {
         it('User agent', function (): void {
             $request = new Request();
             $request = $request->withEnv('HTTP_USER_AGENT', 'Chrome');
-            expect($request->userAgent())->toBe('Chrome');
+            expect((string) $request->userAgent())->toBe('Chrome');
         });
 
         it('Merge if missing', function (): void {

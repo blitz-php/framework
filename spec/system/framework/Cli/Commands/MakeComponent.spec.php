@@ -70,7 +70,7 @@ describe('Commandes / MakeComponent', function (): void {
 			expect(file_exists($file))->toBeTruthy();
 
 			expect($buffer)->toMatch(
-				static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+				static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 			);
 
 			expect($this->getFileContents($file))->toMatch(
@@ -92,7 +92,7 @@ describe('Commandes / MakeComponent', function (): void {
 			expect(file_exists($file))->toBeTruthy();
 
 			expect($buffer)->toMatch(
-				static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+				static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 			);
 
 			expect($this->getFileContents($file))->toMatch(
@@ -114,7 +114,7 @@ describe('Commandes / MakeComponent', function (): void {
 			expect(file_exists($file))->toBeTruthy();
 
 			expect($buffer)->toMatch(
-				static fn ($actual): bool => str_contains($actual, 'File created: ' . clean_path($file))
+				static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 			);
 
 			expect($this->getFileContents($file))->toMatch(

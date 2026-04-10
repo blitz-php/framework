@@ -37,14 +37,16 @@ describe('Commandes / MakeCommand', function (): void {
     afterEach(function (): void {
         COH::tearDown();
 
-		$result = str_replace(["\033[0;32m", "\033[0m", "\n"], '', COH::buffer());
-		$result = explode('APP_PATH', $result);
-		if (!isset($result[1])) {
+		$buffer = str_replace(["\033[0;32m", "\033[0m", "\n", "\x1b[0;38;5;119m"], '', COH::buffer());
+		preg_match('/\[([^\]]+\.php)\]/', $buffer, $matches);
+
+		if (!isset($matches[1])) {
 			return;
 		}
 
-		$file = APP_PATH . ltrim($result[1], DS);
-		$dir  = dirname($file);
+		$result = explode('[', $matches[1]);
+		$file   = array_pop($result);
+		$dir    = dirname($file);
 
         if (is_file($file)) {
             unlink($file);
@@ -118,7 +120,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command deliver --group=Delivrables');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		$file = APP_PATH . 'Commands/Deliver.php';
@@ -134,7 +136,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command deliver --suffix');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		$file = APP_PATH . 'Commands/DeliverCommand.php';
@@ -145,7 +147,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command TestModule');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		$file = APP_PATH . 'Commands/TestModule.php';
@@ -156,7 +158,7 @@ describe('Commandes / MakeCommand', function (): void {
 		command('make:command TestModulecommand');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'File created: ')
+			static fn ($actual): bool => str_contains($actual, 'Créé avec succès')
 		);
 
 		$file = APP_PATH . 'Commands/TestModuleCommand.php';

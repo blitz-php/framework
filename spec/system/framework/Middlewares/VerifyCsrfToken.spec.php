@@ -102,13 +102,13 @@ describe('Middleware / VerifyCsrfToken', function (): void {
         $handler = new TestRequestHandler();
         $middleware = new VerifyCsrfToken($encrypter);
 
-		$_SERVER['ENVIRONMENT'] = 'development';
+		config()->set('app.environment', 'development');
 
         expect(function () use ($middleware, $request, $handler): void {
 			$middleware->process($request, $handler);
 		})->toThrow(new TokenMismatchException('Erreur de jeton CSRF.'));
 
-		$_SERVER['ENVIRONMENT'] = 'testing';
+		config()->set('app.environment', 'testing');
     });
 
     it("devrait ignorer la vérification pour les URI dans la liste 'except'", function (): void {

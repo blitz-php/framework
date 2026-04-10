@@ -68,10 +68,10 @@ describe('Controllers / RestController', function (): void {
 			$controller->initialize($this->request, $this->response, $this->logger);
 
 			// on force l'environnement a etre sur 'dev' car la fonction 'on_dev' ne gere pas le mode test
-			$_SERVER['ENVIRONMENT'] = 'dev';
+			config()->set('app.environment', 'dev');
 
             $result = $controller->testRemap('testMethod');
-			$_SERVER['ENVIRONMENT'] = 'testing';
+			config()->set('app.environment', 'testing');
 
             expect($result->getStatusCode())->toBe(StatusCode::INTERNAL_ERROR);
         });
@@ -89,12 +89,12 @@ describe('Controllers / RestController', function (): void {
 
         it('Doit gérer les autres exceptions en mode développement', function (): void {
             // on force l'environnement a etre sur 'dev' car la fonction 'on_dev' ne gere pas le mode test
-			$_SERVER['ENVIRONMENT'] = 'dev';
+			config()->set('app.environment', 'dev');
 
             $ex = new Exception('Generic error', 1001);
 
             $result = $this->controller->testHandleException($ex);
-			$_SERVER['ENVIRONMENT'] = 'testing';
+			config()->set('app.environment', 'testing');
 
             expect($result->getStatusCode())->toBe(StatusCode::INTERNAL_ERROR);
         });

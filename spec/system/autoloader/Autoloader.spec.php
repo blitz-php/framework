@@ -139,10 +139,10 @@ describe('Autoloader', function (): void {
 
         it(': La methode `getNamespace` retourne un tableau avec les namespaces definis', function (): void {
             expect($this->loader->getNamespace())->toBe([
-                'App'      => [APP_PATH],
-                'BlitzPHP' => [SYST_PATH],
+                'App'      => [rtrim(APP_PATH, DS)],
+                'BlitzPHP' => [rtrim(SYST_PATH, DS)],
             ]);
-            expect($this->loader->getNamespace('BlitzPHP'))->toBe([SYST_PATH]);
+            expect($this->loader->getNamespace('BlitzPHP'))->toBe([rtrim(SYST_PATH, DS)]);
             expect($this->loader->getNamespace('Foo'))->toBe([]);
         });
 
