@@ -142,7 +142,7 @@ class ServerRequest implements ServerRequestInterface
 	/**
 	 * Instance UserAgent
 	 */
-	protected Agent $userAgent;
+	protected ?Agent $userAgent = null;
 
     /**
      * Stockez les attributs supplémentaires attachés à la requête.
@@ -231,9 +231,6 @@ class ServerRequest implements ServerRequestInterface
         if (empty($config['session'])) {
             $config['session'] = single_service('session');
         }
-        if (empty($config['userAgent'])) {
-            $config['userAgent'] = service('userAgent');
-        }
 
         if (empty($config['environment']['REQUEST_METHOD'])) {
             $config['environment']['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -284,7 +281,6 @@ class ServerRequest implements ServerRequestInterface
         $this->query         = $config['query'];
         $this->params        = $config['params'];
         $this->session       = $config['session'];
-        $this->userAgent     = $config['userAgent'];
     }
 
     /**
@@ -331,6 +327,12 @@ class ServerRequest implements ServerRequestInterface
      */
     public function userAgent(): Agent
     {
+		if (! $this->userAgent) {
+			$this->userAgent = service('userAgent');
+		}
+
+		$this->userAgent->setUserAgent($this->getHeaderLine('User-Agent'));
+
 		return $this->userAgent;
     }
 
