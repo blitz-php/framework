@@ -404,6 +404,7 @@ trait GeneratorTrait
             $nameLang = $this->classNameLang ?: 'CLI.generator.className.default';
             $class    = $this->prompt(lang($nameLang));
             $this->eol();
+			$this->mergeArguments(['name' => $class]);
         }
 
         helper('inflector');

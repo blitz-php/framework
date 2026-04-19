@@ -30,7 +30,7 @@ trait DebugTraceableTrait
      * Ajuste le constructeur de l'exception pour assigner le fichier/la ligne à où
      * il est réellement déclenché plutôt que d'être instancié.
      */
-    final public function __construct(string $message = '', ?int $code = null, ?Throwable $previous = null)
+    public function __construct(string $message = '', ?int $code = null, ?Throwable $previous = null)
     {
         parent::__construct($message, $code ?? $this->_defaultCode, $previous);
 

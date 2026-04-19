@@ -94,7 +94,7 @@ class Hasher implements HasherInterface
      *
      * @internal
      */
-    public function verifyConfiguration(array $value): bool
+    public function verifyConfiguration(string $value): bool
     {
         return $this->driver()->verifyConfiguration($value);
     }
