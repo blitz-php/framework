@@ -158,8 +158,8 @@ class UrlGenerator
             '/',
             array_map(
                 'rawurlencode',
-                $this->formatParameters($extra)
-            )
+                $this->formatParameters($extra),
+            ),
         );
 
         // Une fois que nous avons le schéma, nous compilons la "queue" en rassemblant les valeurs
@@ -171,7 +171,7 @@ class UrlGenerator
 
         return $this->format(
             $root,
-            '/' . trim($path . '/' . $tail, '/')
+            '/' . trim($path . '/' . $tail, '/'),
         ) . $query;
     }
 

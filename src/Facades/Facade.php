@@ -52,7 +52,7 @@ abstract class Facade
                     'Impossible de résoudre le service "%s" pour la facade %s. %s',
                     $accessor,
                     static::class,
-                    $e->getMessage()
+                    $e->getMessage(),
                 ), 0, $e);
             }
         }
@@ -61,7 +61,7 @@ abstract class Facade
             throw new InvalidArgumentException(sprintf(
                 'La méthode `%s::accessor` doit retourner un object ou le nom d\'un service. Type "%s" reçu.',
                 static::class,
-                gettype($accessor)
+                gettype($accessor),
             ));
         }
 

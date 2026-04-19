@@ -25,7 +25,7 @@ use Nette\Schema\Schema;
  */
 class FileLocator
 {
-	use Macroable;
+    use Macroable;
 
     /**
      * Cache locates.
@@ -326,7 +326,7 @@ class FileLocator
 
         $fileMap = array_map(
             static fn ($map) => array_filter($map, static fn ($file) => ! empty($file) && is_readable($file)),
-            $fileMap
+            $fileMap,
         );
 
         $fileMap['app']    = array_slice($fileMap['app'], 0, 1);

@@ -103,7 +103,7 @@ class RoutesCollector extends BaseCollector
                     ' <empty> | default: '
                     . var_export(
                         $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null,
-                        true
+                        true,
                     ),
             ];
         }

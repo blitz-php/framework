@@ -147,7 +147,7 @@ class Router implements RouterInterface
                 $this->collection->getDefaultNamespace(),
                 $this->collection->getDefaultController(),
                 $this->collection->getDefaultMethod(),
-                $this->translateURIDashes
+                $this->translateURIDashes,
             );
         }
     }
@@ -229,7 +229,7 @@ class Router implements RouterInterface
         $controller = preg_replace(
             ['#(\_)?Controller$#i', '#' . /** @scrutinizer ignore-type */ config('app.url_suffix') . '$#i'],
             '',
-            ucfirst($controller)
+            ucfirst($controller),
         );
 
         $controller = trim($controller, '/\\');
@@ -397,7 +397,7 @@ class Router implements RouterInterface
 
                     throw new RedirectException(
                         preg_replace('#\A' . $routeKey . '\z#u', $redirectTo, $uri),
-                        $this->collection->getRedirectCode($routeKey)
+                        $this->collection->getRedirectCode($routeKey),
                     );
                 }
                 // Stocke nos paramètres régionaux afin que l'objet CodeIgniter puisse l'affecter à la requête.
@@ -405,7 +405,7 @@ class Router implements RouterInterface
                     preg_match(
                         '#^' . str_replace('{locale}', '(?<locale>[^/]+)', $matchedKey) . '$#u',
                         $uri,
-                        $matched
+                        $matched,
                     );
 
                     if ($this->collection->shouldUseSupportedLocalesOnly()
@@ -503,7 +503,7 @@ class Router implements RouterInterface
 
                 return $matches[$index] ?? '';
             },
-            $input
+            $input,
         );
     }
 
@@ -595,7 +595,7 @@ class Router implements RouterInterface
                 && preg_match('/\A[' . $this->permittedURIChars . ']+\z/iu', $segment) !== 1
             ) {
                 throw new BadRequestException(
-                    'L\'URI que vous avez soumis contient des caractères non autorisés : "' . $segment . '"'
+                    'L\'URI que vous avez soumis contient des caractères non autorisés : "' . $segment . '"',
                 );
             }
         }

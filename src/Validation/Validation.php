@@ -63,7 +63,7 @@ class Validation extends BaseValidation
     {
         $files = array_merge(
             $locator->listFiles('Rules/'), // Regles de l'application ou des fournisseurs
-            $locator->listFiles('Validation/Rules/') // Regles internes du framework
+            $locator->listFiles('Validation/Rules/'), // Regles internes du framework
         );
 
         return array_unique($files);

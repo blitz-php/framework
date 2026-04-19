@@ -1,5 +1,7 @@
 <?php
 
+use BlitzPHP\View\ViewDecoratorInterface;
+
 /*
 | -------------------------------------------------- -----------------
 | CONFIGURATION DU MOTEUR DE RENDU DES VUES
@@ -53,7 +55,7 @@ return [
      *
      * Toutes les classes doivent implémenter BlitzPHP\View\ViewDecoratorInterface
      *
-     * @var list<classe-string<BlitzPHP\View\ViewDecoratorInterface>>
+     * @var list<classe-string<ViewDecoratorInterface>>
      */
     'decorators' => [],
 

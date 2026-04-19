@@ -147,7 +147,7 @@ class Services extends BaseServices
             $config->domain ?: '',
             $config->secure ?: false,
             $config->httponly ?: true,
-            $config->samesite ?: 'Lax'
+            $config->samesite ?: 'Lax',
         );
     }
 

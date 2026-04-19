@@ -1,5 +1,6 @@
 <?php
 
+use BlitzPHP\Mail\Adapters\AbstractAdapter;
 use BlitzPHP\Mail\Mail;
 
 return [
@@ -25,7 +26,7 @@ return [
      *
      * Vous pouvez egalement mettre le FQCN d'une classe qui etend la classe \BlitzPHP\Mail\Adapters\AbstractAdapter
      *
-     * @var class-string<BlitzPHP\Mail\Adapters\AbstractAdapter>|string
+     * @var class-string<AbstractAdapter>|string
      */
     'handler' => env('mail.handler', 'log'),
 

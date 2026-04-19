@@ -21,9 +21,8 @@ class Mail extends GeneratorCommand
     protected array $arguments    = [
         'name' => ['Le nom de la classe de mail.'],
     ];
-
-	protected string $component     = 'Mail';
-	protected string $directory     = 'Mail';
-	protected string $template      = 'mail.tpl.php';
-	protected string $classNameLang = 'CLI.generator.className.mail';
+    protected string $component     = 'Mail';
+    protected string $directory     = 'Mail';
+    protected string $template      = 'mail.tpl.php';
+    protected string $classNameLang = 'CLI.generator.className.mail';
 }

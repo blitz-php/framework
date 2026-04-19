@@ -122,7 +122,7 @@ trait InteractsWithInput
         return Helpers::dataGet(
             $this->data + $this->query,
             $key,
-            $default
+            $default,
         );
     }
 

@@ -189,7 +189,7 @@ class EventDiscover
             logger()->error(sprintf(
                 "Échec de l'enregistrement de l'écouteur d'événement %s : %s",
                 $file,
-                $e->getMessage()
+                $e->getMessage(),
             ));
 
             return false;

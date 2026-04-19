@@ -28,6 +28,7 @@ use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Invade\Invader;
 use BlitzPHP\Utilities\Invade\StaticInvader;
 use BlitzPHP\Utilities\Iterable\Collection;
+use BlitzPHP\View\View;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\StreamInterface;
 
@@ -133,9 +134,9 @@ if (! function_exists('command')) {
      */
     function command(string $command)
     {
-		ob_start();
+        ob_start();
 
-		service(Console::class)->callRaw($command);
+        service(Console::class)->callRaw($command);
 
         return ob_get_clean();
     }
@@ -460,8 +461,8 @@ if (! function_exists('environment')) {
             'staging' => 'testing',
         ];
 
-		$env     = array_map(static fn ($k) => $envMap[$k] ?? $k, (array) $env);
-		$current = $envMap[$current] ?? $current;
+        $env     = array_map(static fn ($k) => $envMap[$k] ?? $k, (array) $env);
+        $current = $envMap[$current] ?? $current;
 
         return in_array($current, $env, true);
     }
@@ -914,7 +915,7 @@ if (! function_exists('view')) {
      *
      * NOTE : Ne fournit pas d'échappement des données, ce qui doit être géré manuellement par le développeur.
      *
-     * @return BlitzPHP\View\View
+     * @return View
      */
     function view(string $view, array $data = [], array $options = [])
     {

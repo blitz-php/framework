@@ -108,7 +108,7 @@ class ResponseEmitter
                 header(sprintf(
                     '%s: %s',
                     $name,
-                    $value
+                    $value,
                 ), $first);
                 $first = false;
             }
@@ -187,7 +187,7 @@ class ResponseEmitter
             'HTTP/%s %d%s',
             $response->getProtocolVersion(),
             $response->getStatusCode(),
-            ($reasonPhrase !== '' && $reasonPhrase !== '0' ? ' ' . $reasonPhrase : '')
+            ($reasonPhrase !== '' && $reasonPhrase !== '0' ? ' ' . $reasonPhrase : ''),
         ));
     }
 

@@ -28,12 +28,10 @@ class Component extends GeneratorCommand
         '--namespace' => ["Définissez l'espace de noms racine. Par défaut\u{a0}: \"APP_NAMESPACE\".", APP_NAMESPACE],
         '--force'     => ['Forcer l\'écrasement du fichier existant.'],
     ];
-
-	protected string $component     = 'Component';
-	protected string $directory     = 'Components';
-	protected string $template      = 'component.tpl.php';
-	protected string $classNameLang = 'CLI.generator.className.component';
-
+    protected string $component     = 'Component';
+    protected string $directory     = 'Components';
+    protected string $template      = 'component.tpl.php';
+    protected string $classNameLang = 'CLI.generator.className.component';
 
     /**
      * {@inheritDoc}
@@ -52,7 +50,7 @@ class Component extends GeneratorCommand
         $viewName = preg_replace(
             '/([a-z][a-z0-9_\/\\\\]+)(-component)$/i',
             '$1',
-            $viewName
+            $viewName,
         ) ?? $viewName;
         $namespace = substr($className, 0, strrpos($className, '\\') + 1);
 

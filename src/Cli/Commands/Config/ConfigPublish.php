@@ -38,14 +38,14 @@ class ConfigPublish extends Command
         $name   = $this->argument('name');
         $skip   = (bool) $this->option('skip-on-missing');
         $names  = [];
-        
+
         if ($name === null) {
             if ($this->option('all')) {
                 $names = array_keys($config);
             } else {
                 $names = $this->choices('Quel fichier de configuration souhaitez-vous publier ?', array_keys($config));
             }
-        } else if (is_string($name)) {
+        } elseif (is_string($name)) {
             $names = explode(',', $name);
         }
 
@@ -56,25 +56,25 @@ class ConfigPublish extends Command
         }
 
         $published = 0;
-        
+
         foreach ($names as $name) {
             if (! isset($config[$name])) {
                 $this->badge()->errorFull("Fichier de configuration '{$name}' non reconnu.");
 
-                if (!$skip) {
+                if (! $skip) {
                     return EXIT_ERROR;
                 }
-                
+
                 continue;
             }
-                
+
             $published++;
 
             $this->eol()->publish($name, $config[$name], config_path($name));
         }
 
         $this->eol()->success(sprintf('%d fichiers publié%s avec succès', $published, $published > 1 ? 's' : ''));
-        
+
         return EXIT_SUCCESS;
     }
 
@@ -107,7 +107,7 @@ class ConfigPublish extends Command
         }
 
         $registrars = config()->registrar('config');
-        
+
         foreach ($registrars as $key => $value) {
             $path = dirname($key);
 
@@ -115,7 +115,7 @@ class ConfigPublish extends Command
                 $config[$name] = $path . DIRECTORY_SEPARATOR . $name . '.php';
             }
         }
-        
+
         return collect($config)->sortKeys()->all();
     }
 }

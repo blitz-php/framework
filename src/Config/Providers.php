@@ -68,7 +68,7 @@ class Providers extends AbstractProvider
             self::interfaces(),
             self::classes(),
             self::services(),
-			AgentProvider::definitions(),
+            AgentProvider::definitions(),
         );
     }
 
@@ -87,7 +87,7 @@ class Providers extends AbstractProvider
             RouteCollectionInterface::class          => static fn () => service('routes'),
             EncrypterInterface::class                => static fn () => service('encrypter'),
             HasherInterface::class                   => static fn () => service('hashing'),
-			CookieManagerInterface::class            => static fn () => service('cookie'),
+            CookieManagerInterface::class            => static fn () => service('cookie'),
             SessionInterface::class                  => static fn () => service('session'),
             RendererInterface::class                 => static fn () => service('viewer')->getAdapter(),
             \Psr\Container\ContainerInterface::class => static fn () => service('container'),
@@ -110,8 +110,8 @@ class Providers extends AbstractProvider
             Locator::class           => static fn () => service('locator'),
             Cache::class             => static fn () => service('cache'),
             Encryption::class        => static fn () => service('encrypter'),
-			Hasher::class            => static fn () => service('hashing'),
-			ResponseCache::class     => static fn () => service('responsecache'),
+            Hasher::class            => static fn () => service('hashing'),
+            ResponseCache::class     => static fn () => service('responsecache'),
             FilesystemManager::class => static fn () => service('storage'),
             Negotiator::class        => static fn () => service('negotiator'),
             Redirection::class       => static fn () => service('redirection'),

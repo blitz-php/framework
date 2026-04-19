@@ -261,13 +261,13 @@ class Redirection extends Response
      */
     public function withInput(array $input = []): static
     {
-		if ($input === []) {
-			$input = $this->request->input();
-		}
+        if ($input === []) {
+            $input = $this->request->input();
+        }
 
-		$this->session->flashInput($this->removeFilesFromInput($input));
+        $this->session->flashInput($this->removeFilesFromInput($input));
 
-		return $this;
+        return $this;
     }
 
     /**

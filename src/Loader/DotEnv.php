@@ -320,7 +320,7 @@ class DotEnv
 
                     return $var ?? $matches[0]; // Garde literal si null
                 },
-                $value
+                $value,
             );
         } while ($iterative && $value !== $original && str_contains($value, '${'));
 

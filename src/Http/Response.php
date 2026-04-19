@@ -525,7 +525,7 @@ class Response implements ResponseInterface, Stringable
             $time = strtotime($time);
             if ($time === false) {
                 throw new InvalidArgumentException(
-                    'Paramètre $time invalide. Assurez-vous que votre valeur peut être analysée par strtotime.'
+                    'Paramètre $time invalide. Assurez-vous que votre valeur peut être analysée par strtotime.',
                 );
             }
         }

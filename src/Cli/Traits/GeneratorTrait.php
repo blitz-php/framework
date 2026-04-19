@@ -184,7 +184,7 @@ trait GeneratorTrait
     {
         if ($this->option('namespace') === 'BlitzPHP') {
             // @codeCoverageIgnoreStart
-			$this->warning(lang('CLI.generator.usingBlitzNamespace'));
+            $this->warning(lang('CLI.generator.usingBlitzNamespace'));
 
             if (! $this->confirm('Are you sure you want to continue?')) {
                 $this->eol()->warning(lang('CLI.generator.cancelOperation'));
@@ -404,7 +404,7 @@ trait GeneratorTrait
             $nameLang = $this->classNameLang ?: 'CLI.generator.className.default';
             $class    = $this->prompt(lang($nameLang));
             $this->eol();
-			$this->mergeArguments(['name' => $class]);
+            $this->mergeArguments(['name' => $class]);
         }
 
         helper('inflector');

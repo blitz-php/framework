@@ -114,7 +114,7 @@ if (! function_exists('site_url')) {
             $uri->getAuthority(),
             $uri->getPath(),
             $uri->getQuery(),
-            $uri->getFragment()
+            $uri->getFragment(),
         );
     }
 }

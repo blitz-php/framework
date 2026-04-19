@@ -29,11 +29,10 @@ class Command extends GeneratorCommand
         '--suffix'    => ['Ajouter le titre du composant au nom de la classe (par exemple, User => UserCommand).'],
         '--force'     => ["Forcer l'écrasement du fichier existant."],
     ];
-
-	protected string $directory     = 'Commands';
-	protected string $component     = 'Command';
-	protected string $template      = 'command.tpl.php';
-	protected string $classNameLang = 'CLI.generator.className.command';
+    protected string $directory     = 'Commands';
+    protected string $component     = 'Command';
+    protected string $template      = 'command.tpl.php';
+    protected string $classNameLang = 'CLI.generator.className.command';
 
     /**
      * Préparez les options et effectuez les remplacements nécessaires.
@@ -62,7 +61,7 @@ class Command extends GeneratorCommand
             $class,
             ['{group}', '{command}'],
             [$group, $command],
-            ['type' => $type]
+            ['type' => $type],
         );
     }
 }

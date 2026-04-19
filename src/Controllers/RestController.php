@@ -140,7 +140,7 @@ class RestController extends BaseController
             return $this->respondBadRequest(
                 'Validation failed',
                 $ex->getCode(),
-                $ex->getErrors()->all()
+                $ex->getErrors()->all(),
             );
         }
 
@@ -354,7 +354,7 @@ class RestController extends BaseController
         ?string $message = "Une erreur s'est produite",
         ?int $status = StatusCode::INTERNAL_ERROR,
         int|string|null $code = null,
-        array $errors = []
+        array $errors = [],
     ): ResponseInterface {
         $message = $message ?: "Une erreur s'est produite";
         $code    = in_array($code, [0, '', '0', null], true) ? $status : $code;
@@ -393,7 +393,7 @@ class RestController extends BaseController
     protected function respondSuccess(
         ?string $message = 'Resultat',
         $result = null,
-        ?int $status = StatusCode::OK
+        ?int $status = StatusCode::OK,
     ): ResponseInterface {
         $message = $message ?: 'Resultat';
         $status ??= StatusCode::OK;
@@ -479,7 +479,7 @@ class RestController extends BaseController
             }
 
             $this->response = $this->response->withType(
-                $mime === $this->mimes['array'] ? $this->mimes['json'] : $mime
+                $mime === $this->mimes['array'] ? $this->mimes['json'] : $mime,
             );
 
             if ($mime === $this->mimes['array']) {

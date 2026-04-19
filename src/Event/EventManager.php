@@ -427,7 +427,7 @@ class EventManager implements EventManagerInterface
                 'Event listener error: %s in %s:%s',
                 $e->getMessage(),
                 $e->getFile(),
-                $e->getLine()
+                $e->getLine(),
             ));
 
             // Relance l'exception si c'est une exception critique
@@ -485,7 +485,7 @@ class EventManager implements EventManagerInterface
         }
 
         if (is_object($callback) && method_exists($callback, '__invoke')) {
-            return get_class($callback) . '::__invoke';
+            return $callback::class . '::__invoke';
         }
 
         return 'Unknown';

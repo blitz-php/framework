@@ -64,7 +64,7 @@ class MailException extends RuntimeException
     {
         return new static(
             sprintf('Validation du mail échouée: %s', implode(', ', $errors)),
-            self::VALIDATION_ERROR
+            self::VALIDATION_ERROR,
         );
     }
 
@@ -78,7 +78,7 @@ class MailException extends RuntimeException
     {
         return new static(
             sprintf('Pièce jointe invalide (%s): %s', $filePath, $reason),
-            self::ATTACHMENT_ERROR
+            self::ATTACHMENT_ERROR,
         );
     }
 }

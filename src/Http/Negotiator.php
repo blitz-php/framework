@@ -208,7 +208,7 @@ class Negotiator
                 preg_match(
                     '/^(?P<name>.+?)=(?P<quoted>"|\')?(?P<value>.*?)(?:\k<quoted>)?$/',
                     $pair,
-                    $param
+                    $param,
                 );
                 $parameters[trim($param['name'])] = trim($param['value']);
             }

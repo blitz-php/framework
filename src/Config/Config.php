@@ -55,8 +55,8 @@ class Config
 
     /**
      * Chemins d'accès vers les différents registrars découverts
-     * 
-     * @var array<string, array<string, array<mixed>>>
+     *
+     * @var array<string, array<string, list<mixed>>>
      */
     protected static array $registrarPaths = [];
 
@@ -191,8 +191,8 @@ class Config
 
     /**
      * Retourne la valeurs d'un registrar donné
-     * 
-     * @return array<string, array<mixed>>
+     *
+     * @return array<string, list<mixed>>
      */
     public function registrar(string $key): array
     {
@@ -268,7 +268,7 @@ class Config
     /**
      * S'assure que la configuration demandée est bien chargée
      */
-    private function ensureConfigLoaded(string $key): void 
+    private function ensureConfigLoaded(string $key): void
     {
         $topLevelKey = $this->configurator->getTopLevelKey($key);
         if (! isset(self::$loaded[$topLevelKey])) {
@@ -356,7 +356,7 @@ class Config
             throw new ConfigException(
                 'Pendant la découverte automatique des Registrars,'
                 . ' "' . static::class . '" a été re-éxecuté.'
-                . ' "' . clean_path($file) . '" doit avoir un mauvais code.'
+                . ' "' . clean_path($file) . '" doit avoir un mauvais code.',
             );
         }
 
@@ -386,7 +386,7 @@ class Config
 
         $class   = new ReflectionClass($classname);
         $methods = $class->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
-        
+
         foreach ($methods as $method) {
             if (! ($method->isPublic() && $method->isStatic())) {
                 continue;
@@ -404,8 +404,8 @@ class Config
             }
 
             self::$registrarPaths[$name][$file] = array_merge(
-                self::$registrarPaths[$name][$file] ?? [], 
-                $result
+                self::$registrarPaths[$name][$file] ?? [],
+                $result,
             );
         }
     }

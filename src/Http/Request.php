@@ -333,7 +333,7 @@ class Request extends ServerRequest implements Arrayable, ArrayAccess
         return $this->merge(
             (new Collection($input))
                 ->filter(fn ($value, $key) => $this->missing($key))
-                ->toArray()
+                ->toArray(),
         );
     }
 

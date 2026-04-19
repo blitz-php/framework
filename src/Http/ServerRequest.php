@@ -139,10 +139,10 @@ class ServerRequest implements ServerRequestInterface
      */
     protected Store $session;
 
-	/**
-	 * Instance UserAgent
-	 */
-	protected ?Agent $userAgent = null;
+    /**
+     * Instance UserAgent
+     */
+    protected ?Agent $userAgent = null;
 
     /**
      * Stockez les attributs supplémentaires attachés à la requête.
@@ -273,7 +273,7 @@ class ServerRequest implements ServerRequestInterface
         if (! (is_array($post) || is_object($post) || $post === null)) {
             throw new InvalidArgumentException(sprintf(
                 'La clé `post` doit être un tableau, un objet ou null. On a obtenu `%s` à la place.',
-                get_debug_type($post)
+                get_debug_type($post),
             ));
         }
         $this->data          = $post;
@@ -327,13 +327,13 @@ class ServerRequest implements ServerRequestInterface
      */
     public function userAgent(): Agent
     {
-		if (! $this->userAgent) {
-			$this->userAgent = service('userAgent');
-		}
+        if (! $this->userAgent) {
+            $this->userAgent = service('userAgent');
+        }
 
-		$this->userAgent->setUserAgent($this->getHeaderLine('User-Agent'));
+        $this->userAgent->setUserAgent($this->getHeaderLine('User-Agent'));
 
-		return $this->userAgent;
+        return $this->userAgent;
     }
 
     /**
@@ -923,7 +923,7 @@ class ServerRequest implements ServerRequestInterface
         if (! preg_match('/^[!#$%&\'*+.^_`\|~0-9a-z-]+$/i', $method)) {
             throw new InvalidArgumentException(sprintf(
                 'Méthode HTTP non prise en charge "%s" fournie',
-                $method
+                $method,
             ));
         }
         $new->_environment['REQUEST_METHOD'] = $method;
@@ -1598,7 +1598,7 @@ class ServerRequest implements ServerRequestInterface
         $new = clone $this;
         if (in_array($name, $this->emulatedAttributes, true)) {
             throw new InvalidArgumentException(
-                "Vous ne pouvez pas supprimer '{$name}'. C'est un attribut BlitzPHP obligatoire."
+                "Vous ne pouvez pas supprimer '{$name}'. C'est un attribut BlitzPHP obligatoire.",
             );
         }
         unset($new->attributes[$name]);

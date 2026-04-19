@@ -2,6 +2,7 @@
 
 use BlitzPHP\Cache\Handlers\Apcu;
 use BlitzPHP\Cache\Handlers\ArrayHandler;
+use BlitzPHP\Cache\Handlers\BaseHandler;
 use BlitzPHP\Cache\Handlers\Dummy;
 use BlitzPHP\Cache\Handlers\File;
 use BlitzPHP\Cache\Handlers\Memcached;
@@ -173,7 +174,7 @@ return [
      * Il s'agit d'un tableau d'alias de moteur de cache et de noms de classe. Seuls les moteurs
      * qui sont répertoriés ici sont autorisés à être utilisés.
      *
-     * @var array<string, class-string<BlitzPHP\Cache\Handlers\BaseHandler>>
+     * @var array<string, class-string<BaseHandler>>
      */
     'valid_handlers' => [
         'apcu'      => Apcu::class,

@@ -365,7 +365,7 @@ class Mail implements MailerInterface
         return match ($this->config['mailType']) {
             'html'  => $this->html($message),
             'text'  => $this->text($message),
-            default => $this
+            default => $this,
         };
     }
 
@@ -411,7 +411,7 @@ class Mail implements MailerInterface
             throw new MailException(
                 sprintf('Erreur d\'envoi de mail: %s', $e->getMessage()),
                 $e->getCode(),
-                $e
+                $e,
             );
         }
 
@@ -517,7 +517,7 @@ class Mail implements MailerInterface
         }
 
         return [
-            'adapter' => get_class($adapter),
+            'adapter' => $adapter::class,
             'config'  => $this->config,
         ];
     }
@@ -625,7 +625,7 @@ class Mail implements MailerInterface
 
         // Test basique de configuration
         $result = [
-            'adapter'      => get_class($adapter),
+            'adapter'      => $adapter::class,
             'config_valid' => true,
             'from'         => $this->config['from'] ?? null,
             'host'         => $this->config['host'] ?? null,

@@ -32,18 +32,17 @@ class Controller extends GeneratorCommand
         '--force'     => ['Forcer l\'écrasement du fichier existant.'],
         '--invokable' => ['Spécifie si on veut avoir un contrôleur à action unique.'],
     ];
-
-	protected string $component     = 'Controller';
-	protected string $directory     = 'Controllers';
-	protected string $template      = 'controller.tpl.php';
-	protected string $classNameLang = 'CLI.generator.className.controller';
+    protected string $component     = 'Controller';
+    protected string $directory     = 'Controllers';
+    protected string $template      = 'controller.tpl.php';
+    protected string $classNameLang = 'CLI.generator.className.controller';
 
     /**
      * {@inheritDoc}
      */
     protected function process(array $parameters)
-	{
-		return parent::process($parameters + ['suffix' => true]);
+    {
+        return parent::process($parameters + ['suffix' => true]);
     }
 
     /**
@@ -89,7 +88,7 @@ class Controller extends GeneratorCommand
             [
                 'type'      => $rest,
                 'invokable' => $this->option('invokable'),
-            ]
+            ],
         );
     }
 }

@@ -1317,7 +1317,7 @@ class RouteCollection implements RouteCollectionInterface
         foreach ($matches[0] as $index => $placeholder) {
             if (! isset($params[$index])) {
                 throw new InvalidArgumentException(
-                    'Argument manquant pour "' . $placeholder . '" dans la route "' . $from . '".'
+                    'Argument manquant pour "' . $placeholder . '" dans la route "' . $from . '".',
                 );
             }
 
@@ -1461,7 +1461,7 @@ class RouteCollection implements RouteCollectionInterface
                     '/\$X/',
                     static fn ($m) => '$' . $i,
                     $to,
-                    1
+                    1,
                 );
             }
         }

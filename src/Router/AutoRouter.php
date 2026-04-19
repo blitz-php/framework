@@ -117,7 +117,7 @@ final class AutoRouter implements AutoRouterInterface
         string $namespace,
         private readonly string $defaultController,
         private readonly string $defaultMethod,
-        private readonly bool $translateURIDashes
+        private readonly bool $translateURIDashes,
     ) {
         $this->namespace = rtrim($namespace, '\\');
 
@@ -206,7 +206,7 @@ final class AutoRouter implements AutoRouterInterface
 
             $namespaces = array_map(
                 fn ($segment) => $this->translateURI($segment),
-                $segments
+                $segments,
             );
 
             $controller = '\\' . $this->namespace
@@ -277,7 +277,7 @@ final class AutoRouter implements AutoRouterInterface
             // Empêcher l'accès au chemin de contrôleur par défaut
             if (strtolower($baseControllerName) === strtolower($this->defaultController)) {
                 throw new PageNotFoundException(
-                    'Impossible d\'accéder au contrôleur par défaut "' . $this->controller . '" avec le nom du contrôleur comme chemin de l\'URI.'
+                    'Impossible d\'accéder au contrôleur par défaut "' . $this->controller . '" avec le nom du contrôleur comme chemin de l\'URI.',
                 );
             }
         } elseif ($this->searchLastDefaultController()) {
@@ -318,14 +318,14 @@ final class AutoRouter implements AutoRouterInterface
             // Empêcher l'accès à la méthode du contrôleur par défaut
             if (strtolower($baseControllerName) === strtolower($this->defaultController)) {
                 throw new PageNotFoundException(
-                    'Impossible d\'accéder au contrôleur par défaut "' . $this->controller . '::' . $this->method . '"'
+                    'Impossible d\'accéder au contrôleur par défaut "' . $this->controller . '::' . $this->method . '"',
                 );
             }
 
             // Empêcher l'accès au chemin de méthode par défaut
             if (strtolower($this->method) === strtolower($defaultMethod)) {
                 throw new PageNotFoundException(
-                    'Impossible d\'accéder à la méthode par défaut "' . $this->method . '" avec le nom de méthode comme chemin d\'URI.'
+                    'Impossible d\'accéder à la méthode par défaut "' . $this->method . '" avec le nom de méthode comme chemin d\'URI.',
                 );
             }
         } elseif (method_exists($this->controller, $defaultMethod)) {
@@ -395,7 +395,7 @@ final class AutoRouter implements AutoRouterInterface
             throw new PageNotFoundException(
                 'Le nombre de param dans l\'URI est supérieur aux paramètres de la méthode du contrôleur.'
                 . ' Handler:' . $this->controller . '::' . $this->method
-                . ', URI:' . $this->uri
+                . ', URI:' . $this->uri,
             );
         }
     }
@@ -408,7 +408,7 @@ final class AutoRouter implements AutoRouterInterface
 
             throw new PageNotFoundException(
                 'AutoRouterImproved ne prend pas en charge la methode `_remap()`.'
-                . ' Contrôleur:' . $this->controller
+                . ' Contrôleur:' . $this->controller,
             );
         } catch (ReflectionException) {
             // Ne rien faire
@@ -431,7 +431,7 @@ final class AutoRouter implements AutoRouterInterface
                     . ' quand $translate_uri_dashes est activé.'
                     . ' Veuillez utiliser les tiret.'
                     . ' Handler:' . $this->controller . '::' . $this->method
-                    . ', URI:' . $this->uri
+                    . ', URI:' . $this->uri,
                 );
             }
         }
@@ -451,7 +451,7 @@ final class AutoRouter implements AutoRouterInterface
 
         if (! in_array(ltrim($classname, '\\'), get_declared_classes(), true)) {
             throw new PageNotFoundException(
-                '"' . $classname . '" n\'a pas été trouvé.'
+                '"' . $classname . '" n\'a pas été trouvé.',
             );
         }
     }
@@ -476,7 +476,7 @@ final class AutoRouter implements AutoRouterInterface
             && ! in_array($method, get_class_methods($this->controller), true)
         ) {
             throw new PageNotFoundException(
-                '"' . $this->controller . '::' . $method . '()" n\'a pas été trouvé.'
+                '"' . $this->controller . '::' . $method . '()" n\'a pas été trouvé.',
             );
         }
     }
@@ -500,7 +500,7 @@ final class AutoRouter implements AutoRouterInterface
                     . ' contenant des lettres majuscules ("' . $segment . '")'
                     . ' lorsque $translateUriToCamelCase est activé.'
                     . ' Veuillez utiliser le tiret.'
-                    . ' URI:' . $this->uri
+                    . ' URI:' . $this->uri,
                 );
             }
 
@@ -510,7 +510,7 @@ final class AutoRouter implements AutoRouterInterface
                     . ' contenant un double tiret ("' . $segment . '")'
                     . ' lorsque $translateUriToCamelCase est activé.'
                     . ' Veuillez utiliser le tiret simple.'
-                    . ' URI:' . $this->uri
+                    . ' URI:' . $this->uri,
                 );
             }
 
@@ -518,8 +518,8 @@ final class AutoRouter implements AutoRouterInterface
                 ' ',
                 '',
                 ucwords(
-                    preg_replace('/[\-]+/', ' ', $segment)
-                )
+                    preg_replace('/[\-]+/', ' ', $segment),
+                ),
             );
         }
 
@@ -547,7 +547,7 @@ final class AutoRouter implements AutoRouterInterface
         $dir = str_replace(
             '\\',
             '/',
-            ltrim(substr($namespaces, strlen($this->namespace)), '\\')
+            ltrim(substr($namespaces, strlen($this->namespace)), '\\'),
         );
 
         if ($dir !== '') {
@@ -564,7 +564,7 @@ final class AutoRouter implements AutoRouterInterface
 
             if ($routeLowerCase === $controller) {
                 throw new PageNotFoundException(
-                    'Impossible d\'accéder à un contrôleur définie dans les routes. Contrôleur : ' . $controllerInRoutes
+                    'Impossible d\'accéder à un contrôleur définie dans les routes. Contrôleur : ' . $controllerInRoutes,
                 );
             }
         }
@@ -609,7 +609,7 @@ final class AutoRouter implements AutoRouterInterface
         return preg_replace(
             ['#(\_)?Controller$#i', '#' . config('app.url_suffix') . '$#i'],
             '',
-            ucfirst($name)
+            ucfirst($name),
         ) . 'Controller';
     }
 }

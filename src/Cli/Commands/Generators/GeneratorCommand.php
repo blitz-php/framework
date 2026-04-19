@@ -16,19 +16,19 @@ use BlitzPHP\Cli\Traits\GeneratorTrait;
 
 abstract class GeneratorCommand extends Command
 {
-	use GeneratorTrait;
+    use GeneratorTrait;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $group   = 'Générateurs';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $group = 'Générateurs';
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected string $service = 'Service de génération de code';
+    /**
+     * {@inheritDoc}
+     */
+    protected string $service = 'Service de génération de code';
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function handle()
@@ -36,65 +36,69 @@ abstract class GeneratorCommand extends Command
         $this->process($this->parameters());
     }
 
-	/**
-	 * Destinné à être surchagée si besoin
-	 */
-	protected function process(array $parameters)
-	{
-		$this->generateClass($parameters);
+    /**
+     * Destinné à être surchagée si besoin
+     */
+    protected function process(array $parameters)
+    {
+        $this->generateClass($parameters);
 
-		return EXIT_SUCCESS;
-	}
+        return EXIT_SUCCESS;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function displayFileCreated(string $file)
-	{
-		$this->badge()->info(sprintf('%s [%s] %s',
-			$this->component,
-			$this->color->ok($file),
-			'Créé avec succès',
-		));
-		$this->eol();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected function displayFileCreated(string $file)
+    {
+        $this->badge()->info(sprintf(
+            '%s [%s] %s',
+            $this->component,
+            $this->color->ok($file),
+            'Créé avec succès',
+        ));
+        $this->eol();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function displayFileExists(string $file)
-	{
-		$this->badge()->error(sprintf('%s [%s]. %s',
-			$this->component,
-			$file,
-			'Fichier déjà existant',
-		));
-		$this->eol();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected function displayFileExists(string $file)
+    {
+        $this->badge()->error(sprintf(
+            '%s [%s]. %s',
+            $this->component,
+            $file,
+            'Fichier déjà existant',
+        ));
+        $this->eol();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function displayFileError(string $file)
-	{
-		$this->badge()->error(sprintf('%s [%s]. %s',
-			$this->component,
-			$file,
-			'Erreur lors de la création du fichier',
-		));
-		$this->eol();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected function displayFileError(string $file)
+    {
+        $this->badge()->error(sprintf(
+            '%s [%s]. %s',
+            $this->component,
+            $file,
+            'Erreur lors de la création du fichier',
+        ));
+        $this->eol();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function displayFileOverwrited(string $file)
-	{
-		$this->badge()->warning(sprintf('%s [%s]. %s',
-			$this->component,
-			$file,
-			'Fichier écrasé',
-		));
-		$this->eol();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    protected function displayFileOverwrited(string $file)
+    {
+        $this->badge()->warning(sprintf(
+            '%s [%s]. %s',
+            $this->component,
+            $file,
+            'Fichier écrasé',
+        ));
+        $this->eol();
+    }
 }

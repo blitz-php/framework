@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Publisher;
 
+use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Exceptions\PublisherException;
 use BlitzPHP\Filesystem\Files\FileCollection;
 use BlitzPHP\Http\Uri;
@@ -99,7 +100,7 @@ class Publisher extends FileCollection
 
         self::$discovered[$key] = [];
 
-        /** @var \BlitzPHP\Contracts\Autoloader\LocatorInterface */
+        /** @var LocatorInterface */
         $locator = service('locator');
 
         $files = $namespace === ''

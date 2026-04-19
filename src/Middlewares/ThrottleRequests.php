@@ -89,7 +89,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
         int $decayMinutes = 1,
         string $prefix = '',
         bool $userBased = false,
-        int $blockDuration = 0
+        int $blockDuration = 0,
     ): string {
         return static::class . ':' . implode(',', func_get_args());
     }

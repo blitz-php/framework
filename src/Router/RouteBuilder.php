@@ -199,14 +199,14 @@ final class RouteBuilder
      */
     public function group(array|Closure $options, ?Closure $callback = null): void
     {
-		if (! is_array($options)) {
-			$callback = $options;
-			$options  = [];
-		}
+        if (! is_array($options)) {
+            $callback = $options;
+            $options  = [];
+        }
 
         $prefix = $options['prefix'] ?? $this->attributes['prefix'] ?? '';
         unset($this->attributes['prefix'], $options['prefix']);
-		$attributes = array_merge($this->attributes, $options);
+        $attributes = array_merge($this->attributes, $options);
 
         $this->collection->group($prefix, $attributes, fn () => $callback($this));
     }

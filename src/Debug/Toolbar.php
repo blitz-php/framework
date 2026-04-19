@@ -66,7 +66,7 @@ class Toolbar
             if (! class_exists($collector)) {
                 logger()->critical(
                     'Le collecteur de la barre d\'outils n\'existe pas (' . $collector . ').'
-                    . ' Veuillez vérifier $collectors dans le fichier app/Config/toolbar.php.'
+                    . ' Veuillez vérifier $collectors dans le fichier app/Config/toolbar.php.',
                 );
 
                 continue;
@@ -406,7 +406,7 @@ class Toolbar
             $stats['startTime'],
             $stats['totalTime'],
             $request,
-            $response
+            $response,
         );
 
         // Mise à jour vers microtime() pour que nous puissions obtenir l'historique
@@ -519,7 +519,7 @@ class Toolbar
             $history = new HistoryCollector();
             $history->setFiles(
                 $debugbarTime[0],
-                $this->config->max_history
+                $this->config->max_history,
             );
 
             $data['collectors'][] = $history->getAsArray();

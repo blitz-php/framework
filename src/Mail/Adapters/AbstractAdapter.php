@@ -253,7 +253,7 @@ abstract class AbstractAdapter implements MailerInterface
         }
 
         throw new BadMethodCallException(
-            sprintf('La méthode %s n\'existe pas dans %s', $method, static::class)
+            sprintf('La méthode %s n\'existe pas dans %s', $method, static::class),
         );
     }
 
@@ -284,7 +284,7 @@ abstract class AbstractAdapter implements MailerInterface
 
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             throw new InvalidArgumentException(
-                sprintf('Adresse email invalide: %s', $email)
+                sprintf('Adresse email invalide: %s', $email),
             );
         }
 
@@ -307,7 +307,7 @@ abstract class AbstractAdapter implements MailerInterface
         if (is_string($address)) {
             if (is_bool($name)) {
                 throw new InvalidArgumentException(
-                    'L\'argument 2 ($name) doit être une chaîne de caractères quand $address est une chaîne'
+                    'L\'argument 2 ($name) doit être une chaîne de caractères quand $address est une chaîne',
                 );
             }
 

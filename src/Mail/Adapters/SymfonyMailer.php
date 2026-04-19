@@ -308,7 +308,7 @@ class SymfonyMailer extends AbstractAdapter
             $domain ?: parse_url(site_url(), PHP_URL_HOST),
             $selector ?: 'blitz',
             [],
-            $passphrase
+            $passphrase,
         );
 
         $this->mailer = $signer->sign($this->mailer);
@@ -329,8 +329,8 @@ class SymfonyMailer extends AbstractAdapter
             (new DataPart(
                 new File($path),
                 $cid,
-                $type
-            ))->asInline()
+                $type,
+            ))->asInline(),
         );
 
         return $this;
@@ -349,8 +349,8 @@ class SymfonyMailer extends AbstractAdapter
             (new DataPart(
                 $binary,
                 $cid,
-                $type
-            ))->asInline()
+                $type,
+            ))->asInline(),
         );
 
         return $this;
@@ -434,7 +434,7 @@ class SymfonyMailer extends AbstractAdapter
                 throw new RuntimeException(
                     sprintf('Erreur d\'envoi de mail: %s', $e->getMessage()),
                     $e->getCode(),
-                    $e
+                    $e,
                 );
             }
 
@@ -556,7 +556,7 @@ class SymfonyMailer extends AbstractAdapter
                 $password,
                 $host,
                 $this->port,
-                $this->encryption ? '?encryption=' . $this->encryption : ''
+                $this->encryption ? '?encryption=' . $this->encryption : '',
             ),
 
             static::PROTOCOL_SENDMAIL => 'sendmail://default',
@@ -565,25 +565,25 @@ class SymfonyMailer extends AbstractAdapter
 
             static::PROTOCOL_POSTMARK => sprintf(
                 'postmark+smtp://%s@default',
-                $username
+                $username,
             ),
 
             static::PROTOCOL_SENDGRID => sprintf(
                 'sendgrid+smtp://%s@default',
-                $username // username contient l'API Key
+                $username, // username contient l'API Key
             ),
 
             static::PROTOCOL_MAILGUN => sprintf(
                 'mailgun+smtp://%s:%s@default',
                 $username,
-                $password
+                $password,
             ),
 
             default => sprintf(
                 '%s+smtp://%s:%s@default',
                 $this->protocol,
                 $username,
-                $password
+                $password,
             ),
         };
     }

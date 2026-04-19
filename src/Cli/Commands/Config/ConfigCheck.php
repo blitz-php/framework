@@ -104,9 +104,9 @@ class ConfigCheck extends Command
             static fn ($matches): string => sprintf(
                 '%s -> %s',
                 str_replace('.', ' ⇁ ', $matches[1]),
-                $matches[2]
+                $matches[2],
             ),
-            $key
+            $key,
         );
     }
 

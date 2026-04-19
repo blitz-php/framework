@@ -115,7 +115,7 @@ class Routes extends Command
                 $collection->getDefaultController(),
                 $collection->getDefaultMethod(),
                 $methods,
-                $collection->getRegisteredControllers('*')
+                $collection->getRegisteredControllers('*'),
             );
 
             $autoRoutes = $autoRouteCollector->get();
@@ -129,7 +129,7 @@ class Routes extends Command
                         $collection->getDefaultMethod(),
                         $methods,
                         $collection->getRegisteredControllers('*'),
-                        $uri
+                        $uri,
                     );
 
                     $autoRoutes = [...$autoRoutes, ...$autoRouteCollector->get()];
@@ -319,8 +319,8 @@ class Routes extends Command
                     $this->write(
                         $this->color->line(
                             sprintf('%s⇂ %s', str_repeat(' ', $maxMethodLength), $middleware),
-                            ['fg' => Color::fg256(60)]
-                        )
+                            ['fg' => Color::fg256(60)],
+                        ),
                     )->eol();
                 }
             }
@@ -349,7 +349,7 @@ class Routes extends Command
                 $this->justify(
                     $method,
                     (string) $routes->where('method', $method)->count(),
-                    $options
+                    $options,
                 );
             }
         }

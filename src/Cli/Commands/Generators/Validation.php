@@ -21,9 +21,8 @@ class Validation extends GeneratorCommand
     protected array $arguments    = [
         'name' => ['Le nom de la classe de validation.'],
     ];
-
-	protected string $component     = 'Validation';
-	protected string $directory     = 'Validations';
-	protected string $template      = 'validation.tpl.php';
-	protected string $classNameLang = 'CLI.generator.className.validation';
+    protected string $component     = 'Validation';
+    protected string $directory     = 'Validations';
+    protected string $template      = 'validation.tpl.php';
+    protected string $classNameLang = 'CLI.generator.className.validation';
 }

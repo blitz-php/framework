@@ -68,7 +68,7 @@ class TranslationsFinder extends Command
             if (! in_array($optionLocale, config('app.supported_locales'), true)) {
                 $this->error(
                     $this->color->error('"' . $optionLocale . '" n\'est pas supporté. Les langues supportées sont: '
-                    . implode(', ', config('app.supported_locales')))
+                    . implode(', ', config('app.supported_locales'))),
                 );
 
                 return EXIT_USER_INPUT;
@@ -114,7 +114,7 @@ class TranslationsFinder extends Command
         [
             'foundLanguageKeys' => $foundLanguageKeys,
             'badLanguageKeys'   => $badLanguageKeys,
-            'countFiles'        => $countFiles
+            'countFiles'        => $countFiles,
         ] = $this->findLanguageKeysInFiles($files);
 
         ksort($foundLanguageKeys);

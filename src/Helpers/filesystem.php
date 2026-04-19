@@ -125,7 +125,7 @@ if (! function_exists('delete_files')) {
         try {
             foreach (new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::CHILD_FIRST
+                RecursiveIteratorIterator::CHILD_FIRST,
             ) as $object) {
                 $filename = $object->getFilename();
                 if (! $hidden && $filename[0] === '.') {
@@ -168,7 +168,7 @@ if (! function_exists('get_filenames')) {
         string $sourceDir,
         ?bool $includePath = false,
         bool $hidden = false,
-        bool $includeDir = true
+        bool $includeDir = true,
     ): array {
         $files = [];
 
@@ -178,7 +178,7 @@ if (! function_exists('get_filenames')) {
         try {
             foreach (new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::SELF_FIRST
+                RecursiveIteratorIterator::SELF_FIRST,
             ) as $name => $object) {
                 $basename = pathinfo($name, PATHINFO_BASENAME);
                 if (! $hidden && $basename[0] === '.') {

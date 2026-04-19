@@ -565,7 +565,7 @@ class Dispatcher
             $uri->getAuthority(),
             $uri->getPath(),
             $uri->getQuery(),
-            $uri->getFragment()
+            $uri->getFragment(),
         ));
     }
 
@@ -579,7 +579,7 @@ class Dispatcher
             $this->response = service('toolbar')->process(
                 $this->getPerformanceStats(),
                 $this->request,
-                $this->response
+                $this->response,
             );
         }
 

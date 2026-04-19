@@ -265,7 +265,7 @@ class Event implements EventInterface, Stringable
         $event = new self(
             $data['name'] ?? '',
             $data['target'] ?? null,
-            $data['params'] ?? []
+            $data['params'] ?? [],
         );
 
         if (isset($data['isPropagationStopped']) && $data['isPropagationStopped']) {
@@ -314,7 +314,7 @@ class Event implements EventInterface, Stringable
             'Event[name="%s", target=%s, params=%s]',
             $this->name ?? 'null',
             get_debug_type($this->target),
-            json_encode($this->params, JSON_THROW_ON_ERROR)
+            json_encode($this->params, JSON_THROW_ON_ERROR),
         );
     }
 }

@@ -12,6 +12,7 @@
 namespace BlitzPHP\Loader;
 
 use BlitzPHP\Exceptions\LoadException;
+use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Traits\Macroable;
 
 /**
@@ -21,7 +22,7 @@ use BlitzPHP\Traits\Macroable;
  */
 class Load
 {
-	use Macroable;
+    use Macroable;
 
     /**
      * Éléments déjà chargés (module → [element → value]).
@@ -76,7 +77,7 @@ class Load
      *
      * @return false|string
      *
-     * @throws \BlitzPHP\Exceptions\ViewException
+     * @throws ViewException
      */
     public static function view(string $name)
     {
@@ -93,7 +94,7 @@ class Load
      */
     public static function unload(string $module, object|string $element): void
     {
-        $key = is_object($element) ? get_class($element) : $element;
+        $key = is_object($element) ? $element::class : $element;
 
         unset(self::$loaded[$module][$key]);
     }
@@ -122,7 +123,7 @@ class Load
             return false;
         }
 
-        $key = is_object($element) ? get_class($element) : $element;
+        $key = is_object($element) ? $element::class : $element;
 
         return isset(self::$loaded[$module][$key]);
     }
@@ -134,7 +135,7 @@ class Load
      */
     protected static function loaded(string $module, object|string $element, mixed $value): void
     {
-        $key = is_object($element) ? get_class($element) : $element;
+        $key = is_object($element) ? $element::class : $element;
 
         if (! isset(self::$loaded[$module])) {
             self::$loaded[$module] = [];
@@ -150,7 +151,7 @@ class Load
      */
     protected static function getLoaded(string $module, object|string $element): mixed
     {
-        $key = is_object($element) ? get_class($element) : $element;
+        $key = is_object($element) ? $element::class : $element;
 
         if (! isset(self::$loaded[$module])) {
             self::$loaded[$module] = [];

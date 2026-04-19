@@ -46,7 +46,7 @@ class Console
             ->withIcons(
                 alert: config('klinge.icons.alert', false),
                 badge: config('klinge.icons.badge', false),
-                logger: config('klinge.icons.logger', true)
+                logger: config('klinge.icons.logger', true),
             )
             ->withHooks(
                 before: $this->beforeHook(...),
@@ -88,7 +88,7 @@ class Console
 
     /**
      * Appelle une commande déjà enregistrée sous forme de chaine
-	 * Entrée attendue dans une seule chaîne comme celle qui serait utilisée sur la ligne de commande elle-même :
+     * Entrée attendue dans une seule chaîne comme celle qui serait utilisée sur la ligne de commande elle-même :
      *
      *  Exp: callRaw('migrate:create SomeMigration');
      */
@@ -99,7 +99,7 @@ class Console
 
     /**
      * Appelle une commande déjà enregistrée sous forme de chaine sans afficher sa sortie
-	 * Entrée attendue dans une seule chaîne comme celle qui serait utilisée sur la ligne de commande elle-même :
+     * Entrée attendue dans une seule chaîne comme celle qui serait utilisée sur la ligne de commande elle-même :
      *
      *  Exp: callRawSilent('migrate:create SomeMigration');
      */
@@ -117,7 +117,7 @@ class Console
     {
         $files = array_merge(
             $locator->listFiles('Commands/'), // Commandes de l'application ou des fournisseurs
-            $locator->listFiles('Cli/Commands/') // Commandes internes du framework
+            $locator->listFiles('Cli/Commands/'), // Commandes internes du framework
         );
 
         return array_unique($files);

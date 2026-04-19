@@ -27,11 +27,10 @@ class Middleware extends GeneratorCommand
         '--force'     => 'Forcer à écraser le fichier existant.',
         '--standard'  => 'Le standard utilisé pour le middleware. Par défaut: "psr15"',
     ];
-
-	protected string $component     = 'Middleware';
-	protected string $directory     = 'Middlewares';
-	protected string $template      = 'middleware.tpl.php';
-	protected string $classNameLang = 'CLI.generator.className.middleware';
+    protected string $component     = 'Middleware';
+    protected string $directory     = 'Middlewares';
+    protected string $template      = 'middleware.tpl.php';
+    protected string $classNameLang = 'CLI.generator.className.middleware';
 
     /**
      * Préparez les options et effectuez les remplacements nécessaires.
@@ -51,7 +50,7 @@ class Middleware extends GeneratorCommand
             $class,
             [],
             [],
-            ['standard' => $standard]
+            ['standard' => $standard],
         );
     }
 }

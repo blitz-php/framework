@@ -139,7 +139,7 @@ class Logger implements LoggerInterface
         }
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, ['json', 'line', 'scalar', 'normalizer'], $options->format)
+            $this->setFormatter($handler, ['json', 'line', 'scalar', 'normalizer'], $options->format),
         );
     }
 
@@ -153,7 +153,7 @@ class Logger implements LoggerInterface
         $handler = new ErrorLogHandler($options->type ?: ErrorLogHandler::OPERATING_SYSTEM, $options->level ?: LogLevel::DEBUG);
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, ['json', 'line'], $options->format)
+            $this->setFormatter($handler, ['json', 'line'], $options->format),
         );
     }
 
@@ -167,7 +167,7 @@ class Logger implements LoggerInterface
         $handler = new NativeMailerHandler($options->to, $options->subject, $options->from, $options->level ?: LogLevel::ERROR);
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, ['html', 'json', 'line'], $options->format)
+            $this->setFormatter($handler, ['html', 'json', 'line'], $options->format),
         );
     }
 
@@ -176,7 +176,7 @@ class Logger implements LoggerInterface
         $handler = new TelegramBotHandler($options->api_key, $options->channel, $options->level ?: LogLevel::DEBUG);
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, [], $options->format)
+            $this->setFormatter($handler, [], $options->format),
         );
     }
 
@@ -190,7 +190,7 @@ class Logger implements LoggerInterface
         $handler = new ChromePHPHandler($options->level ?: LogLevel::DEBUG);
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, [], $options->format)
+            $this->setFormatter($handler, [], $options->format),
         );
     }
 
@@ -204,7 +204,7 @@ class Logger implements LoggerInterface
         $handler = new FirePHPHandler();
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, [], $options->format)
+            $this->setFormatter($handler, [], $options->format),
         );
     }
 
@@ -218,7 +218,7 @@ class Logger implements LoggerInterface
         $handler = new BrowserConsoleHandler();
 
         $this->monolog->pushHandler(
-            $this->setFormatter($handler, [], $options->format)
+            $this->setFormatter($handler, [], $options->format),
         );
     }
 
