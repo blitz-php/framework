@@ -259,12 +259,15 @@ class Redirection extends Response
      * Spécifie que les données $_GET et $_POST actuelles doivent être
      * conservées avec la réponse pour être disponibles via la fonction helper 'old()'
      */
-    public function withInput(): static
+    public function withInput(array $input = []): static
     {
-        return $this->with('_blitz_old_input', [
-            'get'  => $_GET ?: [],
-            'post' => $_POST ?: [],
-        ]);
+		if ($input === []) {
+			$input = $this->request->input();
+		}
+
+		$this->session->flashInput($this->removeFilesFromInput($input));
+
+		return $this;
     }
 
     /**

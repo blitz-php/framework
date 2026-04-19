@@ -31,6 +31,10 @@ trait ContentReplacer
      */
     protected function sourcePath(string $file): string
     {
+		if (is_file($file)) {
+			return $file;
+		}
+		
         return str_replace('/', DS, rtrim($this->sourcePath, '/\\') . DS . $file);
     }
 
@@ -39,6 +43,10 @@ trait ContentReplacer
      */
     protected function distPath(string $file): string
     {
+		if (is_file($file)) {
+			return $file;
+		}
+		
         return str_replace('/', DS, rtrim($this->distPath, '/\\') . DS . $file);
     }
 

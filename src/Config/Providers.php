@@ -23,6 +23,7 @@ use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Mail\MailerInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Security\EncrypterInterface;
+use BlitzPHP\Contracts\Security\HasherInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
 use BlitzPHP\Contracts\Session\SessionInterface;
 use BlitzPHP\Contracts\View\RendererInterface;
@@ -34,6 +35,8 @@ use BlitzPHP\Http\Response;
 use BlitzPHP\Mail\Mail;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
+use BlitzPHP\Security\Encryption\Encryption;
+use BlitzPHP\Security\Hashing\Hasher;
 use BlitzPHP\Session\Cookie\CookieManager;
 use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
@@ -83,7 +86,8 @@ class Providers extends AbstractProvider
             MailerInterface::class                   => static fn () => service('mail'),
             RouteCollectionInterface::class          => static fn () => service('routes'),
             EncrypterInterface::class                => static fn () => service('encrypter'),
-            CookieManagerInterface::class            => static fn () => service('cookie'),
+            HasherInterface::class                   => static fn () => service('hashing'),
+			CookieManagerInterface::class            => static fn () => service('cookie'),
             SessionInterface::class                  => static fn () => service('session'),
             RendererInterface::class                 => static fn () => service('viewer')->getAdapter(),
             \Psr\Container\ContainerInterface::class => static fn () => service('container'),
@@ -105,7 +109,9 @@ class Providers extends AbstractProvider
             Autoloader::class        => static fn () => service('autoloader'),
             Locator::class           => static fn () => service('locator'),
             Cache::class             => static fn () => service('cache'),
-            ResponseCache::class     => static fn () => service('responsecache'),
+            Encryption::class        => static fn () => service('encrypter'),
+			Hasher::class            => static fn () => service('hashing'),
+			ResponseCache::class     => static fn () => service('responsecache'),
             FilesystemManager::class => static fn () => service('storage'),
             Negotiator::class        => static fn () => service('negotiator'),
             Redirection::class       => static fn () => service('redirection'),
