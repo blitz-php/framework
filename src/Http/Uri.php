@@ -569,8 +569,15 @@ class Uri implements UriInterface
     }
 
     /**
-     * Une méthode pratique pour transmettre un tableau d'éléments en tant que requête
-     * partie de l'URI.
+     * Une méthode pratique pour récuperer toutes les variables de l'URI sous forme de tableau.
+     */
+    public function getQueryArray(): array
+    {
+        return $this->query;
+    }
+
+    /**
+     * Une méthode pratique pour transmettre un tableau d'éléments en tant que variables de l'URI.
      */
     public function setQueryArray(array $query): self
     {
@@ -580,8 +587,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Une méthode pratique pour transmettre un tableau d'éléments en tant que requête
-     * partie de l'URI.
+     * Une méthode pratique pour transmettre un tableau d'éléments en tant que variables de l'URI.
      */
     public function withQueryParams(array $query): static
     {
@@ -593,7 +599,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * Ajoute un seul nouvel élément à la requête vars.
+     * Ajoute un seul nouvel élément aux variables de l'URL.
      */
     public function addQuery(string $key, mixed $value = null): self
     {
@@ -603,7 +609,19 @@ class Uri implements UriInterface
     }
 
     /**
-     * Supprime une ou plusieurs variables de requête de l'URI.
+     * Ajoute plusieurs éléments aux variables de l'URL.
+	 * 
+	 * @param array<string, mixed>
+     */
+    public function addQueries(array $queries): self
+    {
+		$this->query = array_merge($this->query, $queries);
+
+        return $this;
+    }
+
+    /**
+     * Supprime une ou plusieurs variables de l'URI.
      */
     public function stripQuery(...$params): self
     {
@@ -615,8 +633,8 @@ class Uri implements UriInterface
     }
 
     /**
-     * Filtre les variables de requête afin que seules les clés transmises
-     * sont gardés. Le reste est supprimé de l'objet.
+     * Filtre les variables de l'URL afin que seules les clés transmises sont gardés. 
+	 * Le reste est supprimé de l'objet.
      */
     public function keepQuery(...$params): self
     {
