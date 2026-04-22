@@ -148,9 +148,9 @@ describe('Redirection', function (): void {
             $returned = $response->withInput();
 
             expect($response)->toBe($returned);
-            expect($_SESSION)->toContainKey('_blitz_old_input');
-            expect($_SESSION['_blitz_old_input']['get']['foo'])->toBe('bar');
-            expect($_SESSION['_blitz_old_input']['post']['bar'])->toBe('baz');
+            expect($_SESSION)->toContainKey('_old_input');
+            expect($_SESSION['_old_input']['foo'])->toBe('bar');
+            expect($_SESSION['_old_input']['bar'])->toBe('baz');
         });
 
         it('With', function (): void {

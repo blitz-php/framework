@@ -264,6 +264,9 @@ class Redirection extends Response
         if ($input === []) {
             $input = $this->request->input();
         }
+		if ($input === []) {
+			$input = $_POST + $_GET;
+		}
 
         $this->session->flashInput($this->removeFilesFromInput($input));
 
