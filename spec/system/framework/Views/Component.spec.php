@@ -24,12 +24,22 @@ use Spec\BlitzPHP\App\Views\Components\RenderedExtraDataNotice;
 use Spec\BlitzPHP\App\Views\Components\RenderedNotice;
 use Spec\BlitzPHP\App\Views\Components\SimpleNotice;
 
+use function Kahlan\expect;
+
 describe('Views / Component', function (): void {
     describe('Composants simples', function (): void {
 		beforeAll(function (): void {
 			$this->cache     = new MockCache();
 			$this->cache->init();
-			$this->component = new ComponentLoader($this->cache);
+			$this->component = new class($this->cache) extends ComponentLoader {
+				public function render(string $library, array|string|null $params = null, mixed $slots = 0, mixed $ttl = null, mixed $cacheName = null): string
+				{
+					$cacheName = $ttl;
+					$ttl = $slots;
+
+					return parent::render($library, $params, [], $ttl, $cacheName);
+				}
+			};
 		});
 		afterAll(function (): void {
 			$this->cache->clear();
