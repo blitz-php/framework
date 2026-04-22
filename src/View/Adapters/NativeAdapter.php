@@ -14,6 +14,7 @@ namespace BlitzPHP\View\Adapters;
 use BlitzPHP\Debug\Toolbar\Collectors\ViewsCollector;
 use BlitzPHP\Exceptions\ViewException;
 use BlitzPHP\Utilities\Helpers;
+use BlitzPHP\View\Components\Slot;
 use RuntimeException;
 
 /**
@@ -75,6 +76,8 @@ class NativeAdapter extends AbstractAdapter
      */
     protected array $_lib_scripts = [];
 
+	 public Slot $slot;
+
     /**
      * {@inheritDoc}
      */
@@ -82,7 +85,8 @@ class NativeAdapter extends AbstractAdapter
     {
         parent::__construct($config, $viewPath, $debug);
 
-        $this->saveData = (bool) ($config['save_data'] ?? true);
+		$this->saveData = (bool) ($config['save_data'] ?? true);
+		$this->slot     = new Slot();
     }
 
     /**
@@ -263,9 +267,18 @@ class NativeAdapter extends AbstractAdapter
     /**
      * Spécifie que la vue actuelle doit étendre une mise en page existante.
      */
-    public function extend(string $layout)
+    public function extends(string $layout, array $data = [])
     {
         $this->setLayout($layout);
+        $this->addData($data);
+    }
+
+    /**
+     * @deprecated use extends instead
+     */
+    public function extend(string $layout)
+    {
+		$this->extends($layout);
     }
 
     /**
@@ -368,6 +381,23 @@ class NativeAdapter extends AbstractAdapter
             }
         }
     }
+
+	/**
+	 * Démarre un slot
+	 */
+	public function slot(string $name)
+	{
+		$this->slot->start($name);
+	}
+
+	/**
+	 * Capture le contenu du slot courant
+	 */
+	public function endSlot()
+	{
+		$this->slot->stop();
+	}
+
 
     /**
      * Affichage rapide du contenu principal

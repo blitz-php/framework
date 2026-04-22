@@ -929,13 +929,31 @@ if (! function_exists('component')) {
      *
      * @throws ReflectionException
      */
-    function component(array|string $library, array|string|null $params = null, int $ttl = 0, ?string $cacheName = null): string
+    function component(array|string $library, array|string|null $params = null, $extra = null, int $ttl = 0, ?string $cacheName = null): string
     {
         if (is_array($library)) {
             $library = implode('::', $library);
         }
 
-        return service('componentLoader')->render($library, $params, $ttl, $cacheName);
+        $slots = [];
+        if (is_callable($extra)) {
+            $content          = $extra();
+            $extracted        = \BlitzPHP\View\Components\Slot::extractFromHtml($content);
+            $slots            = $extracted['slots'];
+            $slots['default'] = $extracted['default'];
+        } elseif (is_array($extra)) {
+            $slots = $extra;               // support direct de tableau de slots
+        } elseif (is_int($extra)) {
+            $ttl = $extra;                 // rétrocompatibilité (ancien 3e param = TTL)
+        }
+
+        // Permettre de passer des slots via params['slots']
+        if (is_array($params) && isset($params['slots'])) {
+            $slots = array_merge($slots, $params['slots']);
+            unset($params['slots']);
+        }
+
+        return service('componentLoader')->render($library, $params, $slots, $ttl, $cacheName);
     }
 }
 

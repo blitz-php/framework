@@ -59,7 +59,7 @@ class ComponentLoader
      *
      * @throws ReflectionException
      */
-    public function render(string $library, array|string|null $params = null, int $ttl = 0, ?string $cacheName = null): string
+    public function render(string $library, array|string|null $params = null, array $slots = [], int $ttl = 0, ?string $cacheName = null): string
     {
         [$instance, $method] = $this->determineClass($library);
 
@@ -83,7 +83,7 @@ class ComponentLoader
         }
 
         $output = $instance instanceof Component
-            ? $this->renderComponent($instance, $method, $params)
+            ? $this->renderComponent($instance->withSlots($slots), $method, $params)
             : $this->renderSimpleClass($instance, $method, $params, $class);
 
         // Doit-on le mettre en cache?
