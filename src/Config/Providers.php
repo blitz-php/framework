@@ -33,6 +33,7 @@ use BlitzPHP\Http\Redirection;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response;
 use BlitzPHP\Mail\Mail;
+use BlitzPHP\RateLimiter\Throttler;
 use BlitzPHP\Router\RouteCollection;
 use BlitzPHP\Router\Router;
 use BlitzPHP\Security\Encryption\Encryption;
@@ -123,6 +124,7 @@ class Providers extends AbstractProvider
             CookieManager::class     => static fn () => service('cookie'),
             Store::class             => static fn () => service('session'),
             Translate::class         => static fn () => service('translator'),
+			Throttler::class         => static fn () => service('throttler'),
         ];
     }
 
