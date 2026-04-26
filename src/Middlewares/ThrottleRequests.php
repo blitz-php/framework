@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Middlewares;
 
+use BlitzPHP\Cache\Handlers\BaseHandler;
 use BlitzPHP\Contracts\Cache\CacheInterface;
 use BlitzPHP\Contracts\RateLimiter\ResultInterface;
 use BlitzPHP\Exceptions\RateLimitExceededException;
@@ -176,8 +177,12 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      */
     public function __construct(protected CacheInterface $cache, protected ?Throttler $throttler = null)
 	{
+		if ($cache instanceof BaseHandler) {
+			$cache->setReservedCharacters('{}()/\\@');
+		}
+
         if ($this->throttler === null) {
-            $this->throttler = service('throttler', ['cache' => $cache]);
+            $this->throttler = service('throttler', ['cache' => $cache], ! on_test());
         }
     }
 
