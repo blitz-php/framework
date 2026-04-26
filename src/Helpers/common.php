@@ -937,11 +937,12 @@ if (! function_exists('component')) {
 
         $slots = [];
         if (is_callable($extra)) {
-			ob_start();
-			$content = $extra();
-			$html    = ob_get_clean() ?? $content ?? '';
+			if (empty($content = $extra())) {
+				ob_start();
+				$content = ob_get_clean();
+			}
 
-			$extracted        = \BlitzPHP\View\Components\Slot::extractFromHtml($html);
+			$extracted        = \BlitzPHP\View\Components\Slot::extractFromHtml($content);
             $slots            = $extracted['slots'];
             $slots['default'] = $extracted['default'];
         } elseif (is_array($extra)) {
