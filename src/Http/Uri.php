@@ -610,12 +610,12 @@ class Uri implements UriInterface
 
     /**
      * Ajoute plusieurs éléments aux variables de l'URL.
-	 * 
-	 * @param array<string, mixed>
+     *
+     * @param array<string, mixed>
      */
     public function addQueries(array $queries): self
     {
-		$this->query = array_merge($this->query, $queries);
+        $this->query = array_merge($this->query, $queries);
 
         return $this;
     }
@@ -633,8 +633,8 @@ class Uri implements UriInterface
     }
 
     /**
-     * Filtre les variables de l'URL afin que seules les clés transmises sont gardés. 
-	 * Le reste est supprimé de l'objet.
+     * Filtre les variables de l'URL afin que seules les clés transmises sont gardés.
+     * Le reste est supprimé de l'objet.
      */
     public function keepQuery(...$params): self
     {

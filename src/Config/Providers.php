@@ -21,6 +21,7 @@ use BlitzPHP\Contracts\Autoloader\LocatorInterface;
 use BlitzPHP\Contracts\Container\ContainerInterface;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Mail\MailerInterface;
+use BlitzPHP\Contracts\RateLimiter\RateLimiterInterface;
 use BlitzPHP\Contracts\Router\RouteCollectionInterface;
 use BlitzPHP\Contracts\Security\EncrypterInterface;
 use BlitzPHP\Contracts\Security\HasherInterface;
@@ -96,6 +97,7 @@ class Providers extends AbstractProvider
             ServerRequestInterface::class            => static fn () => service('request'),
             LoggerInterface::class                   => static fn () => service('logger'),
             CacheInterface::class                    => static fn () => service('cache'),
+            RateLimiterInterface::class              => static fn () => service('throttler'),
         ];
     }
 
@@ -124,7 +126,7 @@ class Providers extends AbstractProvider
             CookieManager::class     => static fn () => service('cookie'),
             Store::class             => static fn () => service('session'),
             Translate::class         => static fn () => service('translator'),
-			Throttler::class         => static fn () => service('throttler'),
+            Throttler::class         => static fn () => service('throttler'),
         ];
     }
 

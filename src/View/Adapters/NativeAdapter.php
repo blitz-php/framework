@@ -76,7 +76,7 @@ class NativeAdapter extends AbstractAdapter
      */
     protected array $_lib_scripts = [];
 
-	 public Slot $slot;
+    public Slot $slot;
 
     /**
      * {@inheritDoc}
@@ -85,8 +85,8 @@ class NativeAdapter extends AbstractAdapter
     {
         parent::__construct($config, $viewPath, $debug);
 
-		$this->saveData = (bool) ($config['save_data'] ?? true);
-		$this->slot     = new Slot();
+        $this->saveData = (bool) ($config['save_data'] ?? true);
+        $this->slot     = new Slot();
     }
 
     /**
@@ -278,7 +278,7 @@ class NativeAdapter extends AbstractAdapter
      */
     public function extend(string $layout)
     {
-		$this->extends($layout);
+        $this->extends($layout);
     }
 
     /**
@@ -382,22 +382,21 @@ class NativeAdapter extends AbstractAdapter
         }
     }
 
-	/**
-	 * Démarre un slot
-	 */
-	public function slot(string $name)
-	{
-		$this->slot->start($name);
-	}
+    /**
+     * Démarre un slot
+     */
+    public function slot(string $name)
+    {
+        $this->slot->start($name);
+    }
 
-	/**
-	 * Capture le contenu du slot courant
-	 */
-	public function endSlot()
-	{
-		$this->slot->stop();
-	}
-
+    /**
+     * Capture le contenu du slot courant
+     */
+    public function endSlot()
+    {
+        $this->slot->stop();
+    }
 
     /**
      * Affichage rapide du contenu principal

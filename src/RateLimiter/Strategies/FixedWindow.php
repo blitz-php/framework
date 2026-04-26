@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\RateLimiter\Strategies;
 
 use BlitzPHP\Contracts\RateLimiter\Limiter;
@@ -16,23 +25,23 @@ class FixedWindow extends BaseStrategy implements Limiter
      */
     public function attempt(string $key, int $limit, int $window, int $cost = 1): ResultInterface
     {
-        $now          = time();
-        $windowStart  = (int) ($now / $window) * $window;
-        $key         .= ':' . $windowStart;
+        $now         = time();
+        $windowStart = (int) ($now / $window) * $window;
+        $key .= ':' . $windowStart;
 
         $count = (int) $this->get($key, 0);
 
-		if ($cost > 0) {
-			if ($allowed = ($count + $cost) <= $limit) {
-				$count += $cost;
-			}
-		} else {
-			// cost=0 : vérification pure
-			$allowed = $count < $limit;
-		}
+        if ($cost > 0) {
+            if ($allowed = ($count + $cost) <= $limit) {
+                $count += $cost;
+            }
+        } else {
+            // cost=0 : vérification pure
+            $allowed = $count < $limit;
+        }
 
-		$ttl = $windowStart + $window - $now;
-		$this->set($key, $count, max(1, $ttl));
+        $ttl = $windowStart + $window - $now;
+        $this->set($key, $count, max(1, $ttl));
 
         $remaining  = max(0, $limit - $count);
         $reset      = $windowStart + $window;
@@ -43,7 +52,7 @@ class FixedWindow extends BaseStrategy implements Limiter
             limit     : $limit,
             remaining : $remaining,
             reset     : $reset,
-            retryAfter: $retryAfter
+            retryAfter: $retryAfter,
         );
     }
 
@@ -54,8 +63,8 @@ class FixedWindow extends BaseStrategy implements Limiter
     {
         // On ne peut pas savoir la fenêtre exacte sans la stocker
         // On fait donc un best-effort sur les fenêtres courantes
-        $now    = time();
-        $total  = 0;
+        $now   = time();
+        $total = 0;
 
         // Vérifier les fenêtres possibles (1min, 5min, 15min, 1h, 24h)
         $windows = [60, 300, 900, 3600, 86400];
@@ -96,7 +105,7 @@ class FixedWindow extends BaseStrategy implements Limiter
     {
         $now = time();
 
-		// Chercher parmi les fenêtres communes
+        // Chercher parmi les fenêtres communes
         $windows = [60, 300, 900, 3600, 86400];
 
         foreach ($windows as $window) {
@@ -119,7 +128,7 @@ class FixedWindow extends BaseStrategy implements Limiter
      */
     public function reset(string $key): bool
     {
-        $now    = time();
+        $now     = time();
         $windows = [60, 300, 900, 3600, 86400];
         $deleted = false;
 
@@ -134,5 +143,5 @@ class FixedWindow extends BaseStrategy implements Limiter
         }
 
         return $deleted;
-	}
+    }
 }

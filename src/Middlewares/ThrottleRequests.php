@@ -113,7 +113,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      *
      * @var (callable(Request): string)|null
      */
-    protected $identifierCallback = null;
+    protected $identifierCallback;
 
     /**
      * Callback personnalisé pour calculer le coût d'une requête.
@@ -121,7 +121,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      *
      * @var (callable(Request): int)|null
      */
-    protected $costCallback = null;
+    protected $costCallback;
 
     /**
      * Callback pour déterminer si le rate limiting doit être ignoré.
@@ -129,7 +129,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      *
      * @var (callable(Request): bool)|null
      */
-    protected $skipCallback = null;
+    protected $skipCallback;
 
     /**
      * Callback exécuté lorsqu'un client est bloqué.
@@ -138,7 +138,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      *
      * @var (callable(string, int): void)|null
      */
-    protected $blockCallback = null;
+    protected $blockCallback;
 
     /**
      * Liste des arguments acceptés en mode positionnel.
@@ -172,14 +172,14 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     /**
      * Constructeur.
      *
-     * @param CacheInterface  $cache     Instance du cache
-     * @param Throttler|null  $throttler Service de rate limiting (auto-créé si null)
+     * @param CacheInterface $cache     Instance du cache
+     * @param Throttler|null $throttler Service de rate limiting (auto-créé si null)
      */
     public function __construct(protected CacheInterface $cache, protected ?Throttler $throttler = null)
-	{
-		if ($cache instanceof BaseHandler) {
-			$cache->setReservedCharacters('{}()/\\@');
-		}
+    {
+        if ($cache instanceof BaseHandler) {
+            $cache->setReservedCharacters('{}()/\\@');
+        }
 
         if ($this->throttler === null) {
             $this->throttler = service('throttler', ['cache' => $cache], ! on_test());
@@ -189,15 +189,15 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     /**
      * Crée une chaîne de middleware avec paramètres nommés pour le routing.
      *
-     * @param int         $maxAttempts  Nombre maximum de requêtes autorisées (défaut: 60)
-     * @param int         $decayMinutes Durée de la fenêtre en minutes (défaut: 1)
-     * @param string      $prefix       Préfixe pour les clés de cache (défaut: '')
-     * @param bool        $userBased    Utiliser l'ID utilisateur au lieu de l'IP (défaut: false)
+     * @param int         $maxAttempts   Nombre maximum de requêtes autorisées (défaut: 60)
+     * @param int         $decayMinutes  Durée de la fenêtre en minutes (défaut: 1)
+     * @param string      $prefix        Préfixe pour les clés de cache (défaut: '')
+     * @param bool        $userBased     Utiliser l'ID utilisateur au lieu de l'IP (défaut: false)
      * @param int         $blockDuration Durée de blocage en minutes après dépassement (0 = désactivé)
-     * @param string      $strategy     Stratégie : "token_bucket", "sliding_window", "fixed_window"
-     * @param string      $identifier   Type : "ip", "user", "api_key", "route", "combined"
-     * @param int         $cost         Coût par défaut (1) ou "auto" pour coût basé sur la méthode HTTP
-     * @param string|null $limiter      Nom du limiteur nommé à utiliser (prioritaire sur les autres options)
+     * @param string      $strategy      Stratégie : "token_bucket", "sliding_window", "fixed_window"
+     * @param string      $identifier    Type : "ip", "user", "api_key", "route", "combined"
+     * @param int         $cost          Coût par défaut (1) ou "auto" pour coût basé sur la méthode HTTP
+     * @param string|null $limiter       Nom du limiteur nommé à utiliser (prioritaire sur les autres options)
      *
      * @return string Chaîne au format "Classe:param1,param2,..." pour le routing
      */
@@ -304,7 +304,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
      * 9. Si limité, bloque éventuellement et lève une exception
      * 10. Si autorisé, traite la requête et ajoute les headers
      *
-     * @param Request  $request La requête entrante
+     * @param Request $request La requête entrante
      *
      * @throws RateLimitExceededException Si la limite est dépassée
      */
@@ -341,7 +341,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
             $result   = $strategy->attempt($key, $maxAttempts, $decaySeconds, $cost);
 
             // Si limite dépassée → réponse 429 et éventuellement bloquer
-            if (!$result->isAllowed()) {
+            if (! $result->isAllowed()) {
                 if ($this->blockDuration > 0) {
                     $this->blockUser($blockKey);
                 }
@@ -349,7 +349,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
                 throw new RateLimitExceededException(
                     retryAfter: $result->retryAfter ?: $decaySeconds,
                     headers: $result->toHeaders(),
-                    message: $this->errorMessages['too_many_requests']
+                    message: $this->errorMessages['too_many_requests'],
                 );
             }
 
@@ -377,13 +377,13 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
         // IPs whitelistées
         // $whitelistedIps = $this->config['whitelist_ips'] ?? ['127.0.0.1', '::1'];
         $whitelistedIps = ['127.0.0.1', '::1'];
-        if (in_array($request->clientIp(), $whitelistedIps)) {
+        if (in_array($request->clientIp(), $whitelistedIps, true)) {
             return true;
         }
 
         // Callback personnalisé
         if ($this->skipCallback && is_callable($this->skipCallback)) {
-            return (bool) call_user_func($this->skipCallback, $request);
+            return (bool) ($this->skipCallback)($request);
         }
 
         return false;
@@ -430,8 +430,9 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     {
         if ($name && $limiter = $this->throttler->limiter($name)) {
             $limits = $limiter($request);
-            if (!empty($limits)) {
+            if (! empty($limits)) {
                 $limit = is_array($limits) ? $limits[0] : $limits;
+
                 return [
                     'maxAttempts'  => $limit->maxAttempts,
                     'decayMinutes' => (int) ceil($limit->decaySeconds / 60),
@@ -465,7 +466,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     {
         // Callback personnalisé prioritaire
         if ($this->identifierCallback && is_callable($this->identifierCallback)) {
-            return (string) call_user_func($this->identifierCallback, $request);
+            return (string) ($this->identifierCallback)($request);
         }
 
         $type = $this->identifier;
@@ -495,7 +496,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     {
         // Callback personnalisé prioritaire
         if ($this->costCallback && is_callable($this->costCallback)) {
-            return (int) call_user_func($this->costCallback, $request);
+            return (int) ($this->costCallback)($request);
         }
 
         $cost = $config['cost'] ?? $this->cost;
@@ -504,9 +505,9 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
         if ($cost === 'auto') {
             return match (strtoupper($request->getMethod())) {
                 'GET', 'HEAD', 'OPTIONS' => 1,
-                'POST', 'PUT', 'PATCH'   => 2,
-                'DELETE'                 => 3,
-                default                  => 1,
+                'POST', 'PUT', 'PATCH' => 2,
+                'DELETE' => 3,
+                default  => 1,
             };
         }
 
@@ -690,7 +691,7 @@ class ThrottleRequests extends BaseMiddleware implements MiddlewareInterface
     protected function formatErrorResponse(ResponseInterface $response, string $message): ResponseInterface
     {
         $acceptHeader = $response->getHeaderLine('Accept') ?:
-                        (isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : '');
+                        ($_SERVER['HTTP_ACCEPT'] ?? '');
 
         if (str_contains($acceptHeader, 'application/json')) {
             return $response

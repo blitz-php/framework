@@ -36,9 +36,9 @@ class Component implements Stringable
      */
     protected string $view = '';
 
-	/**
-	 * Stocke les contenus des slots capturés.
-	 */
+    /**
+     * Stocke les contenus des slots capturés.
+     */
     protected array $slots = [];
 
     /**
@@ -60,17 +60,17 @@ class Component implements Stringable
         return $this;
     }
 
-	/**
-	 * Permet de définir les slots à utiliser lors du rendu du composant.
-	 */
-	public function withSlots(array $slots): self
-	{
-		$this->slots = $slots;
+    /**
+     * Permet de définir les slots à utiliser lors du rendu du composant.
+     */
+    public function withSlots(array $slots): self
+    {
+        $this->slots = $slots;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
+    /**
      * rend actuellement la vue et renvoie le code HTML.
      * Afin de permettre l'accès aux propriétés et méthodes publiques à partir de la vue,
      * cette méthode extrait $data dans le champ d'application actuel et capture le tampon de
@@ -80,11 +80,11 @@ class Component implements Stringable
      */
     final protected function view(?string $view, array $data = []): string
     {
-		$properties          = $this->getPublicProperties();
-		$properties          = $this->includeComputedProperties($properties);
-		$properties          = array_merge($properties, $data);
-		$properties['slot']  = $this->slots['default'] ?? '';
-		$properties['slots'] = $this->slots;
+        $properties          = $this->getPublicProperties();
+        $properties          = $this->includeComputedProperties($properties);
+        $properties          = array_merge($properties, $data);
+        $properties['slot']  = $this->slots['default'] ?? '';
+        $properties['slots'] = $this->slots;
 
         $view = (string) $view;
 

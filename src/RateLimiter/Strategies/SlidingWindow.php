@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\RateLimiter\Strategies;
 
 use BlitzPHP\Contracts\RateLimiter\Limiter;
@@ -39,16 +48,16 @@ class SlidingWindow extends BaseStrategy implements Limiter
             $data['count'] = (int) ceil($data['count'] * $weight);
         }
 
-		if ($cost > 0) {
-			if ($allowed = ($data['count'] + $cost) <= $limit) {
-				$data['count'] += $cost;
-			}
-		} else {
-			// cost=0 : vérification pure
-			$allowed = $data['count'] < $limit;
-		}
+        if ($cost > 0) {
+            if ($allowed = ($data['count'] + $cost) <= $limit) {
+                $data['count'] += $cost;
+            }
+        } else {
+            // cost=0 : vérification pure
+            $allowed = $data['count'] < $limit;
+        }
 
-		$this->set($key, $data, $window);
+        $this->set($key, $data, $window);
 
         $remaining  = max(0, $limit - (int) $data['count']);
         $retryAfter = $allowed ? 0 : max(1, $data['reset'] - $now);
@@ -58,7 +67,7 @@ class SlidingWindow extends BaseStrategy implements Limiter
             limit     : $limit,
             remaining : $remaining,
             reset     : $data['reset'],
-            retryAfter: $retryAfter
+            retryAfter: $retryAfter,
         );
     }
 
@@ -72,7 +81,7 @@ class SlidingWindow extends BaseStrategy implements Limiter
         return $data ? (int) ($data['count'] ?? 0) : 0;
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     public function increment(string $key, int $window, int $amount = 1): int
@@ -116,7 +125,7 @@ class SlidingWindow extends BaseStrategy implements Limiter
     {
         $data = $this->get($key);
 
-        if (!$data) {
+        if (! $data) {
             return 0;
         }
 

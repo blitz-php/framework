@@ -28,6 +28,7 @@ use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Invade\Invader;
 use BlitzPHP\Utilities\Invade\StaticInvader;
 use BlitzPHP\Utilities\Iterable\Collection;
+use BlitzPHP\View\Components\Slot;
 use BlitzPHP\View\View;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\StreamInterface;
@@ -927,6 +928,8 @@ if (! function_exists('component')) {
     /**
      * Les composants de vue sont utilisées dans les vues pour insérer des morceaux de HTML qui sont gérés par d'autres classes.
      *
+     * @param mixed|null $extra
+     *
      * @throws ReflectionException
      */
     function component(array|string $library, array|string|null $params = null, $extra = null, int $ttl = 0, ?string $cacheName = null): string
@@ -937,12 +940,12 @@ if (! function_exists('component')) {
 
         $slots = [];
         if (is_callable($extra)) {
-			if (empty($content = $extra())) {
-				ob_start();
-				$content = ob_get_clean();
-			}
+            if (empty($content = $extra())) {
+                ob_start();
+                $content = ob_get_clean();
+            }
 
-			$extracted        = \BlitzPHP\View\Components\Slot::extractFromHtml($content);
+            $extracted        = Slot::extractFromHtml($content);
             $slots            = $extracted['slots'];
             $slots['default'] = $extracted['default'];
         } elseif (is_array($extra)) {

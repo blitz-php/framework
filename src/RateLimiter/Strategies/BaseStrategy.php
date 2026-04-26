@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\RateLimiter\Strategies;
 
 use BlitzPHP\Contracts\Cache\CacheInterface;
@@ -40,8 +49,6 @@ abstract class BaseStrategy implements Limiter
      *
      * Évite les collisions avec d'autres données en cache.
      * Modifiable via la configuration.
-     *
-     * @var string
      */
     protected string $prefix;
 
@@ -53,7 +60,7 @@ abstract class BaseStrategy implements Limiter
      *                               - prefix : string - Préfixe pour les clés de cache (défaut: "throttler:")
      */
     public function __construct(protected CacheInterface $cache, protected array $config = [])
-{
+    {
         $this->prefix = $config['prefix'] ?? 'throttler:';
     }
 
@@ -111,8 +118,8 @@ abstract class BaseStrategy implements Limiter
      * Permet d'étendre le système avec des stratégies personnalisées
      * sans modifier le code source du framework.
      *
-     * @param array|string                          $alias Un alias ou un tableau [alias => class]
-     * @param class-string<BaseStrategy>|null       $class La classe (obligatoire si $alias est une string)
+     * @param array|string                    $alias Un alias ou un tableau [alias => class]
+     * @param class-string<BaseStrategy>|null $class La classe (obligatoire si $alias est une string)
      *
      * @throws InvalidArgumentException Si la classe ne peut pas être résolue
      *
@@ -131,7 +138,7 @@ abstract class BaseStrategy implements Limiter
         if (is_string($alias)) {
             if ($class === null) {
                 throw new InvalidArgumentException(
-                    "La classe doit être fournie lorsque l'alias est une chaîne de caractères."
+                    "La classe doit être fournie lorsque l'alias est une chaîne de caractères.",
                 );
             }
             $alias = [$alias => $class];
@@ -140,7 +147,7 @@ abstract class BaseStrategy implements Limiter
         foreach ($alias as $name => $class) {
             if (! is_subclass_of($class, self::class, true)) {
                 throw new InvalidArgumentException(
-                    "La classe {$class} doit étendre " . self::class
+                    "La classe {$class} doit étendre " . self::class,
                 );
             }
 
@@ -181,36 +188,36 @@ abstract class BaseStrategy implements Limiter
         return $this->cache->set($this->prefixKey($key), $value, $ttl);
     }
 
-	/**
-	 * Vérifie si une clé existe dans le cache avec le préfixe automatique.
-	 *
-	 * Méthode helper qui applique automatiquement le préfixe configuré
-	 * à la clé avant de vérifier son existence dans le cache.
-	 * Utile pour les stratégies qui ont besoin de vérifier l'existence d'une clé
-	 * sans nécessairement récupérer sa valeur.
-	 *
-	 * @param string $key Clé relative (sans préfixe)
-	 *
-	 * @return bool True si la clé existe dans le cache, false sinon
-	 */
-	protected function has(string $key): bool
-	{
-		return $this->cache->has($this->prefixKey($key));
-	}
+    /**
+     * Vérifie si une clé existe dans le cache avec le préfixe automatique.
+     *
+     * Méthode helper qui applique automatiquement le préfixe configuré
+     * à la clé avant de vérifier son existence dans le cache.
+     * Utile pour les stratégies qui ont besoin de vérifier l'existence d'une clé
+     * sans nécessairement récupérer sa valeur.
+     *
+     * @param string $key Clé relative (sans préfixe)
+     *
+     * @return bool True si la clé existe dans le cache, false sinon
+     */
+    protected function has(string $key): bool
+    {
+        return $this->cache->has($this->prefixKey($key));
+    }
 
-	/**
-	 * Applique le préfixe à une clé pour éviter les collisions.
-	 *
-	 * Méthode helper qui transforme une clé relative en clé complète
-	 * en appliquant le préfixe configuré. Utile pour les opérations de cache
-	 * directes ou pour générer des clés uniques basées sur des paramètres.
-	 *
-	 * @param string $key Clé relative (sans préfixe)
-	 *
-	 * @return string Clé complète avec préfixe
-	 */
-	protected function prefixKey(string $key): string
-	{
-		return $this->prefix . $key;
-	}
+    /**
+     * Applique le préfixe à une clé pour éviter les collisions.
+     *
+     * Méthode helper qui transforme une clé relative en clé complète
+     * en appliquant le préfixe configuré. Utile pour les opérations de cache
+     * directes ou pour générer des clés uniques basées sur des paramètres.
+     *
+     * @param string $key Clé relative (sans préfixe)
+     *
+     * @return string Clé complète avec préfixe
+     */
+    protected function prefixKey(string $key): string
+    {
+        return $this->prefix . $key;
+    }
 }

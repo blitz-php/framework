@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Blitz PHP framework.
+ *
+ * (c) 2022 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace BlitzPHP\RateLimiter;
 
 use BlitzPHP\Cache\Handlers\BaseHandler;
@@ -58,10 +67,10 @@ class Throttler implements RateLimiterInterface
      * @throws InvalidArgumentException Si la stratégie fournie est invalide
      */
     public function __construct(protected CacheInterface $cache, protected array $config = [])
-	{
-		if ($cache instanceof BaseHandler) {
-			$cache->setReservedCharacters('{}()/\\@');
-		}
+    {
+        if ($cache instanceof BaseHandler) {
+            $cache->setReservedCharacters('{}()/\\@');
+        }
 
         $this->strategy = $this->resolveStrategy($config['strategy'] ?? 'token_bucket');
     }
@@ -73,10 +82,10 @@ class Throttler implements RateLimiterInterface
      * réutilisables dans toute l'application. Une fois enregistré, un limiteur peut
      * être référencé par son nom dans le middleware ou les contrôleurs.
      *
-     * @param string              $name     Nom unique du limiteur (ex: "api", "login", "premium")
-     * @param callable|Limit     $callback Configuration du limiteur :
-     *                                      - Un callable recevant Request et retournant Limit|Limit[]
-     *                                      - Une instance de Limit directement
+     * @param string         $name     Nom unique du limiteur (ex: "api", "login", "premium")
+     * @param callable|Limit $callback Configuration du limiteur :
+     *                                 - Un callable recevant Request et retournant Limit|Limit[]
+     *                                 - Une instance de Limit directement
      *
      * @return static Pour le chaînage de méthodes
      *
@@ -110,14 +119,14 @@ class Throttler implements RateLimiterInterface
      */
     public function limiter(string $name): ?callable
     {
-        if (!isset($this->limiters[$name])) {
+        if (! isset($this->limiters[$name])) {
             return null;
         }
 
         $limiter = $this->limiters[$name];
 
         if ($limiter instanceof Limit) {
-            return fn() => [$limiter];
+            return static fn () => [$limiter];
         }
 
         return $limiter;
@@ -179,7 +188,7 @@ class Throttler implements RateLimiterInterface
         // cost=0 : vérifie sans consommer, mais peut réinitialiser la fenêtre si expirée
         $result = $this->strategy->attempt($key, $maxAttempts, $decaySeconds, 0);
 
-		return !$result->isAllowed();
+        return ! $result->isAllowed();
     }
 
     /**
@@ -223,6 +232,7 @@ class Throttler implements RateLimiterInterface
     {
         if ($condition()) {
             $this->hit($key, $decaySeconds);
+
             return true;
         }
 
@@ -263,8 +273,8 @@ class Throttler implements RateLimiterInterface
 
     /**
      * Réinitialise complètement le compteur pour une clé.
-	 *
-	 * Alias explicite pour reset().
+     *
+     * Alias explicite pour reset().
      *
      * @param string $key Clé unique
      *
@@ -277,8 +287,8 @@ class Throttler implements RateLimiterInterface
 
     /**
      * Réinitialise complètement le compteur pour une clé.
-	 *
-	 * Alias expressif pour reset().
+     *
+     * Alias expressif pour reset().
      *
      * @param string $key Clé unique
      *
@@ -299,8 +309,8 @@ class Throttler implements RateLimiterInterface
 
     /**
      * Calcule le nombre de tentatives restantes avant d'atteindre la limite.
-	 *
-	 * Alias explicite pour remaining().
+     *
+     * Alias explicite pour remaining().
      *
      * @param string $key         Clé unique
      * @param int    $maxAttempts Maximum autorisé
@@ -391,7 +401,7 @@ class Throttler implements RateLimiterInterface
 
         if (! class_exists($strategy) || ! is_subclass_of($strategy, BaseStrategy::class, true)) {
             throw new InvalidArgumentException(
-                "Stratégie de rate limiting invalide : {$strategy}"
+                "Stratégie de rate limiting invalide : {$strategy}",
             );
         }
 

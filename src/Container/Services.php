@@ -402,37 +402,37 @@ class Services extends BaseServices
         return new FilesystemManager(/** @scrutinizer ignore-type */ static::get('config')->get('filesystems'));
     }
 
-	/**
-	 * La classe Throttler fournit un moyen de limiter le nombre de fois qu'une action peut être effectuée
-	 * dans une période de temps donnée.
-	 *
-	 * @return Throttler
-	 */
-	public static function throttler(array $config = [], bool $shared = true): RateLimiterInterface
-	{
-		if ($shared) {
-			return static::sharedInstance('throttler', $config);
-		}
-
-		if ($config === []) {
-			$config = static::get('config')->get('security.throttler', []);
+    /**
+     * La classe Throttler fournit un moyen de limiter le nombre de fois qu'une action peut être effectuée
+     * dans une période de temps donnée.
+     *
+     * @return Throttler
+     */
+    public static function throttler(array $config = [], bool $shared = true): RateLimiterInterface
+    {
+        if ($shared) {
+            return static::sharedInstance('throttler', $config);
         }
 
-		if (isset($config['cache'])) {
-			if ($config['cache'] instanceof CacheInterface) {
-				$cache = $config['cache'];
-			} else {
-				$cache_config            = static::config()->get('cache');
-				$cache_config['handler'] = $config['cache'];
-				$cache                   = static::cache($cache_config, false);
-			}
-			unset($config['cache']);
-		} else {
-			$cache = static::cache();
-		}
+        if ($config === []) {
+            $config = static::get('config')->get('security.throttler', []);
+        }
 
-		return new Throttler($cache, $config);
-	}
+        if (isset($config['cache'])) {
+            if ($config['cache'] instanceof CacheInterface) {
+                $cache = $config['cache'];
+            } else {
+                $cache_config            = static::config()->get('cache');
+                $cache_config['handler'] = $config['cache'];
+                $cache                   = static::cache($cache_config, false);
+            }
+            unset($config['cache']);
+        } else {
+            $cache = static::cache();
+        }
+
+        return new Throttler($cache, $config);
+    }
 
     /**
      * La classe Timer fournit un moyen simple d'évaluer des parties de votre application.
