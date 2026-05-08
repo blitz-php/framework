@@ -940,10 +940,10 @@ if (! function_exists('component')) {
 
         $slots = [];
         if (is_callable($extra)) {
-            if (empty($content = $extra())) {
-                ob_start();
-                $content = ob_get_clean();
-            }
+			ob_start();
+			$content = $extra();
+			$buffer  = ob_get_clean();
+			$content = empty($content) ? $buffer : $content;
 
             $extracted        = Slot::extractFromHtml($content);
             $slots            = $extracted['slots'];
