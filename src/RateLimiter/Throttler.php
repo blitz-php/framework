@@ -68,9 +68,7 @@ class Throttler implements RateLimiterInterface
      */
     public function __construct(protected CacheInterface $cache, protected array $config = [])
     {
-        if ($cache instanceof BaseHandler) {
-            $cache->setReservedCharacters('{}()/\\@');
-        }
+		BaseHandler::setReservedCharacters('{}()/\\@');
 
         $this->strategy = $this->resolveStrategy($config['strategy'] ?? 'token_bucket');
     }
@@ -151,6 +149,16 @@ class Throttler implements RateLimiterInterface
 
         return $this;
     }
+
+	/**
+	 * Crée une copie du throtller actuel qui utilisera stratégie de rate limiting spécifiée.
+	 */
+	public function withStrategy(Limiter|string $strategy): static
+	{
+		$new = clone $this;
+
+		return $new->setStrategy($strategy);
+	}
 
     /**
      * Récupère la stratégie de rate limiting actuellement utilisée.

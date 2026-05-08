@@ -39,7 +39,7 @@ class TokenBucket extends BaseStrategy implements Limiter
         // Calculer le nombre de tokens à ajouter depuis la dernière mise à jour
         $elapsed     = $now - $data['last_update'];
         $refillRate  = $limit / $window;
-        $tokensToAdd = $elapsed * $refillRate;
+        $tokensToAdd = (int) ($elapsed * $refillRate);
 
         // Recharger le bucket sans dépasser la limite
         $data['tokens']      = min($limit, $data['tokens'] + $tokensToAdd);
