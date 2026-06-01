@@ -64,7 +64,7 @@ describe('Commandes / ClearDebugbar', function (): void {
 		expect(file_exists(FRAMEWORK_STORAGE_PATH . 'debugbar' . DS . "debugbar_{$this->time}.json"))->toBeFalsy();
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'Debugbar netoyée.')
+			static fn ($actual): bool => str_contains($actual, 'Netoyage des fichiers JSON de la debugbar dans "' . clean_path(FRAMEWORK_STORAGE_PATH . 'debugbar') . '".')
 		);
 	});
 });

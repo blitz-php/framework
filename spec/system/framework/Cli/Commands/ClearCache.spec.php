@@ -40,7 +40,7 @@ describe('Commandes / ClearCache', function (): void {
 		expect(cache('foo'))->toBeNull();
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'Cache vidé.')
+			static fn ($actual): bool => str_contains($actual, 'Cache vidé pour le pilote file.')
 		);
 	});
 
@@ -48,7 +48,7 @@ describe('Commandes / ClearCache', function (): void {
 		command('cache:clear junk');
 
 		expect(COH::buffer())->toMatch(
-			static fn ($actual): bool => str_contains($actual, 'junk n\'est pas un gestionnaire de cache valide.')
+			static fn ($actual): bool => str_contains($actual, lang('Cache.invalidHandler', ['junk']))
 		);
 	});
 });

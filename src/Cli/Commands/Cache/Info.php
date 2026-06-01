@@ -51,19 +51,22 @@ class Info extends Command
     public function handle()
     {
         $config = config('cache');
-        helper('number');
 
         if ($config['handler'] !== 'file') {
-            $this->fail('Cette commande ne prend en charge que le gestionnaire de cache de fichiers.');
+            $this->fail(sprintf(
+                'Cette commande ne prend en charge que le gestionnaire de cache de fichiers. Le gestionnaire configuré est "%s".',
+                $config['handler'],
+            ));
 
-            return;
+            return EXIT_ERROR;
         }
 
         $cache  = service('cache', $config);
-        $caches = $cache->info();
         $tbody  = [];
 
-        foreach ($caches as $key => $field) {
+		helper('number');
+
+        foreach ($cache->info() as $key => $field) {
             $tbody[] = [
                 'nom'               => $key,
                 'chemin du serveur' => clean_path($field['server_path']),
@@ -73,5 +76,7 @@ class Info extends Command
         }
 
         $this->table($tbody, ['head' => 'boldGreen']);
+
+        return EXIT_SUCCESS;
     }
 }

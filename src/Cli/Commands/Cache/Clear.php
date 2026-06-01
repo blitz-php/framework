@@ -50,26 +50,23 @@ class Clear extends Command
      */
     public function handle()
     {
-        $config  = config('cache');
-        $handler = $this->argument('driver', $this->parameter(0, $config['handler']));
+        $config = config('cache');
+        $driver = $this->argument('driver', $this->parameter(0, $config['handler']));
 
-        if (! array_key_exists($handler, $config['valid_handlers'])) {
-            $this->fail($handler . ' n\'est pas un gestionnaire de cache valide.');
+        if (! array_key_exists($driver, $config['valid_handlers'])) {
+            $this->fail(lang('Cache.invalidHandler', [$driver]));
 
-            return;
+            return EXIT_ERROR;
         }
 
-        $config['handler'] = $handler;
-        $cache             = service('cache', $config);
+        if (! service('cache', ['handler' => $driver] + $config)->clear()) {
+            $this->fail(sprintf('Erreur lors de l\'effacement du cache pour le pilote %s.', $driver));
 
-        if (! $cache->clear()) {
-            // @codeCoverageIgnoreStart
-            $this->fail('Erreur lors de l\'effacement du cache.');
-
-            return;
-            // @codeCoverageIgnoreEnd
+            return EXIT_ERROR;
         }
 
-        $this->ok('Cache vidé.');
+        $this->ok(sprintf('Cache vidé pour le pilote %s.', $driver));
+
+        return EXIT_SUCCESS;
     }
 }

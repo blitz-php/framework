@@ -29,14 +29,16 @@ class ClearDebugbar extends Command
     {
         helper('filesystem');
 
-        if (! delete_files(FRAMEWORK_STORAGE_PATH . 'debugbar')) {
-            // @codeCoverageIgnoreStart
-            $this->error('Erreur lors de la suppression des fichiers de la debugbar.')->eol();
+		$path = clean_path(FRAMEWORK_STORAGE_PATH . 'debugbar');
 
-            return;
-            // @codeCoverageIgnoreEnd
+        if (! delete_files(FRAMEWORK_STORAGE_PATH . 'debugbar', htdocs: true)) {
+            $this->error(sprintf('Erreur lors de la suppression des fichiers de la debugbar dans "%s".', $path));
+
+            return EXIT_ERROR;
         }
 
-        $this->success('Debugbar netoyée.')->eol();
+        $this->success(sprintf('Netoyage des fichiers JSON de la debugbar dans "%s".', $path));
+
+		return EXIT_SUCCESS;
     }
 }
