@@ -25,11 +25,16 @@ class GenerateKey extends Command
     protected string $description = 'Génère une nouvelle clé de chiffrememt et la met dans le fichier `.env`.';
     protected string $service     = 'Service de chiffrememt';
     protected array $options      = [
-        '--force'  => ['Force l\'écrasement de clé existante dans le fichier `.env`.'],
+        '--force, -f'  => ['Force l\'écrasement de clé existante dans le fichier `.env`.'],
         '--length' => ['La longueur de la chaîne aléatoire qui doit être retournée en bytes.', 32],
         '--prefix' => ['Prefix à ajouter à la clé encodée (doit être hex2bin ou base64).', 'hex2bin'],
         '--show'   => ['Indique qu\'on souhaite afficher la clé générée dans le terminal après l\'avoir mis dans le fichier `.env`.'],
     ];
+
+    /**
+     * @var list<string>
+     */
+    private const VALID_PREFIXES = ['hex2bin', 'base64'];
 
     /**
      * {@inheritDoc}
@@ -38,8 +43,8 @@ class GenerateKey extends Command
     {
         $prefix = $this->option('prefix', 'hex2bin');
 
-        if (! in_array($prefix, ['hex2bin', 'base64'], true)) {
-            $prefix = $this->choice('Veuillez utiliser un prefixe validee.', ['hex2bin', 'base64']); // @codeCoverageIgnore
+        if (! in_array($prefix, self::VALID_PREFIXES, true)) {
+            $prefix = $this->choice('Veuillez utiliser un prefixe validee.', self::VALID_PREFIXES); // @codeCoverageIgnore
         }
 
         $length = $this->option('length', 32);
@@ -51,16 +56,18 @@ class GenerateKey extends Command
         if ($this->option('show')) {
             $this->writer->warn($encodedKey, true);
 
-            return;
+            return EXIT_SUCCESS;
         }
 
         if (! $this->setNewEncryptionKey($encodedKey)) {
             $this->writer->error('Erreur dans la configuration d\'une nouvelle clé de chiffrement dans le fichier `.env`.', true);
 
-            return;
+            return EXIT_ERROR;
         }
 
         $this->badge()->success('Une nouvelle clé de chiffrement de l\'application a été définie avec succès.');
+
+        return EXIT_SUCCESS;
     }
 
     /**
