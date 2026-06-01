@@ -598,6 +598,14 @@ class Uri implements UriInterface
         return $uri;
     }
 
+	/**
+	 * Donne la valeur d'une variable de l'URI spécifique, ou une valeur par défaut si elle n'existe pas.
+	 */
+	public function getQueryParam(string $key, mixed $default = null): mixed
+	{
+		return $this->query[$key] ?? $default;
+	}
+
     /**
      * Ajoute un seul nouvel élément aux variables de l'URL.
      */
