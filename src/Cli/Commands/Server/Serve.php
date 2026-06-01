@@ -25,7 +25,6 @@ class Serve extends Command
     protected string $group       = 'BlitzPHP';
     protected string $name        = 'serve';
     protected string $description = 'Lance le serveur de développement BlitzPHP.';
-    protected string $usage       = 'php klinge serve';
     protected string $service     = 'Service de lancement du serveur de developpement';
     protected array $options      = [
         '--php'  => ['Le binaire PHP', 'PHP_BINARY'],
@@ -34,14 +33,9 @@ class Serve extends Command
     ];
 
     /**
-     * Le décalage de port actuel.
+     * The number of times to retry if the port is already in use.
      */
-    protected int $portOffset = 0;
-
-    /**
-     * Le nombre maximum de ports à partir desquels tenter de servir
-     */
-    protected int $tries = 10;
+    private const RETRIES = 10;
 
     /**
      * Chemin de base dans lequel sera lancer le server
@@ -61,33 +55,51 @@ class Serve extends Command
      */
     public function handle()
     {
-        $binary = $this->option('php', PHP_BINARY);
-        $php    = escapeshellarg($binary === 'PHP_BINARY' ? PHP_BINARY : $binary);
-        $host   = $this->option('host', 'localhost');
-        $port   = (int) ($this->option('port', 3300)) + $this->portOffset;
+		$basePort = (int) ($this->option('port', 3300));
+		$status   = EXIT_SUCCESS;
+		$host     = $this->option('host', 'localhost');
 
-        $this->task($this->taskMessages['demarrage'] ?: 'Demarrage du serveur de developpement');
-        sleep(2);
+		for ($offset = 0; $offset <= self::RETRIES; $offset++) {
+			$port = $basePort + $offset;
 
-        $this->io->ok($this->taskMessages['demarrer'] ?: 'Le serveur de développement BlitzPHP a démarré sur ');
-        $this->writer->boldGreen('http://' . $host . ':' . $port, true);
-        $this->write("Appuyez sur Control-C pour arrêter.\n", true);
+			$this->task($this->taskMessages['demarrage'] ?: 'Demarrage du serveur de developpement');
+			sleep(2);
 
-        // Définissez le chemin d’accès du contrôleur frontal sur Racine du document.
-        $docroot = escapeshellarg($this->rootDirectory);
+			$this->io->ok($this->taskMessages['demarrer'] ?: 'Le serveur de développement BlitzPHP a démarré sur ');
+			$this->writer->boldGreen('http://' . $host . ':' . $port, true);
+			$this->write("Appuyez sur Control-C pour arrêter.\n", true);
 
-        // Imitez la fonctionnalité mod_rewrite d’Apache avec les paramètres utilisateur.
-        $rewrite = escapeshellarg(__DIR__ . '/rewrite.php');
+			passthru(
+                $this->buildServeCommand($host, $port),
+                $status,
+            );
 
-        // Appelez le serveur Web intégré de PHP, en veillant à définir notre
-        // chemin de base vers le dossier public et pour utiliser le fichier de réécriture
-        // pour s'assurer que notre environnement est défini et qu'il simule le mod_rewrite de base.
-        passthru($php . ' -S ' . $host . ':' . $port . ' -t ' . $docroot . ' ' . $rewrite, $status);
+            if ($status === EXIT_SUCCESS) {
+                return $status;
+            }
 
-        if ($status && $this->portOffset < $this->tries) {
-            $this->portOffset++;
+			$this->newLine();
+		}
 
-            $this->handle();
-        }
+		return $status;
+    }
+
+    /**
+     * Builds the shell command passed to PHP's built-in webserver, escaping
+     * every user-influenced argument so it cannot be interpreted by /bin/sh.
+     */
+    protected function buildServeCommand(string $host, int $port): string
+    {
+		$php     = 'PHP_BINARY' === ($binary = $this->option('php')) ? PHP_BINARY : $binary;
+		$docroot = $this->rootDirectory;
+		$rewrite = __DIR__ . '/rewrite.php';
+
+        return sprintf(
+            '%s -S %s -t %s %s',
+            escapeshellarg($php),
+            escapeshellarg($host . ':' . $port),
+            escapeshellarg($docroot),
+            escapeshellarg($rewrite),
+        );
     }
 }
