@@ -57,7 +57,8 @@ defined('FRAMEWORK_STORAGE_PATH') || define('FRAMEWORK_STORAGE_PATH', STORAGE_PA
 defined('APP_STORAGE_PATH') || define('APP_STORAGE_PATH', STORAGE_PATH . 'app' . DS);
 
 /** Chemin vers le dossier de stockage des fichiers temporaires */
-defined('TEMP_PATH') || define('TEMP_PATH', FRAMEWORK_STORAGE_PATH . 'temp' . DS);
+defined('FRAMEWORK_TEMP_PATH') || define('FRAMEWORK_TEMP_PATH', FRAMEWORK_STORAGE_PATH . 'temp' . DS);
+defined('TEMP_PATH') || define('TEMP_PATH', FRAMEWORK_TEMP_PATH); // @deprecated use FRAMEWORK_TEMP_PATH instead
 
 /** Chemin vers le dossier de cache des vues */
 defined('VIEW_CACHE_PATH') || define('VIEW_CACHE_PATH', FRAMEWORK_STORAGE_PATH . 'cache' . DS);

@@ -12,6 +12,8 @@
 namespace BlitzPHP\Cli\Console;
 
 use Ahc\Cli\IO\Interactor;
+use Dimtrovich\Console\Console as BaseConsole;
+use Dimtrovich\Console\Overrides\Command as BaseCommand;
 
 /**
  * Classe de base utilisée pour créer des commandes pour la console
@@ -41,4 +43,28 @@ abstract class Command extends \Dimtrovich\Console\Command
      * Defini si on doit supprimer les information du header (nom/version du framework) ou pas
      */
     protected bool $suppress = false;
+
+	/**
+     * {@inheritDoc}
+     */
+    public function initialize(BaseConsole $app): BaseCommand
+    {
+		if (! is_cli()) {
+			$input  = config('klinge.interactor.input', FRAMEWORK_TEMP_PATH . 'klinge' . DS . 'input');
+			$output = config('klinge.interactor.output', FRAMEWORK_TEMP_PATH . 'klinge' . DS . 'output');
+
+			foreach ([$input, $output] as $file) {
+				if (! is_file($file)) {
+					if (! is_dir($dir = dirname($file))) {
+						mkdir($dir, 0777, true);
+					}
+					file_put_contents($file, '');
+				}
+			}
+
+			$app = $app->io(new Interactor($input, $output));
+		}
+
+		return parent::initialize($app);
+    }
 }
