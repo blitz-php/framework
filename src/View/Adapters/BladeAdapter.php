@@ -36,7 +36,7 @@ class BladeAdapter extends AbstractAdapter
 
         $this->engine = new Blade(
             $this->viewPath ?: VIEW_PATH,
-            $this->config['cache_path'] ?? VIEW_CACHE_PATH . 'blade' . DIRECTORY_SEPARATOR
+            $this->config['cache_path'] ?? VIEW_CACHE_PATH . 'blade' . DIRECTORY_SEPARATOR,
         );
 
         $this->configure();

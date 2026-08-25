@@ -89,7 +89,7 @@ class Middleware extends Command
             $class,
             [],
             [],
-            ['standard' => $standard]
+            ['standard' => $standard],
         );
     }
 }

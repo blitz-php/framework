@@ -27,6 +27,7 @@ use BlitzPHP\Session\Store;
 use BlitzPHP\Utilities\Helpers;
 use BlitzPHP\Utilities\Iterable\Collection;
 use BlitzPHP\Utilities\Support\Invader;
+use BlitzPHP\View\View;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\StreamInterface;
 
@@ -171,7 +172,7 @@ if (! function_exists('command')) {
                 // @codeCoverageIgnoreStart
                 throw new InvalidArgumentException(sprintf(
                     'Impossible d\'analyser l\'entrée à proximité "... %s ...".',
-                    substr($command, $cursor, 10)
+                    substr($command, $cursor, 10),
                 ));
                 // @codeCoverageIgnoreEnd
             }
@@ -971,7 +972,7 @@ if (! function_exists('view')) {
      *
      * NOTE : Ne fournit pas d'échappement des données, ce qui doit être géré manuellement par le développeur.
      *
-     * @return BlitzPHP\View\View
+     * @return View
      */
     function view(string $view, array $data = [], array $options = [])
     {

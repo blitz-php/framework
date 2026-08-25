@@ -45,7 +45,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
         ?int $size = null,
         int $error = UPLOAD_ERR_OK,
         ?string $clientFilename = null,
-        ?string $clientMediaType = null
+        ?string $clientMediaType = null,
     ): UploadedFileInterface {
         if ($size === null) {
             $size = $stream->getSize() ?? 0;
@@ -66,7 +66,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
         if (! isset($spec['tmp_name']) || ! isset($spec['size']) || ! isset($spec['error'])) {
             throw new InvalidArgumentException(sprintf(
                 '$spec fourni à %s DOIT contenir chacune des clés "tmp_name", "size", et "error" ; une ou plusieurs étaient manquantes',
-                __FUNCTION__
+                __FUNCTION__,
             ));
         }
 
@@ -75,7 +75,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
             (int) $spec['size'],
             $spec['error'],
             $spec['name'] ?? null,
-            $spec['type'] ?? null
+            $spec['type'] ?? null,
         );
     }
 
@@ -108,7 +108,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
             array $sizeTree,
             array $errorTree,
             ?array $nameTree = null,
-            ?array $typeTree = null
+            ?array $typeTree = null,
         ) use (&$recursiveNormalize): array {
             $normalized = [];
 
@@ -120,7 +120,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
                         $sizeTree[$key],
                         $errorTree[$key],
                         $nameTree[$key] ?? null,
-                        $typeTree[$key] ?? null
+                        $typeTree[$key] ?? null,
                     );
 
                     continue;
@@ -157,7 +157,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
                     'Les fichiers fournis à %s DOIVENT contenir chacune des clés "tmp_name", "size" et "error",
 				chacune étant représentée sous la forme d\'un tableau ;
 				une ou plusieurs valeurs manquaient ou n\'étaient pas des tableaux.',
-                    __FUNCTION__
+                    __FUNCTION__,
                 ));
             }
 
@@ -166,7 +166,7 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
                 $files['size'],
                 $files['error'],
                 $files['name'] ?? null,
-                $files['type'] ?? null
+                $files['type'] ?? null,
             );
         };
 

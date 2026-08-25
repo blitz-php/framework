@@ -205,7 +205,7 @@ class Services
             $config->domain ?: '',
             $config->secure ?: false,
             $config->httponly ?: true,
-            $config->samesite ?: 'Lax'
+            $config->samesite ?: 'Lax',
         );
     }
 

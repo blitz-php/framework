@@ -44,7 +44,7 @@ class RedirectException extends Exception implements ResponsableInterface
 
             if ($this->response->getHeaderLine('Location') === '' && $this->response->getHeaderLine('Refresh') === '') {
                 throw new LogicException(
-                    'The Response object passed to RedirectException does not contain a redirect address.'
+                    'The Response object passed to RedirectException does not contain a redirect address.',
                 );
             }
 
@@ -65,7 +65,7 @@ class RedirectException extends Exception implements ResponsableInterface
 
         service('logger')->info(
             'REDIRECTED ROUTE at '
-            . ($this->response->getHeaderLine('Location') ?: substr($this->response->getHeaderLine('Refresh'), 6))
+            . ($this->response->getHeaderLine('Location') ?: substr($this->response->getHeaderLine('Refresh'), 6)),
         );
 
         return $this->response;

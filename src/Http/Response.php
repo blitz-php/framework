@@ -769,7 +769,7 @@ class Response implements ResponseInterface, Stringable
             $time = strtotime($time);
             if ($time === false) {
                 throw new InvalidArgumentException(
-                    'Invalid time parameter. Ensure your time value can be parsed by strtotime'
+                    'Invalid time parameter. Ensure your time value can be parsed by strtotime',
                 );
             }
         }

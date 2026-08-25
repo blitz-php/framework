@@ -155,8 +155,8 @@ class UrlGenerator
             '/',
             array_map(
                 'rawurlencode',
-                $this->formatParameters($extra)
-            )
+                $this->formatParameters($extra),
+            ),
         );
 
         // Once we have the scheme we will compile the "tail" by collapsing the values
@@ -168,7 +168,7 @@ class UrlGenerator
 
         return $this->format(
             $root,
-            '/' . trim($path . '/' . $tail, '/')
+            '/' . trim($path . '/' . $tail, '/'),
         ) . $query;
     }
 

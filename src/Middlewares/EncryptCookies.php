@@ -156,7 +156,7 @@ class EncryptCookies implements MiddlewareInterface
                 $cookie,
                 $this->encrypter->encrypt(
                     CookieValuePrefix::create($cookie->getName(), $this->encrypter->getKey()) . $cookie->getValue(),
-                )
+                ),
             ));
         }
 

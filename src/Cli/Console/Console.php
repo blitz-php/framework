@@ -182,7 +182,7 @@ class Console extends Application
     {
         $files = array_merge(
             $locator->listFiles('Commands/'), // Commandes de l'application ou des fournisseurs
-            $locator->listFiles('Cli/Commands/') // Commandes internes du framework
+            $locator->listFiles('Cli/Commands/'), // Commandes internes du framework
         );
 
         return array_unique($files);
@@ -244,7 +244,7 @@ class Console extends Application
             $instance->name,
             $instance->description,
             false,
-            $this
+            $this,
         );
 
         // Defini le groupe auquel appartient la commande

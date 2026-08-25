@@ -89,7 +89,7 @@ class ResponseEmitter
                 header(sprintf(
                     '%s: %s',
                     $name,
-                    $value
+                    $value,
                 ), $first);
                 $first = false;
             }
@@ -177,7 +177,7 @@ class ResponseEmitter
             'HTTP/%s %d%s',
             $response->getProtocolVersion(),
             $response->getStatusCode(),
-            ($reasonPhrase !== '' && $reasonPhrase !== '0' ? ' ' . $reasonPhrase : '')
+            ($reasonPhrase !== '' && $reasonPhrase !== '0' ? ' ' . $reasonPhrase : ''),
         ));
     }
 
@@ -195,7 +195,7 @@ class ResponseEmitter
                 setcookie(
                     $cookie['name'],
                     $cookie['value'],
-                    ['expires' => $cookie['expires'], 'path' => $cookie['path'], 'domain' => $cookie['domain'], 'secure' => $cookie['secure'], 'httponly' => $cookie['httponly']]
+                    ['expires' => $cookie['expires'], 'path' => $cookie['path'], 'domain' => $cookie['domain'], 'secure' => $cookie['secure'], 'httponly' => $cookie['httponly']],
                 );
 
                 continue;
@@ -236,7 +236,7 @@ class ResponseEmitter
             setcookie(
                 $data['name'],
                 $data['value'],
-                ['expires' => $data['expires'], 'path' => $data['path'], 'domain' => $data['domain'], 'secure' => $data['secure'], 'httponly' => $data['httponly']]
+                ['expires' => $data['expires'], 'path' => $data['path'], 'domain' => $data['domain'], 'secure' => $data['secure'], 'httponly' => $data['httponly']],
             );
         }
     }
