@@ -372,7 +372,7 @@ if (! function_exists('is_pluralizable')) {
                 'wisdom',
                 'work',
             ],
-            true
+            true,
         );
     }
 }

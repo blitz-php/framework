@@ -261,7 +261,7 @@ class View implements Stringable
         if (isset(self::$shared['errors']) && self::$shared['errors'] instanceof ErrorBag) {
             $messages = array_merge(
                 self::$shared['errors']->toArray(),
-                $errors->toArray()
+                $errors->toArray(),
             );
             $errors = new ErrorBag($messages);
         }
@@ -370,7 +370,7 @@ class View implements Stringable
         $this->adapter = new self::$validAdapters[$adapter](
             $config,
             $config['view_path'] ?? null,
-            $debug
+            $debug,
         );
 
         return $this;

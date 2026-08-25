@@ -46,7 +46,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         ?array $query = null,
         ?array $parsedBody = null,
         ?array $cookies = null,
-        ?array $files = null
+        ?array $files = null,
     ): Request {
         $server = self::normalizeServer($server ?? $_SERVER);
 

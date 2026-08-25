@@ -282,7 +282,7 @@ class Mail implements MailerInterface
         return match ($this->config['mailType']) {
             'html'  => $this->html($message),
             'text'  => $this->text($message),
-            default => $this
+            default => $this,
         };
     }
 

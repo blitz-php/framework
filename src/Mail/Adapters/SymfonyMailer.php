@@ -428,7 +428,7 @@ class SymfonyMailer extends AbstractAdapter
         }
 
         return $this->transporter = new Mailer(
-            Transport::fromDsn($this->buildDsn())
+            Transport::fromDsn($this->buildDsn()),
         );
     }
 

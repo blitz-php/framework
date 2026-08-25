@@ -81,7 +81,7 @@ class Component extends Command
         $viewName = preg_replace(
             '/([a-z][a-z0-9_\/\\\\]+)(-component)$/i',
             '$1',
-            $viewName
+            $viewName,
         ) ?? $viewName;
         $namespace = substr($className, 0, strrpos($className, '\\') + 1);
 

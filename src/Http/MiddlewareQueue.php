@@ -380,7 +380,7 @@ class MiddlewareQueue implements Countable, SeekableIterator
             } else {
                 throw new InvalidArgumentException(sprintf(
                     'Middleware, `%s` n\'a pas été trouvé.',
-                    $middleware
+                    $middleware,
                 ));
             }
 
