@@ -72,7 +72,7 @@ if (! function_exists('lib_css_url')) {
         $name     = str_replace(
             [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'],
             '',
-            htmlspecialchars($name)
+            htmlspecialchars($name),
         );
 
         if (is_localfile($name)) {
@@ -109,7 +109,7 @@ if (! function_exists('lib_js_url')) {
         $name     = str_replace(
             [$site_url . 'lib/', $site_url . 'vendor/', $site_url . 'plugins/'],
             '',
-            htmlspecialchars($name)
+            htmlspecialchars($name),
         );
 
         if (is_localfile($name)) {

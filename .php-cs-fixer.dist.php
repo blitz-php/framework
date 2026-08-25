@@ -44,5 +44,5 @@ return Factory::create(new Blitz(), $overrides, $options)->forLibrary(
     'Blitz PHP framework',
     'Dimitri Sitchet Tomkeu',
     'devcode.dst@gmail.com',
-    2022
+    2022,
 );

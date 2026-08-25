@@ -115,7 +115,7 @@ class ConfigCheck extends Command
                 $this->write($this->getKintDump($others));
             } else {
                 $this->write(
-                    $this->color->line($this->getVarDump($others), ['fg' => Color::CYAN])
+                    $this->color->line($this->getVarDump($others), ['fg' => Color::CYAN]),
                 );
             }
         }
@@ -153,7 +153,7 @@ class ConfigCheck extends Command
         return preg_replace(
             '!.*Commands/Utilities/ConfigCheck.php.*\n!u',
             '',
-            $output
+            $output,
         );
     }
 }

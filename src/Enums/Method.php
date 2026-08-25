@@ -111,7 +111,7 @@ abstract class Method
             'post'    => self::POST,
             'put'     => self::PUT,
             'trace'   => self::TRACE,
-            default   => throw new InvalidArgumentException('Nom de methode inconnu')
+            default   => throw new InvalidArgumentException('Nom de methode inconnu'),
         };
     }
 

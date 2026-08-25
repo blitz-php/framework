@@ -289,7 +289,7 @@ class Parser extends NativeAdapter
             $this->leftDelimiter . '\s*/' . preg_quote($variable, '#') . '\s*' . $this->rightDelimiter . '#us',
             $template,
             $matches,
-            PREG_SET_ORDER
+            PREG_SET_ORDER,
         );
 
         /*
@@ -444,12 +444,12 @@ class Parser extends NativeAdapter
         $template = preg_replace(
             '/' . $leftDelimiter . '\s*else\s*' . $rightDelimiter . '/ums',
             '<?php else: ?>',
-            $template
+            $template,
         );
         $template = preg_replace(
             '/' . $leftDelimiter . '\s*endif\s*' . $rightDelimiter . '/ums',
             '<?php endif; ?>',
-            $template
+            $template,
         );
 
         // Parse the PHP itself, or insert an error so they can debug

@@ -92,7 +92,7 @@ class About extends Command
                             ->map(static fn ($value, $key) => [$key, $value])
                             ->values()
                             ->all();
-                    })->flatten(1)
+                    })->flatten(1),
             )
             ->sortBy(static function ($data, $key): int {
                 $index = array_search($key, ['Environnement', 'Cache', 'Gestionnaires'], true);

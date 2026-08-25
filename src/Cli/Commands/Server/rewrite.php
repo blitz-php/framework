@@ -25,7 +25,7 @@ if (PHP_SAPI === 'cli') {
 }
 
 $uri = urldecode(
-    parse_url('https://blitz-php.com' . $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? ''
+    parse_url('https://blitz-php.com' . $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '',
 );
 
 // Toutes les requêtes sont gérées par index.php fichier.

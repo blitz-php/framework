@@ -11,6 +11,7 @@
 
 namespace BlitzPHP\Mail\Adapters;
 
+use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer as Mailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -192,7 +193,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function attach(array|string $path, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
@@ -210,7 +211,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function attachBinary($binary, string $name, string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'attachment'): static
     {
@@ -222,7 +223,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function bcc(array|string $address, bool|string $name = '', bool $set = false): static
     {
@@ -242,7 +243,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function cc(array|string $address, bool|string $name = '', bool $set = false): static
     {
@@ -276,7 +277,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function embedded(string $path, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
@@ -288,7 +289,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function embeddedBinary($binary, string $cid, string $name = '', string $type = '', string $encoding = self::ENCODING_BASE64, string $disposition = 'inline'): static
     {
@@ -300,7 +301,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function from(string $address, string $name = ''): static
     {
@@ -312,7 +313,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function header(array|string $name, ?string $value = null): static
     {
@@ -358,7 +359,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function replyTo(array|string $address, bool|string $name = '', bool $set = false): static
     {
@@ -378,7 +379,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function send(): bool
     {
@@ -418,7 +419,7 @@ class PHPMailer extends AbstractAdapter
     /**
      * {@inheritDoc}
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws Exception
      */
     public function to(array|string $address, bool|string $name = '', bool $set = false): static
     {

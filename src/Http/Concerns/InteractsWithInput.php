@@ -267,7 +267,7 @@ trait InteractsWithInput
         return Arr::dataGet(
             $this->data + $this->query,
             $key,
-            $default
+            $default,
         );
     }
 

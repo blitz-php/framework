@@ -121,7 +121,7 @@ class Controller extends Command
             [
                 'type'      => $rest,
                 'invokable' => $this->option('invokable'),
-            ]
+            ],
         );
     }
 }

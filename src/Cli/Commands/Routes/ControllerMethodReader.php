@@ -63,7 +63,7 @@ final class ControllerMethodReader
                             $classname,
                             $methodName,
                             $httpVerb,
-                            $method
+                            $method,
                         );
 
                         if ($routeForDefaultController !== []) {
@@ -170,7 +170,7 @@ final class ControllerMethodReader
         string $classname,
         string $methodName,
         string $httpVerb,
-        ReflectionMethod $method
+        ReflectionMethod $method,
     ): array {
         $output = [];
 

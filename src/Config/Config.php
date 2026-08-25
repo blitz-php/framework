@@ -297,7 +297,7 @@ class Config
             throw new ConfigException(
                 'Pendant la découverte automatique des Registrars,'
                 . ' "' . static::class . '" a été re-éxecuté.'
-                . ' "' . clean_path(static::$registrarFile) . '" doit avoir un mauvais code.'
+                . ' "' . clean_path(static::$registrarFile) . '" doit avoir un mauvais code.',
             );
         }
 

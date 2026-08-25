@@ -40,7 +40,7 @@ class ShareErrorsFromSession implements MiddlewareInterface
         // Un sac vide est défini lorsqu'il n'y a pas d'erreurs.
         $this->view->share(
             'errors',
-            new ErrorBag($request->session()->getFlashdata('errors') ?: [])
+            new ErrorBag($request->session()->getFlashdata('errors') ?: []),
         );
 
         // Le fait de placer les erreurs dans la vue pour chaque vue permet au développeur de supposer que certaines erreurs sont toujours disponibles,

@@ -99,7 +99,7 @@ class Command extends ConsoleCommand
             $class,
             ['{group}', '{command}'],
             [$group, $command],
-            ['type' => $type]
+            ['type' => $type],
         );
     }
 }

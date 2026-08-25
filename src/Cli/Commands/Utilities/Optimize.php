@@ -97,7 +97,7 @@ final class Optimize extends Command
             [
                 "'config_cache_enabled' => false,"  => "'config_cache_enabled' => true,",
                 "'locator_cache_enabled' => false," => "'locator_cache_enabled' => true,",
-            ]
+            ],
         );
 
         if ($result) {

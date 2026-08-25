@@ -87,13 +87,13 @@ class Component implements Stringable
 
         $candidateViews = array_filter(
             [$view, $possibleView1 ?? '', $possibleView2 ?? ''],
-            static fn (string $path): bool => $path !== '' && is_file($path)
+            static fn (string $path): bool => $path !== '' && is_file($path),
         );
 
         if ($candidateViews === []) {
             throw new LogicException(sprintf(
                 'Impossible de localiser le fichier de vue pour le composant "%s".',
-                static::class
+                static::class,
             ));
         }
 

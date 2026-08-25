@@ -332,7 +332,7 @@ class Uri implements UriInterface
             $this->getAuthority(),
             $path, // Les URI absolus doivent utiliser un "/" pour un chemin vide
             $this->getQuery(),
-            $this->getFragment()
+            $this->getFragment(),
         );
     }
 
@@ -687,7 +687,7 @@ class Uri implements UriInterface
         $path = preg_replace_callback(
             '/(?:[^' . static::CHAR_UNRESERVED . ':@&=\+\$,\/;%]+|%(?![A-Fa-f0-9]{2}))/',
             static fn (array $matches) => rawurlencode($matches[0]),
-            $path
+            $path,
         );
 
         return $path;
