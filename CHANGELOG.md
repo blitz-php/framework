@@ -2,6 +2,18 @@
 
 Toutes les modifications notables apportées à `:package_name` seront documentées dans ce fichier.
 
+## 0.12.3 - 2026-08-25
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+### What's Changed
+
+#### Others (Only for checking. Remove this category)
+
+* fix spec by @dimtrovich in https://github.com/blitz-php/framework/pull/76
+* chore: blocage des dependances sur des version legacy by @dimtrovich in https://github.com/blitz-php/framework/pull/77
+
+**Full Changelog**: https://github.com/blitz-php/framework/compare/0.12.2...0.12.3
+
 ## 0.12.2 - 2025-05-23
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
