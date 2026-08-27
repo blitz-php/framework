@@ -587,11 +587,12 @@ abstract class Command
             'sep'    => (string) ($options['sep'] ?? '.'),
         ];
 
-         while (preg_match('/(\\x1b(?:.+)m)/U', $first, $matches)) {
+        while (preg_match('/(\\x1b(?:.+)m)/U', $first, $matches)) {
             $first = str_replace($matches[1], '', $first);
             $first = preg_replace('/\\x1b\[0m/', '', $first);
         }
-		while (preg_match('/(\\x1b(?:.+)m)/U', $second, $matches)) {
+
+        while (preg_match('/(\\x1b(?:.+)m)/U', $second, $matches)) {
             $second = str_replace($matches[1], '', $second);
             $second = preg_replace('/\\x1b\[0m/', '', $second);
         }

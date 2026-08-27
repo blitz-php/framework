@@ -60,22 +60,22 @@ class Providers extends AbstractProvider
     private static function interfaces(): array
     {
         return [
-			CacheInterface::class           => static fn () => service('cache'),
-			PsrCacheInterface::class        => static fn () => service('cache'),
-			ContainerInterface::class       => static fn () => service('container'),
-			PsrContainerInterface::class    => static fn () => service('container'),
-			CookieManagerInterface::class   => static fn () => service('cookie'),
-			EncrypterInterface::class       => static fn () => service('encrypter'),
-			EventManagerInterface::class    => static fn () => service('event'),
-			LocatorInterface::class         => static fn () => service('locator'),
-			LoggerInterface::class          => static fn () => service('logger'),
-			MailerInterface::class          => static fn () => service('mail'),
-			RendererInterface::class        => static fn () => service('viewer')->getAdapter(),
-			RepositoryInterface::class      => static fn () => service('cache'),
-			ResponseInterface::class        => static fn () => service('response'),
-			RouteCollectionInterface::class => static fn () => service('routes'),
-			ServerRequestInterface::class   => static fn () => service('request'),
-			SessionInterface::class         => static fn () => service('session'),
+            CacheInterface::class           => static fn () => service('cache'),
+            PsrCacheInterface::class        => static fn () => service('cache'),
+            ContainerInterface::class       => static fn () => service('container'),
+            PsrContainerInterface::class    => static fn () => service('container'),
+            CookieManagerInterface::class   => static fn () => service('cookie'),
+            EncrypterInterface::class       => static fn () => service('encrypter'),
+            EventManagerInterface::class    => static fn () => service('event'),
+            LocatorInterface::class         => static fn () => service('locator'),
+            LoggerInterface::class          => static fn () => service('logger'),
+            MailerInterface::class          => static fn () => service('mail'),
+            RendererInterface::class        => static fn () => service('viewer')->getAdapter(),
+            RepositoryInterface::class      => static fn () => service('cache'),
+            ResponseInterface::class        => static fn () => service('response'),
+            RouteCollectionInterface::class => static fn () => service('routes'),
+            ServerRequestInterface::class   => static fn () => service('request'),
+            SessionInterface::class         => static fn () => service('session'),
         ];
     }
 
