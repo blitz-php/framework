@@ -2,6 +2,17 @@
 
 Toutes les modifications notables apportées à `:package_name` seront documentées dans ce fichier.
 
+## 0.12.5 - 2026-08-27
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+### What's Changed
+
+#### Enhancements
+
+* patch: mapping de nouvelles interfaces au container et correction de la methode `command::justify` lorsque les couleurs sont utilisées by @dimtrovich in https://github.com/blitz-php/framework/pull/79
+
+**Full Changelog**: https://github.com/blitz-php/framework/compare/0.12.3...0.12.5
+
 ## 0.12.3 - 2026-08-25
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
