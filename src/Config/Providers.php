@@ -18,6 +18,8 @@ use BlitzPHP\Cache\ResponseCache;
 use BlitzPHP\Container\AbstractProvider;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Autoloader\LocatorInterface;
+use BlitzPHP\Contracts\Cache\CacheInterface;
+use BlitzPHP\Contracts\Cache\RepositoryInterface;
 use BlitzPHP\Contracts\Container\ContainerInterface;
 use BlitzPHP\Contracts\Event\EventManagerInterface;
 use BlitzPHP\Contracts\Mail\MailerInterface;
@@ -45,10 +47,11 @@ use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Reflection\ReflectionClass;
 use Closure;
 use Dimtrovich\UserAgent\Extensions\BlitzPHP\AgentProvider;
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as PsrCacheInterface;
 use ReflectionMethod;
 
 /**
@@ -82,22 +85,25 @@ class Providers extends AbstractProvider
     private static function interfaces(): array
     {
         return [
-            LocatorInterface::class                  => static fn () => service('locator'),
-            ContainerInterface::class                => static fn () => service('container'),
-            EventManagerInterface::class             => static fn () => service('event'),
-            MailerInterface::class                   => static fn () => service('mail'),
-            RouteCollectionInterface::class          => static fn () => service('routes'),
-            EncrypterInterface::class                => static fn () => service('encrypter'),
-            HasherInterface::class                   => static fn () => service('hashing'),
-            CookieManagerInterface::class            => static fn () => service('cookie'),
-            SessionInterface::class                  => static fn () => service('session'),
-            RendererInterface::class                 => static fn () => service('viewer')->getAdapter(),
-            \Psr\Container\ContainerInterface::class => static fn () => service('container'),
-            ResponseInterface::class                 => static fn () => service('response'),
-            ServerRequestInterface::class            => static fn () => service('request'),
-            LoggerInterface::class                   => static fn () => service('logger'),
-            CacheInterface::class                    => static fn () => service('cache'),
-            RateLimiterInterface::class              => static fn () => service('throttler'),
+            CacheInterface::class           => static fn () => service('cache'),
+            ContainerInterface::class       => static fn () => service('container'),
+            CookieManagerInterface::class   => static fn () => service('cookie'),
+            EncrypterInterface::class       => static fn () => service('encrypter'),
+            EventManagerInterface::class    => static fn () => service('event'),
+            HasherInterface::class          => static fn () => service('hashing'),
+            LocatorInterface::class         => static fn () => service('locator'),
+            LoggerInterface::class          => static fn () => service('logger'),
+            MailerInterface::class          => static fn () => service('mail'),
+            RateLimiterInterface::class     => static fn () => service('throttler'),
+            RendererInterface::class        => static fn () => service('viewer')->getAdapter(),
+            RepositoryInterface::class      => static fn () => service('cache'),
+            ResponseInterface::class        => static fn () => service('response'),
+            RouteCollectionInterface::class => static fn () => service('routes'),
+            ServerRequestInterface::class   => static fn () => service('request'),
+            SessionInterface::class         => static fn () => service('session'),
+
+			PsrCacheInterface::class     => static fn () => service('cache'),
+			PsrContainerInterface::class => static fn () => service('container'),
         ];
     }
 
