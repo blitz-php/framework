@@ -2,6 +2,18 @@
 
 $ignoreErrors = [];
 $ignoreErrors[] = [
+	// identifier: staticMethod.notFound
+	'message' => '#^Call to an undefined static method BlitzPHP\\\\Utilities\\\\Iterable\\\\Arr\\:\\:countRecursive\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Cli/Commands/Translation/TranslationsFinder.php',
+];
+$ignoreErrors[] = [
+	// identifier: staticMethod.notFound
+	'message' => '#^Call to an undefined static method BlitzPHP\\\\Utilities\\\\Iterable\\\\Arr\\:\\:diffRecursive\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Cli/Commands/Translation/TranslationsFinder.php',
+];
+$ignoreErrors[] = [
 	// identifier: method.notFound
 	'message' => '#^Call to an undefined method BlitzPHP\\\\Traits\\\\Mixins\\\\HigherOrderCollectionProxy\\:\\:__invoke\\(\\)\\.$#',
 	'count' => 1,

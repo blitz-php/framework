@@ -21,7 +21,8 @@ describe('Cache / Cache Factory', function (): void {
 			$cache = new Cache();
 			Cache::disable();
 
-			$factory = ReflectionHelper::getPrivateMethodInvoker($cache, 'factory');
+			$manager = ReflectionHelper::getPrivateProperty($cache, 'manager');
+			$factory = ReflectionHelper::getPrivateMethodInvoker($manager, 'factory');
 
 			expect(call_user_func($factory))->toBeAnInstanceOf(Dummy::class);
 
@@ -31,9 +32,11 @@ describe('Cache / Cache Factory', function (): void {
 		it('Leve une exception lorsque les gestionnaires valides ne sont pas definis', function (): void {
 			$cache = new Cache();
 
-			expect(ReflectionHelper::getPrivateProperty($cache, 'config'))->toBe([]);
+			$manager = ReflectionHelper::getPrivateProperty($cache, 'manager');
 
-			$factory = ReflectionHelper::getPrivateMethodInvoker($cache, 'factory');
+			expect(ReflectionHelper::getPrivateProperty($manager, 'config'))->toBe([]);
+
+			$factory = ReflectionHelper::getPrivateMethodInvoker($manager, 'factory');
 
 			expect(fn() => call_user_func($factory))->toThrow(new InvalidArgumentException());
 		});
@@ -43,14 +46,16 @@ describe('Cache / Cache Factory', function (): void {
 			$config['valid_handlers'] = config('cache.valid_handlers');
 			$cache                   = new Cache($config);
 
-			$factory = ReflectionHelper::getPrivateMethodInvoker($cache, 'factory');
+			$manager = ReflectionHelper::getPrivateProperty($cache, 'manager');
+			$factory = ReflectionHelper::getPrivateMethodInvoker($manager, 'factory');
 			expect(fn() => call_user_func($factory))->toThrow(new InvalidArgumentException());
 
 
 			$config['handler'] = 'fake_handler';
 			$cache             = new Cache($config);
 
-			$factory = ReflectionHelper::getPrivateMethodInvoker($cache, 'factory');
+			$manager = ReflectionHelper::getPrivateProperty($cache, 'manager');
+			$factory = ReflectionHelper::getPrivateMethodInvoker($manager, 'factory');
 			expect(fn() => call_user_func($factory))->toThrow(new InvalidArgumentException());
 		});
 
@@ -60,7 +65,8 @@ describe('Cache / Cache Factory', function (): void {
 			$config['handler']        = 'fake_handler';
 			$cache                    = new Cache($config);
 
-			$factory = ReflectionHelper::getPrivateMethodInvoker($cache, 'factory');
+			$manager = ReflectionHelper::getPrivateProperty($cache, 'manager');
+			$factory = ReflectionHelper::getPrivateMethodInvoker($manager, 'factory');
 			expect(call_user_func($factory))->toBeAnInstanceOf(Dummy::class);
 		});
 	});
