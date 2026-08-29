@@ -665,8 +665,19 @@ abstract class Command
      *
      * @return void
      */
-    private function initProps()
+    protected function initProps()
     {
+        if (! is_cli()) {
+            if (! file_exists($in = TEMP_PATH . 'cli_input')) {
+                file_put_contents($in, '', LOCK_EX);
+            }
+            if (! file_exists($ou = TEMP_PATH . 'cli_output')) {
+                file_put_contents($ou, '', LOCK_EX);
+            }
+
+            $this->app->io(new Interactor($in, $ou));
+        }
+
         $this->io       = $this->app->io();
         $this->writer   = $this->io->writer();
         $this->reader   = $this->io->reader();
