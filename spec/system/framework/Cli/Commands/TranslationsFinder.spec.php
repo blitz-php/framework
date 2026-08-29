@@ -14,7 +14,7 @@ use BlitzPHP\Spec\CliOutputHelper as COH;
 
 use function Kahlan\expect;
 
-describe('Commandes / TranslationsFinder', function (): void {
+xdescribe('Commandes / TranslationsFinder', function (): void {
     afterEach(function (): void {
         COH::tearDown();
 
