@@ -177,11 +177,19 @@ trait ResponseTrait
      */
     public function streamDownload(callable|StreamInterface|string $stream, string $name, array $headers = []): static
     {
+        return $this->stream($stream, $name, $headers)->withDownload($name);
+    }
+
+    /**
+     * Créez une nouvelle instance de réponse diffusée en continu.
+     */
+    public function stream(callable|StreamInterface|string $stream, string $name, array $headers = []): static
+    {
         if (! ($stream instanceof StreamInterface)) {
-            $stream = to_stream($stream);
+            $stream = Utils::streamFor($stream);
         }
 
-        return $this->withHeaders($headers)->withBody($stream)->withType(pathinfo($name, PATHINFO_EXTENSION))->withDownload($name);
+        return $this->withHeaders($headers)->withBody($stream)->withType(pathinfo($name, PATHINFO_EXTENSION));
     }
 
     /**
