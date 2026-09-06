@@ -2,6 +2,17 @@
 
 Toutes les modifications notables apportées à `:package_name` seront documentées dans ce fichier.
 
+## 0.12.7 - 2026-09-06
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+### What's Changed
+
+#### Enhancements
+
+* feat(ResponseTrait): amélioration des méthodes de téléchargement et de streaming by @dimtrovich in https://github.com/blitz-php/framework/pull/81
+
+**Full Changelog**: https://github.com/blitz-php/framework/compare/0.12.6...0.12.7
+
 ## 0.12.6 - 2026-08-29
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
