@@ -46,6 +46,7 @@ use BlitzPHP\Session\Store;
 use BlitzPHP\Translator\Translate;
 use BlitzPHP\Utilities\Reflection\ReflectionClass;
 use Closure;
+use DI\Factory\RequestedEntry;
 use Dimtrovich\UserAgent\Extensions\BlitzPHP\AgentProvider;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -150,12 +151,15 @@ class Providers extends AbstractProvider
             'get', 'set', 'override',
             'singleton', 'factory',
             'injectMock', 'reset', 'resetSingle',
-            'serviceExists', 'getRegistryServices', '__callStatic',
+            'serviceExists', 'serviceName', 'resolveServiceAliases',
+            'getRegistryServices', '__callStatic',
         ];
+
+        $factory = static fn (RequestedEntry $entry) => Services::{$entry->getName()}();
 
         foreach ($reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC) as $method) {
             if (! in_array($method->getName(), $internal, true)) {
-                $services[$method->getName()] = static fn () => service($method->getName());
+                $services[$method->getName()] = $factory;
             }
         }
 
