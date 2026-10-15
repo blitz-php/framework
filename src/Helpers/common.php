@@ -12,15 +12,19 @@
 use BlitzPHP\Cache\Cache;
 use BlitzPHP\Cli\Console\Console;
 use BlitzPHP\Config\Config;
+use BlitzPHP\Container\Container;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Session\CookieInterface;
 use BlitzPHP\Contracts\Session\CookieManagerInterface;
+use BlitzPHP\Controllers\BaseController;
 use BlitzPHP\Debug\Logger;
 use BlitzPHP\Debug\Timer;
 use BlitzPHP\Exceptions\PageNotFoundException;
 use BlitzPHP\Exceptions\RedirectException;
 use BlitzPHP\Http\Redirection;
+use BlitzPHP\Http\Request;
+use BlitzPHP\Http\Response;
 use BlitzPHP\Http\ServerRequest;
 use BlitzPHP\Loader\Load;
 use BlitzPHP\Session\Store;
@@ -31,7 +35,10 @@ use BlitzPHP\Utilities\Iterable\Collection;
 use BlitzPHP\View\Components\Slot;
 use BlitzPHP\View\View;
 use GuzzleHttp\Psr7\Utils;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
 
 // ================================= FONCTIONS UTIILITAIRES ESSENTIELLES ================================= //
 
@@ -82,7 +89,7 @@ if (! function_exists('service')) {
      *
      * @template T
      *
-     * @param class-string<T> $name
+     * @param string|class-string<T> $name
      *
      * @return object|T
      */
@@ -99,7 +106,7 @@ if (! function_exists('single_service')) {
      *
      * @template T
      *
-     * @param class-string<T> $name
+     * @param string|class-string<T> $name
      *
      * @return object|T
      */
@@ -109,16 +116,6 @@ if (! function_exists('single_service')) {
         $params[] = false;
 
         return service($name, ...$params);
-    }
-}
-
-if (! function_exists('show404')) {
-    /**
-     * Afficher une page 404 introuvable dans le navigateur
-     */
-    function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = []): never
-    {
-        throw PageNotFoundException::pageNotFound($message);
     }
 }
 
@@ -171,6 +168,69 @@ if (! function_exists('config')) {
         }
 
         return null;
+    }
+}
+
+if (! function_exists('container')) {
+    /**
+     * Récupère une instance du conteneur de dépendances
+     *
+     * Si aucune clé n'est fournie, retourne l'instance du conteneur.
+     * Si une clé est fournie, retourne l'instance correspondante depuis le conteneur.
+     *
+     * @template T
+     *
+     * @param string|class-string<T>|null $key La clé ou le nom de classe à récupérer depuis le conteneur
+     *
+     * @return Container|T L'instance du conteneur ou l'instance demandée
+     */
+    function container(?string $key = null)
+    {
+        /** @var Container */
+        $container = service('container');
+
+        if ($key === null) {
+            return $container;
+        }
+
+        return $container->get($key);
+    }
+}
+
+if (! function_exists('controller')) {
+    /**
+     * Charge et initialise une instance de contrôleur
+     *
+     * Cette fonction permet de charger un contrôleur en utilisant le conteneur de services,
+     * puis de l'initialiser avec les dépendances requises (requête, réponse, logger).
+     *
+     * @template TController of BaseController
+     *
+     * @param class-string<TController> $controller Le nom complet de la classe du contrôleur
+     * @param ServerRequestInterface|null $request L'instance de requête (null pour utiliser la requête globale)
+     * @param ResponseInterface|null $response L'instance de réponse (null pour utiliser la réponse globale)
+     * @param LoggerInterface|null $logger L'instance de logger (null pour utiliser le logger global)
+     *
+     * @return TController L'instance du contrôleur initialisée
+     *
+     * @throws InvalidArgumentException Si la classe n'existe pas ou n'est pas une sous-classe de BaseController
+     */
+    function controller(string $controller, ?ServerRequestInterface $request = null, ?ResponseInterface $response = null, ?LoggerInterface $logger = null): BaseController
+    {
+        if (!class_exists($controller) || !is_a($controller, BaseController::class, true)) {
+            throw new InvalidArgumentException(sprintf('La classe contrôleur doit être une sous classe de %s', BaseController::class));
+        }
+
+        /** @var BaseController $instance */
+        $instance = service($controller);
+
+        $request ??= request();
+        $response ??= response();
+        $logger ??= logger();
+
+        $instance->initialize($request, $response, $logger);
+
+        return $instance;
     }
 }
 
@@ -265,6 +325,30 @@ if (! function_exists('cookie')) {
     }
 }
 
+if (! function_exists('request')) {
+    /**
+     * Récupère l'instance de la requête HTTP courante
+     *
+     * @return Request L'instance de la requête
+     */
+    function request(): Request
+    {
+        return service('request');
+    }
+}
+
+if (! function_exists('response')) {
+    /**
+     * Récupère l'instance de la réponse HTTP courante
+     *
+     * @return Response L'instance de la réponse
+     */
+    function response(): Response
+    {
+        return service('response');
+    }
+}
+
 if (! function_exists('session')) {
     /**
      * Une méthode pratique pour accéder à l'instance de session, ou un élément qui a été défini dans la session.
@@ -286,6 +370,16 @@ if (! function_exists('session')) {
         }
 
         return $session;
+    }
+}
+
+if (! function_exists('show404')) {
+    /**
+     * Afficher une page 404 introuvable dans le navigateur
+     */
+    function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = []): never
+    {
+        throw PageNotFoundException::pageNotFound($message);
     }
 }
 
