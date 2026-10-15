@@ -375,7 +375,18 @@ if (! function_exists('session')) {
 
 if (! function_exists('show404')) {
     /**
-     * Afficher une page 404 introuvable dans le navigateur
+     * Affiche une page 404 introuvable dans le navigateur
+     *
+     * Cette fonction lance une exception PageNotFoundException qui sera capturée
+     * par le framework pour afficher une page d'erreur 404.
+     *
+     * @param string $message Le message d'erreur à afficher
+     * @param string $heading Le titre de la page d'erreur (déprécié, non utilisé)
+     * @param array $params Paramètres additionnels (déprécié, non utilisé)
+     *
+     * @return never Cette fonction ne retourne jamais, elle lance toujours une exception
+     *
+     * @throws PageNotFoundException Toujours lancée par cette fonction
      */
     function show404(string $message = 'The page you requested was not found.', string $heading = 'Page Not Found', array $params = []): never
     {
@@ -633,7 +644,9 @@ if (! function_exists('is_windows')) {
 
 if (! function_exists('is_https')) {
     /**
-     * Determines if the application is accessed via an encrypted * (HTTPS) connection.
+     * Détermine si l'application est accessible via une connexion chiffrée (HTTPS)
+     *
+     * @return bool True si la connexion est HTTPS, false sinon
      */
     function is_https(): bool
     {
@@ -643,7 +656,14 @@ if (! function_exists('is_https')) {
 
 if (! function_exists('is_localfile')) {
     /**
-     * Vérifiez si le fichier auquel vous souhaitez accéder est un fichier local de votre application ou non
+     * Vérifie si le fichier auquel vous souhaitez accéder est un fichier local de votre application ou non
+     *
+     * Un fichier est considéré comme local s'il commence par l'URL de base de l'application
+     * ou s'il ne commence pas par http:// ou https://.
+     *
+     * @param string $name Le chemin ou l'URL du fichier à vérifier
+     *
+     * @return bool True si le fichier est local, false sinon
      */
     function is_localfile(string $name): bool
     {
@@ -657,7 +677,9 @@ if (! function_exists('is_localfile')) {
 
 if (! function_exists('is_online')) {
     /**
-     * Tester si l'application s'exécute en local ou en ligne.
+     * Teste si l'application s'exécute en ligne (sur un serveur de production)
+     *
+     * @return bool True si l'application est en ligne, false si elle est en local
      */
     function is_online(): bool
     {
@@ -667,7 +689,9 @@ if (! function_exists('is_online')) {
 
 if (! function_exists('is_connected')) {
     /**
-     * Verifie si l'utilisateur a une connexion internet active.
+     * Vérifie si l'utilisateur a une connexion internet active
+     *
+     * @return bool True si une connexion internet est disponible, false sinon
      */
     function is_connected(): bool
     {
@@ -677,7 +701,11 @@ if (! function_exists('is_connected')) {
 
 if (! function_exists('is_ajax_request')) {
     /**
-     * Testez pour voir si une requête contient l'en-tête HTTP_X_REQUESTED_WITH.
+     * Teste si la requête courante est une requête AJAX
+     *
+     * Vérifie la présence de l'en-tête HTTP_X_REQUESTED_WITH dans la requête.
+     *
+     * @return bool True si c'est une requête AJAX, false sinon
      */
     function is_ajax_request(): bool
     {
@@ -687,7 +715,15 @@ if (! function_exists('is_ajax_request')) {
 
 if (! function_exists('redirection')) {
     /**
-     * Redirige l'utilisateur
+     * Redirige l'utilisateur vers une URL spécifique
+     *
+     * Cette fonction effectue une redirection HTTP et termine l'exécution du script.
+     *
+     * @param string $uri L'URL de destination
+     * @param string $method La méthode de redirection ('location' ou 'refresh')
+     * @param int|null $code Le code de statut HTTP (par défaut 302)
+     *
+     * @return never Cette fonction ne retourne jamais, elle termine l'exécution
      */
     function redirection(string $uri = '', string $method = 'location', ?int $code = 302): never
     {
@@ -723,9 +759,16 @@ if (! function_exists('redirect')) {
 
 if (! function_exists('back')) {
     /**
-     * Retourne a la page precedente
+     * Retourne à la page précédente
      *
-     * @param mixed $fallback
+     * Utilise l'en-tête HTTP Referer pour déterminer l'URL précédente.
+     * Si aucune URL précédente n'est disponible, utilise l'URL de secours spécifiée.
+     *
+     * @param int $code Le code de statut HTTP de la redirection (par défaut 302)
+     * @param array $headers Les en-têtes HTTP additionnels
+     * @param mixed $fallback L'URL de secours si aucune page précédente n'est disponible
+     *
+     * @return Redirection L'instance de redirection
      */
     function back(int $code = 302, array $headers = [], $fallback = false): Redirection
     {
@@ -916,11 +959,11 @@ if (! function_exists('force_https')) {
 
 if (! function_exists('get_type_name')) {
     /**
-     * Renvoie la classe d'objets ou le type var de ce n'est pas un objet
+     * Renvoie le nom de la classe d'un objet ou le type d'une variable
      *
-     * @param mixed $var Variable à vérifier
+     * @param mixed $var La variable à vérifier
      *
-     * @return string Renvoie le nom de la classe ou le type de variable
+     * @return string Le nom de la classe (si objet) ou le type de la variable
      */
     function get_type_name($var): string
     {
@@ -931,6 +974,11 @@ if (! function_exists('get_type_name')) {
 if (! function_exists('ip_address')) {
     /**
      * Renvoie l'adresse IP de l'utilisateur actuel
+     *
+     * Détermine l'adresse IP du client en prenant en compte les proxys
+     * et les en-têtes X-Forwarded-For si configurés.
+     *
+     * @return string L'adresse IP du client
      */
     function ip_address(): string
     {
@@ -940,7 +988,15 @@ if (! function_exists('ip_address')) {
 
 if (! function_exists('is_really_writable')) {
     /**
-     * Tests d'inscriptibilité des fichiers
+     * Teste l'inscriptibilité réelle d'un fichier ou d'un répertoire
+     *
+     * Cette fonction effectue un test plus approfondi que is_writable()
+     * pour contourner les limitations de certains systèmes de fichiers
+     * (notamment sur Windows avec certains comptes d'utilisateur).
+     *
+     * @param string $file Le chemin du fichier ou du répertoire à tester
+     *
+     * @return bool True si le fichier est réellement inscriptible, false sinon
      */
     function is_really_writable(string $file): bool
     {
@@ -950,8 +1006,17 @@ if (! function_exists('is_really_writable')) {
 
 if (! function_exists('lang')) {
     /**
-     * Une méthode pratique pour traduire une chaîne ou un tableau d'entrées et formater
-     * le résultat avec le MessageFormatter de l'extension intl.
+     * Traduit une chaîne de caractères en utilisant le système de traduction
+     *
+     * Cette fonction permet de traduire une clé de traduction en utilisant le
+     * traducteur configuré dans l'application. Les arguments peuvent être passés
+     * pour le formatage du message.
+     *
+     * @param string $line La clé de traduction à rechercher
+     * @param array $args Les arguments à substituer dans le message traduit
+     * @param string|null $locale La locale à utiliser (null pour la locale courante)
+     *
+     * @return string La chaîne traduite
      */
     function lang(string $line, array $args = [], ?string $locale = null): string
     {
@@ -961,8 +1026,16 @@ if (! function_exists('lang')) {
 
 if (! function_exists('__')) {
     /**
-     * Une méthode pratique pour traduire une chaîne ou un tableau d'entrées et formater
-     * le résultat avec le MessageFormatter de l'extension intl.
+     * Traduit une chaîne de caractères en utilisant le fichier de traduction App
+     *
+     * Cette fonction est un raccourci pour lang() qui préfixe automatiquement
+     * la clé avec 'App.' et nettoie le préfixe du résultat.
+     *
+     * @param string $line La clé de traduction (sans le préfixe 'App.')
+     * @param array $args Les arguments à substituer dans le message traduit
+     * @param string|null $locale La locale à utiliser (null pour la locale courante)
+     *
+     * @return string La chaîne traduite
      */
     function __(string $line, array $args = [], ?string $locale = null): string
     {
@@ -995,7 +1068,16 @@ if (! function_exists('namespace_split')) {
 
 if (! function_exists('view_exist')) {
     /**
-     * Verifie si un fichier de vue existe. Utile pour limiter les failles include
+     * Vérifie si un fichier de vue existe
+     *
+     * Cette fonction est utile pour vérifier l'existence d'une vue avant de l'inclure,
+     * ce qui permet d'éviter les erreurs d'inclusion.
+     *
+     * @param string $name Le nom de la vue à vérifier
+     * @param string|null $ext L'extension du fichier (null pour utiliser l'extension par défaut)
+     * @param array $options Options additionnelles pour le viewer
+     *
+     * @return bool True si la vue existe, false sinon
      */
     function view_exist(string $name, ?string $ext = null, array $options = []): bool
     {
@@ -1125,7 +1207,15 @@ if (! function_exists('flash')) {
 
 if (! function_exists('geo_ip')) {
     /**
-     * Recuperation des coordonnees (pays, ville, etc) d'un utilisateur en fonction de son ip
+     * Récupère les informations géographiques (pays, ville, etc.) d'une adresse IP
+     *
+     * Utilise le service ip-api.com pour obtenir les informations de géolocalisation.
+     *
+     * @param string|null $ip L'adresse IP à géolocaliser (null pour l'IP du client courant)
+     *
+     * @return array|null Les informations géographiques ou null en cas d'erreur
+     *
+     * @see http://ip-api.com/
      */
     function geo_ip(?string $ip = null): ?array
     {
@@ -1156,7 +1246,15 @@ if (! function_exists('to_stream')) {
 
 if (! function_exists('value')) {
     /**
-     * Renvoie la valeur par défaut de la valeur donnée.
+     * Renvoie la valeur par défaut de la valeur donnée
+     *
+     * Si la valeur est une callable, elle sera exécutée et son résultat sera retourné.
+     * Sinon, la valeur est retournée telle quelle.
+     *
+     * @param mixed $value La valeur à retourner (peut être une callable)
+     * @param mixed ...$args Les arguments à passer si $value est une callable
+     *
+     * @return mixed La valeur ou le résultat de la callable
      */
     function value(mixed $value, ...$args): mixed
     {
@@ -1166,7 +1264,14 @@ if (! function_exists('value')) {
 
 if (! function_exists('collect')) {
     /**
-     * Créez une collection à partir de la valeur donnée.
+     * Crée une collection à partir de la valeur donnée
+     *
+     * Convertit une valeur (tableau, iterable, ou autre) en instance de Collection
+     * pour bénéficier des méthodes de manipulation de collection.
+     *
+     * @param mixed $value La valeur à convertir en collection (null pour une collection vide)
+     *
+     * @return Collection L'instance de la collection créée
      */
     function collect(mixed $value = null): Collection
     {
@@ -1176,9 +1281,15 @@ if (! function_exists('collect')) {
 
 if (! function_exists('with')) {
     /**
-     * Renvoie la valeur donnée, éventuellement transmise via le rappel donné.
+     * Renvoie la valeur donnée, éventuellement transmise via une callback
      *
-     * @param mixed $value
+     * Si une callback est fournie, la valeur lui sera passée et le résultat
+     * de la callback sera retourné. Sinon, la valeur est retournée telle quelle.
+     *
+     * @param mixed $value La valeur à traiter
+     * @param callable|null $callback La callback à appliquer sur la valeur (optionnel)
+     *
+     * @return mixed La valeur ou le résultat de la callback
      */
     function with($value, ?callable $callback = null): mixed
     {
@@ -1188,7 +1299,15 @@ if (! function_exists('with')) {
 
 if (! function_exists('tap')) {
     /**
-     * Appelez la Closure donnée avec cette instance puis renvoyez l'instance.
+     * Appelle la callback donnée avec la valeur puis retourne la valeur
+     *
+     * Cette fonction est utile pour chaîner des opérations sur une valeur
+     * tout en la retournant pour un usage ultérieur.
+     *
+     * @param mixed $value La valeur à traiter
+     * @param callable|null $callback La callback à appeler avec la valeur (optionnel)
+     *
+     * @return mixed La valeur inchangée
      */
     function tap(mixed $value, ?callable $callback = null): mixed
     {
@@ -1198,13 +1317,13 @@ if (! function_exists('tap')) {
 
 if (! function_exists('last')) {
     /**
-     * Recupere le dernier element d'un tableau
+     * Récupère le dernier élément d'un tableau
      *
      * @template T
      *
-     * @param list<T> $array
+     * @param list<T> $array Le tableau dont on veut récupérer le dernier élément
      *
-     * @return false|T
+     * @return false|T Le dernier élément du tableau ou false si le tableau est vide
      */
     function last(array $array)
     {
