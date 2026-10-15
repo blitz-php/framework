@@ -1477,7 +1477,7 @@ class RouteCollection implements RouteCollectionInterface
         // S'il s'agit d'une redirection, aucun traitement
         if (! isset($options['redirect']) && is_string($to)) {
             // Si aucun espace de noms n'est trouvé, ajouter l'espace de noms par défaut
-            if (! str_contains($to, '\\') || strpos($to, '\\') > 0) {
+            if (! str_contains($to, '\\') || (strpos($to, '\\') > 0 && ! class_exists(explode('::', $to)[0]))) {
                 $namespace = $options['namespace'] ?? $this->defaultNamespace;
                 $to        = trim($namespace, '\\') . '\\' . $to;
             }
