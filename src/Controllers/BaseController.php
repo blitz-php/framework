@@ -130,6 +130,25 @@ abstract class BaseController
     }
 
     /**
+     * Charge et initialise une instance de contrôleur
+     *
+     * Cette fonction permet de charger un contrôleur en utilisant le conteneur de services,
+     * puis de l'initialiser automatiquement avec les dépendances requises.
+     *
+     * @template TController of BaseController
+     *
+     * @param class-string<TController> $controller Le nom complet de la classe du contrôleur
+     *
+     * @return TController L'instance du contrôleur initialisée
+     *
+     * @throws \InvalidArgumentException Si la classe n'existe pas ou n'est pas une sous-classe de BaseController
+     */
+    protected function controller(string $controller)
+    {
+        return controller($controller, $this->request, $this->response, $this->logger);
+    }
+
+    /**
      * Une méthode pratique à utiliser lorsque vous devez vous assurer qu'un seul
      * La méthode est accessible uniquement via HTTPS. Si ce n'est pas le cas, alors une redirection
      * reviendra à cette méthode et l'en-tête HSTS sera envoyé
